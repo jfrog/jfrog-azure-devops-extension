@@ -116,7 +116,7 @@
                 "ms.vss-build-web.build-results-view"
             ],
             "properties": {
-                "name": "Artifactory build info",
+                "name": "Artifactory",
                 "uri": "artifactory-build-info.html"
             }
         },

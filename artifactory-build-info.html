@@ -4,6 +4,15 @@
     <style type="text/css">
         .artifactory-build-info {
             overflow: auto;
+            padding: 10px;
+        }
+
+        .build-info-url {
+            vertical-align: 80%;
+            padding-left: 10px;
+            font-weight: bold;
+            font-size: 19px;
+            font-family: "Segoe UI VSS (Regular)", "-apple-system", BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Ubuntu, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
         }
     </style>
     <script src="lib/VSS.SDK.js"></script>
@@ -21,11 +30,8 @@
     </script>
 </head>
 
-<body class="artifactory-build-info">
-<div data-bind="visible: isLoaded()">
-    <a data-bind="attr: {href: artifactoryBuildInfoUri}" target="blank">
-        <img src="images/icon_buildinfo.png" height="40" title="Build Information"/>
-    </a>
+<body>
+<div id="artifactory-build-info" class="artifactory-build-info">
 </div>
 </body>
 </html>

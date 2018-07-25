@@ -62,10 +62,16 @@ function attachBuildInfoUrl(buildName, buildNumber) {
     let artifactory = tl.getInput("artifactoryService", true);
     let artifactoryUrl = tl.getEndpointUrl(artifactory, false);
     let artifactoryUrlFile = path.join(buildDir, "artifactoryUrlFile");
-    tl.writeFile(artifactoryUrlFile, artifactoryUrl + '/webapp/builds/' + buildName + '/' + buildNumber);
+    let buildDetails = {
+        artifactoryUrl: artifactoryUrl,
+        buildName: buildName,
+        buildNumber: buildNumber
+    };
+
+    tl.writeFile(artifactoryUrlFile, JSON.stringify(buildDetails));
 
     //Executes command to attach the file to build
-    console.log("##vso[task.addattachment type=artifactoryData;name=artifactoryUrl;]" + artifactoryUrlFile);
+    console.log("##vso[task.addattachment type=artifactoryType;name=buildDetails;]" + artifactoryUrlFile);
 }
 
 utils.executeCliTask(RunTaskCbk);
