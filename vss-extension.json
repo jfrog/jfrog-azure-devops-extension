@@ -104,6 +104,18 @@
             }
         },
         {
+            "id": "artifactory-build-info-tab",
+            "type": "ms.vss-build-web.build-results-tab",
+            "description": "A tab in build result to enforce Artifactory integration",
+            "targets": [
+                "ms.vss-build-web.build-results-view"
+            ],
+            "properties": {
+                "name": "Artifactory build info",
+                "uri": "artifactory-build-info.html"
+            }
+        },
+        {
             "id": "artifactory-generic-upload",
             "type": "ms.vss-distributed-task.task",
             "targets": [
