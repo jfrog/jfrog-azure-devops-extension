@@ -1,0 +1,94 @@
+{
+  "id": "58521715-7f44-4090-a3a6-28153049ce37",
+  "name": "ArtifactoryPromote",
+  "friendlyName": "Artifactory Build Promotion",
+  "description": " This task helps you to promote a build into JFrog Artifactory",
+  "author": "jfrog",
+  "helpMarkDown": "Promote a build into Artifactory.",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "1",
+    "Minor": "0",
+    "Patch": "0"
+  },
+  "minimumAgentVersion": "1.83.0",
+  "instanceNameFormat": "ArtifactoryPromote $(message)",
+  "inputs": [
+    {
+      "name": "artifactoryService",
+      "type": "connectedService:artifactoryService",
+      "label": "Artifactory service",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Artifactory service for artifacts upload."
+    },
+    {
+      "name": "targetRepo",
+      "type": "string",
+      "label": "Target repository",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Repository to move or copy the build's artifacts and/or dependencies"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "label": "Status",
+      "defaultValue": "Released",
+      "required": true,
+      "helpMarkDown": "New build status (any string)." 
+    },
+    {
+      "name": "comment",
+      "type": "string",
+      "label": "Comment",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "An optional comment describing the reason for the promotion."
+    },
+    {
+      "name": "sourceRepo",
+      "type": "string",
+      "label": "Source repository",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Source repository to promote the release published artifacts from. If non selected, Artifactory would decide from which repository to promote from."
+    },
+    {
+      "name": "includeDependencies",
+      "type": "boolean",
+      "label": "Copy/move build's dependencies",
+      "defaultValue": "false",
+      "required": true,
+      "helpMarkDown": "If set to true, the build dependencies are also promoted."
+    },
+    {
+      "name": "copy",
+      "type": "boolean",
+      "label": "Copy artifacts",
+      "defaultValue": "false",
+      "required": true,
+      "helpMarkDown": "Whether to copy instead of move, when a target repository is specified."
+    },
+    {
+      "name": "dryRun",
+      "type": "boolean",
+      "label": "Dry run",
+      "defaultValue": "false",
+      "required": true,
+      "helpMarkDown": "If true, promotion is only simulated. The build is not promoted."
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "artifactoryPromote.js",
+      "argumentFormat": "",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}
