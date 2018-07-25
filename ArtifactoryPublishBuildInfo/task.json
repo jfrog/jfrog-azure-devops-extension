@@ -1,0 +1,45 @@
+{
+  "id": "07fc5c20-6752-1e11-abde-6a01c3d00486",
+  "name": "ArtifactoryPublishBuildInfo",
+  "friendlyName": "Artifactory Publish Build Info",
+  "description": "This task publishes the Build Info collected by previous tasks.",
+  "author": "jfrog",
+  "helpMarkDown": "Publish Build Info to Artifactory.",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "1",
+    "Minor": "0",
+    "Patch": "0"
+  },
+  "minimumAgentVersion": "1.83.0",
+  "instanceNameFormat": "Artifactory Publish Build Info",
+  "inputs": [
+    {
+      "name": "artifactoryService",
+      "type": "connectedService:artifactoryService",
+      "label": "Artifactory service",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Artifactory service for build-info publishing."
+    },
+    {
+      "name": "includeEnvVars",
+      "type": "boolean",
+      "label": "Include Environment Variables",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check if you wish to include environment variables in the published buid-info."
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "publishBuildInfo.js",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}

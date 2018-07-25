@@ -1,0 +1,18 @@
+{
+  "name": "jfrog-utils",
+  "version": "1.0.0",
+  "description": "Jfrog utils",
+  "main": "jutils.js",
+  "dependencies": {
+    "vsts-task-lib": "^2.6.0",
+    "checksum-stream": "^1.0.3",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

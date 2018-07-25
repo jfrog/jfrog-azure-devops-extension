@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <style type="text/css">
+        .artifactory-build-info {
+            overflow: auto;
+        }
+    </style>
+    <script src="lib/VSS.SDK.js"></script>
+    <script type="text/javascript">
+        VSS.init({
+            explicitNotifyLoaded: true,
+            usePlatformScripts: true,
+            usePlatformStyles: true
+        });
+
+        VSS.ready(function () {
+            require(["scripts/build-info"], function (extensionData) {
+            });
+        });
+    </script>
+</head>
+
+<body class="artifactory-build-info">
+<div data-bind="visible: isLoaded()">
+    <a data-bind="attr: {href: artifactoryBuildInfoUri}" target="blank">
+        <img src="images/icon_buildinfo.png" height="40" title="Build Information"/>
+    </a>
+</div>
+</body>
+</html>

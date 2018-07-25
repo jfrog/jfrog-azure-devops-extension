@@ -1,0 +1,168 @@
+{
+    "manifestversion": 1,
+    "public": true,
+    "id": "jfrog-artifactory",
+    "version": "2.0.0",
+    "name": "JFrog Artifactory Integration",
+    "description": "Integrate your JFrog Artifactory with Visual Studio Team Service.",
+    "publisher": "JFrog",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "icons": {
+        "default": "images/jfrog.png"
+    },
+    "scopes": [
+        "vso.build",
+        "vso.build_execute"
+    ],
+    "categories": [
+        "Build and release"
+    ],
+    "tags": [
+        "JFrog",
+        "Artifactory",
+        "Artifact",
+        "Repository"
+    ],
+    "content": {
+        "details": {
+            "path": "overview.md"
+        }
+    },
+    "links": {
+        "getstarted": {
+            "uri": "https://www.jfrog.com"
+        },
+        "learn": {
+            "uri": "https://www.jfrog.com/confluence/display/RTF/Welcome+to+Artifactory"
+        },
+        "support": {
+            "uri": "https://www.jfrog.com/support"
+        }
+    },
+    "branding": {
+        "color": "#43a047",
+        "theme": "light"
+    },
+    "contributions": [
+        {
+            "id": "artifactory-service",
+            "description": "Service Endpoint type for Artifactory connections",
+            "type": "ms.vss-endpoint.service-endpoint-type",
+            "targets": [
+                "ms.vss-endpoint.endpoint-types"
+            ],
+            "properties": {
+                "name": "artifactoryService",
+                "displayName": "Artifactory",
+                "url": {
+                    "displayName": "Server URL",
+                    "helpText": "Specify the root URL of your Artifactory installation. For example http://repo.jfrog.org/artifactory"
+                },
+                "dataSources": [
+                    {
+                        "name": "TestConnection",
+                        "endpointUrl": "{{endpoint.url}}/api/plugins",
+                        "resourceUrl": "",
+                        "resultSelector": "jsonpath:$.values[*]",
+                        "headers": [
+                        ],
+                        "authenticationScheme": null
+                    }
+                ],
+                "authenticationSchemes": [
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+                        "inputDescriptors": [
+                            {
+                                "id": "username",
+                                "name": "Username",
+                                "description": "Username of an Artifactory user with deploy permissions",
+                                "inputMode": "textbox",
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "password",
+                                "name": "Password",
+                                "description": "Password or API key of an Artifactory user with deploy permissions",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "artifactory-generic-upload",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryGenericUpload"
+            }
+        },
+        {
+            "id": "artifactory-generic-download",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryGenericDownload"
+            }
+        },
+        {
+            "id": "artifactory-publish-build-info",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryPublishBuildInfo"
+            }
+        }
+    ],
+    "files": [
+        {
+            "path": "artifactory-build-info.html",
+            "addressable": true
+        },
+        {
+            "path": "lib",
+            "addressable": true
+        },
+        {
+            "path": "scripts",
+            "addressable": true
+        },
+        {
+            "path": "css",
+            "addressable": true
+        },
+        {
+            "path": "images",
+            "addressable": true
+        },
+        {
+            "path": "ArtifactoryGenericUpload"
+        },
+        {
+            "path": "ArtifactoryGenericDownload"
+        },
+        {
+            "path": "ArtifactoryPublishBuildInfo"
+        }
+    ]
+}

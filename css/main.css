@@ -1,0 +1,34 @@
+body {
+    font-family: Segoe UI,Helvetica Neue,Helvetica,Arial,Verdana;
+    color: #000;
+    font-size: 12px;
+}
+
+input[type="text"], input[type="password"] {
+    border: 1px solid #E6E6E6;
+    padding: 2px;
+    width: 100%;
+}
+
+button {
+    height: 30px;
+    border: 1px solid #CCC;
+    background-color: #F8F8F8;
+    color: #333;
+    cursor: pointer;
+    border-radius: 2px;
+    outline: 0px none;
+    padding: 2px 12px;
+}
+
+button[disabled], button[disabled]:hover, button[disabled]:focus {
+    color: #ABABAB;
+    background-color: #FFF;
+    border: 1px solid #E6E6E6;
+    box-shadow: none;
+}
+
+label {
+    color: #6D6D6D;
+    font-weight: normal;
+}

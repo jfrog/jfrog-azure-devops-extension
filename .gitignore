@@ -1,0 +1,9 @@
+.idea
+.vscode
+*.vsix
+node_modules
+pack_publish_extension.sh
+vss-extension-private.json
+*.tgz
+*package-lock.json
+.DS_Store

@@ -1,0 +1,58 @@
+{
+  "id": "07fc5c20-6772-11e5-abde-6901d3d00475",
+  "name": "ArtifactoryGenericUpload",
+  "friendlyName": "Artifactory Generic Upload",
+  "description": "This task uploads generic build artifacts to Artifactory",
+  "author": "jfrog",
+  "helpMarkDown": "Upload artifacts to JFrog Artifactory using FileSpecs.",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "1",
+    "Minor": "0",
+    "Patch": "0"
+  },
+  "minimumAgentVersion": "1.83.0",
+  "instanceNameFormat": "Artifactory Generic Upload",
+  "inputs": [
+    {
+      "name": "artifactoryService",
+      "type": "connectedService:artifactoryService",
+      "label": "Artifactory service",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Artifactory service for artifacts upload."
+    },
+    {
+      "name": "filespec",
+      "type": "multiLine",
+      "label": "Spec",
+      "required": true,
+      "defaultValue": "",
+      "properties": {
+        "resizable": "true",
+        "rows": "10",
+        "maxLength": "10000"
+      },
+      "helpMarkDown": "To specify the artifacts you wish to upload to Artifactory, please create a File Spec."
+    },
+    {
+      "name": "collectBuildInfo",
+      "type": "boolean",
+      "label": "Collect Build Info",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check if you wish this task to collect build-info."
+    }
+  ],
+  "execution": {
+    "Node": {
+      "target": "uploadArtifacts.js",
+      "workingDirectory": "$(currentDirectory)"
+    }
+  }
+}
