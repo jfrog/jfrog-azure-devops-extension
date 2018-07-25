@@ -14,9 +14,9 @@ declare -a arr=("ArtifactoryGenericUpload" "ArtifactoryGenericDownload" "Artifac
 
 for i in "${arr[@]}"
 do
+    cd $i
     rm -rf package-lock.json
     rm -rf node_modules
-    cd $i
     npm install
     cd ..
 done
