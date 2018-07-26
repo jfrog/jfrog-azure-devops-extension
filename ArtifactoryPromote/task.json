@@ -1,10 +1,10 @@
 {
   "id": "58521715-7f44-4090-a3a6-28153049ce37",
-  "name": "ArtifactoryPromote",
+  "name": "Artifactory Promote",
   "friendlyName": "Artifactory Build Promotion",
-  "description": " This task helps you to promote a build into JFrog Artifactory",
+  "description": " This task promotes a published build in Artifactory",
   "author": "jfrog",
-  "helpMarkDown": "Promote a build into Artifactory.",
+  "helpMarkDown": "Promote a build in Artifactory.",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -25,7 +25,7 @@
       "label": "Artifactory service",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Artifactory service for artifacts upload."
+      "helpMarkDown": "Artifactory service."
     },
     {
       "name": "targetRepo",
@@ -33,7 +33,7 @@
       "label": "Target repository",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Repository to move or copy the build's artifacts and/or dependencies"
+      "helpMarkDown": "Target promotion repository."
     },
     {
       "name": "status",

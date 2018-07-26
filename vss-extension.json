@@ -12,7 +12,7 @@
         }
     ],
     "icons": {
-        "default": "images/artifactory-while-logo.png"
+        "default": "images/artifactory.png"
     },
     "scopes": [
         "vso.build",
@@ -49,8 +49,8 @@
         }
     },
     "branding": {
-        "color": "#107c10",
-        "theme": "dark"
+        "color": "ffffff",
+        "theme": "light"
     },
     "contributions": [
         {
