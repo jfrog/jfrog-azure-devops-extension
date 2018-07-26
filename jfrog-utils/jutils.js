@@ -16,41 +16,54 @@ const MAX_RETRIES = 10;
 let runTaskCbk = null;
 
 module.exports = {
-    executeCliTask: function (runTaskFunc) {
-        process.env.JFROG_CLI_HOME = path.join(folderPath, version);
-        process.env.JFROG_CLI_OFFER_CONFIG = false;
-
-        runTaskCbk = runTaskFunc;
-        if (!fs.existsSync(cliPath)) {
-            createCliDirs();
-            downloadCli().then(runCbk)
-        } else {
-            console.log("JFrog CLI  " + version + " exists locally.");
-            runCbk();
-        }
-    },
-
-    cliJoin: function () {
-        if (arguments.length === 0) {
-            return "";
-        }
-
-        let command = "";
-        let firstArg;
-        for (let i = 0; i < arguments.length; ++i) {
-            let arg = arguments[i];
-            if (arg.length > 0) {
-                if (command === "") {
-                    command = firstArg = arg;
-                }
-                else {
-                    command += " " + arg;
-                }
-            }
-        }
-        return command;
-    }
+    executeCliTask: executeCliTask,
+    cliJoin: cliJoin,
+    quote: quote,
+    addArtifactoryCredentials: addArtifactoryCredentials
 };
+
+function executeCliTask (runTaskFunc) {
+    process.env.JFROG_CLI_HOME = path.join(folderPath, version);
+    process.env.JFROG_CLI_OFFER_CONFIG = false;
+
+    runTaskCbk = runTaskFunc;
+    if (!fs.existsSync(cliPath)) {
+        createCliDirs();
+        downloadCli().then(runCbk)
+    } else {
+        console.log("JFrog CLI  " + version + " exists locally.");
+        runCbk();
+    }
+}
+
+function cliJoin() {
+    let command = "";
+    for (let i = 0; i < arguments.length; ++i) {
+        let arg = arguments[i];
+        if (arg.length > 0) {
+            command += (command === "") ? arg : (" " + arg);
+        }
+    }
+    return command;
+}
+
+
+function quote(str) {
+    return "\"" + str + "\"";
+}
+
+function addArtifactoryCredentials(cliCommand, artifactoryService) {
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+    // Check if should make anonymous access to artifactory
+    if (artifactoryUser === "") {
+        artifactoryUser = "anonymous";
+        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
+    } else {
+        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
+    }
+    return cliCommand
+}
 
 function runCbk() {
     if (runTaskCbk != null) {

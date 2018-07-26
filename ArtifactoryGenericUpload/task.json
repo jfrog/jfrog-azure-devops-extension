@@ -28,7 +28,7 @@
       "helpMarkDown": "Artifactory service for artifacts upload."
     },
     {
-      "name": "filespec",
+      "name": "fileSpec",
       "type": "multiLine",
       "label": "Spec",
       "required": true,

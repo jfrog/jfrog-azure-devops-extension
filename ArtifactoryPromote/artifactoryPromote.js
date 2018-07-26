@@ -2,6 +2,7 @@
 const tl = require('vsts-task-lib/task');
 const execSync = require('child_process').execSync;
 const utils = require('jfrog-utils');
+
 const cliPromoteCommand = "rt bpr";
 
 function RunTaskCbk(cliPath) {
@@ -10,12 +11,15 @@ function RunTaskCbk(cliPath) {
     let buildDir = tl.getVariable('Agent.BuildDirectory');
     let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
     let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
-    let targetRepo = tl.getInput("targetRepo", true);
+
+    // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    let cliCommand = utils.cliJoin(cliPath, cliPromoteCommand, buildDefinition, buildNumber, targetRepo, "--url=" + artifactoryUrl);
+    let targetRepo = tl.getInput("targetRepo", true);
 
-    cliCommand = addCredentials(cliCommand, artifactoryService);
+    let cliCommand = utils.cliJoin(cliPath, cliPromoteCommand, utils.quote(buildDefinition), utils.quote(buildNumber), utils.quote(targetRepo), "--url=" + utils.quote(artifactoryUrl));
+
+    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
     cliCommand = addStringParam(cliCommand, "status", "status");
     cliCommand = addStringParam(cliCommand, "comment", "comment");
     cliCommand = addStringParam(cliCommand, "sourceRepo", "source-repo");
@@ -27,23 +31,10 @@ function RunTaskCbk(cliPath) {
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 
-function addCredentials(cliCommand, artifactoryService) {
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
-    // Check if should make anonymous access to artifactory
-    if (artifactoryUser === "") {
-        artifactoryUser = "anonymous";
-        cliCommand = utils.cliJoin(cliCommand, "--user=" + artifactoryUser);
-    } else {
-        cliCommand = utils.cliJoin(cliCommand, "--user=" + artifactoryUser, "--password=" + artifactoryPassword);
-    }
-    return cliCommand
-}
-
 function addStringParam(cliCommand, inputParam, cliParam) {
     let val = tl.getInput(inputParam, false);
     if (val !== null) {
-        cliCommand = utils.cliJoin(cliCommand, "--" + cliParam + "=" + val)
+        cliCommand = utils.cliJoin(cliCommand, "--" + cliParam + "='" + val + "'")
     }
     return cliCommand
 }

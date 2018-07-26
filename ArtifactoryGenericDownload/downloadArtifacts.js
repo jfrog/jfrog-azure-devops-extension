@@ -13,33 +13,24 @@ function RunTaskCbk(cliPath) {
     let specPath = path.join(buildDir, "downloadSpec.json");
 
     // Get input parameters
-    let artifactory = tl.getInput("artifactoryService", true);
-    let artifactoryUrl = tl.getEndpointUrl(artifactory);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username", true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password", true);
-    let filespec = tl.getInput("filespec", true);
+    let artifactoryService = tl.getInput("artifactoryService", false);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    let fileSpec = tl.getInput("fileSpec", false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
-    // Write provided filespec to file
+    // Write provided fileSpec to file
     try {
-        tl.writeFile(specPath, filespec);
+        tl.writeFile(specPath, fileSpec);
     } catch (ex) {
         handleException(ex);
     }
 
-    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, "--url=" + artifactoryUrl, "--spec=" + specPath);
-
-    // Check if should make anonymous access to artifactory
-    if (artifactoryUser == "") {
-        artifactoryUser = "anonymous";
-        cliCommand = utils.cliJoin(cliCommand, "--user=" + artifactoryUser);
-    } else {
-        cliCommand = utils.cliJoin(cliCommand, "--user=" + artifactoryUser, "--password=" + artifactoryPassword);
-    }
+    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
+    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
     // Add build info collection
     if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + buildDefinition, "--build-number=" + buildNumber);
+        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
     }
 
     executeCliCommand(cliCommand, buildDir);
@@ -57,8 +48,7 @@ function executeCliCommand(cliCommand, runningDir) {
 }
 
 function handleException (ex) {
-    console.log(ex);
-    tl.setResult(tl.TaskResult.Failed);
+    tl.setResult(tl.TaskResult.Failed, ex);
     process.exit(1);
 }
 
