@@ -1,22 +1,28 @@
 "use strict";
-define(["knockout", "TFS/DistributedTask/TaskRestClient"], function (ko, DT_Client) {
+define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
     let sharedConfig = VSS.getConfiguration();
     let vsoContext = VSS.getWebContext();
     if (sharedConfig) {
         // register your extension with host through callback
-        sharedConfig.onBuildChanged(function (build) {
-            let taskClient = DT_Client.getClient();
+        sharedConfig.onBuildChanged((build) => {
+            let taskClient = taskRestClient.getClient();
             // Get 'artifactoryType' attachments from build agent
             taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "artifactoryType").then((taskAttachments) => {
+                let buildInfoParentDiv = $("#artifactory-build-info-parent");
                 if (taskAttachments.length > 0) {
                     let recId = taskAttachments[0].recordId;
                     let timelineId = taskAttachments[0].timelineId;
-                    taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId, timelineId, recId, "artifactoryType", "buildDetails").then((attachementContent) => {
-                        let buildDetails = JSON.parse(bufferToString(attachementContent));
+                    taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId, timelineId, recId, "artifactoryType", "buildDetails")
+                        .then((attachmentContent) => {
+                        let buildDetails = JSON.parse(bufferToString(attachmentContent));
                         let buildInfoDiv = createBuildInfoDiv(buildDetails);
-                        $("#artifactory-build-info").append(buildInfoDiv);
+                        buildInfoParentDiv.append(buildInfoDiv);
                         VSS.notifyLoadSucceeded();
                     });
+                } else {
+                    let noBuildInfoDiv = createNoBuildInfoDiv();
+                    buildInfoParentDiv.append(noBuildInfoDiv);
+                    VSS.notifyLoadSucceeded();
                 }
             });
         });
@@ -44,5 +50,12 @@ define(["knockout", "TFS/DistributedTask/TaskRestClient"], function (ko, DT_Clie
         buildInfoDiv.append(buildInfoIcon);
         buildInfoDiv.append(buildInfoUrlDiv);
         return buildInfoDiv;
+    }
+
+    function createNoBuildInfoDiv() {
+        let noBuildInfoDiv = document.createElement('p');
+        noBuildInfoDiv.classList.add("build-info-url");
+        noBuildInfoDiv.innerText = "Build Info is not published to Artifactory";
+        return noBuildInfoDiv;
     }
 });

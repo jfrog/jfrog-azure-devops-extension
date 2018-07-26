@@ -22,15 +22,15 @@
             usePlatformStyles: true
         });
 
-        VSS.ready(function () {
-            require(["scripts/build-info"], function (extensionData) {
+        VSS.ready(() => {
+            require(["scripts/build-info"], () => {
             });
         });
     </script>
 </head>
 
 <body>
-<div id="artifactory-build-info" class="artifactory-build-info">
+<div id="artifactory-build-info-parent" class="artifactory-build-info">
 </div>
 </body>
 </html>
