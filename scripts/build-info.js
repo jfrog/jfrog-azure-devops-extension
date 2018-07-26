@@ -39,7 +39,7 @@ define(["knockout", "TFS/DistributedTask/TaskRestClient"], function (ko, DT_Clie
         buildInfoIcon.src = "images/artifactory-build-info.png";
         buildInfoUrlDiv.classList.add("build-info-url");
         buildInfoUrlDiv.href = buildDetails.artifactoryUrl + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
-        buildInfoUrlDiv.text = "Build Info";
+        buildInfoUrlDiv.text = "Artifactory Build Info";
         buildInfoUrlDiv.target = "_blank";
         buildInfoDiv.append(buildInfoIcon);
         buildInfoDiv.append(buildInfoUrlDiv);
