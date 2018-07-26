@@ -3,6 +3,7 @@ const tl = require('vsts-task-lib/task');
 const checksumStream = require('checksum-stream');
 const path = require('path');
 const requestPromise = require('request-promise');
+const execSync = require('child_process').execSync;
 
 const fileName = getFileName();
 const btPackage = "jfrog-cli-" + getArchitecture();
@@ -16,7 +17,9 @@ const MAX_RETRIES = 10;
 let runTaskCbk = null;
 
 module.exports = {
+    executeCliCommand: executeCliCommand,
     executeCliTask: executeCliTask,
+    handleException: handleException,
     cliJoin: cliJoin,
     quote: quote,
     addArtifactoryCredentials: addArtifactoryCredentials
@@ -63,6 +66,20 @@ function addArtifactoryCredentials(cliCommand, artifactoryService) {
         cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
     }
     return cliCommand
+}
+
+function executeCliCommand(cliCommand, runningDir) {
+    try {
+        execSync(cliCommand, {cwd:runningDir, stdio:[0,1,2]});
+    } catch (ex) {
+        // Error occurred
+        handleException(ex);
+    }
+}
+
+function handleException (ex) {
+    tl.setResult(tl.TaskResult.Failed, ex);
+    process.exit(1);
 }
 
 function runCbk() {

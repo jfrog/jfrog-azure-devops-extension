@@ -1,6 +1,5 @@
 
 const tl = require('vsts-task-lib/task');
-const execSync = require('child_process').execSync;
 const utils = require('jfrog-utils');
 
 const cliPromoteCommand = "rt bpr";
@@ -27,7 +26,7 @@ function RunTaskCbk(cliPath) {
     cliCommand = addBoolParam(cliCommand, "copy", "copy");
     cliCommand = addBoolParam(cliCommand, "dryRun", "dry-run");
 
-    executeCliCommand(cliCommand, buildDir);
+    utils.executeCliCommand(cliCommand, buildDir);
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 
@@ -43,20 +42,6 @@ function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
     cliCommand = utils.cliJoin(cliCommand, "--" + cliParam + "=" + val);
     return cliCommand
-}
-
-function executeCliCommand(cliCommand, runningDir) {
-    try {
-        execSync(cliCommand, {cwd:runningDir, stdio:[0,1,2]});
-    } catch (ex) {
-        // Error occurred
-        handleException(ex);
-    }
-}
-
-function handleException (ex) {
-    tl.setResult(tl.TaskResult.Failed, ex);
-    process.exit(1);
 }
 
 utils.executeCliTask(RunTaskCbk);

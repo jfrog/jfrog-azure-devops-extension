@@ -1,6 +1,5 @@
 
 const tl = require('vsts-task-lib/task');
-const execSync = require('child_process').execSync;
 const utils = require('jfrog-utils');
 const path = require('path');
 
@@ -21,35 +20,21 @@ function RunTaskCbk(cliPath) {
     if (includeEnvVars) {
         console.log("Collecting environment variables...");
         let cliEnvVarsCommand = utils.cliJoin(cliPath, cliCollectEnvVarsCommand, utils.quote(buildDefinition), utils.quote(buildNumber));
-        executeCliCommand(cliEnvVarsCommand, buildDir);
+        utils.executeCliCommand(cliEnvVarsCommand, buildDir);
     }
 
     let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
-    executeCliCommand(cliCommand, buildDir);
+    utils.executeCliCommand(cliCommand, buildDir);
     attachBuildInfoUrl(buildDefinition, buildNumber);
 
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 
-function executeCliCommand(cliCommand, runningDir) {
-    try {
-        execSync(cliCommand, {cwd:runningDir, stdio:[0,1,2]});
-    } catch (ex) {
-        // Error occurred
-        handleException(ex);
-    }
-}
-
-function handleException (ex) {
-    tl.setResult(tl.TaskResult.Failed, ex);
-    process.exit(1);
-}
-
 function attachBuildInfoUrl(buildName, buildNumber) {
     let buildDir = tl.getVariable('Agent.BuildDirectory');
-    let artifactory = tl.getInput("artifactoryService", true);
+    let artifactory = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactory, false);
     let artifactoryUrlFile = path.join(buildDir, "artifactoryUrlFile");
     let buildDetails = {

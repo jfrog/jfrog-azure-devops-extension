@@ -1,6 +1,5 @@
 
 const tl = require('vsts-task-lib/task');
-const execSync = require('child_process').execSync;
 const utils = require('jfrog-utils');
 const path = require('path');
 
@@ -18,11 +17,13 @@ function RunTaskCbk(cliPath) {
     let fileSpec = tl.getInput("fileSpec", false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
+    console.log("Using file spec:");
+    console.log(fileSpec);
     // Write provided fileSpec to file
     try {
         tl.writeFile(specPath, fileSpec);
     } catch (ex) {
-        handleException(ex);
+        utils.handleException(ex);
     }
 
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
@@ -33,23 +34,9 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
     }
 
-    executeCliCommand(cliCommand, buildDir);
+    utils.executeCliCommand(cliCommand, buildDir);
 
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
-}
-
-function executeCliCommand(cliCommand, runningDir) {
-    try {
-        execSync(cliCommand, {cwd:runningDir, stdio:[0,1,2]});
-    } catch (ex) {
-        // Error occurred
-        handleException(ex);
-    }
-}
-
-function handleException (ex) {
-    tl.setResult(tl.TaskResult.Failed, ex);
-    process.exit(1);
 }
 
 utils.executeCliTask(RunTaskCbk);
