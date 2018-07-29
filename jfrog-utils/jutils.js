@@ -22,7 +22,9 @@ module.exports = {
     handleException: handleException,
     cliJoin: cliJoin,
     quote: quote,
-    addArtifactoryCredentials: addArtifactoryCredentials
+    addArtifactoryCredentials: addArtifactoryCredentials,
+    addStringParam: addStringParam,
+    addBoolParam: addBoolParam
 };
 
 function executeCliTask (runTaskFunc) {
@@ -135,6 +137,20 @@ function downloadCli(attemptNumber) {
     }).catch((err) => {
         tl.setResult(tl.TaskResult.Failed, err.message);
     });
+}
+
+function addStringParam(cliCommand, inputParam, cliParam) {
+    let val = tl.getInput(inputParam, false);
+    if (val !== null) {
+        cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val))
+    }
+    return cliCommand
+}
+
+function addBoolParam(cliCommand, inputParam, cliParam) {
+    let val = tl.getBoolInput(inputParam, false);
+    cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + val);
+    return cliCommand
 }
 
 function getArchitecture() {

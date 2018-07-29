@@ -17,29 +17,15 @@ function RunTaskCbk(cliPath) {
     let cliCommand = utils.cliJoin(cliPath, cliPromoteCommand, utils.quote(buildDefinition), utils.quote(buildNumber), utils.quote(targetRepo), "--url=" + utils.quote(artifactoryUrl));
 
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
-    cliCommand = addStringParam(cliCommand, "status", "status");
-    cliCommand = addStringParam(cliCommand, "comment", "comment");
-    cliCommand = addStringParam(cliCommand, "sourceRepo", "source-repo");
-    cliCommand = addBoolParam(cliCommand, "includeDependencies", "include-dependencies");
-    cliCommand = addBoolParam(cliCommand, "copy", "copy");
-    cliCommand = addBoolParam(cliCommand, "dryRun", "dry-run");
+    cliCommand = utils.addStringParam(cliCommand, "status", "status");
+    cliCommand = utils.addStringParam(cliCommand, "comment", "comment");
+    cliCommand = utils.addStringParam(cliCommand, "sourceRepo", "source-repo");
+    cliCommand = utils.addBoolParam(cliCommand, "includeDependencies", "include-dependencies");
+    cliCommand = utils.addBoolParam(cliCommand, "copy", "copy");
+    cliCommand = utils.addBoolParam(cliCommand, "dryRun", "dry-run");
 
     utils.executeCliCommand(cliCommand, buildDir);
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
-}
-
-function addStringParam(cliCommand, inputParam, cliParam) {
-    let val = tl.getInput(inputParam, false);
-    if (val !== null) {
-        cliCommand = utils.cliJoin(cliCommand, "--" + cliParam + "=" + utils.quote(val))
-    }
-    return cliCommand
-}
-
-function addBoolParam(cliCommand, inputParam, cliParam) {
-    let val = tl.getBoolInput(inputParam, false);
-    cliCommand = utils.cliJoin(cliCommand, "--" + cliParam + "=" + val);
-    return cliCommand
 }
 
 utils.executeCliTask(RunTaskCbk);

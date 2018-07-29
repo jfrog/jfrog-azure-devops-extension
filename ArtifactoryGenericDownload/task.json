@@ -1,57 +1,65 @@
 {
-  "id": "07fc5c20-6772-11e5-abde-6901d3c00755",
-  "name": "ArtifactoryGenericDownload",
-  "friendlyName": "Artifactory Generic Download",
-  "description": "This task downloads files from Artifactory",
-  "author": "jfrog",
-  "helpMarkDown": "Download artifacts from JFrog Artifactory using FileSpecs.",
-  "category": "Utility",
-  "visibility": [
-    "Build",
-    "Release"
-  ],
-  "demands": [],
-  "version": {
-    "Major": "1",
-    "Minor": "0",
-    "Patch": "0"
-  },
-  "minimumAgentVersion": "1.83.0",
-  "instanceNameFormat": "Artifactory Generic Download",
-  "inputs": [
-    {
-      "name": "artifactoryService",
-      "type": "connectedService:artifactoryService",
-      "label": "Artifactory service",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Artifactory service for artifacts download."
+    "id": "07fc5c20-6772-11e5-abde-6901d3c00755",
+    "name": "ArtifactoryGenericDownload",
+    "friendlyName": "Artifactory Generic Download",
+    "description": "This task downloads files from Artifactory",
+    "author": "jfrog",
+    "helpMarkDown": "Download artifacts from JFrog Artifactory using FileSpecs.",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
     },
-    {
-      "name": "fileSpec",
-      "type": "multiLine",
-      "label": "Spec",
-      "required": true,
-      "defaultValue": "",
-      "properties": {
-        "resizable": "true",
-        "rows": "10",
-        "maxLength": "10000"
-      },
-      "helpMarkDown": "To specify the artifacts you wish to download from Artifactory, please create a File Spec."
-    },
-    {
-      "name": "collectBuildInfo",
-      "type": "boolean",
-      "label": "Collect Build Info",
-      "defaultValue": "false",
-      "required": false,
-      "helpMarkDown": "Check if you wish this task to collect build-info."
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "Artifactory Generic Download",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service for artifacts download."
+        },
+        {
+            "name": "fileSpec",
+            "type": "multiLine",
+            "label": "Spec",
+            "required": true,
+            "defaultValue": "{\n  \"files\": [\n    {\n      \"pattern\": \"REPLACE_ME\",\n      \"target\": \"REPLACE_ME\"\n    }\n  ]\n}",
+            "properties": {
+                "resizable": "true",
+                "rows": "10",
+                "maxLength": "10000"
+            },
+            "helpMarkDown": "To specify the artifacts you wish to download from Artifactory, please create a File Spec. \nYou can read the File Spec schema <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect Build Info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Check if you wish this task to collect build-info."
+        },
+        {
+            "name": "failNoOp",
+            "type": "boolean",
+            "label": "Fail if no dependencies were downloaded",
+            "defaultValue": true,
+            "required": true,
+            "helpMarkDown": "Set to true if you'd like the build to fail in case of no dependencies were downloaded."
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "downloadArtifacts.js"
+        }
     }
-  ],
-  "execution": {
-    "Node": {
-      "target": "downloadArtifacts.js"
-    }
-  }
 }
