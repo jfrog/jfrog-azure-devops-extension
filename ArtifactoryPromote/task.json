@@ -2,9 +2,8 @@
   "id": "58521715-7f44-4090-a3a6-28153049ce37",
   "name": "Artifactory Promote",
   "friendlyName": "Artifactory Build Promotion",
-  "description": "This task promotes a published build in Artifactory",
+  "description": "This task promotes a published build in Artifactory.",
   "author": "jfrog",
-  "helpMarkDown": "Promote a build in Artifactory.",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -25,7 +24,7 @@
       "label": "Artifactory service",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Artifactory service."
+      "helpMarkDown": "Artifactory service used for build promotion."
     },
     {
       "name": "targetRepo",
@@ -33,7 +32,7 @@
       "label": "Target repository",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Target promotion repository."
+      "helpMarkDown": "Sets the target promotion repository."
     },
     {
       "name": "status",
@@ -41,7 +40,7 @@
       "label": "Status",
       "defaultValue": "Released",
       "required": true,
-      "helpMarkDown": "New build status (any string)." 
+      "helpMarkDown": "Sets the new build status."
     },
     {
       "name": "comment",
@@ -49,7 +48,7 @@
       "label": "Comment",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "An optional comment describing the reason for the promotion."
+      "helpMarkDown": "Allows the user to add a comment describing the reason for promotion."
     },
     {
       "name": "sourceRepo",
@@ -57,15 +56,15 @@
       "label": "Source repository",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Source repository to promote the release published artifacts from. If non selected, Artifactory would decide from which repository to promote from."
+      "helpMarkDown": "Sets the source repository from which to promote the release published artifacts. If not specified, Artifactory would determine from which repository to promote."
     },
     {
       "name": "includeDependencies",
       "type": "boolean",
-      "label": "Copy/move build's dependencies",
+      "label": "Include promoted dependencies",
       "defaultValue": "false",
       "required": true,
-      "helpMarkDown": "If set to true, the build dependencies are also promoted."
+      "helpMarkDown": "When selected the build dependencies will be promoted."
     },
     {
       "name": "copy",
@@ -73,7 +72,7 @@
       "label": "Copy artifacts",
       "defaultValue": "false",
       "required": true,
-      "helpMarkDown": "Whether to copy instead of move, when a target repository is specified."
+      "helpMarkDown": "Select to copy the promoted artifacts and dependencies. If this field is not selected, they will be moved."
     },
     {
       "name": "dryRun",
@@ -81,7 +80,7 @@
       "label": "Dry run",
       "defaultValue": "false",
       "required": true,
-      "helpMarkDown": "If true, promotion is only simulated. The build is not promoted."
+      "helpMarkDown": "When selected, the promotion is simulated and the build is not promoted. A failed simulation causes the task to fail."
     }
   ],
   "execution": {

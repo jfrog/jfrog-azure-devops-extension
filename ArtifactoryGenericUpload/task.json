@@ -25,7 +25,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service for artifacts upload."
+            "helpMarkDown": "Artifactory service used for uploading artifacts."
         },
         {
             "name": "fileSpec",
@@ -38,23 +38,23 @@
                 "rows": "10",
                 "maxLength": "10000"
             },
-            "helpMarkDown": "To specify the artifacts you wish to upload to Artifactory, please create a File Spec. \nYou can read the File Spec schema <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>."
+            "helpMarkDown": "To specify the artifacts you wish to upload to Artifactory, please create a File Spec. \nTo read more about the File Spec schema click <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>."
         },
         {
             "name": "collectBuildInfo",
             "type": "boolean",
-            "label": "Collect Build Info",
+            "label": "Collect build info",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Check if you wish this task to collect build-info."
+            "helpMarkDown": "Select to collect build info."
         },
         {
             "name": "failNoOp",
             "type": "boolean",
-            "label": "Fail if no files were uploaded",
+            "label": "Fail task if no files were uploaded",
             "defaultValue": true,
             "required": true,
-            "helpMarkDown": "Set to true if you'd like the build to fail in case of no files were uploaded."
+            "helpMarkDown": "Select if you'd like the task to fail if no files were uploaded."
         }
     ],
     "execution": {

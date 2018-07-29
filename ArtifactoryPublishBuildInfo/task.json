@@ -2,7 +2,7 @@
   "id": "07fc5c20-6752-1e11-abde-6a01c3d00486",
   "name": "ArtifactoryPublishBuildInfo",
   "friendlyName": "Artifactory Publish Build Info",
-  "description": "This task publishes the Build Info collected by previous tasks.",
+  "description": "This task publishes the Build Info collected in previous tasks.",
   "author": "jfrog",
   "helpMarkDown": "Publish Build Info to Artifactory.",
   "category": "Utility",
@@ -25,15 +25,15 @@
       "label": "Artifactory service",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Artifactory service for build-info publishing."
+      "helpMarkDown": "Artifactory service used for publishing the build info."
     },
     {
       "name": "includeEnvVars",
       "type": "boolean",
-      "label": "Include Environment Variables",
+      "label": "Include environment variables",
       "defaultValue": "false",
       "required": false,
-      "helpMarkDown": "Check if you wish to include environment variables in the published buid-info."
+      "helpMarkDown": "Select to include environment variables in the published build info."
     }
   ],
   "execution": {
