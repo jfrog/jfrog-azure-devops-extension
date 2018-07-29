@@ -14,11 +14,11 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
                     let timelineId = taskAttachments[0].timelineId;
                     taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId, timelineId, recId, "artifactoryType", "buildDetails")
                         .then((attachmentContent) => {
-                        let buildDetails = JSON.parse(bufferToString(attachmentContent));
-                        let buildInfoDiv = createBuildInfoDiv(buildDetails);
-                        buildInfoParentDiv.append(buildInfoDiv);
-                        VSS.notifyLoadSucceeded();
-                    });
+                            let buildDetails = JSON.parse(bufferToString(attachmentContent));
+                            let buildInfoDiv = createBuildInfoDiv(buildDetails);
+                            buildInfoParentDiv.append(buildInfoDiv);
+                            VSS.notifyLoadSucceeded();
+                        });
                 } else {
                     let noBuildInfoDiv = createNoBuildInfoDiv();
                     buildInfoParentDiv.append(noBuildInfoDiv);

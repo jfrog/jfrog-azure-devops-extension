@@ -5,8 +5,6 @@ const utils = require('jfrog-utils');
 const cliPromoteCommand = "rt bpr";
 
 function RunTaskCbk(cliPath) {
-    process.env["JFROG_CLI_OFFER_CONFIG"] = false;
-
     let buildDir = tl.getVariable('Agent.BuildDirectory');
     let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
     let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
@@ -33,7 +31,7 @@ function RunTaskCbk(cliPath) {
 function addStringParam(cliCommand, inputParam, cliParam) {
     let val = tl.getInput(inputParam, false);
     if (val !== null) {
-        cliCommand = utils.cliJoin(cliCommand, "--" + cliParam + "='" + val + "'")
+        cliCommand = utils.cliJoin(cliCommand, "--" + cliParam + "=" + utils.quote(val))
     }
     return cliCommand
 }
