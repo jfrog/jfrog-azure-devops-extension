@@ -61,7 +61,7 @@
     {
       "name": "includeDependencies",
       "type": "boolean",
-      "label": "Include promoted dependencies",
+      "label": "Include build dependencies",
       "defaultValue": "false",
       "required": true,
       "helpMarkDown": "When selected the build dependencies will be promoted."
@@ -69,7 +69,7 @@
     {
       "name": "copy",
       "type": "boolean",
-      "label": "Copy artifacts",
+      "label": "Use copy",
       "defaultValue": "false",
       "required": true,
       "helpMarkDown": "Select to copy the promoted artifacts and dependencies. If this field is not selected, they will be moved."
