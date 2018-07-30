@@ -6,7 +6,7 @@ Artifactory provides tight integration with TFS and VSTS through the **JFrog Art
 In addition to managing efficient deployment of your artifacts to Artifactory, 
 the extension lets you capture information about deployed artifacts, 
 and resolved dependencies Gain full traceability for your builds as the environment data associated with your build is automatically collected.
-See the full documentation [here](https://www.jfrog.com/confluence/display/RTF/Artifactory+Extension+for+VSTS+and+TFS).
+See the full documentation [here](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension).
 
 ## Download build dependencies from Artifactory
 The **Artifactory Generic Download** task supports downloading your build dependencies from Artifactory to the build agent. 
