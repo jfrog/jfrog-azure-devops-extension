@@ -6,6 +6,7 @@ Artifactory provides tight integration with TFS and VSTS through the **JFrog Art
 In addition to managing efficient deployment of your artifacts to Artifactory, 
 the extension lets you capture information about deployed artifacts, 
 and resolved dependencies Gain full traceability for your builds as the environment data associated with your build is automatically collected.
+See the full documentation [here](https://www.jfrog.com/confluence/display/RTF/Artifactory+Extension+for+VSTS+and+TFS).
 
 ## Download build dependencies from Artifactory
 The **Artifactory Generic Download** task supports downloading your build dependencies from Artifactory to the build agent. 
@@ -19,7 +20,7 @@ It will store the downloaded files as dependencies in the build-info which can l
 The **Artifactory Generic Upload** task supports uploading your generated build artifacts from the build agent's local file system to Artifactory. 
 The task triggers the [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) to perform the upload. 
 The artifacts are defined using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs). 
-The task can also be configured to capture build-info andstores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+The task can also be configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![BuildInfo](images/marketplace/generic-upload.png)
 
