@@ -22,7 +22,6 @@ let runTaskCbk = null;
 module.exports = {
     executeCliTask: executeCliTask,
     executeCliCommand: executeCliCommand,
-    handleException: handleException,
     cliJoin: cliJoin,
     quote: quote,
     addArtifactoryCredentials: addArtifactoryCredentials,
@@ -52,13 +51,8 @@ function executeCliCommand(cliCommand, runningDir) {
         execSync(cliCommand, {cwd: runningDir, stdio: [0, 1, 2]});
     } catch (ex) {
         // Error occurred
-        handleException(ex);
+        return ex
     }
-}
-
-function handleException(ex) {
-    tl.setResult(tl.TaskResult.Failed, ex);
-    process.exit(1);
 }
 
 function cliJoin() {
@@ -156,11 +150,12 @@ function downloadCli(attemptNumber) {
                 }).on('error', handleError)
                     .on('end', () => {
                         if (res.statusCode >= 200 && res.statusCode < 300) {
-                            fs.rename(cliTmpPath, versionedCliPath, () => {
+                            fs.copyFile(cliTmpPath, versionedCliPath, () => {
                                 if (!process.platform.startsWith("win")) {
                                     fs.chmodSync(versionedCliPath, 0o555)
                                 }
                                 console.log("Finished downloading jfrog cli");
+                                fs.unlinkSync(cliTmpPath);
                                 resolve();
                             });
                         }

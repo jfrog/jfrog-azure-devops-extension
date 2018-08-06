@@ -20,16 +20,24 @@ function RunTaskCbk(cliPath) {
     if (includeEnvVars) {
         console.log("Collecting environment variables...");
         let cliEnvVarsCommand = utils.cliJoin(cliPath, cliCollectEnvVarsCommand, utils.quote(buildDefinition), utils.quote(buildNumber));
-        utils.executeCliCommand(cliEnvVarsCommand, buildDir);
+
+        let taskRes = utils.executeCliCommand(cliEnvVarsCommand, buildDir);
+        if (taskRes) {
+            tl.setResult(tl.TaskResult.Failed, taskRes);
+            return;
+        }
     }
 
     let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
-    utils.executeCliCommand(cliCommand, buildDir);
-    attachBuildInfoUrl(buildDefinition, buildNumber);
-
-    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    let taskRes = utils.executeCliCommand(cliCommand, buildDir);
+    if (taskRes) {
+        tl.setResult(tl.TaskResult.Failed, taskRes);
+    } else {
+        attachBuildInfoUrl(buildDefinition, buildNumber);
+        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    }
 }
 
 function attachBuildInfoUrl(buildName, buildNumber) {

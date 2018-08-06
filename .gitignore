@@ -7,3 +7,5 @@ vss-extension-private.json
 *.tgz
 *package-lock.json
 .DS_Store
+.testData
+.taskkey

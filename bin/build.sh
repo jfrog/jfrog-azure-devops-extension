@@ -22,5 +22,3 @@ do
 done
 
 rm -rf jfrog-utils/node_modules
-
-tfx extension create --manifest-globs vss-extension.json
