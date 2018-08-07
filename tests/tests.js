@@ -11,15 +11,18 @@ let tasks = fs.readdirSync(tasksDir);
 
 describe('JFrog Artifactory VSTS extension tests', () => {
     before(() => {
-        testUtils.cleanUp();
-        testUtils.createTestDataDir();
+        testUtils.initTests();
     });
 
     after(() => {
-        testUtils.cleanUp();
+        testUtils.cleanUpTests();
     });
+
+    // Run tests in 'task' directory
     for (let i = 0; i < tasks.length; i++) {
         let taskName = tasks[i];
+
+        // Run positive tests in 'task' directory
         describe(taskName + ' Positive', () => {
             let testsDir = path.join(tasksDir, taskName, "positive");
             if (fs.existsSync(testsDir)) {
@@ -30,6 +33,7 @@ describe('JFrog Artifactory VSTS extension tests', () => {
             }
         });
 
+        // Run negative tests in 'task' directory
         describe(taskName + ' Negative', () => {
             let testsDir = path.join(tasksDir, taskName, "negative");
             if (fs.existsSync(testsDir)) {
@@ -43,21 +47,33 @@ describe('JFrog Artifactory VSTS extension tests', () => {
 });
 
 
+/**
+ * Run a test
+ * @param taskName (String) - The task name, e.g ArtifactoryGenericDownload, ArtifactoryGenericUpload, etc.
+ * @param testName (String) - The specific test name of the task's test.
+ * @param positive (Boolean) - True iff this is a positive test.
+ */
 function runTest(taskName, testName, positive) {
     it(testName, (done) => {
         let testDir = path.join(tasksDir, taskName, positive ? "positive" : "negative", testName);
         let testPath = path.join(testDir, "test.js");
         let mockRunner = new vstsMockTest.MockTestRunner(testPath);
-        mockRunner.run();
-        assert(positive ? mockRunner.succeeded : mockRunner.failed, mockRunner.stdout);
+        mockRunner.run(); // Mock a test
+        assert(positive ? mockRunner.succeeded : mockRunner.failed, mockRunner.stdout); // Check the test results
         if (positive) {
-            assertFiles(testDir, testName);
+            assertFiles(testDir, testName); // Check that the files that were downloaded to 'testDir/<testName>/' are correct
         }
         done();
     }).timeout(100000);
 }
 
+/**
+ * Assert that the files that were downloaded to 'testData' are correct.
+ * @param testDir - (String) The test directory where the source files exists.
+ * @param testName - (String) - The specific test name of the task's test.
+ */
 function assertFiles(testDir, testName) {
+    // Check that all necessary files were downloaded to 'testDir/<testName>/'
     let filesToCheck = [];
     let filesDir = path.join(testDir, "files");
     let testData = path.join(testUtils.testDataDir, testName);
@@ -70,6 +86,8 @@ function assertFiles(testDir, testName) {
             filesToCheck.push(fileName);
         }
     }
+
+    // Check that only necessary files were downloaded to 'testDir/<testName>/'
     if (!fs.existsSync(testData) && filesToCheck.length === 0) {
         return;
     }

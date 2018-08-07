@@ -12,15 +12,22 @@ let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
 
 module.exports = {
-    createTestDataDir: createTestDataDir,
-    runTask: runTask,
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
     testDataDir: testDataDir,
+
+    initTests: initTests,
+    runTask: runTask,
     execCli: execCli,
-    cleanUp: cleanUp,
-    deleteBuild: deleteBuild
+    deleteBuild: deleteBuild,
+    cleanUpTests: cleanUpTests
 };
+
+function initTests() {
+    createTestRepositories();
+    cleanUpTests();
+    fs.mkdirSync(testDataDir);
+}
 
 function runTask(testMain, variables, inputs) {
     variables["Agent.WorkFolder"] = testDataDir;
@@ -34,6 +41,43 @@ function runTask(testMain, variables, inputs) {
 
     tmr.registerMock('vsts-task-lib/mock-task', tl);
     tmr.run();
+}
+
+function execCli(command) {
+    command = command.replace(/\\/g, "\\\\");
+    execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
+}
+
+function deleteBuild(buildName) {
+    syncRequest('DELETE', artifactoryUrl + "/api/build/" + buildName + "?deleteAll=1", {
+        headers: {
+            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+        }
+    });
+}
+
+function cleanUpTests() {
+    if (fs.existsSync(testDataDir)) {
+        rmdir.sync(testDataDir);
+    }
+    cleanUpRepositories();
+}
+
+function createTestRepositories() {
+    createRepo(module.exports.repoKey1);
+    createRepo(module.exports.repoKey2);
+}
+
+function createRepo(repoKey) {
+    syncRequest('PUT', artifactoryUrl + "/api/repositories/" + repoKey, {
+        headers: {
+            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            rclass: "local"
+        })
+    });
 }
 
 function setArtifactoryCredentials() {
@@ -60,31 +104,7 @@ function setInputs(inputs) {
     };
 }
 
-function execCli(command) {
-    command = command.replace(/\\/g, "\\\\");
-    execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
-}
-
-function createTestDataDir() {
-    fs.mkdirSync(testDataDir);
-}
-
 function cleanUpRepositories() {
     execCli("rt del " + module.exports.repoKey1 + '/*' + " --quiet");
     execCli("rt del " + module.exports.repoKey2 + '/*' + " --quiet");
-}
-
-function cleanUp() {
-    if (fs.existsSync(testDataDir)) {
-        rmdir.sync(testDataDir);
-    }
-    cleanUpRepositories();
-}
-
-function deleteBuild(buildName) {
-    syncRequest('DELETE', artifactoryUrl + "/api/build/" + buildName + "?deleteAll=1", {
-        headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
-        }
-    });
 }
