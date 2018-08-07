@@ -22,7 +22,7 @@ To build and run the extension sources, please follow these steps:
     npm install
     ```
 After the build process is completed, you'll find the vsix file in the project directory.
-The vsix file can be loaded into VSTS.
+The vsix file can be loaded into VSTS and TFS.
 
 # Pull Requests
 We welcome pull requests from the community!
