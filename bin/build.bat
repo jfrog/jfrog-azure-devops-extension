@@ -35,5 +35,3 @@ set list=ArtifactoryGenericUpload ArtifactoryGenericDownload ArtifactoryPublishB
     cd ..
     echo Back to path %cd%
     ))
-
-tfx extension create --manifest-globs vss-extension.json

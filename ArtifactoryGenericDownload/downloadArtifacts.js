@@ -23,7 +23,8 @@ function RunTaskCbk(cliPath) {
     try {
         tl.writeFile(specPath, fileSpec);
     } catch (ex) {
-        utils.handleException(ex);
+        tl.setResult(tl.TaskResult.Failed, ex);
+        return
     }
 
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
@@ -35,9 +36,12 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
     }
 
-    utils.executeCliCommand(cliCommand, buildDir);
-
-    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    let taskRes = utils.executeCliCommand(cliCommand, buildDir);
+    if (taskRes) {
+        tl.setResult(tl.TaskResult.Failed, taskRes);
+    } else {
+        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    }
 }
 
 utils.executeCliTask(RunTaskCbk);

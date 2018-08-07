@@ -1,0 +1,17 @@
+{
+  "name": "jfrog-test-utils",
+  "version": "1.0.0",
+  "description": "Test utils",
+  "main": "testUtils.js",
+  "dependencies": {
+    "mocha": "^5.2.0",
+    "path": "^0.12.7",
+    "rmdir-recursive": "^0.0.1",
+    "sync-request": "^6.0.0",
+    "vsts-task-lib": "^2.6.0"
+  },
+  "scripts": {
+    "test": "npm install && mocha tests.js -t 10000"
+  },
+  "license": "Apache-2.0"
+}

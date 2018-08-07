@@ -1,0 +1,24 @@
+image:
+- Visual Studio 2017
+- Ubuntu
+
+stack: node 9
+environment:
+  nodejs_version: "6"
+  VSTS_ARTIFACTORY_URL:
+    secure: KkjTm9RrjPrzDQocmxTmQPdE2bozPgix5CFjkeam6Fscx1S34tR4Hpqg3j/7R+AH
+  VSTS_ARTIFACTORY_USERNAME:
+    secure: b79qvuMVVlqhdsKoJC046g==
+  VSTS_ARTIFACTORY_PASSWORD:
+    secure: eebX+bKmzB9hHtjniAvmXQYLqNSWPxPwy71sOeNLrkU=
+
+install:
+  - npm install -g jfrog-cli-go
+
+test_script:
+  - node --version
+  - npm --version
+  - npm test
+
+# Don't actually build.
+build: off

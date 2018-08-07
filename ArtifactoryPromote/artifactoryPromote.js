@@ -24,8 +24,12 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addBoolParam(cliCommand, "copy", "copy");
     cliCommand = utils.addBoolParam(cliCommand, "dryRun", "dry-run");
 
-    utils.executeCliCommand(cliCommand, buildDir);
-    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    let taskRes = utils.executeCliCommand(cliCommand, buildDir);
+    if (taskRes) {
+        tl.setResult(tl.TaskResult.Failed, taskRes);
+    } else {
+        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    }
 }
 
 utils.executeCliTask(RunTaskCbk);
