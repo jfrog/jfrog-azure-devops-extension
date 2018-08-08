@@ -1,4 +1,5 @@
-const fs = require('fs');
+const os = require('os');
+const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
 const checksumStream = require('checksum-stream');
 const path = require('path');
@@ -26,7 +27,8 @@ module.exports = {
     quote: quote,
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
-    addBoolParam: addBoolParam
+    addBoolParam: addBoolParam,
+    fixWindowsPaths: fixWindowsPaths
 };
 
 function executeCliTask(runTaskFunc) {
@@ -150,14 +152,13 @@ function downloadCli(attemptNumber) {
                 }).on('error', handleError)
                     .on('end', () => {
                         if (res.statusCode >= 200 && res.statusCode < 300) {
-                            fs.copyFile(cliTmpPath, versionedCliPath, () => {
+                            fs.move(cliTmpPath, versionedCliPath).then(() => {
                                 if (!process.platform.startsWith("win")) {
-                                    fs.chmodSync(versionedCliPath, 0o555)
+                                    fs.chmodSync(versionedCliPath, 0o555);
                                 }
                                 console.log("Finished downloading jfrog cli");
-                                fs.unlinkSync(cliTmpPath);
                                 resolve();
-                            });
+                            })
                         }
                     })
             ).pipe(
@@ -190,4 +191,11 @@ function getFileName() {
         executable += ".exe"
     }
     return executable
+}
+
+function fixWindowsPaths(str) {
+    if (os.type() === "Windows_NT") {
+        return str.replace(/([^\\])\\(?!\\)/g, '$1\\\\');
+    }
+    return str;
 }

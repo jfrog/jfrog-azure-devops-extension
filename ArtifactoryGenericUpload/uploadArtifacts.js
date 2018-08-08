@@ -17,6 +17,7 @@ function RunTaskCbk(cliPath) {
     let fileSpec = tl.getInput("fileSpec", false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
+    fileSpec = utils.fixWindowsPaths(fileSpec);
     console.log("Using file spec:");
     console.log(fileSpec);
     // Write provided fileSpec to file
