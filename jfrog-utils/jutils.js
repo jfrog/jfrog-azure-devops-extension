@@ -1,8 +1,8 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
-const checksumStream = require('checksum-stream');
+const crypto = require('crypto');
 const path = require('path');
-const requestPromise = require('request-promise');
+const request = require('request-promise-lite');
 const execSync = require('child_process').execSync;
 
 const fileName = getFileName();
@@ -139,34 +139,43 @@ function downloadCli(attemptNumber) {
                 reject(err);
             }
         };
+
         const cliTmpPath = versionedCliPath + ".tmp";
-        let req = requestPromise.get(cliUrl);
-        req.on('response', (res) => {
-            res.pipe(
-                checksumStream({
-                    algorithm: 'sha256',
-                    digest: res.headers['X-Checksum-Sha256'],
-                    size: res.headers['content-length']
-                }).on('error', handleError)
-                    .on('end', () => {
-                        if (res.statusCode >= 200 && res.statusCode < 300) {
-                            fs.copyFile(cliTmpPath, versionedCliPath, () => {
-                                if (!process.platform.startsWith("win")) {
-                                    fs.chmodSync(versionedCliPath, 0o555)
-                                }
-                                console.log("Finished downloading jfrog cli");
-                                fs.unlinkSync(cliTmpPath);
-                                resolve();
-                            });
+
+        // Perform download
+        request.get(cliUrl, {json:false, resolveWithFullResponse:true}).then((response) => {
+            // Check valid response
+            if (response.statusCode < 200 || response.statusCode >= 300) {
+                handleError("Received http response code " + response.statusCode);
+            }
+
+            // Write body to file
+            fs.writeFileSync(cliTmpPath, response.body);
+
+            // Validate checksum
+            var stream = fs.createReadStream(cliTmpPath);
+            var digest = crypto.createHash('sha256');
+
+            stream.on('data', function(data) {
+                digest.update(data, 'utf8')
+            });
+
+            stream.on('end', function() {
+                let hex = digest.digest('hex');
+                if (hex === response.headers['x-checksum-sha256']) {
+                    fs.move(cliTmpPath, versionedCliPath).then( () => {
+                        if (!process.platform.startsWith("win")) {
+                            fs.chmodSync(versionedCliPath, 0o555);
                         }
-                    })
-            ).pipe(
-                fs.createWriteStream(cliTmpPath)
-            )
-        }).catch(handleError)
-    }).catch((err) => {
-        console.error(DOWNLOAD_CLI_ERR);
-        tl.setResult(tl.TaskResult.Failed, err.message);
+                        console.log("Finished downloading jfrog cli");
+                        resolve();
+                    });
+                } else { handleError }
+            });
+        }).catch((err) => {
+            console.error(DOWNLOAD_CLI_ERR);
+            tl.setResult(tl.TaskResult.Failed, err.message);
+        })
     });
 }
 
