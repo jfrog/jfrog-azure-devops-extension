@@ -193,16 +193,23 @@ function getFileName() {
     return executable
 }
 
+/**
+ * Escape single backslashes in fileSpec.
+ * / -> //
+ * // -> //
+ * @param fileSpec (String) - The file spec to escape
+ * @returns fileSpec (String) - The file spec after escaping
+ */
 function fixWindowsPaths(fileSpec) {
     if (os.type() === "Windows_NT") {
         fileSpec = fileSpec.replace(/([^\\])\\(?!\\)/g, '$1\\\\');
-        assertSpecNotRegex(fileSpec);
+        validateSpecWithoutRegex(fileSpec);
         return fileSpec
     }
     return fileSpec;
 }
 
-function assertSpecNotRegex(fileSpec) {
+function validateSpecWithoutRegex(fileSpec) {
     let files = JSON.parse(fileSpec)["files"];
     for (const file of Object.keys(files)) {
         let values = files[file];
