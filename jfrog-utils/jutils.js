@@ -1,3 +1,4 @@
+const os = require('os');
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
 const crypto = require('crypto');
@@ -26,7 +27,8 @@ module.exports = {
     quote: quote,
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
-    addBoolParam: addBoolParam
+    addBoolParam: addBoolParam,
+    fixWindowsPaths: fixWindowsPaths
 };
 
 function executeCliTask(runTaskFunc) {
@@ -202,4 +204,31 @@ function getFileName() {
         executable += ".exe"
     }
     return executable
+}
+
+/**
+ * Escape single backslashes in fileSpec.
+ * / -> //
+ * // -> //
+ * @param fileSpec (String) - The file spec to escape
+ * @returns fileSpec (String) - The file spec after escaping
+ */
+function fixWindowsPaths(fileSpec) {
+    if (os.type() === "Windows_NT") {
+        fileSpec = fileSpec.replace(/([^\\])\\(?!\\)/g, '$1\\\\');
+        validateSpecWithoutRegex(fileSpec);
+        return fileSpec
+    }
+    return fileSpec;
+}
+
+function validateSpecWithoutRegex(fileSpec) {
+    let files = JSON.parse(fileSpec)["files"];
+    for (const file of Object.keys(files)) {
+        let values = files[file];
+        let regexp = values["regexp"];
+        if (regexp && regexp.toLowerCase() === "true") {
+            throw ("The File Spec includes 'regexp: true' which is currently not supported.");
+        }
+    }
 }
