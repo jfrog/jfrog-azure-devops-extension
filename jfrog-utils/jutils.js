@@ -40,7 +40,7 @@ function executeCliTask(runTaskFunc) {
         runCbk(versionedCliPath);
     } else {
         createCliDirs();
-        downloadCli().then(() => {
+        downloadCli(0).then(() => {
             runCbk(versionedCliPath);
         });
     }
@@ -153,8 +153,8 @@ function downloadCli(attemptNumber) {
             fs.writeFileSync(cliTmpPath, response.body);
 
             // Validate checksum
-            var stream = fs.createReadStream(cliTmpPath);
-            var digest = crypto.createHash('sha256');
+            let stream = fs.createReadStream(cliTmpPath);
+            let digest = crypto.createHash('sha256');
 
             stream.on('data', function(data) {
                 digest.update(data, 'utf8')
@@ -162,15 +162,18 @@ function downloadCli(attemptNumber) {
 
             stream.on('end', function() {
                 let hex = digest.digest('hex');
-                if (hex === response.headers['x-checksum-sha256']) {
+                let rawChecksum = response.headers['x-checksum-sha256'];
+                let trimmedChecksum = rawChecksum.split(',')[0];
+
+                if (hex === trimmedChecksum) {
                     fs.move(cliTmpPath, versionedCliPath).then( () => {
                         if (!process.platform.startsWith("win")) {
                             fs.chmodSync(versionedCliPath, 0o555);
                         }
-                        console.log("Finished downloading jfrog cli");
+                        console.log("Finished downloading jfrog cli.");
                         resolve();
                     });
-                } else { handleError }
+                } else { handleError("Checksum mismatch for downloaded jfrog cli.") }
             });
         }).catch((err) => {
             console.error(DOWNLOAD_CLI_ERR);
