@@ -17,11 +17,11 @@ function RunTaskCbk(cliPath) {
     let fileSpec = tl.getInput("fileSpec", false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
-    fileSpec = utils.fixWindowsPaths(fileSpec);
-    console.log("Using file spec:");
-    console.log(fileSpec);
-    // Write provided fileSpec to file
     try {
+        fileSpec = utils.fixWindowsPaths(fileSpec);
+        console.log("Using file spec:");
+        console.log(fileSpec);
+        // Write provided fileSpec to file
         tl.writeFile(specPath, fileSpec);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);

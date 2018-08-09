@@ -193,9 +193,22 @@ function getFileName() {
     return executable
 }
 
-function fixWindowsPaths(str) {
+function fixWindowsPaths(fileSpec) {
     if (os.type() === "Windows_NT") {
-        return str.replace(/([^\\])\\(?!\\)/g, '$1\\\\');
+        fileSpec = fileSpec.replace(/([^\\])\\(?!\\)/g, '$1\\\\');
+        assertSpecNotRegex(fileSpec);
+        return fileSpec
     }
-    return str;
+    return fileSpec;
+}
+
+function assertSpecNotRegex(fileSpec) {
+    let files = JSON.parse(fileSpec)["files"];
+    for (const file of Object.keys(files)) {
+        let values = files[file];
+        let regexp = values["regexp"];
+        if (regexp && regexp.toLowerCase() === "true") {
+            throw ("The File Spec includes 'regexp: true' which is currently not supported.");
+        }
+    }
 }
