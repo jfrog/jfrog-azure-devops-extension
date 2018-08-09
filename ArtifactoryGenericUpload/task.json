@@ -3,7 +3,7 @@
     "name": "ArtifactoryGenericUpload",
     "friendlyName": "Artifactory Generic Upload",
     "description": "This task uploads generic build artifacts to Artifactory",
-    "author": "jfrog",
+    "author": "JFrog",
     "helpMarkDown": "Upload artifacts to JFrog Artifactory using FileSpecs.",
     "category": "Utility",
     "visibility": [
@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "3"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "Artifactory Generic Upload",

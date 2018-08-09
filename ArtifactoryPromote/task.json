@@ -3,7 +3,7 @@
   "name": "Artifactory Promote",
   "friendlyName": "Artifactory Build Promotion",
   "description": "This task promotes a published build in Artifactory.",
-  "author": "jfrog",
+  "author": "JFrog",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -13,7 +13,7 @@
   "version": {
     "Major": "1",
     "Minor": "0",
-    "Patch": "0"
+    "Patch": "3"
   },
   "minimumAgentVersion": "1.83.0",
   "instanceNameFormat": "Artifactory Build Promotion",

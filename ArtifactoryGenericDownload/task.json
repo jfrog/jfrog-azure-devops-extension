@@ -3,7 +3,7 @@
     "name": "ArtifactoryGenericDownload",
     "friendlyName": "Artifactory Generic Download",
     "description": "This task downloads artifacts from Artifactory.",
-    "author": "jfrog",
+    "author": "JFrog",
     "helpMarkDown": "Download the artifacts using FileSpecs.",
     "category": "Utility",
     "visibility": [
@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "3"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "Artifactory Generic Download",
