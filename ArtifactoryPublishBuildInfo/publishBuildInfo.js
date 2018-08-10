@@ -7,7 +7,9 @@ const cliBuildPublishCommand = "rt bp";
 const cliCollectEnvVarsCommand = "rt bce";
 
 function RunTaskCbk(cliPath) {
-    let buildDir = tl.getVariable('Agent.BuildDirectory');
+    let buildDir = tl.getVariable('Agent.BuildDirectory')
+        || tl.getVariable('Agent.ReleaseDirectory')
+        || process.cwd();
     let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
     let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
 
