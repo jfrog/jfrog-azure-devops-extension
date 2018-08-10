@@ -35,6 +35,9 @@
     "content": {
         "details": {
             "path": "overview.md"
+        },
+        "license": {
+            "path": "license.txt"
         }
     },
     "links": {
@@ -47,6 +50,10 @@
         "support": {
             "uri": "https://www.jfrog.com/support"
         }
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/jfrog/artifactory-vsts-extension"
     },
     "branding": {
         "color": "ffffff",
