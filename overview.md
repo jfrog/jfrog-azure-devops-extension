@@ -1,3 +1,4 @@
+## Overview
 **JFrog Artifactory** is a Universal Repository Manager supporting all major packaging formats and build tools.
 
 [Learn more](https://jfrog.com/artifactory/)
@@ -6,7 +7,11 @@ Artifactory provides tight integration with TFS and VSTS through the **JFrog Art
 In addition to managing efficient deployment of your artifacts to Artifactory, 
 the extension lets you capture information about deployed artifacts, 
 and resolved dependencies Gain full traceability for your builds as the environment data associated with your build is automatically collected.
-See the full documentation [here](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension).
+
+## Documentation and Source Code
+The full extension documentation is available [here](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension).
+<br>
+See the source code is on [GitHub](https://github.com/jfrog/artifactory-vsts-extension).
 
 ## Download build dependencies from Artifactory
 The **Artifactory Generic Download** task supports downloading your build dependencies from Artifactory to the build agent. 
