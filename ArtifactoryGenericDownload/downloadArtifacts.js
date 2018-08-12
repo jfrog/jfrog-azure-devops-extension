@@ -6,12 +6,14 @@ const path = require('path');
 const cliDownloadCommand = "rt dl";
 
 function RunTaskCbk(cliPath) {
-    let buildDir = tl.getVariable('Agent.BuildDirectory')
-        || tl.getVariable('Agent.ReleaseDirectory')
-        || process.cwd();
     let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
     let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
-    let specPath = path.join(buildDir, "downloadSpec.json");
+    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
+    if (!workDir) {
+        tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
+        return;
+    }
+    let specPath = path.join(workDir, "downloadSpec.json");
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
@@ -27,7 +29,7 @@ function RunTaskCbk(cliPath) {
         tl.writeFile(specPath, fileSpec);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
-        return
+        return;
     }
 
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
@@ -39,7 +41,15 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
     }
 
-    let taskRes = utils.executeCliCommand(cliCommand, buildDir);
+    let taskRes = utils.executeCliCommand(cliCommand, workDir);
+
+    // Remove created fileSpec from file system
+    try {
+        tl.rmRF(specPath);
+    } catch (ex) {
+        taskRes = "Failed cleaning temporary FileSpec file.";
+    }
+
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
     } else {

@@ -5,9 +5,6 @@ const utils = require('jfrog-utils');
 const cliPromoteCommand = "rt bpr";
 
 function RunTaskCbk(cliPath) {
-    let buildDir = tl.getVariable('Agent.BuildDirectory')
-        || tl.getVariable('Agent.ReleaseDirectory')
-        || process.cwd();
     let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
     let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
 
@@ -26,7 +23,7 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addBoolParam(cliCommand, "copy", "copy");
     cliCommand = utils.addBoolParam(cliCommand, "dryRun", "dry-run");
 
-    let taskRes = utils.executeCliCommand(cliCommand, buildDir);
+    let taskRes = utils.executeCliCommand(cliCommand, process.cwd());
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
     } else {
