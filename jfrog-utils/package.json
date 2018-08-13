@@ -6,8 +6,7 @@
   "dependencies": {
     "vsts-task-lib": "^2.6.0",
     "fs-extra": "^7.0.0",
-    "request-promise-lite": "^0.13.1",
-    "crypto": "^1.0.1"
+    "request-promise-lite": "^0.13.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
