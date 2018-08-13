@@ -134,7 +134,7 @@ function downloadCli(attemptNumber) {
     return new Promise((resolve, reject) => {
         let handleError = (err) => {
             if (attemptNumber <= MAX_CLI_DOWNLOADS_RETRIES) {
-                console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed, trying again.");
+                console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
                 downloadCli(++attemptNumber);
             } else {
                 console.error(DOWNLOAD_CLI_ERR);
@@ -165,6 +165,10 @@ function downloadCli(attemptNumber) {
             stream.on('end', function() {
                 let hex = digest.digest('hex');
                 let rawChecksum = response.headers['x-checksum-sha256'];
+                if (!rawChecksum) {
+                    handleError("Checksum header is missing from http response, cannot validate downloaded jfrog cli.");
+                }
+
                 let trimmedChecksum = rawChecksum.split(',')[0];
 
                 if (hex === trimmedChecksum) {
@@ -175,7 +179,9 @@ function downloadCli(attemptNumber) {
                         console.log("Finished downloading jfrog cli.");
                         resolve();
                     });
-                } else { handleError("Checksum mismatch for downloaded jfrog cli.") }
+                } else {
+                    handleError("Checksum mismatch for downloaded jfrog cli.");
+                }
             });
         }).catch((err) => {
             console.error(DOWNLOAD_CLI_ERR);
