@@ -9,3 +9,4 @@ vss-extension-private.json
 .DS_Store
 .testData
 .taskkey
+*.log

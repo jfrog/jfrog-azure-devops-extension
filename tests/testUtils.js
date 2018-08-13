@@ -14,11 +14,13 @@ let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
 module.exports = {
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
+    repoConan: "conan-local",
     testDataDir: testDataDir,
     promote: path.join(__dirname, "..", "ArtifactoryPromote", "artifactoryPromote.js"),
     download: path.join(__dirname, "..", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
     publish: path.join(__dirname, "..", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
+    conan: path.join(__dirname, "..", "ArtifactoryConan", "artifactoryconan.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -88,18 +90,20 @@ function cleanUpTests() {
 }
 
 function createTestRepositories() {
-    createRepo(module.exports.repoKey1);
-    createRepo(module.exports.repoKey2);
+    createRepo(module.exports.repoKey1, "generic");
+    createRepo(module.exports.repoKey2, "generic");
+    createRepo(module.exports.repoConan, "conan");
 }
 
-function createRepo(repoKey) {
+function createRepo(repoKey, packageType) {
     syncRequest('PUT', artifactoryUrl + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            rclass: "local"
+            rclass: "local",
+            packageType: packageType
         })
     });
 }
@@ -123,7 +127,7 @@ function setVariables(variables) {
 }
 
 function setInputs(inputs) {
-    tl.getInput = tl.getBoolInput = (name, required) => {
+    tl.getInput = tl.getBoolInput = tl.getPathInput = (name, required) => {
         return inputs[name];
     };
 }
@@ -131,6 +135,7 @@ function setInputs(inputs) {
 function cleanUpRepositories() {
     execCli("rt del " + module.exports.repoKey1 + '/*' + " --quiet");
     execCli("rt del " + module.exports.repoKey2 + '/*' + " --quiet");
+    execCli("rt del " + module.exports.repoConan + '/*' + " --quiet");
 }
 
 function getTestName(testDir) {

@@ -137,6 +137,41 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(testDir);
         });
     });
+
+    describe("Conan Task Tests", () => {
+        runTest("Conan Custom Command", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommand");
+        });
+
+        runTest("Conan Custom Command With Working Dir", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommandWithWorkingDir");
+        });
+
+        runTest("Conan Custom Invalid Command", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomInvalidCommand", true);
+        });
+
+        runTest("Conan Custom Command With Build Info", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommandWithBuildInfo");
+        });
+
+        runTest("Conan Add Remote", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+        });
+
+        runTest("Conan Create And Upload", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+            mockTask(testDir, "conanCreate");
+            mockTask(testDir, "conanUpload");
+        });
+    });
+
 });
 
 /**

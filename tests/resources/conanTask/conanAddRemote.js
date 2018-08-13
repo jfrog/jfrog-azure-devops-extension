@@ -1,0 +1,22 @@
+const testUtils = require('../../testUtils');
+const path = require('path');
+
+const TEST_NAME = path.basename(__dirname);
+const BUILD_NAME = TEST_NAME
+const BUILD_NUMBER = "1"
+
+let variables = {
+    "Build.DefinitionName": BUILD_NAME,
+    "Build.BuildDirectory": "/tmp/" + BUILD_NAME,
+    "Build.BuildNumber": BUILD_NUMBER
+};
+
+let inputs = {
+    "remoteName": "artifactory",
+    "artifactoryService": "40567017-861d-4e23-8ebf-c71c33a72224",
+    "conanCommand": "Add Remote",
+    "conanRepo": "conan-local",
+    "conanUserHome": "/tmp/" + BUILD_NAME + "/" + BUILD_NUMBER
+};
+
+testUtils.runTask(testUtils.conan, variables, inputs);
