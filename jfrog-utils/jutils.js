@@ -1,9 +1,9 @@
 const os = require('os');
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
-const checksumStream = require('checksum-stream');
+const crypto = require('crypto');
 const path = require('path');
-const requestPromise = require('request-promise');
+const request = require('request-promise-lite');
 const execSync = require('child_process').execSync;
 
 const fileName = getFileName();
@@ -42,7 +42,7 @@ function executeCliTask(runTaskFunc) {
         runCbk(versionedCliPath);
     } else {
         createCliDirs();
-        downloadCli().then(() => {
+        downloadCli(0).then(() => {
             runCbk(versionedCliPath);
         });
     }
@@ -134,40 +134,58 @@ function downloadCli(attemptNumber) {
     return new Promise((resolve, reject) => {
         let handleError = (err) => {
             if (attemptNumber <= MAX_CLI_DOWNLOADS_RETRIES) {
-                console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed, trying again.");
+                console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
                 downloadCli(++attemptNumber);
             } else {
                 console.error(DOWNLOAD_CLI_ERR);
                 reject(err);
             }
         };
+
         const cliTmpPath = versionedCliPath + ".tmp";
-        let req = requestPromise.get(cliUrl);
-        req.on('response', (res) => {
-            res.pipe(
-                checksumStream({
-                    algorithm: 'sha256',
-                    digest: res.headers['X-Checksum-Sha256'],
-                    size: res.headers['content-length']
-                }).on('error', handleError)
-                    .on('end', () => {
-                        if (res.statusCode >= 200 && res.statusCode < 300) {
-                            fs.move(cliTmpPath, versionedCliPath).then(() => {
-                                if (!process.platform.startsWith("win")) {
-                                    fs.chmodSync(versionedCliPath, 0o555);
-                                }
-                                console.log("Finished downloading jfrog cli");
-                                resolve();
-                            })
+
+        // Perform download
+        request.get(cliUrl, {json:false, resolveWithFullResponse:true}).then((response) => {
+            // Check valid response
+            if (response.statusCode < 200 || response.statusCode >= 300) {
+                handleError("Received http response code " + response.statusCode);
+            }
+
+            // Write body to file
+            fs.writeFileSync(cliTmpPath, response.body);
+
+            // Validate checksum
+            let stream = fs.createReadStream(cliTmpPath);
+            let digest = crypto.createHash('sha256');
+
+            stream.on('data', function(data) {
+                digest.update(data, 'utf8')
+            });
+
+            stream.on('end', function() {
+                let hex = digest.digest('hex');
+                let rawChecksum = response.headers['x-checksum-sha256'];
+                if (!rawChecksum) {
+                    handleError("Checksum header is missing from http response, cannot validate downloaded jfrog cli.");
+                }
+
+                let trimmedChecksum = rawChecksum.split(',')[0];
+                if (hex === trimmedChecksum) {
+                    fs.move(cliTmpPath, versionedCliPath).then( () => {
+                        if (!process.platform.startsWith("win")) {
+                            fs.chmodSync(versionedCliPath, 0o555);
                         }
-                    })
-            ).pipe(
-                fs.createWriteStream(cliTmpPath)
-            )
-        }).catch(handleError)
-    }).catch((err) => {
-        console.error(DOWNLOAD_CLI_ERR);
-        tl.setResult(tl.TaskResult.Failed, err.message);
+                        console.log("Finished downloading jfrog cli.");
+                        resolve();
+                    });
+                } else {
+                    handleError("Checksum mismatch for downloaded jfrog cli.");
+                }
+            });
+        }).catch((err) => {
+            console.error(DOWNLOAD_CLI_ERR);
+            tl.setResult(tl.TaskResult.Failed, err.message);
+        })
     });
 }
 
