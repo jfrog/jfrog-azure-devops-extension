@@ -15,15 +15,26 @@ module.exports = {
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
     testDataDir: testDataDir,
+    promote: path.join(__dirname, "..", "ArtifactoryPromote", "artifactoryPromote.js"),
+    download: path.join(__dirname, "..", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
+    upload: path.join(__dirname, "..", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
+    publish: path.join(__dirname, "..", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
 
     initTests: initTests,
     runTask: runTask,
-    execCli: execCli,
+    getTestName: getTestName,
+    getTestLocalFilesDir: getTestLocalFilesDir,
+    getLocalTestDir: getLocalTestDir,
+    getRemoteTestDir: getRemoteTestDir,
+    isBuildExist: isBuildExist,
     deleteBuild: deleteBuild,
-    cleanUpTests: cleanUpTests
+    cleanUpTests: cleanUpTests,
+    execCli: execCli
 };
 
 function initTests() {
+    process.env.JFROG_CLI_OFFER_CONFIG = false;
+    tl.setVariable("Agent.WorkFolder", "");
     createTestRepositories();
     cleanUpTests();
     fs.mkdirSync(testDataDir);
@@ -31,7 +42,7 @@ function initTests() {
 
 function runTask(testMain, variables, inputs) {
     variables["Agent.WorkFolder"] = testDataDir;
-    variables["Agent.BuildDirectory"] = testDataDir;
+    variables["System.DefaultWorkingDirectory"] = testDataDir;
 
     let tmr = new tmrm.TaskMockRunner(testMain);
 
@@ -45,7 +56,20 @@ function runTask(testMain, variables, inputs) {
 
 function execCli(command) {
     command = command.replace(/\\/g, "\\\\");
-    execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
+    try {
+        execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
+    } catch (ex) {
+        console.error("Command failed", "jfrog " + command);
+    }
+}
+
+function isBuildExist(buildName, buildNumber) {
+    let res = syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
+        headers: {
+            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+        }
+    });
+    return res.statusCode === 200;
 }
 
 function deleteBuild(buildName) {
@@ -107,4 +131,20 @@ function setInputs(inputs) {
 function cleanUpRepositories() {
     execCli("rt del " + module.exports.repoKey1 + '/*' + " --quiet");
     execCli("rt del " + module.exports.repoKey2 + '/*' + " --quiet");
+}
+
+function getTestName(testDir) {
+    return path.basename(testDir);
+}
+
+function getLocalTestDir(testName) {
+    return path.join(testDataDir, testName, "/");
+}
+
+function getTestLocalFilesDir(testDir) {
+    return path.join(testDir, "files", "/")
+}
+
+function getRemoteTestDir(repo, testName) {
+    return repo + "/" + testName + "/"
 }

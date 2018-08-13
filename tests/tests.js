@@ -1,82 +1,155 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
-const path = require('path');
-const vstsMockTest = require('vsts-task-lib/mock-test');
-const fs = require('fs');
-const testUtils = require('./testUtils');
+const assert = require("assert");
+const path = require("path");
+const vstsMockTest = require("vsts-task-lib/mock-test");
+const fs = require("fs-extra");
+const testUtils = require("./testUtils");
+const os = require("os");
 
-let tasksDir = path.join(__dirname, "tasks");
-let tasks = fs.readdirSync(tasksDir);
-
-describe('JFrog Artifactory VSTS extension tests', () => {
+describe("JFrog Artifactory VSTS Extension Tests", () => {
+    let jfrogUtils;
     before(() => {
         testUtils.initTests();
+        jfrogUtils = require("jfrog-utils");
     });
 
     after(() => {
         testUtils.cleanUpTests();
     });
 
-    // Run tests in 'task' directory
-    for (let i = 0; i < tasks.length; i++) {
-        let taskName = tasks[i];
-
-        // Run positive tests in 'task' directory
-        describe(taskName + ' Positive', () => {
-            let testsDir = path.join(tasksDir, taskName, "positive");
-            if (fs.existsSync(testsDir)) {
-                let tests = fs.readdirSync(testsDir);
-                for (let i = 0; i < tests.length; i++) {
-                    runTest(taskName, tests[i], true);
-                }
-            }
+    describe("Utils Tests", () => {
+        console.log("OS:", os.type());
+        runTest("Mask password", () => {
+            let oldPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
+            process.env.VSTS_ARTIFACTORY_PASSWORD = "SUPER_SECRET";
+            let retVal = jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
+            process.env.VSTS_ARTIFACTORY_PASSWORD = oldPassword;
+            assert(!retVal.toString().includes("SUPER_SECRET"), "Output contains password");
         });
 
-        // Run negative tests in 'task' directory
-        describe(taskName + ' Negative', () => {
-            let testsDir = path.join(tasksDir, taskName, "negative");
-            if (fs.existsSync(testsDir)) {
-                let tests = fs.readdirSync(testsDir);
-                for (let i = 0; i < tests.length; i++) {
-                    runTest(taskName, tests[i], false);
-                }
-            }
+        runTest("Cli join", () => {
+            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u"), "jfrog rt u");
+            assert.equal(jfrogUtils.cliJoin("jfrog"), "jfrog");
+            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a/b/c", "a/b/c"), "jfrog rt u a/b/c a/b/c");
+            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\b\c", "a\b\c"), "jfrog rt u a\b\c a\b\c");
+            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\\b\c\\", "a\\b\c\\"), "jfrog rt u a\\b\c\\ a\\b\c\\");
         });
-    }
+
+        runTest("Fix windows paths", () => {
+            let specBeforeFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specBeforeFix.json"), "utf8");
+            let expectedSpecAfterFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specAfterFix.json"), "utf8");
+            let specAfterFix = jfrogUtils.fixWindowsPaths(specBeforeFix);
+            assert.equal(specAfterFix, process.platform.startsWith("win") ? expectedSpecAfterFix : specBeforeFix, "\nSpec after fix:\n" + specAfterFix);
+        });
+
+        runTest("Get architecture", () => {
+            let arch = jfrogUtils.getArchitecture();
+            switch (os.type()) {
+                case "Linux":
+                    assert(arch.startsWith("linux"));
+                    break;
+                case "Darwin":
+                    assert.equal(arch, "mac-386");
+                    break;
+                case "Windows_NT":
+                    assert.equal(arch, "windows-amd64");
+                    break;
+                default:
+                    assert.fail("Unsupported OS found: " + os.type());
+            }
+        })
+    });
+
+    describe("Upload and Download Tests", () => {
+        runTest("Upload and download", () => {
+            let testDir = "uploadAndDownload";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "download");
+            assertFiles(testDir);
+        });
+
+        runTest("Upload fail-no-op", () => {
+            let testDir = "uploadFailNoOp";
+            mockTask(testDir, "upload", true);
+            assertFiles(testDir);
+        });
+
+        runTest("Download fail-no-op", () => {
+            let testDir = "downloadFailNoOp";
+            mockTask(testDir, "download", true);
+            assertFiles(testDir);
+        });
+    });
+
+    describe("Publish Build Info Tests", () => {
+        runTest("Publish build info", () => {
+            let testDir = "publishBuildInfo";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "download");
+            assertAndDeleteBuild("buildPublish", "3");
+            assertFiles(testDir);
+        });
+    });
+
+    describe("Build Promotion Tests", () => {
+        runTest("Build promotion", () => {
+            let testDir = "promotion";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "promote");
+            mockTask(testDir, "download");
+            assertAndDeleteBuild("buildPromote", "3");
+            assertFiles(testDir);
+        });
+
+        runTest("Build promotion dry run", () => {
+            let testDir = "promotionDryRun";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "promote");
+            mockTask(testDir, "download");
+            assertAndDeleteBuild("buildPromoteDryRun", "3");
+            assertFiles(testDir);
+        });
+    });
 });
 
-
 /**
- * Run a test
- * @param taskName (String) - The task name, e.g ArtifactoryGenericDownload, ArtifactoryGenericUpload, etc.
- * @param testName (String) - The specific test name of the task's test.
- * @param positive (Boolean) - True iff this is a positive test.
+ * Run a test using mocha suit.
+ * @param description (String) - Test description
+ * @param testFunc (Function) - The test logic
  */
-function runTest(taskName, testName, positive) {
-    it(testName, (done) => {
-        let testDir = path.join(tasksDir, taskName, positive ? "positive" : "negative", testName);
-        let testPath = path.join(testDir, "test.js");
-        let mockRunner = new vstsMockTest.MockTestRunner(testPath);
-        mockRunner.run(); // Mock a test
-        assert(positive ? mockRunner.succeeded : mockRunner.failed, mockRunner.stdout); // Check the test results
-        if (positive) {
-            assertFiles(testDir, testName); // Check that the files that were downloaded to 'testDir/<testName>/' are correct
-        }
+function runTest(description, testFunc) {
+    it(description, (done) => {
+        testFunc();
         done();
     }).timeout(100000);
 }
 
 /**
- * Assert that the files that were downloaded to 'testData' are correct.
- * @param testDir - (String) The test directory where the source files exists.
- * @param testName - (String) - The specific test name of the task's test.
+ * Mock a task from resources directory.
+ * @param testDir (String) - The test directory in resources
+ * @param taskName (String) - The '.js' file
+ * @param isNegative (Boolean) - True if the task supposed to fail
  */
-function assertFiles(testDir, testName) {
-    // Check that all necessary files were downloaded to 'testDir/<testName>/'
+function mockTask(testDir, taskName, isNegative) {
+    let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
+    let mockRunner = new vstsMockTest.MockTestRunner(taskPath);
+    mockRunner.run(); // Mock a test
+    assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + "\n" + mockRunner.stdout); // Check the test results
+}
+
+/**
+ * Assert that the files that were downloaded to "testData" are correct.
+ * @param testDir - (String) - The test directory in resources
+ */
+function assertFiles(testDir) {
+    // Check that all necessary files were downloaded to "testDir/<testName>/"
     let filesToCheck = [];
-    let filesDir = path.join(testDir, "files");
-    let testData = path.join(testUtils.testDataDir, testName);
+    let filesDir = path.join(__dirname, "resources", testDir, "files");
+    let testData = path.join(testUtils.testDataDir, testDir);
     if (fs.existsSync(filesDir)) {
         let files = fs.readdirSync(filesDir);
         for (let i = 0; i < files.length; i++) {
@@ -87,7 +160,7 @@ function assertFiles(testDir, testName) {
         }
     }
 
-    // Check that only necessary files were downloaded to 'testDir/<testName>/'
+    // Check that only necessary files were downloaded to "testDir/<testName>/"
     if (!fs.existsSync(testData) && filesToCheck.length === 0) {
         return;
     }
@@ -96,4 +169,14 @@ function assertFiles(testDir, testName) {
         let fileName = path.basename(files[i]);
         assert(filesToCheck.indexOf(fileName) >= 0, fileName + " should not exist");
     }
+}
+
+/**
+ * Assert build exist in Artifactory and delete it.
+ * @param buildName - (String) - The build name
+ * @param buildNumber - (String) - The build number
+ */
+function assertAndDeleteBuild(buildName, buildNumber) {
+    assert(testUtils.isBuildExist(buildName, buildNumber), "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory");
+    testUtils.deleteBuild(buildName);
 }

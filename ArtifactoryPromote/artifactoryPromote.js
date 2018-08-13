@@ -5,8 +5,8 @@ const utils = require('jfrog-utils');
 const cliPromoteCommand = "rt bpr";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
-    let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);

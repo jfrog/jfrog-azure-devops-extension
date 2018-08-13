@@ -6,8 +6,8 @@ const path = require('path');
 const cliDownloadCommand = "rt dl";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
-    let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
