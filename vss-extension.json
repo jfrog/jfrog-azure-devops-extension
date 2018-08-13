@@ -1,11 +1,11 @@
 {
     "manifestversion": 1,
-    "public": true,
-    "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.0.4",
-    "name": "JFrog Artifactory",
+    "public": false,
+    "id": "eliomjfrog-artifactory-vsts-extension",
+    "version": "1.0.35",
+    "name": "JFrog Artifactory (Conan Support Preview)",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
-    "publisher": "JFrog",
+    "publisher": "eliomjfrog",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
@@ -161,6 +161,16 @@
             "properties": {
                 "name": "ArtifactoryPromote"
             }
+        },
+        {
+            "id": "artifactory-conan-build-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryConan"
+            }
         }
     ],
     "files": [
@@ -195,6 +205,9 @@
         },
         {
             "path": "ArtifactoryPromote"
+        },
+        {
+            "path": "ArtifactoryConan"
         }
     ]
 }
