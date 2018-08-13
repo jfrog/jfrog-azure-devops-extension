@@ -170,7 +170,6 @@ function downloadCli(attemptNumber) {
                 }
 
                 let trimmedChecksum = rawChecksum.split(',')[0];
-
                 if (hex === trimmedChecksum) {
                     fs.move(cliTmpPath, versionedCliPath).then( () => {
                         if (!process.platform.startsWith("win")) {
