@@ -2,7 +2,7 @@
     "manifestversion": 1,
     "public": false,
     "id": "eliomjfrog-artifactory-vsts-extension",
-    "version": "1.0.31",
+    "version": "1.0.35",
     "name": "JFrog Artifactory (Conan Support Preview)",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "eliomjfrog",

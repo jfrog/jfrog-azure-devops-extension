@@ -3,7 +3,7 @@ const path = require('path');
 
 const TEST_NAME = path.basename(__dirname);
 const BUILD_NAME = TEST_NAME
-const BUILD_NUMBER = "1"
+const BUILD_NUMBER = "2"
 
 let variables = {
     "Build.DefinitionName": BUILD_NAME,
@@ -12,9 +12,10 @@ let variables = {
 };
 
 let inputs = {
-    "conanCommand": "Upload",
-    "patternOrReference": "Conan-min*",
-    "extraArguments": "-r artifactory --all",
+    "conanCommand": "Install",
+    "pathOrReference": "..",
+    "workingDirectory": path.join(__dirname, "files", "conan-install", "build"),
+    "extraArguments": "",
     "collectBuildInfo": true,
     "conanUserHome": "/tmp/" + BUILD_NAME + "/" + BUILD_NUMBER
 };

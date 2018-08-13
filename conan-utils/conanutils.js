@@ -153,6 +153,8 @@ let executeConanCommand = async( function(conanPath, commandArgs, workingDir) {
     if (workingDir) {
         console.log("Running Conan command at: " + workingDir);
         options['cwd'] = workingDir;
+        // Make sure working directory exists
+        fs.mkdirsSync(workingDir);
     }
 
     // Run command and wait for exitCode

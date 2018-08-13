@@ -3,7 +3,7 @@ const path = require('path');
 
 const TEST_NAME = path.basename(__dirname);
 const BUILD_NAME = TEST_NAME
-const BUILD_NUMBER = "1"
+const BUILD_NUMBER = "3"
 
 let variables = {
     "Build.DefinitionName": BUILD_NAME,
@@ -12,10 +12,10 @@ let variables = {
 };
 
 let inputs = {
-    "conanCommand": "Upload",
-    "patternOrReference": "Conan-min*",
-    "extraArguments": "-r artifactory --all",
-    "collectBuildInfo": true,
+    "conanCommand": "Config Install",
+    "configSourceType": "zip",
+    "configZipPath": path.join(__dirname, "files", "conan-config", "conan-config.zip"),
+    "extraArguments": "",
     "conanUserHome": "/tmp/" + BUILD_NAME + "/" + BUILD_NUMBER
 };
 
