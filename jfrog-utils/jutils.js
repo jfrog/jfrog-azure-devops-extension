@@ -28,7 +28,8 @@ module.exports = {
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
-    fixWindowsPaths: fixWindowsPaths
+    fixWindowsPaths: fixWindowsPaths,
+    getArchitecture: getArchitecture
 };
 
 function executeCliTask(runTaskFunc) {
@@ -48,12 +49,15 @@ function executeCliTask(runTaskFunc) {
     }
 }
 
-function executeCliCommand(cliCommand, runningDir) {
+function executeCliCommand(cliCommand, runningDir, stdio) {
     try {
-        execSync(cliCommand, {cwd: runningDir, stdio: [0, 1, 2]});
+        if (!stdio) {
+            stdio = [0, 1, 2];
+        }
+        execSync(cliCommand, {cwd: runningDir, stdio: stdio});
     } catch (ex) {
         // Error occurred
-        return ex
+        return ex.toString().replace(/--password=".*"/g, "--password=***");
     }
 }
 

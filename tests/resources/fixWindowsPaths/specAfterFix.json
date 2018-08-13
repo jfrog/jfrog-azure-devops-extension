@@ -1,0 +1,9 @@
+{
+    "files": [
+        {
+            "pattern": "C:\\Agents\\11_work\\331\\s\\ci-utils\\",
+            "target": "libs-release-local/test/",
+            "props": "a=//b\\c\\\\d\\e"
+        }
+    ]
+}

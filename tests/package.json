@@ -4,11 +4,13 @@
   "description": "Test utils",
   "main": "testUtils.js",
   "dependencies": {
+    "jfrog-utils": "file:../jfrog-utils/jfrog-utils-1.0.0.tgz",
     "mocha": "^5.2.0",
     "path": "^0.12.7",
     "rmdir-recursive": "^0.0.1",
     "sync-request": "^6.0.0",
-    "vsts-task-lib": "^2.6.0"
+    "vsts-task-lib": "^2.6.0",
+    "fs-extra": "^7.0.0"
   },
   "scripts": {
     "test": "npm install && mocha tests.js -t 10000"

@@ -2,9 +2,9 @@ image:
 - Visual Studio 2017
 - Ubuntu
 
-stack: node 9
+stack: node 8
 environment:
-  nodejs_version: "6"
+  nodejs_version: "8"
   VSTS_ARTIFACTORY_URL:
     secure: KkjTm9RrjPrzDQocmxTmQPdE2bozPgix5CFjkeam6Fscx1S34tR4Hpqg3j/7R+AH
   VSTS_ARTIFACTORY_USERNAME:
