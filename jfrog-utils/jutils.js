@@ -254,14 +254,22 @@ function encodePath(str) {
 
     let encodedPath = "";
     let arr = str.split(separator);
+    let count = 0;
     for (let section of arr) {
+        if (section.length === 0) {
+            continue;
+        }
+        count++;
         if (section.indexOf(" ") > 0) {
             section = quote(section);
         }
         encodedPath += section + separator;
     }
-    if (!str.endsWith(separator)) {
+    if (count > 0 && !str.endsWith(separator)) {
         encodedPath = encodedPath.substring(0, encodedPath.length - 1);
+    }
+    if (str.startsWith(separator)) {
+        encodedPath = separator + encodedPath;
     }
 
     return encodedPath;
