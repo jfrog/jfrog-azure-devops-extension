@@ -29,6 +29,7 @@ module.exports = {
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
+    encodePath: encodePath,
     getArchitecture: getArchitecture
 };
 
@@ -37,14 +38,14 @@ function executeCliTask(runTaskFunc) {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
 
     runTaskCbk = runTaskFunc;
-    if (fs.existsSync(customCliPath)) {
-        runCbk(customCliPath);
-    } else if (fs.existsSync(versionedCliPath)) {
-        runCbk(versionedCliPath);
+    if (fs.existsSync(quote(customCliPath))) {
+        runCbk(encodePath(customCliPath));
+    } else if (fs.existsSync(encodePath(versionedCliPath))) {
+        runCbk(encodePath(versionedCliPath));
     } else {
         createCliDirs();
         downloadCli(0).then(() => {
-            runCbk(versionedCliPath);
+            runCbk(encodePath(versionedCliPath));
         });
     }
 }
@@ -125,12 +126,12 @@ function runCbk(cliPath) {
 }
 
 function createCliDirs() {
-    if (!fs.existsSync(jfrogFolderPath)) {
-        fs.mkdirSync(jfrogFolderPath);
+    if (!fs.existsSync(encodePath(jfrogFolderPath))) {
+        fs.mkdirSync(encodePath(jfrogFolderPath));
     }
 
-    if (!fs.existsSync(path.join(jfrogFolderPath, version))) {
-        fs.mkdirSync(path.join(jfrogFolderPath, version));
+    if (!fs.existsSync(encodePath(path.join(jfrogFolderPath, version)))) {
+        fs.mkdirSync(encodePath(path.join(jfrogFolderPath, version)));
     }
 }
 
@@ -149,24 +150,24 @@ function downloadCli(attemptNumber) {
         const cliTmpPath = versionedCliPath + ".tmp";
 
         // Perform download
-        request.get(cliUrl, {json:false, resolveWithFullResponse:true}).then((response) => {
+        request.get(cliUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
             // Check valid response
             if (response.statusCode < 200 || response.statusCode >= 300) {
                 handleError("Received http response code " + response.statusCode);
             }
 
             // Write body to file
-            fs.writeFileSync(cliTmpPath, response.body);
+            fs.writeFileSync(encodePath(cliTmpPath), response.body);
 
             // Validate checksum
-            let stream = fs.createReadStream(cliTmpPath);
+            let stream = fs.createReadStream(encodePath(cliTmpPath));
             let digest = crypto.createHash('sha256');
 
-            stream.on('data', function(data) {
+            stream.on('data', function (data) {
                 digest.update(data, 'utf8')
             });
 
-            stream.on('end', function() {
+            stream.on('end', function () {
                 let hex = digest.digest('hex');
                 let rawChecksum = response.headers['x-checksum-sha256'];
                 if (!rawChecksum) {
@@ -175,9 +176,9 @@ function downloadCli(attemptNumber) {
 
                 let trimmedChecksum = rawChecksum.split(',')[0];
                 if (hex === trimmedChecksum) {
-                    fs.move(cliTmpPath, versionedCliPath).then( () => {
+                    fs.move(encodePath(cliTmpPath), encodePath(versionedCliPath)).then(() => {
                         if (!process.platform.startsWith("win")) {
-                            fs.chmodSync(versionedCliPath, 0o555);
+                            fs.chmodSync(encodePath(versionedCliPath), 0o555);
                         }
                         console.log("Finished downloading jfrog cli.");
                         resolve();
@@ -240,4 +241,28 @@ function validateSpecWithoutRegex(fileSpec) {
             throw ("The File Spec includes 'regexp: true' which is currently not supported.");
         }
     }
+}
+
+/**
+ * Encodes spaces with quotes in a path.
+ * a/b/Program Files/c --> a/b/"Program Files"/c
+ * @param str (String) - The path to encoded.
+ * @returns {string} - The encoded path.
+ */
+function encodePath(str) {
+    let separator = (process.platform.startsWith("win") ? "\\" : "/");
+
+    let encodedPath = "";
+    let arr = str.split(separator);
+    for (let section of arr) {
+        if (section.indexOf(" ") > 0) {
+            section = quote(section);
+        }
+        encodedPath += section + separator;
+    }
+    if (!str.endsWith(separator)) {
+        encodedPath = encodedPath.substring(0, encodedPath.length - 1);
+    }
+
+    return encodedPath;
 }
