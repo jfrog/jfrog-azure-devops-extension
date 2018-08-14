@@ -8,10 +8,10 @@ const execSync = require('child_process').execSync;
 
 const fileName = getFileName();
 const btPackage = "jfrog-cli-" + getArchitecture();
-const jfrogFolderPath = path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog");
+const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
 const version = "1.17.1";
-const versionedCliPath = path.join(jfrogFolderPath, version, fileName);
-const customCliPath = path.join(jfrogFolderPath, "current", fileName);
+const versionedCliPath = encodePath(path.join(jfrogFolderPath, version, fileName));
+const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName));
 const cliUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + version + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 const MAX_CLI_DOWNLOADS_RETRIES = 10;
 const DOWNLOAD_CLI_ERR = "Failed while attempting to download JFrog CLI from " + cliUrl +
@@ -29,6 +29,7 @@ module.exports = {
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
+    encodePath: encodePath,
     getArchitecture: getArchitecture
 };
 
@@ -146,10 +147,10 @@ function downloadCli(attemptNumber) {
             }
         };
 
-        const cliTmpPath = versionedCliPath + ".tmp";
+        const cliTmpPath = encodePath(versionedCliPath + ".tmp");
 
         // Perform download
-        request.get(cliUrl, {json:false, resolveWithFullResponse:true}).then((response) => {
+        request.get(cliUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
             // Check valid response
             if (response.statusCode < 200 || response.statusCode >= 300) {
                 handleError("Received http response code " + response.statusCode);
@@ -162,11 +163,11 @@ function downloadCli(attemptNumber) {
             let stream = fs.createReadStream(cliTmpPath);
             let digest = crypto.createHash('sha256');
 
-            stream.on('data', function(data) {
+            stream.on('data', function (data) {
                 digest.update(data, 'utf8')
             });
 
-            stream.on('end', function() {
+            stream.on('end', function () {
                 let hex = digest.digest('hex');
                 let rawChecksum = response.headers['x-checksum-sha256'];
                 if (!rawChecksum) {
@@ -175,7 +176,7 @@ function downloadCli(attemptNumber) {
 
                 let trimmedChecksum = rawChecksum.split(',')[0];
                 if (hex === trimmedChecksum) {
-                    fs.move(cliTmpPath, versionedCliPath).then( () => {
+                    fs.move(cliTmpPath, versionedCliPath).then(() => {
                         if (!process.platform.startsWith("win")) {
                             fs.chmodSync(versionedCliPath, 0o555);
                         }
@@ -240,4 +241,34 @@ function validateSpecWithoutRegex(fileSpec) {
             throw ("The File Spec includes 'regexp: true' which is currently not supported.");
         }
     }
+}
+
+/**
+ * Encodes spaces with quotes in a path.
+ * a/b/Program Files/c --> a/b/"Program Files"/c
+ * @param str (String) - The path to encoded.
+ * @returns {string} - The encoded path.
+ */
+function encodePath(str) {
+    let encodedPath = "";
+    let arr = str.split(path.sep);
+    let count = 0;
+    for (let section of arr) {
+        if (section.length === 0) {
+            continue;
+        }
+        count++;
+        if (section.indexOf(" ") > 0) {
+            section = quote(section);
+        }
+        encodedPath += section + path.sep;
+    }
+    if (count > 0 && !str.endsWith(path.sep)) {
+        encodedPath = encodedPath.substring(0, encodedPath.length - 1);
+    }
+    if (str.startsWith(path.sep)) {
+        encodedPath = path.sep + encodedPath;
+    }
+
+    return encodedPath;
 }
