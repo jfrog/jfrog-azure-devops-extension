@@ -8,10 +8,10 @@ const execSync = require('child_process').execSync;
 
 const fileName = getFileName();
 const btPackage = "jfrog-cli-" + getArchitecture();
-const jfrogFolderPath = path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog");
+const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
 const version = "1.17.1";
-const versionedCliPath = path.join(jfrogFolderPath, version, fileName);
-const customCliPath = path.join(jfrogFolderPath, "current", fileName);
+const versionedCliPath = encodePath(path.join(jfrogFolderPath, version, fileName));
+const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName));
 const cliUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + version + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 const MAX_CLI_DOWNLOADS_RETRIES = 10;
 const DOWNLOAD_CLI_ERR = "Failed while attempting to download JFrog CLI from " + cliUrl +
@@ -38,14 +38,14 @@ function executeCliTask(runTaskFunc) {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
 
     runTaskCbk = runTaskFunc;
-    if (fs.existsSync(quote(customCliPath))) {
-        runCbk(encodePath(customCliPath));
-    } else if (fs.existsSync(encodePath(versionedCliPath))) {
-        runCbk(encodePath(versionedCliPath));
+    if (fs.existsSync(customCliPath)) {
+        runCbk(customCliPath);
+    } else if (fs.existsSync(versionedCliPath)) {
+        runCbk(versionedCliPath);
     } else {
         createCliDirs();
         downloadCli(0).then(() => {
-            runCbk(encodePath(versionedCliPath));
+            runCbk(versionedCliPath);
         });
     }
 }
@@ -126,12 +126,12 @@ function runCbk(cliPath) {
 }
 
 function createCliDirs() {
-    if (!fs.existsSync(encodePath(jfrogFolderPath))) {
-        fs.mkdirSync(encodePath(jfrogFolderPath));
+    if (!fs.existsSync(jfrogFolderPath)) {
+        fs.mkdirSync(jfrogFolderPath);
     }
 
-    if (!fs.existsSync(encodePath(path.join(jfrogFolderPath, version)))) {
-        fs.mkdirSync(encodePath(path.join(jfrogFolderPath, version)));
+    if (!fs.existsSync(path.join(jfrogFolderPath, version))) {
+        fs.mkdirSync(path.join(jfrogFolderPath, version));
     }
 }
 
@@ -147,7 +147,7 @@ function downloadCli(attemptNumber) {
             }
         };
 
-        const cliTmpPath = versionedCliPath + ".tmp";
+        const cliTmpPath = encodePath(versionedCliPath + ".tmp");
 
         // Perform download
         request.get(cliUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
@@ -157,10 +157,10 @@ function downloadCli(attemptNumber) {
             }
 
             // Write body to file
-            fs.writeFileSync(encodePath(cliTmpPath), response.body);
+            fs.writeFileSync(cliTmpPath, response.body);
 
             // Validate checksum
-            let stream = fs.createReadStream(encodePath(cliTmpPath));
+            let stream = fs.createReadStream(cliTmpPath);
             let digest = crypto.createHash('sha256');
 
             stream.on('data', function (data) {
@@ -176,9 +176,9 @@ function downloadCli(attemptNumber) {
 
                 let trimmedChecksum = rawChecksum.split(',')[0];
                 if (hex === trimmedChecksum) {
-                    fs.move(encodePath(cliTmpPath), encodePath(versionedCliPath)).then(() => {
+                    fs.move(cliTmpPath, versionedCliPath).then(() => {
                         if (!process.platform.startsWith("win")) {
-                            fs.chmodSync(encodePath(versionedCliPath), 0o555);
+                            fs.chmodSync(versionedCliPath, 0o555);
                         }
                         console.log("Finished downloading jfrog cli.");
                         resolve();

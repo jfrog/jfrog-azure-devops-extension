@@ -44,9 +44,15 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         });
 
         runTest("Encode paths", () => {
-            assert.equal(jfrogUtils.encodePath("dir1/dir 2/dir 3"), "dir1/\"dir 2\"/\"dir 3\"");
-            assert.equal(jfrogUtils.encodePath("dir 1/dir2/a b.txt"), "\"dir 1\"/dir2/\"a b.txt\"");
-            assert.equal(jfrogUtils.encodePath("dir1/dir2/a.txt"), "dir1/dir2/a.txt");
+            if (process.platform.startsWith("win")) {
+                assert.equal(jfrogUtils.encodePath("dir1\\dir 2\\dir 3"), "dir1\\\"dir 2\"\\\"dir 3\"");
+                assert.equal(jfrogUtils.encodePath("dir 1\\dir2\\a b.txt"), "\"dir 1\"\\dir2\\\"a b.txt\"");
+                assert.equal(jfrogUtils.encodePath("dir1\\dir2\\a.txt"), "dir1\\dir2\\a.txt");
+            } else {
+                assert.equal(jfrogUtils.encodePath("dir1/dir 2/dir 3"), "dir1/\"dir 2\"/\"dir 3\"");
+                assert.equal(jfrogUtils.encodePath("dir 1/dir2/a b.txt"), "\"dir 1\"/dir2/\"a b.txt\"");
+                assert.equal(jfrogUtils.encodePath("dir1/dir2/a.txt"), "dir1/dir2/a.txt");
+            }
         });
 
         runTest("Get architecture", () => {
