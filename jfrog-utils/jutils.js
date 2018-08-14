@@ -250,10 +250,8 @@ function validateSpecWithoutRegex(fileSpec) {
  * @returns {string} - The encoded path.
  */
 function encodePath(str) {
-    let separator = (process.platform.startsWith("win") ? "\\" : "/");
-
     let encodedPath = "";
-    let arr = str.split(separator);
+    let arr = str.split(path.sep);
     let count = 0;
     for (let section of arr) {
         if (section.length === 0) {
@@ -263,13 +261,13 @@ function encodePath(str) {
         if (section.indexOf(" ") > 0) {
             section = quote(section);
         }
-        encodedPath += section + separator;
+        encodedPath += section + path.sep;
     }
-    if (count > 0 && !str.endsWith(separator)) {
+    if (count > 0 && !str.endsWith(path.sep)) {
         encodedPath = encodedPath.substring(0, encodedPath.length - 1);
     }
-    if (str.startsWith(separator)) {
-        encodedPath = separator + encodedPath;
+    if (str.startsWith(path.sep)) {
+        encodedPath = path.sep + encodedPath;
     }
 
     return encodedPath;
