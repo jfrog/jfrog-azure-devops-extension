@@ -51,6 +51,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                 assert.equal(jfrogUtils.encodePath("dir1\\"), "dir1\\");
                 assert.equal(jfrogUtils.encodePath("dir1"), "dir1");
                 assert.equal(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
+                // Avoid double encoding
+                assert.equal(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
             } else {
                 assert.equal(jfrogUtils.encodePath("dir1/dir 2/dir 3"), "dir1/\"dir 2\"/\"dir 3\"");
                 assert.equal(jfrogUtils.encodePath("dir 1/dir2/a b.txt"), "\"dir 1\"/dir2/\"a b.txt\"");
@@ -59,6 +61,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                 assert.equal(jfrogUtils.encodePath("dir1"), "dir1");
                 assert.equal(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
                 assert.equal(jfrogUtils.encodePath("/dir1"), "/dir1");
+                // Avoid double encoding
+                assert.equal(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
             }
         });
 

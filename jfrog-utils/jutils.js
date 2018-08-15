@@ -258,7 +258,7 @@ function encodePath(str) {
             continue;
         }
         count++;
-        if (section.indexOf(" ") > 0) {
+        if (section.indexOf(" ") > 0 && !section.startsWith("\"") && !section.endsWith("\"")) {
             section = quote(section);
         }
         encodedPath += section + path.sep;
