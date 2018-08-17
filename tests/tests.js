@@ -170,6 +170,16 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "conanCreate");
             mockTask(testDir, "conanUpload");
         });
+
+        runTest("Conan Install", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanInstall");
+        });
+
+        runTest("Conan Add Config", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanConfigInstall");
+        });
     });
 
 });
