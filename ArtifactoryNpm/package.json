@@ -1,0 +1,15 @@
+{
+  "name": "artifactorynpm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "npmTask.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vsts-task-lib": "^2.6.0",
+    "jfrog-utils": "file:../jfrog-utils/jfrog-utils-1.0.0.tgz"
+  }
+}
