@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/yhxlpbmakgxlsoyk?svg=true)](https://ci.appveyor.com/project/yahavi/artifactory-vsts-extension-k3cgm)
+[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-vsts-extension)
 # Overview
 JFrog Artifactory provides tight integration with VSTS and TFS through the **JFrog Artifactory VSTS Extension**.
 Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about artifacts deployed, dependencies resolved, environment data associated with the build runs and more, 

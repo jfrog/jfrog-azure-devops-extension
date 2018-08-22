@@ -6,11 +6,11 @@ stack: node 8
 environment:
   nodejs_version: "8"
   VSTS_ARTIFACTORY_URL:
-    secure: KkjTm9RrjPrzDQocmxTmQPdE2bozPgix5CFjkeam6Fscx1S34tR4Hpqg3j/7R+AH
+    secure: RIh0gGFDn2JAnLUEEqLsQnZ5H3XFWg1s+Qq8Z4i+Xu+FtQf6Tsu2AnfY4/6AaXJ8
   VSTS_ARTIFACTORY_USERNAME:
-    secure: b79qvuMVVlqhdsKoJC046g==
+    secure: YEB5Wiv9a2vNpUhy+MfL+A==
   VSTS_ARTIFACTORY_PASSWORD:
-    secure: eebX+bKmzB9hHtjniAvmXQYLqNSWPxPwy71sOeNLrkU=
+    secure: Um8o75MQIieSavIemF4ySA==
 
 install:
   - npm install -g jfrog-cli-go
