@@ -1,5 +1,5 @@
 {
-    "manifestversion": 1,
+    "manifestversion": 1, 
     "public": true,
     "id": "jfrog-artifactory-vsts-extension",
     "version": "1.0.6",
