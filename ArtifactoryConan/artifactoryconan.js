@@ -27,6 +27,9 @@ function run() {
         case "Custom":
             handleCustomCommand();
             break;
+        case "POC Publish Build Info":
+            handlePublishBuildInfo();
+            break;
         default:
             tl.setResult(tl.TaskResult.Failed, "Conan Command not supported: " + conanCommand);
     }
@@ -37,7 +40,7 @@ function run() {
 */
 let handleConfigInstallCommand = async(function() {
     let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', true);
+    let conanUserHome = tl.getInput('conanUserHome', false);
     let configSourceType = tl.getInput('configSourceType', true);
     let extraArguments = tl.getInput("extraArguments", false);
 
@@ -66,7 +69,7 @@ let handleConfigInstallCommand = async(function() {
 */
 let handleAddRemoteCommand = async(function() {
     let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', true);
+    let conanUserHome = tl.getInput('conanUserHome', false);
     let remoteName = tl.getInput("remoteName", true);
     let artifactoryService = tl.getInput("artifactoryService", true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
@@ -102,7 +105,7 @@ let handleCreateCommand = async(function() {
     let buildDefinition = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', true);
+    let conanUserHome = tl.getInput('conanUserHome', false);
     let createPath = tl.getPathInput("createPath", true, true);
     let createReference = tl.getInput("createReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
@@ -127,7 +130,7 @@ let handleInstallCommand = async(function() {
     let buildDefinition = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', true);
+    let conanUserHome = tl.getInput('conanUserHome', false);
     let pathOrReference = tl.getInput("pathOrReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
@@ -150,7 +153,7 @@ let handleUploadCommand = async(function() {
     let buildDefinition = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', true);
+    let conanUserHome = tl.getInput('conanUserHome', false);
     let patternOrReference = tl.getInput("patternOrReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
@@ -175,13 +178,32 @@ let handleCustomCommand = async(function() {
     let buildDefinition = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', true);
+    let conanUserHome = tl.getInput('conanUserHome', false);
     let customArguments = tl.getInput('customArguments', true);
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
 
     let conanArguments = customArguments.split(" ");
     let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
         conanUserHome, conanArguments, collectBuildInfo, buildDefinition, buildNumber));
+
+    setTaskResult(taskSuccessful);
+});
+
+/**
+* Handle Publish Build Info
+*/
+let handlePublishBuildInfo = async(function() {
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
+    let conanUserHome = tl.getInput('conanUserHome', false);
+    let artifactoryService = tl.getInput("artifactoryService", true);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+
+    let taskSuccessful = await(conanutils.publishBuildInfo(workingDirectory, conanUserHome, buildDefinition,
+        buildNumber, artifactoryUrl, artifactoryUser, artifactoryPassword));
 
     setTaskResult(taskSuccessful);
 });

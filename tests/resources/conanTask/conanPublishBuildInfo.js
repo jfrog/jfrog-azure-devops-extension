@@ -14,11 +14,9 @@ let variables = {
 };
 
 let inputs = {
-    "conanCommand": "Create",
-    "createPath": path.join(__dirname, "files", "conan-min"),
-    "createReference": "user/testing",
-    "extraArguments": "",
-    "collectBuildInfo": true
+    "remoteName": "artifactory",
+    "artifactoryService": "40567017-861d-4e23-8ebf-c71c33a72224",
+    "conanCommand": "POC Publish Build Info"
 };
 
 testUtils.runTask(testUtils.conan, variables, inputs);
