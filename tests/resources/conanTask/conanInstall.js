@@ -6,6 +6,8 @@ const BUILD_NAME = TEST_NAME
 const BUILD_NUMBER = "2"
 
 let variables = {
+    "System.HostType": "build",
+    "System.DefinitionId": BUILD_NAME,
     "Build.DefinitionName": BUILD_NAME,
     "Build.BuildDirectory": "/tmp/" + BUILD_NAME,
     "Build.BuildNumber": BUILD_NUMBER
@@ -16,8 +18,7 @@ let inputs = {
     "pathOrReference": "..",
     "workingDirectory": path.join(__dirname, "files", "conan-install", "build"),
     "extraArguments": "",
-    "collectBuildInfo": true,
-    "conanUserHome": "/tmp/" + BUILD_NAME + "/" + BUILD_NUMBER
+    "collectBuildInfo": true
 };
 
 testUtils.runTask(testUtils.conan, variables, inputs);

@@ -6,18 +6,16 @@ const BUILD_NAME = TEST_NAME
 const BUILD_NUMBER = "1"
 
 let variables = {
-    "System.HostType": "build",
-    "System.DefinitionId": BUILD_NAME,
+    "System.HostType": "release",
+    "Build.DefinitionId": BUILD_NAME,
     "Build.DefinitionName": BUILD_NAME,
-    "Build.BuildDirectory": "/tmp/" + BUILD_NAME,
     "Build.BuildNumber": BUILD_NUMBER
 };
 
 let inputs = {
-    "conanCommand": "Create",
-    "createPath": path.join(__dirname, "files", "conan-min"),
-    "createReference": "user/testing",
-    "extraArguments": "",
+    "conanCommand": "Upload",
+    "patternOrReference": "Conan-min*",
+    "extraArguments": "-r artifactory --all",
     "collectBuildInfo": true
 };
 

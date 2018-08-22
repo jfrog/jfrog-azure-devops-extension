@@ -1,7 +1,7 @@
 {
     "id": "2b8ef770-9bc6-4394-aa81-197d0759e9c8",
     "name": "Artifactory Conan",
-    "friendlyName": "Artifactory Conan Build",
+    "friendlyName": "Artifactory Conan",
     "description": "This task runs a Conan command.",
     "author": "JFrog",
     "helpMarkDown": "Run Conan command.",
@@ -12,7 +12,7 @@
     ],
     "demands": [],
     "version": {
-        "Major": "21",
+        "Major": "26",
         "Minor": "0",
         "Patch": "0"
     },
@@ -37,7 +37,8 @@
                 "Install": "Install",
                 "Create": "Create",
                 "Upload": "Upload",
-                "Custom": "Custom"
+                "Custom": "Custom",
+                "POC Publish Build Info": "POC Publish Build Info"
             },
             "required": true,
             "helpMarkDown": "The conan command to be run by this task."
@@ -55,7 +56,7 @@
             "name": "artifactoryService",
             "type": "connectedService:artifactoryService",
             "label": "Artifactory Service",
-            "visibleRule": "conanCommand = Add Remote",
+            "visibleRule": "conanCommand = Add Remote || conanCommand = POC Publish Build Info",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Artifactory service used by this remote configuration."
@@ -170,9 +171,9 @@
             "name": "conanUserHome",
             "type": "string",
             "label": "Conan User Home",
-            "defaultValue": "$(Agent.BuildDirectory)/$(Build.BuildNumber)",
-            "required": true,
-            "helpMarkDown": "Conan User Home folder location.",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Conan User Home folder location. The default values for build and release pipelines are $(Agent.WorkFolder)/$(System.DefinitionId)/$(Build.BuildId) and $(Agent.WorkFolder)/$(Build.DefinitionId)/$(Build.BuildId) respectively.",
             "groupName": "advanced"
         },
         {

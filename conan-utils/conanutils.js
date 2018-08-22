@@ -5,6 +5,7 @@ const uuid = require('uuid/v1')
 const os = require('os');
 const fs = require('fs-extra');
 const path = require('path');
+const pbi = require('./publish-build-info')
 
 // Helper Constants
 const CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME = "artifact_property_build.name";
@@ -45,6 +46,9 @@ let executeConanTask = async(function (workingDir, conanUserHome,
         * Conan User Home is set as a variable in the phase scope so it will be
         * availabe to every task running after this one
         */
+        if (!conanUserHome) {
+            conanUserHome = getDefaultConanUserHome();
+        }
         console.log("Conan User Home: " + conanUserHome);
         tl.setVariable('CONAN_USER_HOME', conanUserHome);
 
@@ -83,6 +87,30 @@ let executeConanTask = async(function (workingDir, conanUserHome,
 */
 function generateConanTaskUUId() {
     return uuid();
+}
+
+/**
+* Get Default Conan User Home Folder.
+*
+* If process is a build it will be:
+* $(Agent.WorkFolder)/$(System.DefinitionId)/$(Build.BuildId)
+*
+* If the process is a release it will be:
+* $(Agent.WorkFolder)/$(Build.DefinitionId)/$(Build.BuildId)
+*/
+function getDefaultConanUserHome() {
+    let hostType = tl.getVariable('System.HostType');
+    let workFolder = tl.getVariable('Agent.WorkFolder')
+    let buildNumber = tl.getVariable('Build.BuildNumber')
+
+    // Get Build Id during build process
+    buildId = tl.getVariable('System.DefinitionId');
+    if (hostType == "release") {
+        // Get Build Id during release process
+        buildId = tl.getVariable('Build.DefinitionId');
+    }
+
+    return path.join(workFolder, buildId, buildNumber);
 }
 
 /**
@@ -151,11 +179,15 @@ let executeConanCommand = async( function(conanPath, commandArgs, workingDir) {
 
     // Set working dir if present
     if (workingDir) {
-        console.log("Running Conan command at: " + workingDir);
-        options['cwd'] = workingDir;
-        // Make sure working directory exists
+        // Make sure custom working directory exists
         fs.mkdirsSync(workingDir);
+    } else {
+        // Use default working dir
+        workingDir = tl.getVariable('System.DefaultWorkingDirectory');
     }
+
+    console.log("Running Conan command at: " + workingDir);
+    options['cwd'] = workingDir;
 
     // Run command and wait for exitCode
     let exitCode = await(conan.exec(options));
@@ -288,5 +320,6 @@ function convertConanPropertiesToMap(propertiesContent) {
 }
 
 module.exports = {
-    executeConanTask: executeConanTask
+    executeConanTask: executeConanTask,
+    publishBuildInfo: pbi.publishBuildInfo
 }
