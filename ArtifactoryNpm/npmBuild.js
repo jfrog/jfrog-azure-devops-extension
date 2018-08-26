@@ -30,7 +30,7 @@ function RunTaskCbk(cliPath) {
     if (inputCommand === "install") {
         cliNpmCommand = npmInstallCommand;
         npmRepository = tl.getInput("sourceRepo", true);
-    } else if (inputCommand === "packAndPublish") {
+    } else if (inputCommand === "pack and publish") {
         cliNpmCommand = npmPublishCommand;
         npmRepository = tl.getInput("targetRepo", true);
     } else {

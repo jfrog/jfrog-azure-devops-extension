@@ -31,7 +31,7 @@
             },
             "options": {
                 "install": "install",
-                "packAndPublish": "pack and publish"
+                "pack and publish": "pack and publish"
             }
         },
         {
@@ -60,7 +60,7 @@
             "label": "Npm target repository",
             "defaultValue": "",
             "required": true,
-            "visibleRule": "command = publish",
+            "visibleRule": "command = pack and publish",
             "helpMarkDown": "The target npm repository\nCan be local, or a virtual npm repository containing local repositories.",
             "properties": {
                 "EditableOptions": "True"
@@ -109,7 +109,7 @@
 
     "execution": {
         "Node": {
-            "target": "npmTask.js"
+            "target": "npmBuild.js"
         }
     }
 }
