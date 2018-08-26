@@ -46,7 +46,7 @@
             "label": "Collect build info",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Select to collect build info."
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
         },
         {
             "name": "failNoOp",

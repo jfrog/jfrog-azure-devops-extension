@@ -161,6 +161,16 @@
             "properties": {
                 "name": "ArtifactoryPromote"
             }
+        },
+        {
+            "id": "artifactory-npm",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryNpm"
+            }
         }
     ],
     "files": [
@@ -195,6 +205,9 @@
         },
         {
             "path": "ArtifactoryPromote"
+        },
+        {
+            "path": "ArtifactoryNpm"
         }
     ]
 }
