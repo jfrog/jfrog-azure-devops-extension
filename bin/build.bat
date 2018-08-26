@@ -1,5 +1,5 @@
 echo Build started ...
-cd jfrog-utils
+cd artifactory-tasks-utils
 echo In path: %cd%
 @echo off
 IF EXIST "package-lock.json" (

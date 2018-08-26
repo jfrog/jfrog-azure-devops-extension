@@ -11,7 +11,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
     before(() => {
         testUtils.initTests();
-        jfrogUtils = require("jfrog-utils");
+        jfrogUtils = require("artifactory-tasks-utils");
     });
 
     after(() => {

@@ -123,13 +123,13 @@
             }
         },
         {
-            "id": "artifactory-generic-upload",
+            "id": "artifactory-promote-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryGenericUpload"
+                "name": "tasks/ArtifactoryBuildPromotion"
             }
         },
         {
@@ -139,7 +139,17 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryGenericDownload"
+                "name": "tasks/ArtifactoryGenericDownload"
+            }
+        },
+        {
+            "id": "artifactory-generic-upload",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryGenericUpload"
             }
         },
         {
@@ -149,17 +159,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryPublishBuildInfo"
-            }
-        },
-        {
-            "id": "artifactory-promote-build-task",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "ArtifactoryPromote"
+                "name": "tasks/ArtifactoryPublishBuildInfo"
             }
         }
     ],
@@ -177,24 +177,20 @@
             "addressable": true
         },
         {
-            "path": "css",
-            "addressable": true
-        },
-        {
             "path": "images",
             "addressable": true
         },
         {
-            "path": "ArtifactoryGenericUpload"
+            "path": "tasks/ArtifactoryBuildPromotion"
         },
         {
-            "path": "ArtifactoryGenericDownload"
+            "path": "tasks/ArtifactoryGenericDownload"
         },
         {
-            "path": "ArtifactoryPublishBuildInfo"
+            "path": "tasks/ArtifactoryGenericUpload"
         },
         {
-            "path": "ArtifactoryPromote"
+            "path": "tasks/ArtifactoryPublishBuildInfo"
         }
     ]
 }

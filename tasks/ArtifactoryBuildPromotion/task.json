@@ -107,7 +107,7 @@
   ],
   "execution": {
     "Node": {
-      "target": "artifactoryPromote.js",
+      "target": "buildPromotion.js",
       "argumentFormat": "",
       "workingDirectory": "$(currentDirectory)"
     }

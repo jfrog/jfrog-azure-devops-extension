@@ -1,12 +1,12 @@
 {
-  "name": "jfrog-test-utils",
+  "name": "artifactory-test-utils",
   "version": "1.0.0",
   "author": "JFrog",
   "license": "Apache-2.0",
   "description": "Test utils",
   "main": "testUtils.js",
   "dependencies": {
-    "jfrog-utils": "file:../jfrog-utils/jfrog-utils-1.0.0.tgz",
+    "artifactory-tasks-utils": "file:../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz",
     "mocha": "^5.2.0",
     "path": "^0.12.7",
     "rmdir-recursive": "^0.0.1",

@@ -1,7 +1,7 @@
 #!/bin/bash
 echo Build started ...
 
-cd jfrog-utils
+cd artifactory-tasks-utils
 echo In path: $(pwd)
 rm -rf package-lock.json
 rm -rf node_modules
@@ -27,4 +27,4 @@ rm -rf node_modules
 npm install
 cd ..
 
-rm -rf jfrog-utils/node_modules
+rm -rf artifactory-tasks-utils/node_modules

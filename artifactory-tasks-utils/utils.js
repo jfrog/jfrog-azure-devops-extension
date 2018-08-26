@@ -6,17 +6,17 @@ const path = require('path');
 const request = require('request-promise-lite');
 const execSync = require('child_process').execSync;
 
-const fileName = getFileName();
+const fileName = getCliExecutableName();
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const version = "1.17.1";
-const versionedCliPath = encodePath(path.join(jfrogFolderPath, version, fileName));
-const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName));
-const cliUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + version + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
+const jfrogCliVersion = "1.17.1";
+const versionedCliPath = encodePath(path.join(jfrogFolderPath, jfrogCliVersion, fileName)); // Path that depends on jfrog-cli version. The default behaviour.
+const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
+const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 const MAX_CLI_DOWNLOADS_RETRIES = 10;
-const DOWNLOAD_CLI_ERR = "Failed while attempting to download JFrog CLI from " + cliUrl +
-    ". If this build agent is not accessible to the internet, you can manually place version " + version +
-    " of JFrog CLI on the agent in the following path: " + customCliPath;
+const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +
+    ". If this build agent cannot access the internet, you can manually download version " + jfrogCliVersion +
+    " of JFrog CLI and place it on the agent in the following path: " + customCliPath;
 
 let runTaskCbk = null;
 
@@ -109,10 +109,10 @@ function checkCliVersion(cliPath) {
     try {
         let res = execSync(cliCommand);
         let detectedVersion = String.fromCharCode.apply(null, res).split(' ')[2].trim();
-        if (detectedVersion === version) {
+        if (detectedVersion === jfrogCliVersion) {
             console.log("JFrog CLI version: " + detectedVersion);
         } else {
-            console.warn("Expected to find version " + version + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
+            console.warn("Expected to find version " + jfrogCliVersion + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
         }
     } catch (ex) {
         console.error("Failed to get JFrog CLI version: " + ex);
@@ -130,8 +130,8 @@ function createCliDirs() {
         fs.mkdirSync(jfrogFolderPath);
     }
 
-    if (!fs.existsSync(path.join(jfrogFolderPath, version))) {
-        fs.mkdirSync(path.join(jfrogFolderPath, version));
+    if (!fs.existsSync(path.join(jfrogFolderPath, jfrogCliVersion))) {
+        fs.mkdirSync(path.join(jfrogFolderPath, jfrogCliVersion));
     }
 }
 
@@ -142,7 +142,7 @@ function downloadCli(attemptNumber) {
                 console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
                 downloadCli(++attemptNumber);
             } else {
-                console.error(DOWNLOAD_CLI_ERR);
+                console.error(jfrogCliDownloadErrorMessage);
                 reject(err);
             }
         };
@@ -150,7 +150,7 @@ function downloadCli(attemptNumber) {
         const cliTmpPath = encodePath(versionedCliPath + ".tmp");
 
         // Perform download
-        request.get(cliUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
+        request.get(jfrogCliDownloadUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
             // Check valid response
             if (response.statusCode < 200 || response.statusCode >= 300) {
                 handleError("Received http response code " + response.statusCode);
@@ -188,7 +188,7 @@ function downloadCli(attemptNumber) {
                 }
             });
         }).catch((err) => {
-            console.error(DOWNLOAD_CLI_ERR);
+            console.error(jfrogCliDownloadErrorMessage);
             tl.setResult(tl.TaskResult.Failed, err.message);
         })
     });
@@ -208,7 +208,7 @@ function getArchitecture() {
     return "linux-386"
 }
 
-function getFileName() {
+function getCliExecutableName() {
     let executable = "jfrog";
     if (process.platform.startsWith("win")) {
         executable += ".exe"

@@ -1,6 +1,6 @@
 
 const tl = require('vsts-task-lib/task');
-const utils = require('jfrog-utils');
+const utils = require('artifactory-tasks-utils');
 
 const cliPromoteCommand = "rt bpr";
 
