@@ -1,6 +1,6 @@
 {
   "id": "58521715-7f44-4090-a3a6-28153049ce37",
-  "name": "Artifactory Promote",
+  "name": "ArtifactoryBuildPromotion",
   "friendlyName": "Artifactory Build Promotion",
   "description": "This task promotes a published build in Artifactory.",
   "author": "JFrog",

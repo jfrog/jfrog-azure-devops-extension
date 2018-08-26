@@ -1,15 +1,15 @@
 {
   "name": "artifactorypublishbuildinfo",
   "version": "1.0.0",
-  "description": "",
+  "author": "JFrog",
+  "license": "Apache-2.0",
+  "description": "This task publishes the Build Info collected in previous tasks.",
   "main": "publishBuildInfo.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "vsts-task-lib": "^2.6.0",
-    "jfrog-utils": "file:..//jfrog-utils//jfrog-utils-1.0.0.tgz"
+    "jfrog-utils": "file:../../jfrog-utils/jfrog-utils-1.0.0.tgz"
   }
 }
