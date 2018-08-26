@@ -30,8 +30,7 @@ module.exports = {
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
-    getArchitecture: getArchitecture,
-    determineCliWorkDir : determineCliWorkDir
+    getArchitecture: getArchitecture
 };
 
 function executeCliTask(runTaskFunc) {
@@ -103,17 +102,6 @@ function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
     cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + val);
     return cliCommand
-}
-
-// Determines the required working directory for running the cli.
-// Decision is based on the default path to run, and the provided path by the user.
-function determineCliWorkDir(defaultPath, providedPath) {
-    if (providedPath && path.isAbsolute(providedPath)) {
-        return providedPath;
-    } else if (providedPath) {
-        return path.join(defaultPath, providedPath);
-    }
-    return defaultPath;
 }
 
 function checkCliVersion(cliPath) {

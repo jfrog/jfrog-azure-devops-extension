@@ -2,7 +2,7 @@
     "id": "07fc5c20-6772-11d2-cace-6501d1a00335",
     "name": "ArtifactoryNpm",
     "friendlyName": "Artifactory npm",
-    "description": "Install, pack and deploy npm projects to Artifactory",
+    "description": "Install, pack and deploy npm packages to Artifactory",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Npm+Registry)",
     "category": "Utility",
@@ -31,7 +31,7 @@
             },
             "options": {
                 "install": "install",
-                "publish": "publish"
+                "packAndPublish": "pack and publish"
             }
         },
         {
@@ -40,7 +40,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service used for npm tasks."
+            "helpMarkDown": "The Artifactory service used by the task."
         },
         {
             "name": "sourceRepo",
@@ -88,7 +88,7 @@
             "label": "Collect build info",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Select to collect build info."
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
         }
     ],
     "dataSourceBindings": [

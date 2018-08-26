@@ -22,7 +22,7 @@ function RunTaskCbk(cliPath) {
 
     // Determine working directory for the cli
     let inputWorkingFolder = tl.getInput("workingFolder", false);
-    let requiredWorkDir = utils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
+    let requiredWorkDir = determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
 
     // Determine npm command
     let inputCommand = tl.getInput("command", true);
@@ -30,7 +30,7 @@ function RunTaskCbk(cliPath) {
     if (inputCommand === "install") {
         cliNpmCommand = npmInstallCommand;
         npmRepository = tl.getInput("sourceRepo", true);
-    } else if (inputCommand === "publish") {
+    } else if (inputCommand === "packAndPublish") {
         cliNpmCommand = npmPublishCommand;
         npmRepository = tl.getInput("targetRepo", true);
     } else {
@@ -55,6 +55,18 @@ function RunTaskCbk(cliPath) {
     } else {
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }
+}
+
+// Determines the required working directory for running the cli.
+// Decision is based on the default path to run, and the provided path by the user.
+function determineCliWorkDir(defaultPath, providedPath) {
+    if (providedPath) {
+        if (path.isAbsolute()) {
+            return providedPath;
+        }
+        return path.join(defaultPath, providedPath);
+    }
+    return defaultPath;
 }
 
 utils.executeCliTask(RunTaskCbk);
