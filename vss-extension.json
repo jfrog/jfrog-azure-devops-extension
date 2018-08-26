@@ -2,7 +2,7 @@
     "manifestversion": 1,
     "public": true,
     "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.0.2",
+    "version": "1.0.6",
     "name": "JFrog Artifactory",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "JFrog",
@@ -46,6 +46,9 @@
         },
         "support": {
             "uri": "https://www.jfrog.com/support"
+        },
+        "repository": {
+            "uri": "https://github.com/jfrog/artifactory-vsts-extension"
         }
     },
     "branding": {
@@ -73,8 +76,7 @@
                         "endpointUrl": "{{endpoint.url}}/api/plugins",
                         "resourceUrl": "",
                         "resultSelector": "jsonpath:$.values[*]",
-                        "headers": [
-                        ],
+                        "headers": [],
                         "authenticationScheme": null
                     }
                 ],
@@ -159,6 +161,16 @@
             "properties": {
                 "name": "ArtifactoryPromote"
             }
+        },
+        {
+            "id": "artifactory-npm",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryNpm"
+            }
         }
     ],
     "files": [
@@ -193,6 +205,9 @@
         },
         {
             "path": "ArtifactoryPromote"
+        },
+        {
+            "path": "ArtifactoryNpm"
         }
     ]
 }

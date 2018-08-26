@@ -3,7 +3,7 @@
   "name": "Artifactory Promote",
   "friendlyName": "Artifactory Build Promotion",
   "description": "This task promotes a published build in Artifactory.",
-  "author": "jfrog",
+  "author": "JFrog",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -13,7 +13,7 @@
   "version": {
     "Major": "1",
     "Minor": "0",
-    "Patch": "0"
+    "Patch": "6"
   },
   "minimumAgentVersion": "1.83.0",
   "instanceNameFormat": "Artifactory Build Promotion",
@@ -28,11 +28,14 @@
     },
     {
       "name": "targetRepo",
-      "type": "string",
+      "type": "pickList",
       "label": "Target repository",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Sets the target promotion repository."
+      "helpMarkDown": "Sets the target promotion repository.",
+      "properties": {
+        "EditableOptions": "True"
+      }
     },
     {
       "name": "status",
@@ -52,11 +55,14 @@
     },
     {
       "name": "sourceRepo",
-      "type": "string",
+      "type": "pickList",
       "label": "Source repository",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Sets the source repository from which to promote the release published artifacts. If not specified, Artifactory would determine from which repository to promote."
+      "helpMarkDown": "Sets the source repository from which to promote the release published artifacts. If not specified, Artifactory would determine from which repository to promote.",
+      "properties": {
+        "EditableOptions": "True"
+      }
     },
     {
       "name": "includeDependencies",
@@ -81,6 +87,22 @@
       "defaultValue": "false",
       "required": true,
       "helpMarkDown": "When selected, the promotion is simulated and the build is not promoted. A failed simulation causes the task to fail."
+    }
+  ],
+  "dataSourceBindings": [
+    {
+      "endpointId": "$(artifactoryService)",
+      "endpointURL": "{{endpoint.url}}/api/repositories",
+      "target": "targetRepo",
+      "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+    },
+    {
+      "endpointId": "$(artifactoryService)",
+      "endpointURL": "{{endpoint.url}}/api/repositories",
+      "target": "sourceRepo",
+      "resultSelector": "jsonpath:$[?(@.type=='LOCAL')]",
+      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
     }
   ],
   "execution": {

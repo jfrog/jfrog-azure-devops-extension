@@ -3,7 +3,7 @@
     "name": "ArtifactoryGenericUpload",
     "friendlyName": "Artifactory Generic Upload",
     "description": "This task uploads generic build artifacts to Artifactory",
-    "author": "jfrog",
+    "author": "JFrog",
     "helpMarkDown": "Upload artifacts to JFrog Artifactory using FileSpecs.",
     "category": "Utility",
     "visibility": [
@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "6"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "Artifactory Generic Upload",
@@ -46,7 +46,7 @@
             "label": "Collect build info",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Select to collect build info."
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
         },
         {
             "name": "failNoOp",

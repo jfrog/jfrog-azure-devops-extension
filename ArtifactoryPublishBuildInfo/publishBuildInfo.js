@@ -7,9 +7,13 @@ const cliBuildPublishCommand = "rt bp";
 const cliCollectEnvVarsCommand = "rt bce";
 
 function RunTaskCbk(cliPath) {
-    let buildDir = tl.getVariable('Agent.BuildDirectory');
-    let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
-    let buildNumber = tl.getVariable('BUILD_BUILDNUMBER');
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
+    if (!workDir) {
+        tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
+        return;
+    }
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
@@ -21,7 +25,7 @@ function RunTaskCbk(cliPath) {
         console.log("Collecting environment variables...");
         let cliEnvVarsCommand = utils.cliJoin(cliPath, cliCollectEnvVarsCommand, utils.quote(buildDefinition), utils.quote(buildNumber));
 
-        let taskRes = utils.executeCliCommand(cliEnvVarsCommand, buildDir);
+        let taskRes = utils.executeCliCommand(cliEnvVarsCommand, workDir);
         if (taskRes) {
             tl.setResult(tl.TaskResult.Failed, taskRes);
             return;
@@ -31,20 +35,19 @@ function RunTaskCbk(cliPath) {
     let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
-    let taskRes = utils.executeCliCommand(cliCommand, buildDir);
+    let taskRes = utils.executeCliCommand(cliCommand, workDir);
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
     } else {
-        attachBuildInfoUrl(buildDefinition, buildNumber);
+        attachBuildInfoUrl(buildDefinition, buildNumber, workDir);
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }
 }
 
-function attachBuildInfoUrl(buildName, buildNumber) {
-    let buildDir = tl.getVariable('Agent.BuildDirectory');
+function attachBuildInfoUrl(buildName, buildNumber, workDir) {
     let artifactory = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactory, false);
-    let artifactoryUrlFile = path.join(buildDir, "artifactoryUrlFile");
+    let artifactoryUrlFile = path.join(workDir, "artifactoryUrlFile");
     let buildDetails = {
         artifactoryUrl: artifactoryUrl,
         buildName: buildName,
