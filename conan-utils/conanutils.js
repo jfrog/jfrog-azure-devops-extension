@@ -18,7 +18,7 @@ const BUILD_INFO_BUILD_STARTED = "started";
 /**
 * Execute Artifactory Conan Task
 * @param workingDir (string) - Path to Working Directory where Conan command will
-                               be executed
+*                               be executed
 * @param conanUserHome (string) - Conan User Home location
 * @param commandArgs (Array) - Conan command arguments
 * @param collectBuildInfo (Boolean) - Collect BuildInfo flag
@@ -319,7 +319,51 @@ function convertConanPropertiesToMap(propertiesContent) {
     return map;
 }
 
+/**
+* Purge existing Conan remote repositories
+*
+* @param workingDir (string) - Path to Working Directory where Conan command will
+*                               be executed
+* @param conanUserHome (string) - Conan User Home location
+*/
+let purgeConanRemotes = async(function (workingDir, conanUserHome) {
+    try {
+        /*
+        * Get Conan tool Path. This will force the conan task to fail fast if
+        * conan tool is not available in the PATH
+        */
+        let conanPath = tl.which('conan', true);
+        console.log("Running Conan build tool from: " + conanPath);
+
+        /*
+        * Set Conan Environment Variable
+        * Conan User Home is set as a variable in the phase scope so it will be
+        * availabe to every task running after this one
+        */
+        if (!conanUserHome) {
+            conanUserHome = getDefaultConanUserHome();
+        }
+        console.log("Conan User Home: " + conanUserHome);
+        tl.setVariable('CONAN_USER_HOME', conanUserHome);
+
+        // Make sure Conan User Home exists
+        let conanFolder = path.join(conanUserHome, '.conan');
+        fs.mkdirsSync(conanFolder);
+
+        // Empty registry.txt file to remove all existing remotes
+        let registryFile = path.join(conanFolder, 'registry.txt');
+        console.log("Purging Conan remotes by removing content of " + registryFile);
+        fs.writeFileSync(registryFile, '');
+
+        return true;
+    } catch (err) {
+        console.error("Conan task failed with exception: " + err.message);
+        return false;
+    }
+});
+
 module.exports = {
     executeConanTask: executeConanTask,
-    publishBuildInfo: pbi.publishBuildInfo
+    publishBuildInfo: pbi.publishBuildInfo,
+    purgeConanRemotes: purgeConanRemotes
 }

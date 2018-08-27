@@ -74,6 +74,15 @@
             }
         },
         {
+            "name": "purgeExistingRemotes",
+            "type": "boolean",
+            "label": "Purge Existing Remotes",
+            "visibleRule": "conanCommand = Add Remote",
+            "defaultValue": "false",
+            "required": true,
+            "helpMarkDown": "Purge existing remotes before adding this new one."
+        },
+        {
             "name": "configSourceType",
             "type": "radio",
             "label": "Source Type",
@@ -88,12 +97,12 @@
         },
         {
             "name": "configZipPath",
-            "type": "filePath",
-            "label": "Zip File Path",
+            "type": "string",
+            "label": "Zip File location",
             "visibleRule": "conanCommand = Config Install && configSourceType = zip",
             "required": true,
             "defaultValue": "",
-            "helpMarkDown": "Path to configuration zip file to be installed."
+            "helpMarkDown": "Path or URL to configuration zip file to be installed."
         },
         {
             "name": "configInstallGit",
@@ -163,7 +172,7 @@
             "type": "boolean",
             "label": "Collect build info",
             "visibleRule": "conanCommand = Install || conanCommand = Upload || conanCommand = Create || conanCommand = Custom",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "required": false,
             "helpMarkDown": "Select to collect build info."
         },

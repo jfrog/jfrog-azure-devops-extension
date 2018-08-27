@@ -164,6 +164,11 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "conanAddRemote");
         });
 
+        runTest("Conan Add Remote With Purge", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemoteWithPurge");
+        });
+
         runTest("Conan Create And Upload", () => {
             let testDir = "conanTask";
             mockTask(testDir, "conanAddRemote");

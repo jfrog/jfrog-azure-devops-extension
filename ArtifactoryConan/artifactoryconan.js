@@ -48,7 +48,7 @@ let handleConfigInstallCommand = async(function() {
     conanArguments = addExtraArguments(conanArguments, extraArguments);
 
     if (configSourceType == "zip") {
-        let configZipPath = tl.getPathInput("configZipPath", true, true);
+        let configZipPath = tl.getInput("configZipPath", true);
         conanArguments.push(configZipPath);
     } else {
         let configInstallGit = tl.getInput("configInstallGit", true);
@@ -76,11 +76,22 @@ let handleAddRemoteCommand = async(function() {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
     let conanRepo = tl.getInput("conanRepo", true);
+    let purgeExistingRemotes = tl.getBoolInput("purgeExistingRemotes", true);
 
     let conanArguments = [
         "remote", "add", remoteName, artifactoryUrl + "/api/conan/" + conanRepo,
         "--insert", "--force"
     ];
+
+    // Purge existing
+    if (purgeExistingRemotes) {
+        let taskSuccessful = await(conanutils.purgeConanRemotes(workingDirectory,
+            conanUserHome));
+        if (!taskSuccessful) {
+            setTaskResult(taskSuccessful);
+            return;
+        }
+    }
 
     // Add remote repo configuration
     let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
