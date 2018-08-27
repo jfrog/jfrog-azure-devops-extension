@@ -9,13 +9,19 @@ const os = require("os");
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
+    let npmBuild;
     before(() => {
         testUtils.initTests();
         jfrogUtils = require("jfrog-utils");
+        npmBuild = require("../ArtifactoryNpm/npmBuild");
     });
 
     after(() => {
-        testUtils.cleanUpTests();
+        testUtils.cleanUpAllTests();
+    });
+
+    beforeEach (() => {
+        testUtils.cleanUpBetweenTests();
     });
 
     describe("Utils Tests", () => {
@@ -81,7 +87,21 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                 default:
                     assert.fail("Unsupported OS found: " + os.type());
             }
-        })
+        });
+    });
+
+    describe("Unit Tests", () => {
+        runTest("npm - Determine cli workdir", () => {
+            if (process.platform.startsWith("win")) {
+                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
+                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
+                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
+             } else {
+                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
+                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
+                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
+            }
+        });
     });
 
     describe("Upload and Download Tests", () => {
@@ -89,19 +109,19 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let testDir = "uploadAndDownload";
             mockTask(testDir, "upload");
             mockTask(testDir, "download");
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Download fail-no-op", () => {
             let testDir = "downloadFailNoOp";
             mockTask(testDir, "download", true);
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
     });
 
@@ -112,7 +132,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "download");
             assertAndDeleteBuild("buildPublish", "3");
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
     });
 
@@ -124,7 +144,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
             assertAndDeleteBuild("buildPromote", "3");
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Build promotion dry run", () => {
@@ -134,7 +154,17 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
             assertAndDeleteBuild("buildPromoteDryRun", "3");
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
+        });
+    });
+
+    describe("Npm Tests", () => {
+        runTest("Npm", () => {
+            let testDir = "npm";
+            mockTask(testDir, "install");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
         });
     });
 });
@@ -166,13 +196,14 @@ function mockTask(testDir, taskName, isNegative) {
 
 /**
  * Assert that the files that were downloaded to "testData" are correct.
- * @param testDir - (String) - The test directory in resources
+ * @param expectedFiles - (String) - The relative path of expected files under tests/resources
+ * @param resultFiles - (String) - The relative path of result files under testDataDir
  */
-function assertFiles(testDir) {
+function assertFiles(expectedFiles, resultFiles) {
     // Check that all necessary files were downloaded to "testDir/<testName>/"
     let filesToCheck = [];
-    let filesDir = path.join(__dirname, "resources", testDir, "files");
-    let testData = path.join(testUtils.testDataDir, testDir);
+    let filesDir = path.join(__dirname, "resources", expectedFiles);
+    let testData = path.join(testUtils.testDataDir, resultFiles);
     if (fs.existsSync(filesDir)) {
         let files = fs.readdirSync(filesDir);
         for (let i = 0; i < files.length; i++) {

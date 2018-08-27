@@ -2,6 +2,8 @@
     "name": "artifactory-vsts-extension",
     "version": "1.0.0",
     "dependencies": {
+        "babel": "^6.23.0",
+        "babel-core": "^6.26.3",
         "tfx-cli": "^0.5.14"
     },
     "scripts": {
