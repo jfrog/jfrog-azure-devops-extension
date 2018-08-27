@@ -161,6 +161,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryPublishBuildInfo"
             }
+        },
+        {
+            "id": "artifactory-npm",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryNpm"
+            }
         }
     ],
     "files": [
@@ -191,6 +201,9 @@
         },
         {
             "path": "tasks/ArtifactoryPublishBuildInfo"
+        },
+        {
+            "path": "tasks/ArtifactoryNpm"
         }
     ]
 }
