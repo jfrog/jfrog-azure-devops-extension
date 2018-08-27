@@ -152,6 +152,17 @@
                 "name": "tasks/ArtifactoryGenericUpload"
             }
         },
+
+        {
+            "id": "artifactory-npm",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryNpm"
+            }
+        },
         {
             "id": "artifactory-publish-build-info",
             "type": "ms.vss-distributed-task.task",
@@ -160,16 +171,6 @@
             ],
             "properties": {
                 "name": "tasks/ArtifactoryPublishBuildInfo"
-            }
-        },
-        {
-            "id": "artifactory-npm",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "ArtifactoryNpm"
             }
         }
     ],
@@ -200,10 +201,10 @@
             "path": "tasks/ArtifactoryGenericUpload"
         },
         {
-            "path": "tasks/ArtifactoryPublishBuildInfo"
+            "path": "tasks/ArtifactoryNpm"
         },
         {
-            "path": "tasks/ArtifactoryNpm"
+            "path": "tasks/ArtifactoryPublishBuildInfo"
         }
     ]
 }
