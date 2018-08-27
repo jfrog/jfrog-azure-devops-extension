@@ -123,7 +123,7 @@ function setVariables(variables) {
 }
 
 function setInputs(inputs) {
-    tl.getInput = tl.getBoolInput = (name, required) => {
+    tl.getInput = tl.getBoolInput = tl.getPathInput = (name, required) => {
         return inputs[name];
     };
 }

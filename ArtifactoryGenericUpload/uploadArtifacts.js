@@ -2,6 +2,7 @@
 const tl = require('vsts-task-lib/task');
 const utils = require('jfrog-utils');
 const path = require('path');
+const fs = require('fs-extra');
 
 const cliDownloadCommand = "rt u";
 
@@ -18,10 +19,17 @@ function RunTaskCbk(cliPath) {
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    let fileSpec = tl.getInput("fileSpec", false);
+    let specSource = tl.getInput("specSource", false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
     try {
+        let fileSpec;
+        if (specSource === "file") {
+            specPath = tl.getPathInput("file", true, true);
+            fileSpec = fs.readFileSync(specPath, "utf8");
+        } else {
+            fileSpec = tl.getInput("fileSpec", true);
+        }
         fileSpec = utils.fixWindowsPaths(fileSpec);
         console.log("Using file spec:");
         console.log(fileSpec);
