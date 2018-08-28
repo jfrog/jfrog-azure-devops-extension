@@ -117,7 +117,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let testDir = "uploadAndDownloadFromFile";
             mockTask(testDir, "upload");
             mockTask(testDir, "download");
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         })
 
         runTest("Upload fail-no-op", () => {
@@ -198,9 +198,10 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     describe("Npm Tests", () => {
         runTest("Npm", () => {
             let testDir = "npm";
-            mockTask(testDir, "install");
-            mockTask(testDir, "publish");
+            mockTask(testDir, "npmInstall");
+            mockTask(testDir, "npmPublish");
             mockTask(testDir, "download");
+            mockTask(testDir, "publish");
             assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
             getAndAssertBuild("npmTest", "1");
             deleteBuild("npmTest");
