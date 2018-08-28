@@ -28,12 +28,12 @@
       "helpMarkDown": "Artifactory service used for publishing the build info."
     },
     {
-      "name": "includeEnvVars",
-      "type": "boolean",
-      "label": "Include environment variables",
-      "defaultValue": "false",
+      "name": "excludeEnvVars",
+      "type": "string",
+      "label": "Exclude environment variables",
+      "defaultValue": "*password*;*secret*;*key*;*token*",
       "required": false,
-      "helpMarkDown": "Select to include environment variables in the published build info."
+      "helpMarkDown": "List of case insensitive patterns in the form of value1;value2;.... Environment variables match those patterns will be excluded."
     }
   ],
   "execution": {

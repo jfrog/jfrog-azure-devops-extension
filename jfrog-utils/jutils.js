@@ -30,7 +30,8 @@ module.exports = {
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
-    getArchitecture: getArchitecture
+    getArchitecture: getArchitecture,
+    collectEnv: collectEnv
 };
 
 function executeCliTask(runTaskFunc) {
@@ -271,4 +272,18 @@ function encodePath(str) {
     }
 
     return encodedPath;
+}
+
+/**
+ * Run collect environment variables command.
+ * @param cliPath - (String) - The cli path.
+ * @param buildDefinition - (String) - The build name.
+ * @param buildNumber - (String) - The build number.
+ * @param workDir - (String) - Task's working directory.
+ * @returns (String|void) - String with error message or void if passes successfully.
+ */
+function collectEnv(cliPath, buildDefinition, buildNumber, workDir) {
+    console.log("Collecting environment variables...");
+    let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
+    return executeCliCommand(cliEnvVarsCommand, workDir);
 }

@@ -26,7 +26,7 @@ module.exports = {
     getTestLocalFilesDir: getTestLocalFilesDir,
     getLocalTestDir: getLocalTestDir,
     getRemoteTestDir: getRemoteTestDir,
-    isBuildExist: isBuildExist,
+    getBuild: getBuild,
     deleteBuild: deleteBuild,
     cleanUpTests: cleanUpTests,
     execCli: execCli
@@ -63,13 +63,12 @@ function execCli(command) {
     }
 }
 
-function isBuildExist(buildName, buildNumber) {
-    let res = syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
+function getBuild(buildName, buildNumber) {
+    return syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
         }
     });
-    return res.statusCode === 200;
 }
 
 function deleteBuild(buildName) {
