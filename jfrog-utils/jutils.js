@@ -30,7 +30,8 @@ module.exports = {
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
-    getArchitecture: getArchitecture
+    getArchitecture: getArchitecture,
+    collectEnvIfRequested: collectEnvIfRequested
 };
 
 function executeCliTask(runTaskFunc) {
@@ -271,4 +272,21 @@ function encodePath(str) {
     }
 
     return encodedPath;
+}
+
+/**
+ * Runs collect environment variables JFrog CLI command.
+ * @param cliPath - (String) - The cli path.
+ * @param buildDefinition - (String) - The build name.
+ * @param buildNumber - (String) - The build number.
+ * @param workDir - (String) - Task's working directory.
+ * @returns (String|void) - String with error message or void if passes successfully.
+ */
+function collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir) {
+    let includeEnvVars = tl.getBoolInput("includeEnvVars");
+    if (includeEnvVars) {
+        console.log("Collecting environment variables...");
+        let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
+        return executeCliCommand(cliEnvVarsCommand, workDir);
+    }
 }

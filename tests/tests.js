@@ -113,6 +113,13 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), testDir);
         });
 
+        runTest("Upload and Download From File", () => {
+            let testDir = "uploadAndDownloadFromFile";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "download");
+            assertFiles(testDir);
+        })
+
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);
@@ -124,6 +131,19 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "download", true);
             assertFiles(path.join(testDir, "files"), testDir);
         });
+
+        runTest("Include Environment Variables", () => {
+            let testDir = "includeEnv";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            let build = getBuild("includeEnv", "3");
+            assertBuildEnv(build, "buildInfo.env.BUILD_DEFINITIONNAME", "includeEnv");
+            assertBuildEnv(build, "buildInfo.env.BUILD_BUILDNUMBER", "3");
+            assertBuildEnv(build, "buildInfo.env.BUILD_UNDEFINED", "undefined");
+            assertBuildEnv(build, "buildInfo.env.BUILD_NULL", "null");
+            assertBuildEnv(build, "buildInfo.env.BUILD_PASSWORD", "open-sesame");
+            deleteBuild("includeEnv");
+        })
     });
 
     describe("Publish Build Info Tests", () => {
@@ -132,9 +152,23 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
             mockTask(testDir, "download");
-            assertAndDeleteBuild("buildPublish", "3");
             assertFiles(path.join(testDir, "files"), testDir);
+            getBuild("buildPublish", "3");
+            deleteBuild("buildPublish");
         });
+
+        runTest("Exclude Environment Variables", () => {
+            let testDir = "excludeEnv";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            let build = getBuild("excludeEnv", "3");
+            assertBuildEnv(build, "buildInfo.env.BUILD_DEFINITIONNAME", "excludeEnv");
+            assertBuildEnv(build, "buildInfo.env.BUILD_BUILDNUMBER", "3");
+            assertBuildEnv(build, "buildInfo.env.BUILD_UNDEFINED", "undefined");
+            assertBuildEnv(build, "buildInfo.env.BUILD_NULL", "null");
+            assertBuildEnv(build, "buildInfo.env.BUILD_PASSWORD", undefined);
+            deleteBuild("excludeEnv");
+        })
     });
 
     describe("Build Promotion Tests", () => {
@@ -144,8 +178,9 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
-            assertAndDeleteBuild("buildPromote", "3");
             assertFiles(path.join(testDir, "files"), testDir);
+            getBuild("buildPromote", "3");
+            deleteBuild("buildPromote");
         });
 
         runTest("Build promotion dry run", () => {
@@ -154,8 +189,9 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
-            assertAndDeleteBuild("buildPromoteDryRun", "3");
             assertFiles(path.join(testDir, "files"), testDir);
+            getBuild("buildPromoteDryRun", "3");
+            deleteBuild("buildPromoteDryRun");
         });
     });
 
@@ -166,6 +202,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "download");
             assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
+            getBuild("npmTest", "1");
+            deleteBuild("npmTest");
         });
     });
 });
@@ -227,11 +265,31 @@ function assertFiles(expectedFiles, resultFiles) {
 }
 
 /**
- * Assert build exist in Artifactory and delete it.
+ * Get build from Artifactory.
  * @param buildName - (String) - The build name
  * @param buildNumber - (String) - The build number
  */
-function assertAndDeleteBuild(buildName, buildNumber) {
-    assert(testUtils.isBuildExist(buildName, buildNumber), "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory");
+function getBuild(buildName, buildNumber) {
+    let build = testUtils.getBuild(buildName, buildNumber);
+    assertBuild(build, buildName, buildNumber);
+    return build;
+}
+
+/**
+ * Assert build environment in the build.
+ * @param build - (Object) - The build object returned from Artifactory
+ * @param key - (String) - The build environment key
+ * @param value - (String) - The build environment value
+ */
+function assertBuildEnv(build, key, value) {
+    let body = JSON.parse(build.getBody('utf8'));
+    assert.equal(body["buildInfo"]["properties"][key], value);
+}
+
+function assertBuild(build, buildName, buildNumber) {
+    assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory");
+}
+
+function deleteBuild(buildName) {
     testUtils.deleteBuild(buildName);
 }

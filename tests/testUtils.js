@@ -30,7 +30,7 @@ module.exports = {
     getTestLocalFilesDir: getTestLocalFilesDir,
     getLocalTestDir: getLocalTestDir,
     getRemoteTestDir: getRemoteTestDir,
-    isBuildExist: isBuildExist,
+    getBuild: getBuild,
     deleteBuild: deleteBuild,
     cleanUpAllTests: cleanUpAllTests,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
@@ -53,7 +53,7 @@ function runTask(testMain, variables, inputs) {
 
     setVariables(variables);
     setArtifactoryCredentials();
-    setInputs(inputs);
+    mockGetInputs(inputs);
 
     tmr.registerMock('vsts-task-lib/mock-task', tl);
     tmr.run();
@@ -75,13 +75,12 @@ function recreateTestDataDir() {
     fs.mkdirSync(testDataDir);
 }
 
-function isBuildExist(buildName, buildNumber) {
-    let res = syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
+function getBuild(buildName, buildNumber) {
+    return syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
         }
     });
-    return res.statusCode === 200;
 }
 
 function deleteBuild(buildName) {
@@ -182,8 +181,13 @@ function setVariables(variables) {
     }
 }
 
-function setInputs(inputs) {
-    tl.getInput = tl.getBoolInput = (name, required) => {
+/**
+ * Override tl.getInput(), tl.getBoolInput() and tl.getPathInput() functions.
+ * The test will return inputs[name] instead of using the original functions.
+ * @param inputs - (String) - Test inputs
+ */
+function mockGetInputs(inputs) {
+    tl.getInput = tl.getBoolInput = tl.getPathInput = (name, required) => {
         return inputs[name];
     };
 }
