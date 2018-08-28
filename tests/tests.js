@@ -136,7 +136,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let testDir = "includeEnv";
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
-            let build = getBuild("includeEnv", "3");
+            let build = getAndAssertBuild("includeEnv", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_DEFINITIONNAME", "includeEnv");
             assertBuildEnv(build, "buildInfo.env.BUILD_BUILDNUMBER", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_UNDEFINED", "undefined");
@@ -153,7 +153,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "download");
             assertFiles(path.join(testDir, "files"), testDir);
-            getBuild("buildPublish", "3");
+            getAndAssertBuild("buildPublish", "3");
             deleteBuild("buildPublish");
         });
 
@@ -161,7 +161,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let testDir = "excludeEnv";
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
-            let build = getBuild("excludeEnv", "3");
+            let build = getAndAssertBuild("excludeEnv", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_DEFINITIONNAME", "excludeEnv");
             assertBuildEnv(build, "buildInfo.env.BUILD_BUILDNUMBER", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_UNDEFINED", "undefined");
@@ -179,7 +179,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
             assertFiles(path.join(testDir, "files"), testDir);
-            getBuild("buildPromote", "3");
+            getAndAssertBuild("buildPromote", "3");
             deleteBuild("buildPromote");
         });
 
@@ -190,7 +190,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
             assertFiles(path.join(testDir, "files"), testDir);
-            getBuild("buildPromoteDryRun", "3");
+            getAndAssertBuild("buildPromoteDryRun", "3");
             deleteBuild("buildPromoteDryRun");
         });
     });
@@ -202,7 +202,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "download");
             assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
-            getBuild("npmTest", "1");
+            getAndAssertBuild("npmTest", "1");
             deleteBuild("npmTest");
         });
     });
@@ -265,11 +265,11 @@ function assertFiles(expectedFiles, resultFiles) {
 }
 
 /**
- * Get build from Artifactory.
+ * Get build from Artifactory and assert that it exists.
  * @param buildName - (String) - The build name
  * @param buildNumber - (String) - The build number
  */
-function getBuild(buildName, buildNumber) {
+function getAndAssertBuild(buildName, buildNumber) {
     let build = testUtils.getBuild(buildName, buildNumber);
     assertBuild(build, buildName, buildNumber);
     return build;
