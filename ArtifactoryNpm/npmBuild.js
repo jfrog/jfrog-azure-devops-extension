@@ -1,6 +1,7 @@
 
 const tl = require('vsts-task-lib/task');
 const utils = require('jfrog-utils');
+const path = require('path');
 
 const npmInstallCommand = "rt npmi";
 const npmPublishCommand = "rt npmp";
@@ -68,12 +69,16 @@ function RunTaskCbk(cliPath) {
 // Decision is based on the default path to run, and the provided path by the user.
 function determineCliWorkDir(defaultPath, providedPath) {
     if (providedPath) {
-        if (path.isAbsolute()) {
+        if (path.isAbsolute(providedPath)) {
             return providedPath;
         }
         return path.join(defaultPath, providedPath);
     }
     return defaultPath;
 }
+
+module.exports = {
+    determineCliWorkDir: determineCliWorkDir
+};
 
 utils.executeCliTask(RunTaskCbk);

@@ -15,10 +15,19 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     });
 
     after(() => {
-        testUtils.cleanUpTests();
+        testUtils.cleanUpAllTests();
     });
 
-    describe("Utils Tests", () => {
+    beforeEach (() => {
+        testUtils.cleanUpBetweenTests();
+    });
+
+    describe("Unit Tests", () => {
+        let npmBuild;
+        before(() => {
+            npmBuild = require("../ArtifactoryNpm/npmBuild");
+        });
+
         console.log("OS:", os.type());
         runTest("Mask password", () => {
             let oldPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
@@ -81,7 +90,19 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                 default:
                     assert.fail("Unsupported OS found: " + os.type());
             }
-        })
+        });
+
+        runTest("npm - Determine cli workdir", () => {
+            if (process.platform.startsWith("win")) {
+                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
+                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
+                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
+            } else {
+                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
+                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
+                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
+            }
+        });
     });
 
     describe("Upload and Download Tests", () => {
@@ -89,7 +110,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let testDir = "uploadAndDownload";
             mockTask(testDir, "upload");
             mockTask(testDir, "download");
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Upload and Download From File", () => {
@@ -102,20 +123,20 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Download fail-no-op", () => {
             let testDir = "downloadFailNoOp";
             mockTask(testDir, "download", true);
-            assertFiles(testDir);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Include Environment Variables", () => {
             let testDir = "includeEnv";
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
-            let build = getBuild("includeEnv", "3");
+            let build = getAndAssertBuild("includeEnv", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_DEFINITIONNAME", "includeEnv");
             assertBuildEnv(build, "buildInfo.env.BUILD_BUILDNUMBER", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_UNDEFINED", "undefined");
@@ -131,8 +152,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
             mockTask(testDir, "download");
-            assertFiles(testDir);
-            getBuild("buildPublish", "3");
+            assertFiles(path.join(testDir, "files"), testDir);
+            getAndAssertBuild("buildPublish", "3");
             deleteBuild("buildPublish");
         });
 
@@ -140,7 +161,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let testDir = "excludeEnv";
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
-            let build = getBuild("excludeEnv", "3");
+            let build = getAndAssertBuild("excludeEnv", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_DEFINITIONNAME", "excludeEnv");
             assertBuildEnv(build, "buildInfo.env.BUILD_BUILDNUMBER", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_UNDEFINED", "undefined");
@@ -157,8 +178,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
-            assertFiles(testDir);
-            getBuild("buildPromote", "3");
+            assertFiles(path.join(testDir, "files"), testDir);
+            getAndAssertBuild("buildPromote", "3");
             deleteBuild("buildPromote");
         });
 
@@ -168,9 +189,21 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "promote");
             mockTask(testDir, "download");
-            assertFiles(testDir);
-            getBuild("buildPromoteDryRun", "3");
+            assertFiles(path.join(testDir, "files"), testDir);
+            getAndAssertBuild("buildPromoteDryRun", "3");
             deleteBuild("buildPromoteDryRun");
+        });
+    });
+
+    describe("Npm Tests", () => {
+        runTest("Npm", () => {
+            let testDir = "npm";
+            mockTask(testDir, "install");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
+            getAndAssertBuild("npmTest", "1");
+            deleteBuild("npmTest");
         });
     });
 });
@@ -202,13 +235,14 @@ function mockTask(testDir, taskName, isNegative) {
 
 /**
  * Assert that the files that were downloaded to "testData" are correct.
- * @param testDir - (String) - The test directory in resources
+ * @param expectedFiles - (String) - The relative path of expected files under tests/resources
+ * @param resultFiles - (String) - The relative path of result files under testDataDir
  */
-function assertFiles(testDir) {
+function assertFiles(expectedFiles, resultFiles) {
     // Check that all necessary files were downloaded to "testDir/<testName>/"
     let filesToCheck = [];
-    let filesDir = path.join(__dirname, "resources", testDir, "files");
-    let testData = path.join(testUtils.testDataDir, testDir);
+    let filesDir = path.join(__dirname, "resources", expectedFiles);
+    let testData = path.join(testUtils.testDataDir, resultFiles);
     if (fs.existsSync(filesDir)) {
         let files = fs.readdirSync(filesDir);
         for (let i = 0; i < files.length; i++) {
@@ -231,11 +265,11 @@ function assertFiles(testDir) {
 }
 
 /**
- * Get build from Artifactory.
+ * Get build from Artifactory and assert that it exists.
  * @param buildName - (String) - The build name
  * @param buildNumber - (String) - The build number
  */
-function getBuild(buildName, buildNumber) {
+function getAndAssertBuild(buildName, buildNumber) {
     let build = testUtils.getBuild(buildName, buildNumber);
     assertBuild(build, buildName, buildNumber);
     return build;

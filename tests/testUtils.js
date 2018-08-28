@@ -14,11 +14,15 @@ let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
 module.exports = {
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
+    npmLocalRepoKey: "vsts-npm-local-test",
+    npmRemoteRepoKey: "vsts-npm-remote-test",
+    npmVirtualRepoKey: "vsts-npm-virtual-test",
     testDataDir: testDataDir,
     promote: path.join(__dirname, "..", "ArtifactoryPromote", "artifactoryPromote.js"),
     download: path.join(__dirname, "..", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
     publish: path.join(__dirname, "..", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
+    npm: path.join(__dirname, "..", "ArtifactoryNpm", "npmBuild.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -28,16 +32,17 @@ module.exports = {
     getRemoteTestDir: getRemoteTestDir,
     getBuild: getBuild,
     deleteBuild: deleteBuild,
-    cleanUpTests: cleanUpTests,
-    execCli: execCli
+    cleanUpAllTests: cleanUpAllTests,
+    copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
+    cleanUpBetweenTests: cleanUpBetweenTests
 };
 
 function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     tl.setVariable("Agent.WorkFolder", "");
     createTestRepositories();
-    cleanUpTests();
-    fs.mkdirSync(testDataDir);
+    cleanUpRepositories();
+    recreateTestDataDir();
 }
 
 function runTask(testMain, variables, inputs) {
@@ -63,6 +68,13 @@ function execCli(command) {
     }
 }
 
+function recreateTestDataDir() {
+    if (fs.existsSync(testDataDir)) {
+        rmdir.sync(testDataDir);
+    }
+    fs.mkdirSync(testDataDir);
+}
+
 function getBuild(buildName, buildNumber) {
     return syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
         headers: {
@@ -79,27 +91,45 @@ function deleteBuild(buildName) {
     });
 }
 
-function cleanUpTests() {
+function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
         rmdir.sync(testDataDir);
     }
-    cleanUpRepositories();
+    deleteRepositories();
 }
 
 function createTestRepositories() {
-    createRepo(module.exports.repoKey1);
-    createRepo(module.exports.repoKey2);
+    createRepo(module.exports.repoKey1, JSON.stringify({rclass: "local", packageType: "generic"}));
+    createRepo(module.exports.repoKey2, JSON.stringify({rclass: "local", packageType: "generic"}));
+    createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
+    createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
+    createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
 }
 
-function createRepo(repoKey) {
+function deleteRepositories() {
+    deleteRepo(module.exports.repoKey1);
+    deleteRepo(module.exports.repoKey2);
+    deleteRepo(module.exports.npmVirtualRepoKey);
+    deleteRepo(module.exports.npmLocalRepoKey);
+    deleteRepo(module.exports.npmRemoteRepoKey);
+}
+
+function createRepo(repoKey, body) {
     syncRequest('PUT', artifactoryUrl + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-            rclass: "local"
-        })
+        body: body
+    });
+}
+
+function deleteRepo(repoKey) {
+    syncRequest('DELETE', artifactoryUrl + "/api/repositories/" + repoKey, {
+        headers: {
+            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
+            "Content-Type": "application/json"
+        }
     });
 }
 
@@ -113,6 +143,36 @@ function setArtifactoryCredentials() {
         }
         return artifactoryPassword;
     };
+}
+
+/**
+ * Returns an array of files contained in folderToCopy
+ */
+function getResourcesFiles(folderToCopy) {
+    let dir = path.join(__dirname, "resources", folderToCopy);
+    let files = fs.readdirSync(dir);
+    let fullFilesPath = [];
+    for (let i = 0; i < files.length; i++) {
+        fullFilesPath.push(path.join(dir, files[i]))
+    }
+    return fullFilesPath;
+}
+
+/**
+ * Copies all files exists in "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>"
+ * @param testDirName - test directory
+ * @param folderToCopy - the folder to copy from the test
+ */
+function copyTestFilesToTestWorkDir(testDirName, folderToCopy) {
+    let files = getResourcesFiles(path.join(testDirName, folderToCopy));
+
+    if (!fs.existsSync(path.join(testDataDir, testDirName))) {
+        fs.mkdirSync(path.join(testDataDir, testDirName));
+    }
+
+    for (let i = 0; i < files.length; i++) {
+        fs.copyFileSync(files[i], path.join(getLocalTestDir(testDirName), path.basename(files[i])));
+    }
 }
 
 function setVariables(variables) {
@@ -132,9 +192,17 @@ function mockGetInputs(inputs) {
     };
 }
 
+function cleanUpBetweenTests() {
+    recreateTestDataDir();
+    cleanUpRepositories();
+}
+
 function cleanUpRepositories() {
     execCli("rt del " + module.exports.repoKey1 + '/*' + " --quiet");
     execCli("rt del " + module.exports.repoKey2 + '/*' + " --quiet");
+    execCli("rt del " + module.exports.npmLocalRepoKey + '/*' + " --quiet");
+    execCli("rt del " + module.exports.npmRemoteRepoKey + '/*' + " --quiet");
+    execCli("rt del " + module.exports.npmVirtualRepoKey + '/*' + " --quiet");
 }
 
 function getTestName(testDir) {
