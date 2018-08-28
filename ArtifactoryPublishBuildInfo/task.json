@@ -33,7 +33,7 @@
       "label": "Exclude environment variables",
       "defaultValue": "*password*;*secret*;*key*;*token*",
       "required": false,
-      "helpMarkDown": "List of case insensitive patterns in the form of value1;value2;.... Environment variables match those patterns will be excluded."
+      "helpMarkDown": "List of case insensitive patterns in the form of value1;value2;.... Environment variables match those patterns will be excluded from the published build info."
     }
   ],
   "execution": {

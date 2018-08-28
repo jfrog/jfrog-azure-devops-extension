@@ -39,12 +39,9 @@ function RunTaskCbk(cliPath) {
     // Add build info collection
     if (collectBuildInfo) {
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
-    }
 
-    // Collect env vars
-    let includeEnvVars = tl.getBoolInput("includeEnvVars");
-    if (collectBuildInfo && includeEnvVars) {
-        let taskRes = utils.collectEnv(cliPath, buildDefinition, buildNumber, workDir);
+        // Collect env vars
+        let taskRes = utils.collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir);
         if (taskRes) {
             tl.setResult(tl.TaskResult.Failed, taskRes);
             return;

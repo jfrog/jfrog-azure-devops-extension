@@ -236,7 +236,7 @@ function getBuild(buildName, buildNumber) {
 
 /**
  * Assert build environment in the build.
- * @param buildName - (Object) - The build object returned from Artifactory
+ * @param build - (Object) - The build object returned from Artifactory
  * @param key - (String) - The build environment key
  * @param value - (String) - The build environment value
  */
