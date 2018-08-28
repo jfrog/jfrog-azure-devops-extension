@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "JFrog",
   "license": "Apache-2.0",
-  "description": "Jfrog utils",
+  "description": "Utilities for the Artifactory VSTS extension",
   "main": "utils.js",
   "dependencies": {
     "vsts-task-lib": "^2.6.0",
