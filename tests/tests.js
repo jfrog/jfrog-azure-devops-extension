@@ -9,11 +9,9 @@ const os = require("os");
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
-    let npmBuild;
     before(() => {
         testUtils.initTests();
         jfrogUtils = require("jfrog-utils");
-        npmBuild = require("../ArtifactoryNpm/npmBuild");
     });
 
     after(() => {
@@ -24,7 +22,12 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         testUtils.cleanUpBetweenTests();
     });
 
-    describe("Utils Tests", () => {
+    describe("Unit Tests", () => {
+        let npmBuild;
+        before(() => {
+            npmBuild = require("../ArtifactoryNpm/npmBuild");
+        });
+
         console.log("OS:", os.type());
         runTest("Mask password", () => {
             let oldPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
@@ -88,15 +91,13 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                     assert.fail("Unsupported OS found: " + os.type());
             }
         });
-    });
 
-    describe("Unit Tests", () => {
         runTest("npm - Determine cli workdir", () => {
             if (process.platform.startsWith("win")) {
                 assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
                 assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
                 assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
-             } else {
+            } else {
                 assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
                 assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
                 assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
