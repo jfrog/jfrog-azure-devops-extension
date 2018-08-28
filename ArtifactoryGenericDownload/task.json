@@ -28,17 +28,36 @@
             "helpMarkDown": "Artifactory service used for downloading artifacts."
         },
         {
+            "name": "specSource",
+            "type": "radio",
+            "label": "File spec source",
+            "required": true,
+            "defaultValue": "taskConfiguration",
+            "helpMarkDown": "To specify the artifacts you wish to download from Artifactory, please create a File Spec. \nTo read more about the File Spec schema click <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>.",
+            "options": {
+                "taskConfiguration": "Task Configuration",
+                "file": "File"
+            }
+        },
+        {
             "name": "fileSpec",
             "type": "multiLine",
             "label": "Spec",
-            "required": true,
+            "visibleRule": "specSource=taskConfiguration",
             "defaultValue": "{\n  \"files\": [\n    {\n      \"pattern\": \"REPLACE_ME\",\n      \"target\": \"REPLACE_ME\"\n    }\n  ]\n}",
             "properties": {
                 "resizable": "true",
                 "rows": "10",
                 "maxLength": "10000"
             },
-            "helpMarkDown": "To specify the artifacts you wish to download from Artifactory, please create a File Spec. \nTo read more about the File Spec schema click <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>."
+            "helpMarkDown": "Use file spec from task configuration."
+        },
+        {
+            "name": "file",
+            "type": "filePath",
+            "label": "File path",
+            "visibleRule": "specSource=file",
+            "helpMarkDown": "Use file spec from a local file."
         },
         {
             "name": "collectBuildInfo",

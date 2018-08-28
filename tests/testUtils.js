@@ -48,7 +48,7 @@ function runTask(testMain, variables, inputs) {
 
     setVariables(variables);
     setArtifactoryCredentials();
-    setInputs(inputs);
+    mockGetInputs(inputs);
 
     tmr.registerMock('vsts-task-lib/mock-task', tl);
     tmr.run();
@@ -122,8 +122,13 @@ function setVariables(variables) {
     }
 }
 
-function setInputs(inputs) {
-    tl.getInput = tl.getBoolInput = (name, required) => {
+/**
+ * Override tl.getInput(), tl.getBoolInput() and tl.getPathInput() functions.
+ * The test will return inputs[name] instead of using the original functions.
+ * @param inputs - (String) - Test inputs
+ */
+function mockGetInputs(inputs) {
+    tl.getInput = tl.getBoolInput = tl.getPathInput = (name, required) => {
         return inputs[name];
     };
 }
