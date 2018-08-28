@@ -30,7 +30,7 @@
         {
             "name": "specSource",
             "type": "radio",
-            "label": "Upload spec source",
+            "label": "File spec source",
             "required": true,
             "defaultValue": "taskConfiguration",
             "helpMarkDown": "To specify the artifacts you wish to upload to Artifactory, please create a File Spec. \nTo read more about the File Spec schema click <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>.",
