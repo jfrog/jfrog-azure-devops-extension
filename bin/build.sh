@@ -10,7 +10,7 @@ npm pack
 cd ..
 
 echo In path: $(pwd)
-declare -a arr=("tests" "ArtifactoryGenericUpload" "ArtifactoryGenericDownload" "ArtifactoryPublishBuildInfo" "ArtifactoryPromote" "ArtifactoryNpm")
+declare -a arr=("tests" "ArtifactoryGenericUpload" "ArtifactoryGenericDownload" "ArtifactoryPublishBuildInfo" "ArtifactoryMaven" "ArtifactoryNuget" "ArtifactoryPromote" "ArtifactoryNpm")
 
 for i in "${arr[@]}"
 do

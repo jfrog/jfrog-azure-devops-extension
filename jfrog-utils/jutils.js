@@ -9,7 +9,7 @@ const execSync = require('child_process').execSync;
 const fileName = getFileName();
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const version = "1.17.1";
+const version = "1.19.1";
 const versionedCliPath = encodePath(path.join(jfrogFolderPath, version, fileName));
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName));
 const cliUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + version + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;

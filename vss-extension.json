@@ -163,6 +163,26 @@
             }
         },
         {
+            "id": "artifactory-maven",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryMaven"
+            }
+        },
+        {
+            "id": "artifactory-nuget",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryNuget"
+            }
+        },
+        {
             "id": "artifactory-npm",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -205,6 +225,12 @@
         },
         {
             "path": "ArtifactoryPromote"
+        },
+        {
+            "path": "ArtifactoryMaven"
+        },
+        {
+            "path": "ArtifactoryNuget"
         },
         {
             "path": "ArtifactoryNpm"
