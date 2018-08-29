@@ -89,6 +89,15 @@
             "defaultValue": "false",
             "required": false,
             "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
         }
     ],
     "dataSourceBindings": [

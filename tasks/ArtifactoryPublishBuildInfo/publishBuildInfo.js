@@ -4,7 +4,6 @@ const utils = require('artifactory-tasks-utils');
 const path = require('path');
 
 const cliBuildPublishCommand = "rt bp";
-const cliCollectEnvVarsCommand = "rt bce";
 
 function RunTaskCbk(cliPath) {
     let buildDefinition = tl.getVariable('Build.DefinitionName');
@@ -18,21 +17,12 @@ function RunTaskCbk(cliPath) {
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    let includeEnvVars = tl.getBoolInput("includeEnvVars");
-
-    // Collect env vars
-    if (includeEnvVars) {
-        console.log("Collecting environment variables...");
-        let cliEnvVarsCommand = utils.cliJoin(cliPath, cliCollectEnvVarsCommand, utils.quote(buildDefinition), utils.quote(buildNumber));
-
-        let taskRes = utils.executeCliCommand(cliEnvVarsCommand, workDir);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-            return;
-        }
+    let excludeEnvVars = tl.getInput("excludeEnvVars", false);
+    if (!excludeEnvVars) {
+        excludeEnvVars = "_"; // This is a workaround - jfrog-cli v1.18 doesn't support empty env-exclude patterns.
     }
 
-    let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl));
+    let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl), "--env-exclude=" + utils.quote(excludeEnvVars));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
     let taskRes = utils.executeCliCommand(cliCommand, workDir);

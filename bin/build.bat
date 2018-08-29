@@ -18,7 +18,7 @@ call npm pack
 cd ..
 echo Back to path %cd%
 @echo off
-set list=ArtifactoryBuildPromotion ArtifactoryGenericDownload ArtifactoryGenericUpload ArtifactoryNpm ArtifactoryPublishBuildInfo
+set list=ArtifactoryBuildPromotion ArtifactoryGenericDownload ArtifactoryGenericUpload ArtifactoryMaven ArtifactoryNpm ArtifactoryNuget ArtifactoryPublishBuildInfo
 (for %%a in (%list%) do (
     cd tasks\%%a
     echo In path: %cd%

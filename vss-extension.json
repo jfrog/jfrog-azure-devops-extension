@@ -172,6 +172,26 @@
             "properties": {
                 "name": "tasks/ArtifactoryPublishBuildInfo"
             }
+        },
+        {
+            "id": "artifactory-maven",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryMaven"
+            }
+        },
+        {
+            "id": "artifactory-nuget",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "ArtifactoryNuget"
+            }
         }
     ],
     "files": [
@@ -205,6 +225,12 @@
         },
         {
             "path": "tasks/ArtifactoryPublishBuildInfo"
+        },
+        {
+            "path": "ArtifactoryMaven"
+        },
+        {
+            "path": "ArtifactoryNuget"
         }
     ]
 }
