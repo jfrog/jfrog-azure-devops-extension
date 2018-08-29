@@ -21,7 +21,7 @@ test_script:
   - sh: if [[ "$APPVEYOR_REPO_BRANCH" = "dev" && -z "$APPVEYOR_PULL_REQUEST_TITLE" ]]; then
           npm test;
         fi
-  - cmd: IF "%APPVEYOR_REPO_BRANCH%" == "dev IF "%APPVEYOR_PULL_REQUEST_TITLE%" == "" (
+  - cmd: IF "%APPVEYOR_REPO_BRANCH%" == "dev" IF "%APPVEYOR_PULL_REQUEST_TITLE%" == "" (
            npm test
          )
 
