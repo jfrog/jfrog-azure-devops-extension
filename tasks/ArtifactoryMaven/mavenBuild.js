@@ -1,6 +1,6 @@
 let tl = require('vsts-task-lib/task');
 const path = require('path');
-let utils = require('jfrog-utils');
+let utils = require('artifactory-tasks-utils');
 const cliConfigCommand = "rt c";
 const cliMavenCommand = "rt mvn";
 let serverIdDeployer;
@@ -12,7 +12,7 @@ utils.executeCliTask(RunTaskCbk);
 function checkAndSetMavenHome() {
     let m2HomeEnvVar = tl.getVariable('M2_HOME');
     if (!m2HomeEnvVar) {
-        console.log("M2_HOME is not defined. Retrieving Maven home using mvn --version.")
+        console.log("M2_HOME is not defined. Retrieving Maven home using mvn --version.");
         // The M2_HOME environment variable is not defined.
         // Since Maven installation can be located in different locations,
         // depending on the installation type and the OS (for example: For Mac with brew install: /usr/local/Cellar/maven/{version}/libexec or Ubuntu with debian: /usr/share/maven),
@@ -48,16 +48,20 @@ function deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver) {
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
 
-    let buildDir = tl.getVariable('System.DefaultWorkingDirectory');
-    let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
-    let buildNumber = tl.getVariable('BUILD.BUILDNUMBER');
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
+    if (!workDir) {
+        tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
+        return;
+    }
 
     // Creating the config file for Maven
-    let config = path.join(buildDir, "config");
-    let taskRes = createMavenConfigFile(config, cliPath, buildDir, buildDefinition, buildNumber);
+    let config = path.join(workDir, "config");
+    let taskRes = createMavenConfigFile(config, cliPath, workDir, buildDefinition, buildNumber);
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
-        taskRes = deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver);
+        taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
         if (taskRes) {
             tl.setResult(tl.TaskResult.Failed, taskRes);
         }
@@ -77,10 +81,10 @@ function RunTaskCbk(cliPath) {
     if (collectBuildInfo) {
         mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
         // Collect env vars
-        let taskRes = utils.collectEnvIfRequested(cliPath, buildDefinition, buildNumber, buildDir);
+        let taskRes = utils.collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir);
         if (taskRes) {
             tl.setResult(tl.TaskResult.Failed, taskRes);
-            taskRes = deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver);
+            taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
             if (taskRes) {
                 tl.setResult(tl.TaskResult.Failed, taskRes);
             }
@@ -88,17 +92,17 @@ function RunTaskCbk(cliPath) {
         }
     }
 
-    taskRes = utils.executeCliCommand(mavenCommand, buildDir);
+    taskRes = utils.executeCliCommand(mavenCommand, workDir);
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
-        taskRes = deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver);
+        taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
         if (taskRes) {
             tl.setResult(tl.TaskResult.Failed, taskRes);
         }
         return;
     }
 
-    taskRes = deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver);
+    taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
         return;

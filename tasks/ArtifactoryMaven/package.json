@@ -1,16 +1,16 @@
 {
-  "name": "artifactorymaven",
+  "name": "artifactory-maven",
   "version": "1.0.0",
-  "description": "",
+  "author": "JFrog",
+  "license": "Apache-2.0",
+  "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory.",
   "main": "mavenBuild.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "vsts-task-lib": "^2.6.0",
     "fs-extra": "^5.0.0",
-    "jfrog-utils": "file:../jfrog-utils/jfrog-utils-1.0.0.tgz"
+    "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
   }
 }

@@ -1,18 +1,18 @@
 {
-  "name": "artifactorynuget",
+  "name": "artifactory-nuget",
   "version": "1.0.0",
-  "description": "",
+  "author": "JFrog",
+  "license": "Apache-2.0",
+  "description": "This task triggers NuGet restore command and can push the nupkg file to Artifactory ",
   "main": "nugetBuild.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "vsts-task-lib": "^2.6.0",
     "asyncawait": "^1.0.7",
     "vsts-task-tool-lib": "^0.10.0",
     "fs-extra": "^5.0.0",
-    "jfrog-utils": "file:../jfrog-utils/jfrog-utils-1.0.0.tgz"
+    "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
   }
 }

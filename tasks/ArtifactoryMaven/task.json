@@ -1,183 +1,185 @@
 {
-  "id": "07fc5c20-6772-11e5-abde-6901d3d00476",
-  "name": "ArtifactoryMaven",
-  "friendlyName": "Artifactory Maven",
-  "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory.",
-  "author": "JFrog",
-  "helpMarkDown": "Triggers Maven resolution/deployment using JFrog Artifactory.",
-  "category": "Utility",
-  "visibility": [
-    "Build",
-    "Release"
-  ],
-  "version": {
-    "Major": "1",
-    "Minor": "0",
-    "Patch": "6"
-  },
-  "demands": [
-    "maven"
-  ],
-  "minimumAgentVersion": "1.89.0",
-  "instanceNameFormat": "Artifactory Maven",
-  "groups": [
-    {
-      "name": "resolve",
-      "displayName": "Resolve dependencies from Artifactory",
-      "isExpanded": true
+    "id": "07fc5c20-6772-11e5-abde-6901d3d00476",
+    "name": "ArtifactoryMaven",
+    "friendlyName": "Artifactory Maven",
+    "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory.",
+    "author": "JFrog",
+    "helpMarkDown": "Triggers Maven resolution/deployment using JFrog Artifactory.",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "6"
     },
-    {
-      "name": "deployer",
-      "displayName": "Deploy artifacts to Artifactory",
-      "isExpanded": true
+    "demands": [
+        "maven"
+    ],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "Artifactory Maven",
+    "groups": [
+        {
+            "name": "resolve",
+            "displayName": "Resolve dependencies from Artifactory",
+            "isExpanded": true
+        },
+        {
+            "name": "deployer",
+            "displayName": "Deploy artifacts to Artifactory",
+            "isExpanded": true
+        }
+    ],
+    "inputs": [
+        {
+            "name": "mavenPOMFile",
+            "aliases": [
+                "mavenPomFile"
+            ],
+            "type": "filePath",
+            "label": "Maven POM file",
+            "defaultValue": "pom.xml",
+            "required": true,
+            "helpMarkDown": "Path to the Maven POM file."
+        },
+        {
+            "name": "goals",
+            "type": "string",
+            "label": "Goal(s)",
+            "defaultValue": "install",
+            "required": false
+        },
+        {
+            "name": "options",
+            "type": "string",
+            "label": "Options",
+            "defaultValue": "",
+            "required": false
+        },
+        {
+            "name": "artifactoryResolverService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "groupName": "resolve",
+            "required": false,
+            "helpMarkDown": "Artifactory service for artifacts resolution."
+        },
+        {
+            "name": "targetResolveReleaseRepo",
+            "type": "pickList",
+            "label": "Resolution repository for releases",
+            "groupName": "resolve",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the target release repository for resolution.",
+            "visibleRule": "artifactoryResolverService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetResolveSnapshotRepo",
+            "type": "pickList",
+            "label": "Resolution repository for snapshots",
+            "groupName": "resolve",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the target snapshot repository for resolution.",
+            "visibleRule": "artifactoryResolverService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "artifactoryDeployService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "groupName": "deployer",
+            "required": true,
+            "helpMarkDown": "Artifactory service for artifacts deployment."
+        },
+        {
+            "name": "targetDeployReleaseRepo",
+            "type": "pickList",
+            "label": "Deployment repository for releases",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Sets the target release repository for deploying release artifacts.",
+            "visibleRule": "artifactoryDeployService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetDeploySnapshotRepo",
+            "type": "pickList",
+            "label": "Deployment repository for snapshots",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Sets the target snapshot repository for deploying snapshot artifacts.",
+            "visibleRule": "artifactoryDeployService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally. The collected build info can be published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo == true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryResolverService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetResolveReleaseRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryDeployService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetDeployReleaseRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryResolverService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetResolveSnapshotRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryDeployService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetDeploySnapshotRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "mavenBuild.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
     }
-  ],
-  "inputs": [
-    {
-      "name": "mavenPOMFile",
-      "aliases": [ "mavenPomFile" ],
-      "type": "filePath",
-      "label": "Maven POM file",
-      "defaultValue": "pom.xml",
-      "required": true,
-      "helpMarkDown": "Path to the Maven POM file."
-    },
-    {
-      "name": "goals",
-      "type": "string",
-      "label": "Goal(s)",
-      "defaultValue": "install",
-      "required": false
-    },
-    {
-      "name": "options",
-      "type": "string",
-      "label": "Options",
-      "defaultValue": "",
-      "required": false
-    },
-    {
-      "name": "artifactoryResolverService",
-      "type": "connectedService:artifactoryService",
-      "label": "Artifactory service",
-      "defaultValue": "",
-      "groupName": "resolve",
-      "required": false,
-      "helpMarkDown": "Artifactory service for artifacts resolution."
-    },
-    {
-      "name": "targetResolveReleaseRepo",
-      "type": "pickList",
-      "label": "Resolution repository for releases",
-      "groupName": "resolve",
-      "defaultValue": "",
-      "required": "true",
-      "helpMarkDown": "Sets the target release repository for resolution.",
-      "visibleRule": "artifactoryResolverService != \"\"",
-      "properties": {
-        "EditableOptions": "True"
-      }
-    },
-    {
-      "name": "targetResolveSnapshotRepo",
-      "type": "pickList",
-      "label": "Resolution repository for snapshots",
-      "groupName": "resolve",
-      "defaultValue": "",
-      "required": "true",
-      "helpMarkDown": "Sets the target snapshot repository for resolution.",
-      "visibleRule": "artifactoryResolverService != \"\"",
-      "properties": {
-        "EditableOptions": "True"
-      }
-    },
-    {
-      "name": "artifactoryDeployService",
-      "type": "connectedService:artifactoryService",
-      "label": "Artifactory service",
-      "defaultValue": "",
-      "groupName": "deployer",
-      "required": true,
-      "helpMarkDown": "Artifactory service for artifacts deployment."
-    },
-    {
-      "name": "targetDeployReleaseRepo",
-      "type": "pickList",
-      "label": "Deployment repository for releases",
-      "groupName": "deployer",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Sets the target release repository for deploying release artifacts.",
-      "visibleRule": "artifactoryDeployService != \"\"",
-      "properties": {
-        "EditableOptions": "True"
-      }
-    },
-    {
-      "name": "targetDeploySnapshotRepo",
-      "type": "pickList",
-      "label": "Deployment repository for snapshots",
-      "groupName": "deployer",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Sets the target snapshot repository for deploying snapshot artifacts.",
-      "visibleRule": "artifactoryDeployService != \"\"",
-      "properties": {
-        "EditableOptions": "True"
-      }
-    },
-    {
-      "name": "collectBuildInfo",
-      "type": "boolean",
-      "label": "Collect build info",
-      "defaultValue": "true",
-      "required": false,
-      "helpMarkDown": "Select to collect build info and store it locally. The collected build info can be published to Artifactory using the \"Artifactory Publish Build Info\" task."
-    },
-    {
-      "name": "includeEnvVars",
-      "type": "boolean",
-      "label": "Include environment variables",
-      "defaultValue": "false",
-      "required": false,
-      "visibleRule": "collectBuildInfo == true",
-      "helpMarkDown": "Select to include environment variables in the published build info."
-    }
-  ],
-  "dataSourceBindings": [
-    {
-      "endpointId": "$(artifactoryResolverService)",
-      "endpointURL": "{{endpoint.url}}/api/repositories",
-      "target": "targetResolveReleaseRepo",
-      "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
-      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-    },
-    {
-      "endpointId": "$(artifactoryDeployService)",
-      "endpointURL": "{{endpoint.url}}/api/repositories",
-      "target": "targetDeployReleaseRepo",
-      "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
-      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-    },
-    {
-      "endpointId": "$(artifactoryResolverService)",
-      "endpointURL": "{{endpoint.url}}/api/repositories",
-      "target": "targetResolveSnapshotRepo",
-      "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
-      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-    },
-    {
-      "endpointId": "$(artifactoryDeployService)",
-      "endpointURL": "{{endpoint.url}}/api/repositories",
-      "target": "targetDeploySnapshotRepo",
-      "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
-      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-    }
-  ],
-  "execution": {
-    "Node": {
-      "target": "mavenBuild.js",
-      "workingDirectory": "$(currentDirectory)"
-    }
-  }
 }

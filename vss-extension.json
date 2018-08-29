@@ -152,27 +152,6 @@
                 "name": "tasks/ArtifactoryGenericUpload"
             }
         },
-
-        {
-            "id": "artifactory-npm",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "tasks/ArtifactoryNpm"
-            }
-        },
-        {
-            "id": "artifactory-publish-build-info",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "tasks/ArtifactoryPublishBuildInfo"
-            }
-        },
         {
             "id": "artifactory-maven",
             "type": "ms.vss-distributed-task.task",
@@ -184,6 +163,16 @@
             }
         },
         {
+            "id": "artifactory-npm",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryNpm"
+            }
+        },
+        {
             "id": "artifactory-nuget",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -191,6 +180,16 @@
             ],
             "properties": {
                 "name": "ArtifactoryNuget"
+            }
+        },
+        {
+            "id": "artifactory-publish-build-info",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryPublishBuildInfo"
             }
         }
     ],
@@ -221,16 +220,16 @@
             "path": "tasks/ArtifactoryGenericUpload"
         },
         {
+            "path": "tasks/ArtifactoryMaven"
+        },
+        {
             "path": "tasks/ArtifactoryNpm"
         },
         {
+            "path": "tasks/ArtifactoryNuget"
+        },
+        {
             "path": "tasks/ArtifactoryPublishBuildInfo"
-        },
-        {
-            "path": "ArtifactoryMaven"
-        },
-        {
-            "path": "ArtifactoryNuget"
         }
     ]
 }

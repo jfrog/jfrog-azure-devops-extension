@@ -1,45 +1,45 @@
 {
-  "id": "07fc5c20-6752-1e11-abde-6a01c3d00486",
-  "name": "ArtifactoryPublishBuildInfo",
-  "friendlyName": "Artifactory Publish Build Info",
-  "description": "This task publishes the Build Info collected in previous tasks.",
-  "author": "JFrog",
-  "helpMarkDown": "Publish Build Info to Artifactory.",
-  "category": "Utility",
-  "visibility": [
-    "Build",
-    "Release"
-  ],
-  "demands": [],
-  "version": {
-    "Major": "1",
-    "Minor": "0",
-    "Patch": "6"
-  },
-  "minimumAgentVersion": "1.83.0",
-  "instanceNameFormat": "Artifactory Publish Build Info",
-  "inputs": [
-    {
-      "name": "artifactoryService",
-      "type": "connectedService:artifactoryService",
-      "label": "Artifactory service",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Artifactory service used for publishing the build info."
+    "id": "07fc5c20-6752-1e11-abde-6a01c3d00486",
+    "name": "ArtifactoryPublishBuildInfo",
+    "friendlyName": "Artifactory Publish Build Info",
+    "description": "This task publishes the Build Info collected in previous tasks.",
+    "author": "JFrog",
+    "helpMarkDown": "Publish Build Info to Artifactory.",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "6"
     },
-    {
-      "name": "excludeEnvVars",
-      "type": "string",
-      "label": "Exclude environment variables",
-      "defaultValue": "*password*;*secret*;*key*;*token*",
-      "required": false,
-      "helpMarkDown": "List of case insensitive patterns in the form of value1;value2;.... Environment variables match those patterns will be excluded from the published build info."
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "Artifactory Publish Build Info",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used for publishing the build info."
+        },
+        {
+            "name": "excludeEnvVars",
+            "type": "string",
+            "label": "Exclude environment variables",
+            "defaultValue": "*password*;*secret*;*key*;*token*",
+            "required": false,
+            "helpMarkDown": "List of case insensitive patterns in the form of value1;value2;.... Environment variables match those patterns will be excluded from the published build info."
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "publishBuildInfo.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
     }
-  ],
-  "execution": {
-    "Node": {
-      "target": "publishBuildInfo.js",
-      "workingDirectory": "$(currentDirectory)"
-    }
-  }
 }

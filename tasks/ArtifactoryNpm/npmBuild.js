@@ -1,19 +1,19 @@
 
 const tl = require('vsts-task-lib/task');
-const utils = require('jfrog-utils');
-const path = require('path');
+const utils = require('artifactory-tasks-utils');
+const npmUtils = require('./npmUtils');
 
 const npmInstallCommand = "rt npmi";
 const npmPublishCommand = "rt npmp";
 
 function RunTaskCbk(cliPath) {
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
         return;
     }
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
@@ -23,7 +23,7 @@ function RunTaskCbk(cliPath) {
 
     // Determine working directory for the cli
     let inputWorkingFolder = tl.getInput("workingFolder", false);
-    let requiredWorkDir = determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
+    let requiredWorkDir = npmUtils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
 
     // Determine npm command
     let inputCommand = tl.getInput("command", true);
@@ -64,21 +64,5 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }
 }
-
-// Determines the required working directory for running the cli.
-// Decision is based on the default path to run, and the provided path by the user.
-function determineCliWorkDir(defaultPath, providedPath) {
-    if (providedPath) {
-        if (path.isAbsolute(providedPath)) {
-            return providedPath;
-        }
-        return path.join(defaultPath, providedPath);
-    }
-    return defaultPath;
-}
-
-module.exports = {
-    determineCliWorkDir: determineCliWorkDir
-};
 
 utils.executeCliTask(RunTaskCbk);

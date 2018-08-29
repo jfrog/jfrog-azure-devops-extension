@@ -1,7 +1,7 @@
 const tl = require('vsts-task-lib/task');
 const toolLib = require('vsts-task-tool-lib/tool');
 const fs = require('fs-extra');
-const utils = require('jfrog-utils');
+const utils = require('artifactory-tasks-utils');
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
 const async = require('asyncawait/async');
@@ -54,7 +54,7 @@ let RunTaskCbk = async(function (cliPath) {
 });
 
 if (process.platform !== "win32") {
-    tl.setResult(tl.TaskResult.Failed, "This task currently supports Windows agents only.")
+    tl.setResult(tl.TaskResult.Failed, "This task currently supports Windows agents only.");
     return;
 }
 
@@ -91,8 +91,8 @@ function exec(cliPath, nugetCommand) {
 }
 
 function runNuGet(nugetCommandCli, cliPath, buildDir) {
-    let buildDefinition = tl.getVariable('BUILD.DEFINITIONNAME');
-    let buildNumber = tl.getVariable('BUILD.BUILDNUMBER');
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
     if (collectBuildInfo) {
@@ -117,12 +117,11 @@ function runNuGet(nugetCommandCli, cliPath, buildDir) {
 
 // Adds the Artifactory information to the command
 function addArtifactoryServer(nugetCommandCli) {
-    let artifactoryService = tl.getInput("artifactoryService");
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username");
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password");
+    let artifactoryService = tl.getInput("artifactoryService", false);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
 
-    nugetCommandCli = utils.cliJoin(nugetCommandCli, "--url=" + utils.quote(artifactoryUrl), "--user=" + utils.quote(artifactoryUser), "--password=" + utils.quote(artifactoryPassword));
+    nugetCommandCli = utils.cliJoin(nugetCommandCli, "--url=" + utils.quote(artifactoryUrl));
+    nugetCommandCli = utils.addArtifactoryCredentials(nugetCommandCli, artifactoryService);
     return nugetCommandCli;
 }
 

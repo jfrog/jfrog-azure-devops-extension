@@ -10,7 +10,9 @@
         "Build",
         "Release"
     ],
-    "demands": ["npm"],
+    "demands": [
+        "npm"
+    ],
     "version": {
         "Major": "1",
         "Minor": "0",
@@ -108,14 +110,13 @@
             "resultSelector": "jsonpath:$[*].key"
         },
         {
-          "endpointId": "$(artifactoryService)",
-          "endpointURL": "{{endpoint.url}}/api/repositories",
-          "target": "targetRepo",
-          "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
-          "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         }
     ],
-
     "execution": {
         "Node": {
             "target": "npmBuild.js"

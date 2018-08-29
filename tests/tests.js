@@ -6,6 +6,7 @@ const vstsMockTest = require("vsts-task-lib/mock-test");
 const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
+const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
@@ -23,11 +24,6 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     });
 
     describe("Unit Tests", () => {
-        let npmBuild;
-        before(() => {
-            npmBuild = require("../ArtifactoryNpm/npmBuild");
-        });
-
         console.log("OS:", os.type());
         runTest("Mask password", () => {
             let oldPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
@@ -94,13 +90,13 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
 
         runTest("npm - Determine cli workdir", () => {
             if (process.platform.startsWith("win")) {
-                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
-                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
-                assert.equal(npmBuild.determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
+                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
+                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
+                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
             } else {
-                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
-                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
-                assert.equal(npmBuild.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
+                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
+                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
+                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
             }
         });
     });

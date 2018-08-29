@@ -118,8 +118,6 @@ function resolveWildcardPath(pattern) {
     if (!isWindows) {
         return filesList;
     }
-    else {
-        return filesList.map(file => file.split("/").join("\\"));
-    }
+    return filesList.map(file => file.split("/").join("\\"));
 }
 
