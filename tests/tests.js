@@ -118,7 +118,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "upload");
             mockTask(testDir, "download");
             assertFiles(path.join(testDir, "files"), testDir);
-        })
+        });
 
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
@@ -206,6 +206,43 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             getAndAssertBuild("npmTest", "1");
             deleteBuild("npmTest");
         });
+    });
+
+    describe("Maven Tests", () => {
+        runTest("Maven", () => {
+            let testDir = "maven";
+            mockTask(testDir, "build");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
+            getAndAssertBuild("Maven", "3");
+            deleteBuild("Maven");
+        });
+    });
+
+    describe("NuGet Tests", () => {
+        if (process.platform === "win32") {
+            runTest("NuGet restore", () => {
+                let testDir = "nuget";
+                // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
+                assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+                mockTask(testDir, "restore");
+                mockTask(testDir, "publish");
+                getAndAssertBuild("NuGet", "3");
+                deleteBuild("NuGet");
+            });
+            runTest("NuGet push", () => {
+                let testDir = "nuget";
+                // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
+                assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+                mockTask(testDir, "push");
+                mockTask(testDir, "publish");
+                mockTask(testDir, "download");
+                assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
+                getAndAssertBuild("NuGet", "3");
+                deleteBuild("NuGet");
+            });
+        }
     });
 });
 
