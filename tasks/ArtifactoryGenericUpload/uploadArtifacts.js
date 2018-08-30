@@ -26,7 +26,7 @@ function RunTaskCbk(cliPath) {
         let fileSpec;
         if (specSource === "file") {
             let specInputPath = tl.getPathInput("file", true, true);
-            console.log("Using file spec from " + specInputPath);
+            console.log("Using file spec located at " + specInputPath);
             fileSpec = fs.readFileSync(specInputPath, "utf8");
         } else {
             fileSpec = tl.getInput("fileSpec", true);
