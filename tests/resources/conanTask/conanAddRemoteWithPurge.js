@@ -17,7 +17,7 @@ let inputs = {
     "remoteName": "artifactory",
     "artifactoryService": "40567017-861d-4e23-8ebf-c71c33a72224",
     "conanCommand": "Add Remote",
-    "conanRepo": "conan-local",
+    "conanRepo": testUtils.repoConan,
     "purgeExistingRemotes": true,
     "conanUserHome": "/tmp/custom/" + BUILD_NAME + "/" + BUILD_NUMBER
 };

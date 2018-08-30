@@ -2,7 +2,7 @@
     "manifestversion": 1,
     "public": true,
     "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.0.6",
+    "version": "1.1.0",
     "name": "JFrog Artifactory",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "JFrog",
@@ -123,13 +123,13 @@
             }
         },
         {
-            "id": "artifactory-generic-upload",
+            "id": "artifactory-promote-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryGenericUpload"
+                "name": "tasks/ArtifactoryBuildPromotion"
             }
         },
         {
@@ -139,7 +139,47 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryGenericDownload"
+                "name": "tasks/ArtifactoryGenericDownload"
+            }
+        },
+        {
+            "id": "artifactory-generic-upload",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryGenericUpload"
+            }
+        },
+        {
+            "id": "artifactory-maven",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryMaven"
+            }
+        },
+        {
+            "id": "artifactory-npm",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryNpm"
+            }
+        },
+        {
+            "id": "artifactory-nuget",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryNuget"
             }
         },
         {
@@ -149,17 +189,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryPublishBuildInfo"
-            }
-        },
-        {
-            "id": "artifactory-promote-build-task",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "ArtifactoryPromote"
+                "name": "tasks/ArtifactoryPublishBuildInfo"
             }
         },
         {
@@ -187,27 +217,32 @@
             "addressable": true
         },
         {
-            "path": "css",
-            "addressable": true
-        },
-        {
             "path": "images",
             "addressable": true
         },
         {
-            "path": "ArtifactoryGenericUpload"
+            "path": "tasks/ArtifactoryBuildPromotion"
         },
         {
-            "path": "ArtifactoryGenericDownload"
+            "path": "tasks/ArtifactoryGenericDownload"
         },
         {
-            "path": "ArtifactoryPublishBuildInfo"
+            "path": "tasks/ArtifactoryGenericUpload"
         },
         {
-            "path": "ArtifactoryPromote"
+            "path": "tasks/ArtifactoryMaven"
         },
         {
-            "path": "ArtifactoryConan"
+            "path": "tasks/ArtifactoryNpm"
+        },
+        {
+            "path": "tasks/ArtifactoryNuget"
+        },
+        {
+            "path": "tasks/ArtifactoryPublishBuildInfo"
+        },
+        {
+            "path": "tasks/ArtifactoryConan"
         }
     ]
 }

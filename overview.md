@@ -8,26 +8,47 @@ In addition to managing efficient deployment of your artifacts to Artifactory,
 the extension lets you capture information about deployed artifacts, 
 and resolved dependencies Gain full traceability for your builds as the environment data associated with your build is automatically collected.
 
+The extension currently support generic, maven, npm and nuget builds. 
+
 ## Documentation and Source Code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension).
 <br>
 See the source code is on [GitHub](https://github.com/jfrog/artifactory-vsts-extension).
 
-## Download build dependencies from Artifactory
+## Download generic build dependencies from Artifactory
 The **Artifactory Generic Download** task supports downloading your build dependencies from Artifactory to the build agent. 
 The task triggers the [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) to perform the download. The downloaded dependencies are defined using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs) 
-and can also be configured to capture the build-info. 
+and can be also configured to capture the build-info. 
 It will store the downloaded files as dependencies in the build-info which can later be published to Artifactory using the Artifactory Publish Build-Info task.
 
 ![BuildInfo](images/marketplace/generic-download.png)
 
-## Upload build artifacts to Artifactory
+## Upload generic build artifacts to Artifactory
 The **Artifactory Generic Upload** task supports uploading your generated build artifacts from the build agent's local file system to Artifactory. 
 The task triggers the [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) to perform the upload. 
 The artifacts are defined using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs). 
-The task can also be configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![BuildInfo](images/marketplace/generic-upload.png)
+
+## Trigger maven builds
+The **Artifactory Maven** task allows triggering maven builds, while resolvong dependencies and deploying artifacts from and to Artifactory. 
+The task can also be configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+
+![BuildInfo](images/marketplace/maven.png)
+
+## Trigger npm builds
+The **Artifactory Npm** task allows triggering npm builds, while resolvong npm dependencies and deploying npm packages from and to Artifactory. 
+The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+
+![BuildInfo](images/marketplace/npm.png)
+
+## Trigger nuget builds
+The **Artifactory Nuget** task allows triggering nuget restore while resolving nuget dependencies from Artifactory. 
+It also allows publishing nuget packages to Artifactory.
+The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+
+![BuildInfo](images/marketplace/nuget.png)
 
 ## Promote published builds 
 Artifactory supports promoting published builds from one repository to another, 

@@ -1,0 +1,16 @@
+{
+  "name": "artifactory-tasks-utils",
+  "version": "1.0.0",
+  "author": "JFrog",
+  "license": "Apache-2.0",
+  "description": "Utilities for the Artifactory VSTS extension",
+  "main": "utils.js",
+  "dependencies": {
+    "vsts-task-lib": "^2.6.0",
+    "fs-extra": "^7.0.0",
+    "request-promise-lite": "^0.13.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

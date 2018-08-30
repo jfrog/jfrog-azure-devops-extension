@@ -1,0 +1,14 @@
+{
+    "name": "artifactory-build-promotion",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "license": "Apache-2.0",
+    "description": "This task promotes a published build in Artifactory.",
+    "main": "buildPromotion.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+    }
+}

@@ -1,6 +1,6 @@
 echo Build started ...
 
-set libraries=jfrog-utils conan-utils
+set libraries=artifactory-tasks-utils conan-utils
 (for %%l in (%libraries%) do (
 
     cd %%l
@@ -25,20 +25,30 @@ set libraries=jfrog-utils conan-utils
 
 echo Back to path %cd%
 @echo off
-set list=ArtifactoryGenericUpload ArtifactoryGenericDownload ArtifactoryPublishBuildInfo ArtifactoryPromote ArtifactoryConan
+
+set list=ArtifactoryBuildPromotion ArtifactoryGenericDownload ArtifactoryGenericUpload ArtifactoryMaven ArtifactoryNpm ArtifactoryNuget ArtifactoryPublishBuildInfo ArtifactoryConan
+
 (for %%a in (%list%) do (
-
-    cd %%a
+    cd tasks\%%a
     echo In path: %cd%
-     IF EXIST "package-lock.json" (
-          del /f package-lock.json
-          )
-
-        IF EXIST "%cd%\node_modules\" (
-          rmdir /s /q %cd%\node_modules\
-        )
-
+    IF EXIST "package-lock.json" (
+        del /f package-lock.json
+    )
+    IF EXIST "%cd%\node_modules\" (
+        rmdir /s /q %cd%\node_modules\
+    )
     call npm install
-    cd ..
+    cd ..\..
     echo Back to path %cd%
-    ))
+))
+
+cd tests
+echo In path: %cd%
+IF EXIST "package-lock.json" (
+    del /f package-lock.json
+)
+IF EXIST "%cd%\node_modules\" (
+    rmdir /s /q %cd%\node_modules\
+)
+
+call npm install
