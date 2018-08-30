@@ -14,7 +14,7 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
         return;
     }
-    let specPath = path.join(workDir, "downloadSpec.json");
+    let specPath = path.join(workDir, "downloadSpec" + Date.now() + ".json");
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
@@ -25,8 +25,9 @@ function RunTaskCbk(cliPath) {
     try {
         let fileSpec;
         if (specSource === "file") {
-            specPath = tl.getPathInput("file", true, true);
-            fileSpec = fs.readFileSync(specPath, "utf8");
+            let specInputPath = tl.getPathInput("file", true, true);
+            console.log("Using file spec from " + specInputPath);
+            fileSpec = fs.readFileSync(specInputPath, "utf8");
         } else {
             fileSpec = tl.getInput("fileSpec", true);
         }
