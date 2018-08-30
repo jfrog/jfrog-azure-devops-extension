@@ -28,7 +28,10 @@ The vsix file can be loaded into VSTS and TFS.
 
 # Pull Requests
 We welcome pull requests from the community!
-Before creating your first pull request, please join our contributors community by signing [JFrog's CLA](https://secure.echosign.com/public/hostedForm?formid=5IYKLZ2RXB543N).
+## Guidelines
+* Before creating your first pull request, please join our contributors community by signing [JFrog's CLA](https://secure.echosign.com/public/hostedForm?formid=5IYKLZ2RXB543N).
+* Pull requests should be created on the *dev* branch.
+* Please make sure the code is covered by tests. 
 
 # Release Notes
 See the release notes [here](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension#VSTSandTFSArtifactoryExtension-ReleaseNotes).
