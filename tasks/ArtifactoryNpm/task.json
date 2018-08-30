@@ -1,0 +1,125 @@
+{
+    "id": "07fc5c20-6772-11d2-cace-6501d1a00335",
+    "name": "ArtifactoryNpm",
+    "friendlyName": "Artifactory npm",
+    "description": "Install, pack and deploy npm packages to Artifactory",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Npm+Registry)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [
+        "npm"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "6"
+    },
+    "minimumAgentVersion": "1.91.0",
+    "instanceNameFormat": "Artifactory npm $(command)",
+    "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "install",
+            "helpMarkDown": "The npm command to run.",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "install": "install",
+                "pack and publish": "pack and publish"
+            }
+        },
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The Artifactory service used by the task."
+        },
+        {
+            "name": "sourceRepo",
+            "type": "pickList",
+            "label": "Npm source repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = install",
+            "helpMarkDown": "The source npm repository.\nCan be local, remote, or a virtual npm repository.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetRepo",
+            "type": "pickList",
+            "label": "Npm target repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = pack and publish",
+            "helpMarkDown": "The target npm repository\nCan be local, or a virtual npm repository containing local repositories.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "workingFolder",
+            "type": "string",
+            "label": "Working folder with package.json",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Path to the folder containing the target package.json and .npmrc files. Select the folder, not the file e.g. \"/packages/mypackage\"."
+        },
+        {
+            "name": "arguments",
+            "type": "string",
+            "label": "Npm arguments",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "A list of npm arguments and options in the form of \"--arg1=value1 --arg2=value2\"."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "sourceRepo",
+            "resultSelector": "jsonpath:$[*].key"
+        },
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "npmBuild.js"
+        }
+    }
+}

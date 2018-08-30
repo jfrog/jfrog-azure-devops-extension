@@ -13,17 +13,19 @@ environment:
     secure: Um8o75MQIieSavIemF4ySA==
 
 install:
-  - npm install -g jfrog-cli-go
+- npm install -g jfrog-cli-go
 
 test_script:
+- sh: if [[ "$APPVEYOR_REPO_BRANCH" = "dev" && -z "$APPVEYOR_PULL_REQUEST_TITLE" ]]; then
   - node --version
   - npm --version
-  - sh: if [[ "$APPVEYOR_REPO_BRANCH" = "dev" && -z "$APPVEYOR_PULL_REQUEST_TITLE" ]]; then
-          npm test;
-        fi
-  - cmd: IF "%APPVEYOR_REPO_BRANCH%" == "dev" IF "%APPVEYOR_PULL_REQUEST_TITLE%" == "" (
-           npm test
-         )
+  - npm test
+    fi
+- cmd: IF "%APPVEYOR_REPO_BRANCH%" == "dev" IF "%APPVEYOR_PULL_REQUEST_TITLE%" == "" (
+  - node --version
+  - npm --version
+  - npm test
+    )
 
 # Don't actually build.
 build: off

@@ -5,13 +5,14 @@ const fs = require('fs');
 const rmdir = require('rmdir-recursive');
 const execSync = require('child_process').execSync;
 const syncRequest = require('sync-request');
-const testsDir = path.join(__dirname);
 const testDataDir = path.join(__dirname, "testData");
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
 
 module.exports = {
+    testDataDir: testDataDir,
+
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
     remoteMaven: "vsts-extension-test-maven-remote",
@@ -22,15 +23,14 @@ module.exports = {
     npmLocalRepoKey: "vsts-npm-local-test",
     npmRemoteRepoKey: "vsts-npm-remote-test",
     npmVirtualRepoKey: "vsts-npm-virtual-test",
-    testDataDir: testDataDir,
-    testsDir: testsDir,
-    promote: path.join(__dirname, "..", "ArtifactoryPromote", "artifactoryPromote.js"),
-    download: path.join(__dirname, "..", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
-    upload: path.join(__dirname, "..", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
-    publish: path.join(__dirname, "..", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
-    maven: path.join(__dirname, "..", "ArtifactoryMaven", "mavenBuild.js"),
-    nuget: path.join(__dirname, "..", "ArtifactoryNuget", "nugetBuild.js"),
-    npm: path.join(__dirname, "..", "ArtifactoryNpm", "npmBuild.js"),
+
+    promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
+    download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
+    upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
+    maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
+    npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
+    nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
+    publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -42,20 +42,18 @@ module.exports = {
     getBuild: getBuild,
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
+    isWindows: isWindows,
     fixWinPath: fixWinPath,
     execCli: execCli,
-    cleanUpAllTests: cleanUpAllTests,
-    cleanUpBetweenTests: cleanUpBetweenTests
+    cleanUpAllTests: cleanUpAllTests
 };
 
 function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
     tl.setVariable("Agent.WorkFolder", "");
-    tl.setVariable("Agent.TempDirectory", "");
-    tl.setVariable("Agent.ToolsDirectory", "");
+    deleteTestRepositories();
     createTestRepositories();
-    cleanUpRepositories();
     recreateTestDataDir();
 }
 
@@ -76,7 +74,7 @@ function runTask(testMain, variables, inputs) {
 }
 
 function execCli(command) {
-    command = command.replace(/\\/g, "\\\\");
+    command = fixWinPath(command);
     try {
         execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
     } catch (ex) {
@@ -111,7 +109,7 @@ function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
         rmdir.sync(testDataDir);
     }
-    deleteRepositories();
+    deleteTestRepositories();
 }
 
 function createTestRepositories() {
@@ -126,7 +124,7 @@ function createTestRepositories() {
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
 }
 
-function deleteRepositories() {
+function deleteTestRepositories() {
     deleteRepo(module.exports.repoKey1);
     deleteRepo(module.exports.repoKey2);
     deleteRepo(module.exports.localMaven);
@@ -146,6 +144,15 @@ function createRepo(repoKey, body) {
         },
         body: body
     });
+}
+
+function isRepoExists(repoKey) {
+    let res = syncRequest('GET', artifactoryUrl + "/api/repositories/" + repoKey, {
+        headers: {
+            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+        }
+    });
+    return res.statusCode === 200;
 }
 
 function deleteRepo(repoKey) {
@@ -216,23 +223,6 @@ function mockGetInputs(inputs) {
     };
 }
 
-function cleanUpBetweenTests() {
-    recreateTestDataDir();
-    cleanUpRepositories();
-}
-
-function cleanUpRepositories() {
-    execCli("rt del " + module.exports.repoKey1 + '/*' + " --quiet");
-    execCli("rt del " + module.exports.repoKey2 + '/*' + " --quiet");
-    execCli("rt del " + module.exports.npmLocalRepoKey + '/*' + " --quiet");
-    execCli("rt del " + module.exports.npmRemoteRepoKey + '/*' + " --quiet");
-    execCli("rt del " + module.exports.npmVirtualRepoKey + '/*' + " --quiet");
-    execCli("rt del " + module.exports.remoteMaven + '/*' + " --quiet");
-    execCli("rt del " + module.exports.remoteNuGet + '/*' + " --quiet");
-    execCli("rt del " + module.exports.localNuGet + '/*' + " --quiet");
-    execCli("rt del " + module.exports.localMaven + '/*' + " --quiet");
-}
-
 function getTestName(testDir) {
     return path.basename(testDir);
 }
@@ -249,17 +239,12 @@ function getRemoteTestDir(repo, testName) {
     return repo + "/" + testName + "/"
 }
 
-function isRepoExists(repoName) {
-    let res = syncRequest('GET', artifactoryUrl + "/api/repositories/" + repoName, {
-        headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
-        }
-    });
-    return res.statusCode === 200;
+function isWindows() {
+    return process.platform.startsWith("win");
 }
 
 function fixWinPath(path) {
-    if (process.platform === "win32") {
+    if (isWindows()) {
         return path.replace(/(\\)/g, "\\\\")
     }
 }

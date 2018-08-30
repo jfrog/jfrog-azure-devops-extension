@@ -123,13 +123,13 @@
             }
         },
         {
-            "id": "artifactory-generic-upload",
+            "id": "artifactory-promote-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryGenericUpload"
+                "name": "tasks/ArtifactoryBuildPromotion"
             }
         },
         {
@@ -139,27 +139,17 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryGenericDownload"
+                "name": "tasks/ArtifactoryGenericDownload"
             }
         },
         {
-            "id": "artifactory-publish-build-info",
+            "id": "artifactory-generic-upload",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryPublishBuildInfo"
-            }
-        },
-        {
-            "id": "artifactory-promote-build-task",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "ArtifactoryPromote"
+                "name": "tasks/ArtifactoryGenericUpload"
             }
         },
         {
@@ -169,17 +159,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryMaven"
-            }
-        },
-        {
-            "id": "artifactory-nuget",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "ArtifactoryNuget"
+                "name": "tasks/ArtifactoryMaven"
             }
         },
         {
@@ -189,7 +169,27 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryNpm"
+                "name": "tasks/ArtifactoryNpm"
+            }
+        },
+        {
+            "id": "artifactory-nuget",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryNuget"
+            }
+        },
+        {
+            "id": "artifactory-publish-build-info",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryPublishBuildInfo"
             }
         }
     ],
@@ -207,33 +207,29 @@
             "addressable": true
         },
         {
-            "path": "css",
-            "addressable": true
-        },
-        {
             "path": "images",
             "addressable": true
         },
         {
-            "path": "ArtifactoryGenericUpload"
+            "path": "tasks/ArtifactoryBuildPromotion"
         },
         {
-            "path": "ArtifactoryGenericDownload"
+            "path": "tasks/ArtifactoryGenericDownload"
         },
         {
-            "path": "ArtifactoryPublishBuildInfo"
+            "path": "tasks/ArtifactoryGenericUpload"
         },
         {
-            "path": "ArtifactoryPromote"
+            "path": "tasks/ArtifactoryMaven"
         },
         {
-            "path": "ArtifactoryMaven"
+            "path": "tasks/ArtifactoryNpm"
         },
         {
-            "path": "ArtifactoryNuget"
+            "path": "tasks/ArtifactoryNuget"
         },
         {
-            "path": "ArtifactoryNpm"
+            "path": "tasks/ArtifactoryPublishBuildInfo"
         }
     ]
 }

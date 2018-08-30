@@ -1,12 +1,13 @@
 {
     "name": "artifactory-vsts-extension",
     "version": "1.0.0",
+    "author": "JFrog",
+    "license": "Apache-2.0",
     "dependencies": {
         "tfx-cli": "^0.5.14"
     },
     "scripts": {
-        "install": "node build.js && tfx extension create --manifest-globs vss-extension.json",
-        "test": "node build.js && npm t --prefix=tests"
-    },
-    "license": "Apache-2.0"
+        "install": "node build.js && tfx extension create",
+        "test": "npm i && npm t --prefix=tests"
+    }
 }
