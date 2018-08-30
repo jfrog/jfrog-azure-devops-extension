@@ -45,16 +45,15 @@ module.exports = {
     isWindows: isWindows,
     fixWinPath: fixWinPath,
     execCli: execCli,
-    cleanUpAllTests: cleanUpAllTests,
-    cleanUpBetweenTests: cleanUpBetweenTests
+    cleanUpAllTests: cleanUpAllTests
 };
 
 function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
     tl.setVariable("Agent.WorkFolder", "");
+    deleteTestRepositories();
     createTestRepositories();
-    cleanUpRepositories();
     recreateTestDataDir();
 }
 
@@ -110,7 +109,7 @@ function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
         rmdir.sync(testDataDir);
     }
-    deleteRepositories();
+    deleteTestRepositories();
 }
 
 function createTestRepositories() {
@@ -125,7 +124,7 @@ function createTestRepositories() {
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
 }
 
-function deleteRepositories() {
+function deleteTestRepositories() {
     deleteRepo(module.exports.repoKey1);
     deleteRepo(module.exports.repoKey2);
     deleteRepo(module.exports.localMaven);
@@ -222,23 +221,6 @@ function mockGetInputs(inputs) {
     tl.getInput = tl.getBoolInput = tl.getPathInput = (name, required) => {
         return inputs[name];
     };
-}
-
-function cleanUpBetweenTests() {
-    recreateTestDataDir();
-    cleanUpRepositories();
-}
-
-function cleanUpRepositories() {
-    execCli("rt del " + module.exports.repoKey1 + '/*' + " --quiet");
-    execCli("rt del " + module.exports.repoKey2 + '/*' + " --quiet");
-    execCli("rt del " + module.exports.npmLocalRepoKey + '/*' + " --quiet");
-    execCli("rt del " + module.exports.npmRemoteRepoKey + '/*' + " --quiet");
-    execCli("rt del " + module.exports.npmVirtualRepoKey + '/*' + " --quiet");
-    execCli("rt del " + module.exports.remoteMaven + '/*' + " --quiet");
-    execCli("rt del " + module.exports.remoteNuGet + '/*' + " --quiet");
-    execCli("rt del " + module.exports.localNuGet + '/*' + " --quiet");
-    execCli("rt del " + module.exports.localMaven + '/*' + " --quiet");
 }
 
 function getTestName(testDir) {

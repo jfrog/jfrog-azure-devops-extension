@@ -159,7 +159,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryMaven"
+                "name": "tasks/ArtifactoryMaven"
             }
         },
         {
@@ -179,7 +179,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "ArtifactoryNuget"
+                "name": "tasks/ArtifactoryNuget"
             }
         },
         {

@@ -19,10 +19,6 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         testUtils.cleanUpAllTests();
     });
 
-    beforeEach(() => {
-        testUtils.cleanUpBetweenTests();
-    });
-
     describe("Unit Tests", () => {
         console.log("OS:", os.type());
         runTest("Mask password", () => {
