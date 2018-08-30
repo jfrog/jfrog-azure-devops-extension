@@ -88,7 +88,7 @@
             "name": "solutionPath",
             "type": "filePath",
             "label": "Path to the solution (The root of working directory by default)",
-            "defaultValue": ".",
+            "defaultValue": "**/*.sln",
             "helpMarkDown": "The path to the solution (*.sln).",
             "required": "true",
             "visibleRule": "command = restore"
