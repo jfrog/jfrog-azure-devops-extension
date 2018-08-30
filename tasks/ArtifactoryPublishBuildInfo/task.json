@@ -2,9 +2,8 @@
     "id": "07fc5c20-6752-1e11-abde-6a01c3d00486",
     "name": "ArtifactoryPublishBuildInfo",
     "friendlyName": "Artifactory Publish Build Info",
-    "description": "This task publishes the Build Info collected in previous tasks.",
+    "description": "Publish the build-info collected in previous tasks to Artifactory.",
     "author": "JFrog",
-    "helpMarkDown": "Publish Build Info to Artifactory.",
     "category": "Utility",
     "visibility": [
         "Build",

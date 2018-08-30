@@ -2,9 +2,8 @@
     "id": "07fc5c20-6772-11e5-abde-6901d3d00475",
     "name": "ArtifactoryGenericUpload",
     "friendlyName": "Artifactory Generic Upload",
-    "description": "This task uploads generic build artifacts to Artifactory",
+    "description": "Upload build artifacts to Artifactory using FileSpecs while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "Upload artifacts to JFrog Artifactory using FileSpecs.",
     "category": "Utility",
     "visibility": [
         "Build",

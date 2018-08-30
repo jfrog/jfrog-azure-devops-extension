@@ -2,9 +2,9 @@
     "id": "07fc5c20-6772-11e5-abde-6901d3d11476",
     "name": "ArtifactoryNuGet",
     "friendlyName": "Artifactory Nuget",
-    "description": "This task triggers NuGet restore command and can push the nupkg file to Artifactory ",
+    "description": "Restore and push NuGet packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "Triggers NuGet with JFrog Artifactory.",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/NuGet+Repositories)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -138,7 +138,7 @@
             "name": "collectBuildInfo",
             "type": "boolean",
             "label": "Collect build info",
-            "defaultValue": "true",
+            "defaultValue": "false",
             "required": false,
             "helpMarkDown": "Select to collect build info."
         },
