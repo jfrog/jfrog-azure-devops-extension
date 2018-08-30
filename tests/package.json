@@ -1,20 +1,20 @@
 {
-  "name": "artifactory-test-utils",
-  "version": "1.0.0",
-  "author": "JFrog",
-  "license": "Apache-2.0",
-  "description": "Test utils",
-  "main": "testUtils.js",
-  "dependencies": {
-    "artifactory-tasks-utils": "file:../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz",
-    "mocha": "^5.2.0",
-    "path": "^0.12.7",
-    "rmdir-recursive": "^0.0.1",
-    "sync-request": "^6.0.0",
-    "vsts-task-lib": "^2.6.0",
-    "fs-extra": "^7.0.0"
-  },
-  "scripts": {
-    "test": "npm i && mocha tests.js -t 600000"
-  }
+    "name": "artifactory-test-utils",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "license": "Apache-2.0",
+    "description": "Test utils",
+    "main": "testUtils.js",
+    "dependencies": {
+        "artifactory-tasks-utils": "file:../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz",
+        "mocha": "^5.2.0",
+        "path": "^0.12.7",
+        "rmdir-recursive": "^0.0.1",
+        "sync-request": "^6.0.0",
+        "vsts-task-lib": "^2.6.0",
+        "fs-extra": "^7.0.0"
+    },
+    "scripts": {
+        "test": "npm i && mocha tests.js -t 600000"
+    }
 }

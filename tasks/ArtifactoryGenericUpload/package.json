@@ -1,16 +1,16 @@
 {
-  "name": "artifactory-generic-upload",
-  "version": "1.0.0",
-  "author": "JFrog",
-  "license": "Apache-2.0",
-  "description": "This task uploads generic build artifacts to Artifactory",
-  "main": "uploadArtifacts.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "vsts-task-lib": "^2.6.0",
-    "fs-extra": "^5.0.0",
-    "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
-  }
+    "name": "artifactory-generic-upload",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "license": "Apache-2.0",
+    "description": "This task uploads generic build artifacts to Artifactory",
+    "main": "uploadArtifacts.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "vsts-task-lib": "^2.6.0",
+        "fs-extra": "^5.0.0",
+        "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+    }
 }

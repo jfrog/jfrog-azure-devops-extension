@@ -4,7 +4,6 @@
     "author": "JFrog",
     "license": "Apache-2.0",
     "dependencies": {
-        "t": "^0.5.1",
         "tfx-cli": "^0.5.14"
     },
     "scripts": {
