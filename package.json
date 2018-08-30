@@ -8,6 +8,6 @@
     },
     "scripts": {
         "install": "node build.js && tfx extension create",
-        "test": "npm i && npm t --prefix=tests"
+        "test": "node build.js && npm t --prefix=tests"
     }
 }
