@@ -5,7 +5,7 @@ const fs = require('fs');
 const rmdir = require('rmdir-recursive');
 const execSync = require('child_process').execSync;
 const syncRequest = require('sync-request');
-
+const testsDir = path.join(__dirname);
 const testDataDir = path.join(__dirname, "testData");
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
@@ -14,15 +14,23 @@ let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
 module.exports = {
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
+    remoteMaven: "vsts-extension-test-maven-remote",
+    localMaven: "vsts-extension-test-maven-local",
+    virtualNuget: "vsts-extension-test-nuget-virtual",
+    remoteNuGet: "vsts-extension-test-nuget-remote",
+    localNuGet: "vsts-extension-test-nuget-local",
     npmLocalRepoKey: "vsts-npm-local-test",
     npmRemoteRepoKey: "vsts-npm-remote-test",
     npmVirtualRepoKey: "vsts-npm-virtual-test",
     testDataDir: testDataDir,
+    testsDir: testsDir,
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
     download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
+    maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
+    nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -30,10 +38,13 @@ module.exports = {
     getTestLocalFilesDir: getTestLocalFilesDir,
     getLocalTestDir: getLocalTestDir,
     getRemoteTestDir: getRemoteTestDir,
+    isRepoExists: isRepoExists,
     getBuild: getBuild,
     deleteBuild: deleteBuild,
-    cleanUpAllTests: cleanUpAllTests,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
+    fixWinPath: fixWinPath,
+    execCli: execCli,
+    cleanUpAllTests: cleanUpAllTests,
     cleanUpBetweenTests: cleanUpBetweenTests
 };
 
@@ -41,6 +52,8 @@ function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
     tl.setVariable("Agent.WorkFolder", "");
+    tl.setVariable("Agent.TempDirectory", "");
+    tl.setVariable("Agent.ToolsDirectory", "");
     createTestRepositories();
     cleanUpRepositories();
     recreateTestDataDir();
@@ -48,6 +61,8 @@ function initTests() {
 
 function runTask(testMain, variables, inputs) {
     variables["Agent.WorkFolder"] = testDataDir;
+    variables["Agent.TempDirectory"] = testDataDir;
+    variables["Agent.ToolsDirectory"] = testDataDir;
     variables["System.DefaultWorkingDirectory"] = testDataDir;
 
     let tmr = new tmrm.TaskMockRunner(testMain);
@@ -102,6 +117,10 @@ function cleanUpAllTests() {
 function createTestRepositories() {
     createRepo(module.exports.repoKey1, JSON.stringify({rclass: "local", packageType: "generic"}));
     createRepo(module.exports.repoKey2, JSON.stringify({rclass: "local", packageType: "generic"}));
+    createRepo(module.exports.localMaven, JSON.stringify({rclass: "local", packageType: "maven"}));
+    createRepo(module.exports.remoteMaven, JSON.stringify({rclass: "remote", packageType: "nuget", url: "https://jcenter.bintray.com"}));
+    createRepo(module.exports.localNuGet, JSON.stringify({rclass: "local", packageType: "nuget"}));
+    createRepo(module.exports.virtualNuget, JSON.stringify({rclass: "virtual", packageType: "nuget", repositories: [module.exports.remoteNuGet, module.exports.localNuGet]}));
     createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
@@ -110,6 +129,10 @@ function createTestRepositories() {
 function deleteRepositories() {
     deleteRepo(module.exports.repoKey1);
     deleteRepo(module.exports.repoKey2);
+    deleteRepo(module.exports.localMaven);
+    deleteRepo(module.exports.remoteMaven);
+    deleteRepo(module.exports.localNuGet);
+    deleteRepo(module.exports.virtualNuget);
     deleteRepo(module.exports.npmVirtualRepoKey);
     deleteRepo(module.exports.npmLocalRepoKey);
     deleteRepo(module.exports.npmRemoteRepoKey);
@@ -204,6 +227,10 @@ function cleanUpRepositories() {
     execCli("rt del " + module.exports.npmLocalRepoKey + '/*' + " --quiet");
     execCli("rt del " + module.exports.npmRemoteRepoKey + '/*' + " --quiet");
     execCli("rt del " + module.exports.npmVirtualRepoKey + '/*' + " --quiet");
+    execCli("rt del " + module.exports.remoteMaven + '/*' + " --quiet");
+    execCli("rt del " + module.exports.remoteNuGet + '/*' + " --quiet");
+    execCli("rt del " + module.exports.localNuGet + '/*' + " --quiet");
+    execCli("rt del " + module.exports.localMaven + '/*' + " --quiet");
 }
 
 function getTestName(testDir) {
@@ -220,4 +247,19 @@ function getTestLocalFilesDir(testDir) {
 
 function getRemoteTestDir(repo, testName) {
     return repo + "/" + testName + "/"
+}
+
+function isRepoExists(repoName) {
+    let res = syncRequest('GET', artifactoryUrl + "/api/repositories/" + repoName, {
+        headers: {
+            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+        }
+    });
+    return res.statusCode === 200;
+}
+
+function fixWinPath(path) {
+    if (process.platform === "win32") {
+        return path.replace(/(\\)/g, "\\\\")
+    }
 }
