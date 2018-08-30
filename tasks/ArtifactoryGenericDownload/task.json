@@ -2,9 +2,8 @@
     "id": "07fc5c20-6772-11e5-abde-6901d3c00755",
     "name": "ArtifactoryGenericDownload",
     "friendlyName": "Artifactory Generic Download",
-    "description": "This task downloads artifacts from Artifactory.",
+    "description": "Download artifacts from Artifactory using FileSpecs. Allowing to collect build-info, to be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "Download the artifacts using FileSpecs.",
     "category": "Utility",
     "visibility": [
         "Build",

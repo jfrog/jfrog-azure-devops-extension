@@ -2,9 +2,9 @@
     "id": "07fc5c20-6772-11e5-abde-6901d3d00476",
     "name": "ArtifactoryMaven",
     "friendlyName": "Artifactory Maven",
-    "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory.",
+    "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory. Allowing to collect build-info, to be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "Triggers Maven resolution/deployment using JFrog Artifactory.",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Maven+Repository)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -132,7 +132,7 @@
             "name": "collectBuildInfo",
             "type": "boolean",
             "label": "Collect build info",
-            "defaultValue": "true",
+            "defaultValue": "false",
             "required": false,
             "helpMarkDown": "Select to collect build info and store it locally. The collected build info can be published to Artifactory using the \"Artifactory Publish Build Info\" task."
         },
