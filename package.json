@@ -7,7 +7,7 @@
         "tfx-cli": "^0.5.14"
     },
     "scripts": {
-        "install": "node build.js && node_modules/.bin/tfx extension create",
+        "install": "node build.js && ./node_modules/.bin/tfx extension create",
         "test": "npm i && npm t --prefix=tests"
     }
 }
