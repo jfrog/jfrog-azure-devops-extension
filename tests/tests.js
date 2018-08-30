@@ -19,7 +19,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         testUtils.cleanUpAllTests();
     });
 
-    beforeEach (() => {
+    beforeEach(() => {
         testUtils.cleanUpBetweenTests();
     });
 
@@ -45,11 +45,11 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let specBeforeFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specBeforeFix.json"), "utf8");
             let expectedSpecAfterFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specAfterFix.json"), "utf8");
             let specAfterFix = jfrogUtils.fixWindowsPaths(specBeforeFix);
-            assert.equal(specAfterFix, process.platform.startsWith("win") ? expectedSpecAfterFix : specBeforeFix, "\nSpec after fix:\n" + specAfterFix);
+            assert.equal(specAfterFix, testUtils.isWindows() ? expectedSpecAfterFix : specBeforeFix, "\nSpec after fix:\n" + specAfterFix);
         });
 
         runTest("Encode paths", () => {
-            if (process.platform.startsWith("win")) {
+            if (testUtils.isWindows()) {
                 assert.equal(jfrogUtils.encodePath("dir1\\dir 2\\dir 3"), "dir1\\\"dir 2\"\\\"dir 3\"");
                 assert.equal(jfrogUtils.encodePath("dir 1\\dir2\\a b.txt"), "\"dir 1\"\\dir2\\\"a b.txt\"");
                 assert.equal(jfrogUtils.encodePath("dir1\\dir2\\a.txt"), "dir1\\dir2\\a.txt");
@@ -89,7 +89,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         });
 
         runTest("npm - Determine cli workdir", () => {
-            if (process.platform.startsWith("win")) {
+            if (testUtils.isWindows()) {
                 assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
                 assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
                 assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
@@ -217,7 +217,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     });
 
     describe("NuGet Tests", () => {
-        if (process.platform === "win32") {
+        if (testUtils.isWindows()) {
             runTest("NuGet restore", () => {
                 let testDir = "nuget";
                 // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
@@ -238,6 +238,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                 getAndAssertBuild("NuGet", "3");
                 deleteBuild("NuGet");
             });
+        } else {
+            console.log("Skipping NuGet tests");
         }
     });
 });
@@ -251,7 +253,7 @@ function runTest(description, testFunc) {
     it(description, (done) => {
         testFunc();
         done();
-    }).timeout(100000);
+    }).timeout(300000); // 5 minutes
 }
 
 /**

@@ -15,6 +15,6 @@
     "fs-extra": "^7.0.0"
   },
   "scripts": {
-    "test": "npm install && mocha tests.js -t 10000"
+    "test": "npm i && mocha tests.js -t 600000"
   }
 }

@@ -5,13 +5,14 @@ const fs = require('fs');
 const rmdir = require('rmdir-recursive');
 const execSync = require('child_process').execSync;
 const syncRequest = require('sync-request');
-const testsDir = path.join(__dirname);
 const testDataDir = path.join(__dirname, "testData");
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
 
 module.exports = {
+    testDataDir: testDataDir,
+
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
     remoteMaven: "vsts-extension-test-maven-remote",
@@ -22,15 +23,14 @@ module.exports = {
     npmLocalRepoKey: "vsts-npm-local-test",
     npmRemoteRepoKey: "vsts-npm-remote-test",
     npmVirtualRepoKey: "vsts-npm-virtual-test",
-    testDataDir: testDataDir,
-    testsDir: testsDir,
+
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
     download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
-    publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
-    npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
+    npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
+    publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -42,6 +42,7 @@ module.exports = {
     getBuild: getBuild,
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
+    isWindows: isWindows,
     fixWinPath: fixWinPath,
     execCli: execCli,
     cleanUpAllTests: cleanUpAllTests,
@@ -52,8 +53,6 @@ function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
     tl.setVariable("Agent.WorkFolder", "");
-    tl.setVariable("Agent.TempDirectory", "");
-    tl.setVariable("Agent.ToolsDirectory", "");
     createTestRepositories();
     cleanUpRepositories();
     recreateTestDataDir();
@@ -76,7 +75,7 @@ function runTask(testMain, variables, inputs) {
 }
 
 function execCli(command) {
-    command = command.replace(/\\/g, "\\\\");
+    command = fixWinPath(command);
     try {
         execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
     } catch (ex) {
@@ -146,6 +145,15 @@ function createRepo(repoKey, body) {
         },
         body: body
     });
+}
+
+function isRepoExists(repoKey) {
+    let res = syncRequest('GET', artifactoryUrl + "/api/repositories/" + repoKey, {
+        headers: {
+            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+        }
+    });
+    return res.statusCode === 200;
 }
 
 function deleteRepo(repoKey) {
@@ -249,17 +257,12 @@ function getRemoteTestDir(repo, testName) {
     return repo + "/" + testName + "/"
 }
 
-function isRepoExists(repoName) {
-    let res = syncRequest('GET', artifactoryUrl + "/api/repositories/" + repoName, {
-        headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
-        }
-    });
-    return res.statusCode === 200;
+function isWindows() {
+    return process.platform.startsWith("win");
 }
 
 function fixWinPath(path) {
-    if (process.platform === "win32") {
+    if (isWindows()) {
         return path.replace(/(\\)/g, "\\\\")
     }
 }

@@ -4,10 +4,11 @@
     "author": "JFrog",
     "license": "Apache-2.0",
     "dependencies": {
+        "t": "^0.5.1",
         "tfx-cli": "^0.5.14"
     },
     "scripts": {
-        "install": "node build.js && tfx extension create --manifest-globs vss-extension.json",
-        "test": "node build.js && npm t --prefix=tests"
+        "install": "node build.js && tfx extension create",
+        "test": "npm i && npm t --prefix=tests"
     }
 }
