@@ -15,8 +15,8 @@ environment:
     secure: Um8o75MQIieSavIemF4ySA==
 
 install:
-- npm install -g jfrog-cli-go
-- npm install -g tfx-cli
+- npm i -g jfrog-cli-go
+- npm i -g tfx-cli
 
 test_script:
 - node --version
