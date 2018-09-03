@@ -11,7 +11,7 @@ See the full extension documentation at the [VSTS and TFS Artifactory Extension 
 
 # Download and Installation
 The extension is available for installation on your VSTS organization in the [VSTS Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension).
-To install the extension TFS, see the [nstall extensions for Team Foundation Server (TFS)](https://docs.microsoft.com/en-us/vsts/marketplace/get-tfs-extensions?view=tfs-2018#install-extensions-while-connected-to-tfs) documentation page.
+To install the extension TFS, see the [install extensions for Team Foundation Server (TFS)](https://docs.microsoft.com/en-us/vsts/marketplace/get-tfs-extensions?view=tfs-2018#install-extensions-while-connected-to-tfs) documentation page.
 
 # Building and Testing the Extension
 To build and run the extension sources, please follow these steps:
