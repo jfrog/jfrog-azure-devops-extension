@@ -37,8 +37,7 @@
                 "Install": "Install",
                 "Create": "Create",
                 "Upload": "Upload",
-                "Custom": "Custom",
-                "POC Publish Build Info": "POC Publish Build Info"
+                "Custom": "Custom"
             },
             "required": true,
             "helpMarkDown": "The conan command to be run by this task."
@@ -56,7 +55,7 @@
             "name": "artifactoryService",
             "type": "connectedService:artifactoryService",
             "label": "Artifactory Service",
-            "visibleRule": "conanCommand = Add Remote || conanCommand = POC Publish Build Info",
+            "visibleRule": "conanCommand = Add Remote",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Artifactory service used by this remote configuration."

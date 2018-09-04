@@ -12,7 +12,8 @@
         "rmdir-recursive": "^0.0.1",
         "sync-request": "^6.0.0",
         "vsts-task-lib": "^2.6.0",
-        "fs-extra": "^7.0.0"
+        "fs-extra": "^7.0.0",
+        "conan-utils": "file:../conan-utils"
     },
     "scripts": {
         "test": "npm i && mocha tests.js -t 600000"

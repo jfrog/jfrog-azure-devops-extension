@@ -27,13 +27,10 @@ function run() {
         case "Custom":
             handleCustomCommand();
             break;
-        case "POC Publish Build Info":
-            handlePublishBuildInfo();
-            break;
         default:
             tl.setResult(tl.TaskResult.Failed, "Conan Command not supported: " + conanCommand);
     }
-};
+}
 
 /**
 * Handle Conan Config Install Command
@@ -196,25 +193,6 @@ let handleCustomCommand = async(function() {
     let conanArguments = customArguments.split(" ");
     let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
         conanUserHome, conanArguments, collectBuildInfo, buildDefinition, buildNumber));
-
-    setTaskResult(taskSuccessful);
-});
-
-/**
-* Handle Publish Build Info
-*/
-let handlePublishBuildInfo = async(function() {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
-    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', false);
-    let artifactoryService = tl.getInput("artifactoryService", true);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
-
-    let taskSuccessful = await(conanutils.publishBuildInfo(workingDirectory, conanUserHome, buildDefinition,
-        buildNumber, artifactoryUrl, artifactoryUser, artifactoryPassword));
 
     setTaskResult(taskSuccessful);
 });

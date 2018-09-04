@@ -1,11 +1,10 @@
 const tl = require('vsts-task-lib/task');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
-const uuid = require('uuid/v1')
+const uuid = require('uuid/v1');
 const os = require('os');
 const fs = require('fs-extra');
 const path = require('path');
-const pbi = require('./publish-build-info')
 
 // Helper Constants
 const CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME = "artifact_property_build.name";
@@ -14,6 +13,8 @@ const CONAN_ARTIFACTS_PROPERTIES_BUILD_TIMESTAMP = "artifact_property_build.time
 const BUILD_INFO_BUILD_NAME = "name";
 const BUILD_INFO_BUILD_NUMBER = "number";
 const BUILD_INFO_BUILD_STARTED = "started";
+const BUILD_INFO_FILE_NAME = "generatedBuildInfo";
+const BUILD_TEMP_PATH = "jfrog/builds";
 
 /**
 * Execute Artifactory Conan Task
@@ -32,7 +33,7 @@ let executeConanTask = async(function (workingDir, conanUserHome,
     try {
         let conanTaskId = generateConanTaskUUId();
         console.log("Conan Task Id: " + conanTaskId);
-        let buildTimestamp = Date.now()
+        let buildTimestamp = Date.now();
 
         /*
         * Get Conan tool Path. This will force the conan task to fail fast if
@@ -54,6 +55,7 @@ let executeConanTask = async(function (workingDir, conanUserHome,
 
         // Prepare Conan to generate build info
         if (collectBuildInfo) {
+            initCliPartialsBuildDir(buildName, buildNumber);
             setConanTraceFileLocation(conanUserHome, conanTaskId);
             setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, buildTimestamp);
         }
@@ -139,7 +141,7 @@ function setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, 
         let propertiesMap = convertConanPropertiesToMap(existingContent.toString());
         if (buildName == propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME] &&
             buildNumber == propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER]) {
-            console.log("Conan artifacts.properties already set for this build at " + conanArtifactsPropertiesPath);
+            tl.debug("Conan artifacts.properties already set for this build at " + conanArtifactsPropertiesPath);
             return;
         } else {
             console.warn("Conan artifacts.properties file exists at "
@@ -154,7 +156,7 @@ function setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, 
         CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER + "=" + buildNumber + os.EOL +
         CONAN_ARTIFACTS_PROPERTIES_BUILD_TIMESTAMP + "=" + buildTimestamp + os.EOL;
     fs.outputFileSync(conanArtifactsPropertiesPath, content);
-    console.log("Conan artifacts.properties file created at " + conanArtifactsPropertiesPath);
+    tl.debug("Conan artifacts.properties file created at " + conanArtifactsPropertiesPath);
 }
 
 /**
@@ -169,7 +171,7 @@ let executeConanCommand = async( function(conanPath, commandArgs, workingDir) {
     cleanupConanArguments(commandArgs);
 
     // Create command
-    let conan = tl.tool(conanPath).arg(commandArgs)
+    let conan = tl.tool(conanPath).arg(commandArgs);
     let options = {
         failOnStdErr: false,
         errStream: process.stdout,
@@ -231,7 +233,7 @@ let generateBuildInfo = async( function (conanUserHome, conanTaskId) {
         conanTraceFilePath,
         "--output",
         buildInfoFilePath
-    ]
+    ];
 
     let options = {
         failOnStdErr: false,
@@ -260,16 +262,24 @@ function completeBuildInfo(conanUserHome, conanTaskId) {
     let content = fs.readFileSync(conanArtifactsPropertiesPath);
     let propertiesMap = convertConanPropertiesToMap(content.toString());
 
+    let buildName = propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME];
+    let buildNumber = propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER];
+
     // Read build info json file
     let buildInfoJson = fs.readJsonSync(buildInfoFilePath);
-    buildInfoJson[BUILD_INFO_BUILD_NAME] = propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME];
-    buildInfoJson[BUILD_INFO_BUILD_NUMBER] = propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER];
+    buildInfoJson[BUILD_INFO_BUILD_NAME] = buildName;
+    buildInfoJson[BUILD_INFO_BUILD_NUMBER] = buildNumber;
     let buildTimestamp = new Date(parseInt(propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_TIMESTAMP], 10));
     buildInfoJson[BUILD_INFO_BUILD_STARTED] = buildTimestamp.toISOString();
 
+
+    // Delete the previously created BuildInfo
+    fs.unlinkSync(buildInfoFilePath);
+    buildInfoFilePath = path.join(getCliPartialsBuildDir(buildName, buildNumber), BUILD_INFO_FILE_NAME + conanTaskId);
+
     // Write build info json file
     fs.writeJsonSync(buildInfoFilePath, buildInfoJson);
-    console.log("Build Info created at " + buildInfoFilePath);
+    tl.debug("Build Info created at " + buildInfoFilePath);
 }
 
 /**
@@ -362,8 +372,27 @@ let purgeConanRemotes = async(function (workingDir, conanUserHome) {
     }
 });
 
+/**
+  * Creates the path of for partials build info and initializing the details file with Timestamp.
+  * @param buildName (string) - The build name
+  * @param buildNumber (string) - The build number
+  */
+function initCliPartialsBuildDir(buildName, buildNumber) {
+        let partialsBuildDir = path.join(getCliPartialsBuildDir(buildName, buildNumber), "partials");
+        if (!fs.pathExistsSync(partialsBuildDir)) {
+                fs.ensureDirSync(partialsBuildDir);
+            }
+        fs.writeJsonSync(path.join(partialsBuildDir, "details"), {Timestamp: new Date().toISOString()});
+        tl.debug("Created partial details at: " + path.join(partialsBuildDir, "details"))
+}
+
+
+function getCliPartialsBuildDir(buildName, buildNumber) {
+    return path.join(os.tmpdir(), BUILD_TEMP_PATH, Buffer.from(buildName + "_" + buildNumber).toString('base64'));
+}
+
 module.exports = {
     executeConanTask: executeConanTask,
-    publishBuildInfo: pbi.publishBuildInfo,
+    getCliPartialsBuildDir: getCliPartialsBuildDir, // Exported for tests
     purgeConanRemotes: purgeConanRemotes
-}
+};
