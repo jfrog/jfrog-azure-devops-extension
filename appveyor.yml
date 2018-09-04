@@ -2,7 +2,9 @@ image:
 - Visual Studio 2017
 - Ubuntu
 
+build: off
 stack: node 8
+skip_tags: true
 environment:
   nodejs_version: "8"
   VSTS_ARTIFACTORY_URL:
@@ -13,15 +15,11 @@ environment:
     secure: Um8o75MQIieSavIemF4ySA==
 
 install:
-- npm install -g jfrog-cli-go
+- npm i -g jfrog-cli-go
+- npm i -g tfx-cli
 
 test_script:
-- sh: if [[ "$APPVEYOR_REPO_BRANCH" = "dev" && -z "$APPVEYOR_PULL_REQUEST_TITLE" ]]; then
-        node --version && npm --version && npm test;
-      fi
-- cmd: IF "%APPVEYOR_REPO_BRANCH%" == "dev" IF "%APPVEYOR_PULL_REQUEST_TITLE%" == "" (
-         node --version && npm --version && npm test
-       )
-
-# Don't actually build.
-build: off
+- node --version
+- npm --version
+- npm run create # Make sure that that the extension can be created
+- npm t
