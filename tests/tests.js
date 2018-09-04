@@ -7,10 +7,16 @@ const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
+const execSync = require('child_process').execSync;
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
     before(() => {
+        // Validate environment variables exist for tests
+        if (!testUtils.artifactoryUrl || !testUtils.artifactoryUsername || !testUtils.artifactoryPassword) {
+            assert.fail("Tests are missing one or more environment variables: VSTS_ARTIFACTORY_URL, VSTS_ARTIFACTORY_USERNAME, VSTS_ARTIFACTORY_PASSWORD");
+        }
+
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
     });
@@ -238,6 +244,28 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             console.log("Skipping NuGet tests");
         }
     });
+
+    describe("Docker Tests", () => {
+        if (testUtils.isToolExists("docker")) {
+            runTest("Docker push", () => {
+                if (!testUtils.artiactoryDockerTag) {
+                    assert.fail("Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_TAG");
+                }
+
+                let testDir = "docker";
+                let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
+                // Run docker build + tag
+                execSync("docker build -t " + testUtils.artiactoryDockerTag + " " + path.join(__dirname, "resources", testDir, filesDir));
+                // run docker push
+                mockTask(testDir, "push");
+                mockTask(testDir, "publish");
+                getAndAssertBuild("dockerTest", "1");
+                deleteBuild("dockerTest");
+            })
+        } else {
+            console.log("Could not find 'docker' executable, skipping Docker tests");
+        }
+    })
 });
 
 /**

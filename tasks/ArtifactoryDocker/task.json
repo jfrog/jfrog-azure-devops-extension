@@ -1,0 +1,88 @@
+{
+    "id": "07fc5c20-6882-a1c2-cbcd-6531d5a72113",
+    "name": "ArtifactoryDocker",
+    "friendlyName": "Artifactory Docker",
+    "description": "Publish docker images to Artifactory, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Docker+Registry)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "7"
+    },
+    "minimumAgentVersion": "1.91.0",
+    "instanceNameFormat": "Artifactory docker push",
+    "groups": [
+      {
+        "name": "advanced",
+        "displayName": "Advanced",
+        "isExpanded": false
+      }
+    ],
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The Artifactory service used by the task."
+        },
+        {
+            "name": "targetRepo",
+            "type": "pickList",
+            "label": "Docker target repository",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The target docker repository\nCan be local, or a virtual docker repository containing local repositories.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+          "name": "imageTag",
+          "type": "string",
+          "label": "Image tag",
+          "defaultValue": "",
+          "required": false,
+          "helpMarkDown": "The docker image tag to push."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+          "endpointId": "$(artifactoryService)",
+          "endpointURL": "{{endpoint.url}}/api/repositories",
+          "target": "targetRepo",
+          "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+          "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+
+    "execution": {
+        "Node": {
+            "target": "docker.js"
+        }
+    }
+}

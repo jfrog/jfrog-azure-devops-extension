@@ -9,9 +9,14 @@ const testDataDir = path.join(__dirname, "testData");
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
+let artiactoryDockerTag = process.env.VSTS_ARTIFACTORY_DOCKER_TAG;
 
 module.exports = {
     testDataDir: testDataDir,
+    artiactoryDockerTag: artiactoryDockerTag,
+    artifactoryUrl: artifactoryUrl,
+    artifactoryPassword: artifactoryPassword,
+    artifactoryUsername: artifactoryUsername,
 
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
@@ -23,6 +28,7 @@ module.exports = {
     npmLocalRepoKey: "vsts-npm-local-test",
     npmRemoteRepoKey: "vsts-npm-remote-test",
     npmVirtualRepoKey: "vsts-npm-virtual-test",
+    dockerLocalRepoKey: "vsts-docker-local-test",
 
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
     download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
@@ -31,6 +37,7 @@ module.exports = {
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
+    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "docker.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -45,7 +52,8 @@ module.exports = {
     isWindows: isWindows,
     fixWinPath: fixWinPath,
     execCli: execCli,
-    cleanUpAllTests: cleanUpAllTests
+    cleanUpAllTests: cleanUpAllTests,
+    isToolExists: isToolExists
 };
 
 function initTests() {
@@ -122,6 +130,7 @@ function createTestRepositories() {
     createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
+    createRepo(module.exports.dockerLocalRepoKey, JSON.stringify({rclass: "local", packageType: "docker"}));
 }
 
 function deleteTestRepositories() {
@@ -134,6 +143,7 @@ function deleteTestRepositories() {
     deleteRepo(module.exports.npmVirtualRepoKey);
     deleteRepo(module.exports.npmLocalRepoKey);
     deleteRepo(module.exports.npmRemoteRepoKey);
+    deleteRepo(module.exports.dockerLocalRepoKey);
 }
 
 function createRepo(repoKey, body) {
@@ -247,4 +257,8 @@ function fixWinPath(path) {
     if (isWindows()) {
         return path.replace(/(\\)/g, "\\\\")
     }
+}
+
+function isToolExists(toolName) {
+    return !!tl.which(toolName, false);
 }
