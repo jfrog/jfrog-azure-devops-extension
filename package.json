@@ -4,10 +4,12 @@
     "author": "JFrog",
     "license": "Apache-2.0",
     "dependencies": {
+        "rimraf": "^2.6.2",
         "tfx-cli": "^0.5.14"
     },
     "scripts": {
-        "install": "node build.js && tfx extension create",
-        "test": "node build.js && npm t --prefix=tests"
+        "install": "node build.js",
+        "create": "npm i && tfx extension create",
+        "test": "npm i && npm t --prefix=tests"
     }
 }
