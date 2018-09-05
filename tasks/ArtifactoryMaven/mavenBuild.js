@@ -80,16 +80,6 @@ function RunTaskCbk(cliPath) {
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
     if (collectBuildInfo) {
         mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
-        // Collect env vars
-        let taskRes = utils.collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-            taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
-            if (taskRes) {
-                tl.setResult(tl.TaskResult.Failed, taskRes);
-            }
-            return;
-        }
     }
 
     taskRes = utils.executeCliCommand(mavenCommand, workDir);

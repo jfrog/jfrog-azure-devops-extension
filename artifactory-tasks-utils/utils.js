@@ -30,8 +30,7 @@ module.exports = {
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
-    getArchitecture: getArchitecture,
-    collectEnvIfRequested: collectEnvIfRequested
+    getArchitecture: getArchitecture
 };
 
 function executeCliTask(runTaskFunc) {
@@ -39,16 +38,29 @@ function executeCliTask(runTaskFunc) {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
 
     runTaskCbk = runTaskFunc;
-    if (fs.existsSync(customCliPath)) {
-        runCbk(customCliPath);
-    } else if (fs.existsSync(versionedCliPath)) {
-        runCbk(versionedCliPath);
-    } else {
-        createCliDirs();
-        downloadCli(0).then(() => {
-            runCbk(versionedCliPath);
-        });
-    }
+    getCliPath().then((cliPath) => {
+        runCbk(cliPath);
+        collectEnvironmentVariablesIfNeeded(cliPath);
+    }).catch((error) => tl.setResult(tl.TaskResult.Failed, jfrogCliDownloadErrorMessage + "\n" + error))
+}
+
+function getCliPath() {
+    return new Promise(
+        function (resolve, reject) {
+            if (fs.existsSync(customCliPath)) {
+                tl.debug("Using cli from custom cli path: " + customCliPath);
+                resolve(customCliPath);
+            } else if (fs.existsSync(versionedCliPath)) {
+                tl.debug("Using existing versioned cli path: " + versionedCliPath);
+                resolve(versionedCliPath);
+            } else {
+                createCliDirs();
+                return downloadCli(0)
+                    .then((cliPath) => resolve(cliPath))
+                    .catch((error) => reject(error));
+            }
+        }
+    );
 }
 
 function executeCliCommand(cliCommand, runningDir, stdio) {
@@ -140,10 +152,9 @@ function downloadCli(attemptNumber) {
     return new Promise((resolve, reject) => {
         let handleError = (err) => {
             if (attemptNumber <= MAX_CLI_DOWNLOADS_RETRIES) {
-                console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
+                console.warn("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
                 downloadCli(++attemptNumber);
             } else {
-                console.error(jfrogCliDownloadErrorMessage);
                 reject(err);
             }
         };
@@ -172,7 +183,7 @@ function downloadCli(attemptNumber) {
                 let hex = digest.digest('hex');
                 let rawChecksum = response.headers['x-checksum-sha256'];
                 if (!rawChecksum) {
-                    handleError("Checksum header is missing from http response, cannot validate downloaded jfrog cli.");
+                    handleError("Checksum header is missing from http response, cannot validate downloaded JFrog cli.");
                 }
 
                 let trimmedChecksum = rawChecksum.split(',')[0];
@@ -181,11 +192,11 @@ function downloadCli(attemptNumber) {
                         if (!process.platform.startsWith("win")) {
                             fs.chmodSync(versionedCliPath, 0o555);
                         }
-                        console.log("Finished downloading jfrog cli.");
-                        resolve();
+                        tl.debug("Finished downloading JFrog cli.");
+                        resolve(versionedCliPath);
                     });
                 } else {
-                    handleError("Checksum mismatch for downloaded jfrog cli.");
+                    handleError("Checksum mismatch for downloaded JFrog cli.");
                 }
             });
         }).catch((err) => {
@@ -275,18 +286,29 @@ function encodePath(str) {
 }
 
 /**
- * Runs collect environment variables JFrog CLI command.
+ * Runs collect environment variables JFrog CLI command if includeEnvVars is configured to true.
  * @param cliPath - (String) - The cli path.
- * @param buildDefinition - (String) - The build name.
- * @param buildNumber - (String) - The build number.
- * @param workDir - (String) - Task's working directory.
- * @returns (String|void) - String with error message or void if passes successfully.
  */
-function collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir) {
+function collectEnvironmentVariablesIfNeeded(cliPath) {
     let includeEnvVars = tl.getBoolInput("includeEnvVars");
     if (includeEnvVars) {
-        console.log("Collecting environment variables...");
-        let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
-        return executeCliCommand(cliEnvVarsCommand, workDir);
+        let taskRes = collectEnvironmentVariables(cliPath);
+        if (taskRes) {
+            tl.setResult(tl.TaskResult.Failed, taskRes);
+        }
     }
+}
+
+/**
+ * Runs collect environment variables JFrog CLI command.
+ * @param cliPath - (String) - The cli path.
+ * @returns (String|void) - String with error message or void if passes successfully.
+ */
+function collectEnvironmentVariables(cliPath) {
+    console.log("Collecting environment variables...");
+    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
+    let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
+    return executeCliCommand(cliEnvVarsCommand, workDir);
 }
