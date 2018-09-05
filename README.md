@@ -17,7 +17,7 @@ To install the extension on TFS, see the [install extensions for Team Foundation
 To build and run the extension sources, please follow these steps:
 1. Clone the code from git.
 2. To run the tests, use the following commands:
-    1. Set the VSTS_ARTIFACTORY_URL, VSTS_ARTIFACTORY_USERNAME and VSTS_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password.
+    1. Set the VSTS_ARTIFACTORY_URL, VSTS_ARTIFACTORY_USERNAME and VSTS_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password. The environment variables VSTS_ARTIFACTORY_LOG_LEVEL="DEBUG" can be set if debug log level is required.
     2. Run the following commands:
     ```
     npm i -g jfrog-cli-go
