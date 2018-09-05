@@ -301,7 +301,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "conanAddRemote");
             mockTask(testDir, "conanCreate");
             mockTask(testDir, "conanUpload");
-            mockTask(testDir, "conanPublishBuildInfo");
+            mockTask(testDir, "publishBuildInfo");
             getAndAssertBuild("conanTask", "1");
             deleteBuild("conanTask");
         });
