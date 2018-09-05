@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 
 cleanExecNpm('pack', 'artifactory-tasks-utils');
-cleanExecNpm('pack', 'conan-utils');
 installTasks();
 cleanExecNpm(('i'), 'tests');
 

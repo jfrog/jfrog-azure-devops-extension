@@ -1,4 +1,4 @@
-const conanutils = require('conan-utils');
+const conanutils = require('./conanutils');
 const tl = require('vsts-task-lib/task');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
