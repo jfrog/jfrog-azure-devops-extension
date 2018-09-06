@@ -265,7 +265,6 @@ function mockTask(testDir, taskName, isNegative) {
     if (debugLogLevel) {
         process.env.JFROG_CLI_LOG_LEVEL = "DEBUG";
         console.log(mockRunner.stdout);
-        console.error(mockRunner.stderr);
     }
     assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + "\nStdout:\n" + mockRunner.stdout+ "\nStderr:\n" + mockRunner.stderr); // Check the test results
 }
