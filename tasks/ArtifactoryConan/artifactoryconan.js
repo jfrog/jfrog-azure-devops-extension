@@ -7,7 +7,6 @@ function run() {
     let conanCommand = tl.getInput('conanCommand', true);
 
     // Handle different conan commands
-    let conanArguments = []
     switch (conanCommand) {
         case "Config Install":
             handleConfigInstallCommand();
@@ -36,15 +35,13 @@ function run() {
 * Handle Conan Config Install Command
 */
 let handleConfigInstallCommand = async(function() {
-    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', false);
     let configSourceType = tl.getInput('configSourceType', true);
     let extraArguments = tl.getInput("extraArguments", false);
 
     let conanArguments = ["config", "install"];
     conanArguments = addExtraArguments(conanArguments, extraArguments);
 
-    if (configSourceType == "zip") {
+    if (configSourceType === "zip") {
         let configZipPath = tl.getInput("configZipPath", true);
         conanArguments.push(configZipPath);
     } else {
@@ -55,8 +52,7 @@ let handleConfigInstallCommand = async(function() {
     }
 
     // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
-        conanUserHome, conanArguments, false));
+    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
 
     setTaskResult(taskSuccessful);
 });
@@ -65,8 +61,6 @@ let handleConfigInstallCommand = async(function() {
 * Handle Conan Add Remote Command
 */
 let handleAddRemoteCommand = async(function() {
-    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', false);
     let remoteName = tl.getInput("remoteName", true);
     let artifactoryService = tl.getInput("artifactoryService", true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
@@ -82,8 +76,7 @@ let handleAddRemoteCommand = async(function() {
 
     // Purge existing
     if (purgeExistingRemotes) {
-        let taskSuccessful = await(conanutils.purgeConanRemotes(workingDirectory,
-            conanUserHome));
+        let taskSuccessful = await(conanutils.purgeConanRemotes());
         if (!taskSuccessful) {
             setTaskResult(taskSuccessful);
             return;
@@ -91,16 +84,14 @@ let handleAddRemoteCommand = async(function() {
     }
 
     // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
-        conanUserHome, conanArguments, false));
+    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
 
     if (taskSuccessful) {
         // Add user credentials
         conanArguments = [
             "user", artifactoryUser, "-r", remoteName, "-p", artifactoryPassword,
-        ]
-        taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
-            conanUserHome, conanArguments, false));
+        ];
+        taskSuccessful = await(conanutils.executeConanTask(conanArguments));
     }
 
     setTaskResult(taskSuccessful);
@@ -110,14 +101,9 @@ let handleAddRemoteCommand = async(function() {
 * Handle Conan Create Command
 */
 let handleCreateCommand = async(function() {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
-    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', false);
     let createPath = tl.getPathInput("createPath", true, true);
     let createReference = tl.getInput("createReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
 
     let conanArguments = ["create"];
     conanArguments = addExtraArguments(conanArguments, extraArguments);
@@ -125,8 +111,7 @@ let handleCreateCommand = async(function() {
     conanArguments.push(createReference);
 
     // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
-        conanUserHome, conanArguments, collectBuildInfo, buildDefinition, buildNumber));
+    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
 
     setTaskResult(taskSuccessful);
 });
@@ -135,21 +120,15 @@ let handleCreateCommand = async(function() {
 * Handle Conan Install Command
 */
 let handleInstallCommand = async(function() {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
-    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', false);
     let pathOrReference = tl.getInput("pathOrReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
 
     let conanArguments = ["install"];
     conanArguments = addExtraArguments(conanArguments, extraArguments);
     conanArguments.push(pathOrReference);
 
     // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
-        conanUserHome, conanArguments, collectBuildInfo, buildDefinition, buildNumber));
+    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
 
     setTaskResult(taskSuccessful);
 });
@@ -158,13 +137,8 @@ let handleInstallCommand = async(function() {
 * Handle Conan Upload Command
 */
 let handleUploadCommand = async(function() {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
-    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', false);
     let patternOrReference = tl.getInput("patternOrReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
 
     let conanArguments = ["upload"];
     conanArguments = addExtraArguments(conanArguments, extraArguments);
@@ -173,8 +147,7 @@ let handleUploadCommand = async(function() {
     conanArguments.push(patternOrReference);
 
     // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
-        conanUserHome, conanArguments, collectBuildInfo, buildDefinition, buildNumber));
+    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
 
     setTaskResult(taskSuccessful);
 })
@@ -183,16 +156,9 @@ let handleUploadCommand = async(function() {
 * Handle Conan Custom Command
 */
 let handleCustomCommand = async(function() {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
-    let workingDirectory = tl.getPathInput('workingDirectory', false, false);
-    let conanUserHome = tl.getInput('conanUserHome', false);
     let customArguments = tl.getInput('customArguments', true);
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
-
     let conanArguments = customArguments.split(" ");
-    let taskSuccessful = await(conanutils.executeConanTask(workingDirectory,
-        conanUserHome, conanArguments, collectBuildInfo, buildDefinition, buildNumber));
+    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
 
     setTaskResult(taskSuccessful);
 });

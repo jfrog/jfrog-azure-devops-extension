@@ -20,68 +20,79 @@ const BUILD_TEMP_PATH = "jfrog/builds";
 * Execute Artifactory Conan Task
 * @param workingDir (string) - Path to Working Directory where Conan command will
 *                               be executed
-* @param conanUserHome (string) - Conan User Home location
 * @param commandArgs (Array) - Conan command arguments
-* @param collectBuildInfo (Boolean) - Collect BuildInfo flag
-* @param buildName (string) - Build Name to be used by BuildInfo
-* @param buildNumber (string) - Build Number to be used by BuildInfo
-* @param silent (boolean) - Runs command in a silent way, useful if the command
-*                           contains credentials
 */
-let executeConanTask = async(function (workingDir, conanUserHome,
-    commandArgs, collectBuildInfo, buildName, buildNumber) {
-    try {
-        let conanTaskId = generateConanTaskUUId();
-        console.log("Conan Task Id: " + conanTaskId);
-        let buildTimestamp = Date.now();
+let executeConanTask = async(function (commandArgs) {
+    let workingDir = tl.getPathInput('workingDirectory', false, false);
+    let conanUserHome = tl.getInput('conanUserHome', false);
+    let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
+    let buildName = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
 
+    let conanTaskId = generateConanTaskUUId();
+    console.log("Conan Task Id: " + conanTaskId);
+    let buildTimestamp = Date.now();
+
+    let conanPath = null;
+    try {
         /*
         * Get Conan tool Path. This will force the conan task to fail fast if
         * conan tool is not available in the PATH
         */
-        let conanPath = tl.which('conan', true);
+        conanPath = tl.which('conan', true);
         console.log("Running Conan build tool from: " + conanPath);
+    } catch (err) {
+        console.error("Failed to locate Conan executable path: " + err.message);
+        return false;
+    }
 
-        /*
-        * Set Conan Environment Variable
-        * Conan User Home is set as a variable in the phase scope so it will be
-        * availabe to every task running after this one
-        */
-        if (!conanUserHome) {
-            conanUserHome = getDefaultConanUserHome();
-        }
-        console.log("Conan User Home: " + conanUserHome);
-        tl.setVariable('CONAN_USER_HOME', conanUserHome);
+    /*
+    * Set Conan Environment Variable
+    * Conan User Home is set as a variable in the phase scope so it will be
+    * availabe to every task running after this one
+    */
+    if (!conanUserHome) {
+        conanUserHome = getDefaultConanUserHome();
+    }
+    console.log("Conan User Home: " + conanUserHome);
+    tl.setVariable('CONAN_USER_HOME', conanUserHome);
 
-        // Prepare Conan to generate build info
-        if (collectBuildInfo) {
+    // Prepare Conan to generate build info
+    if (collectBuildInfo) {
+        try {
             initCliPartialsBuildDir(buildName, buildNumber);
             setConanTraceFileLocation(conanUserHome, conanTaskId);
             setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, buildTimestamp);
-        }
-
-        // Run conan command and set task result
-        let exitCode = await(executeConanCommand(conanPath, commandArgs, workingDir));
-        if (exitCode !== 0) {
-            console.error("Conan task returned bad exit code: " + exitCode);
+        } catch (err) {
+            console.error("Failed to setup Build Info collection: " + err.message);
             return false;
         }
+    }
 
-        // Generate build info if requested
-        if (collectBuildInfo) {
-            exitCode = await(generateBuildInfo(conanUserHome, conanTaskId));
-            if (exitCode !== 0) {
-                console.error("Failed to generate build info with bad exit code: " + exitCode);
-                return false;
-            }
-            completeBuildInfo(conanUserHome, conanTaskId);
-        }
-
-        return true;
-    } catch (err) {
-        console.error("Conan task failed with exception: " + err.message);
+    // Run conan command and set task result
+    let exitCode = await(executeConanCommand(conanPath, commandArgs, workingDir));
+    if (exitCode !== 0) {
+        console.error("Conan task returned bad exit code: " + exitCode);
         return false;
     }
+
+    // Generate build info if requested
+    if (collectBuildInfo) {
+        exitCode = await(generateBuildInfo(conanUserHome, conanTaskId));
+        if (exitCode !== 0) {
+            console.error("Failed to generate build info with bad exit code: " + exitCode);
+            return false;
+        }
+        try{
+            completeBuildInfo(conanUserHome, conanTaskId);
+        } catch (err) {
+            console.error("Failed to make Build Info available: " + err.message);
+            return false;
+        }
+    }
+
+    return true;
+
 });
 
 /**
@@ -102,12 +113,12 @@ function generateConanTaskUUId() {
 */
 function getDefaultConanUserHome() {
     let hostType = tl.getVariable('System.HostType');
-    let workFolder = tl.getVariable('Agent.WorkFolder')
-    let buildNumber = tl.getVariable('Build.BuildNumber')
+    let workFolder = tl.getVariable('Agent.WorkFolder');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
 
     // Get Build Id during build process
-    buildId = tl.getVariable('System.DefinitionId');
-    if (hostType == "release") {
+    let buildId = tl.getVariable('System.DefinitionId');
+    if (hostType === "release") {
         // Get Build Id during release process
         buildId = tl.getVariable('Build.DefinitionId');
     }
@@ -139,14 +150,14 @@ function setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, 
     if (fs.existsSync(conanArtifactsPropertiesPath)) {
         let existingContent = fs.readFileSync(conanArtifactsPropertiesPath);
         let propertiesMap = convertConanPropertiesToMap(existingContent.toString());
-        if (buildName == propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME] &&
-            buildNumber == propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER]) {
+        if (buildName === propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME] &&
+            buildNumber === propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER]) {
             tl.debug("Conan artifacts.properties already set for this build at " + conanArtifactsPropertiesPath);
             return;
         } else {
             console.warn("Conan artifacts.properties file exists at "
                 + conanArtifactsPropertiesPath + " with different build info values. " +
-                "The content of this file will be ovewritten.")
+                "The content of this file will be ovewritten.");
         }
     }
 
@@ -192,9 +203,7 @@ let executeConanCommand = async( function(conanPath, commandArgs, workingDir) {
     options['cwd'] = workingDir;
 
     // Run command and wait for exitCode
-    let exitCode = await(conan.exec(options));
-
-    return exitCode
+    return await(conan.exec(options));
 });
 
 /**
@@ -203,12 +212,12 @@ let executeConanCommand = async( function(conanPath, commandArgs, workingDir) {
 * @param commandArgs (Array) - The collection of arguments
 */
 function cleanupConanArguments(commandArgs) {
-    if (commandArgs[0] == "conan") {
-        commandArgs.splice(0, 1)
+    if (commandArgs[0] === "conan") {
+        commandArgs.splice(0, 1);
     }
-    for (i = 0; i < commandArgs.length; i++) {
-        commandArgs[i] = commandArgs[i].trim()
-        if (commandArgs[i] == "") {
+    for (let i = 0; i < commandArgs.length; i++) {
+        commandArgs[i] = commandArgs[i].trim();
+        if (commandArgs[i] === "") {
             commandArgs.splice(i, 1);
             // Process the current index again, since one element has been removed
             i--;
@@ -225,7 +234,7 @@ function cleanupConanArguments(commandArgs) {
 let generateBuildInfo = async( function (conanUserHome, conanTaskId) {
     let conanBuildInfoPath = tl.which('conan_build_info', true);
     let buildInfoFilePath = getBuildInfoFileLocation(conanUserHome, conanTaskId);
-    let conanTraceFilePath = process.env.CONAN_TRACE_FILE
+    let conanTraceFilePath = process.env.CONAN_TRACE_FILE;
 
     console.log("Generating Build Info at " + buildInfoFilePath);
 
@@ -245,8 +254,7 @@ let generateBuildInfo = async( function (conanUserHome, conanTaskId) {
     let conanBuildInfo = tl.tool(conanBuildInfoPath).arg(conanBuildInfoArgs);
 
     // Run command and wait for exitCode
-    let exitCode = await(conanBuildInfo.exec(options));
-    return exitCode
+    return await(conanBuildInfo.exec(options));
 });
 
 /**
@@ -318,9 +326,9 @@ function convertConanPropertiesToMap(propertiesContent) {
     if (!propertiesContent) {
         return {};
     }
-    let map = {}
+    let map = {};
     let lines = propertiesContent.split(os.EOL);
-    for (i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
         let parts = lines[i].split("=");
         let key = parts[0];
         parts.splice(0, 1);
@@ -331,12 +339,11 @@ function convertConanPropertiesToMap(propertiesContent) {
 
 /**
 * Purge existing Conan remote repositories
-*
-* @param workingDir (string) - Path to Working Directory where Conan command will
-*                               be executed
-* @param conanUserHome (string) - Conan User Home location
 */
-let purgeConanRemotes = async(function (workingDir, conanUserHome) {
+let purgeConanRemotes = async(function () {
+    let conanUserHome = tl.getInput('conanUserHome', false);
+
+    let conanPath = null;
     try {
         /*
         * Get Conan tool Path. This will force the conan task to fail fast if
@@ -344,32 +351,37 @@ let purgeConanRemotes = async(function (workingDir, conanUserHome) {
         */
         let conanPath = tl.which('conan', true);
         console.log("Running Conan build tool from: " + conanPath);
-
-        /*
-        * Set Conan Environment Variable
-        * Conan User Home is set as a variable in the phase scope so it will be
-        * availabe to every task running after this one
-        */
-        if (!conanUserHome) {
-            conanUserHome = getDefaultConanUserHome();
-        }
-        console.log("Conan User Home: " + conanUserHome);
-        tl.setVariable('CONAN_USER_HOME', conanUserHome);
-
-        // Make sure Conan User Home exists
-        let conanFolder = path.join(conanUserHome, '.conan');
-        fs.mkdirsSync(conanFolder);
-
-        // Empty registry.txt file to remove all existing remotes
-        let registryFile = path.join(conanFolder, 'registry.txt');
-        console.log("Purging Conan remotes by removing content of " + registryFile);
-        fs.writeFileSync(registryFile, '');
-
-        return true;
     } catch (err) {
-        console.error("Conan task failed with exception: " + err.message);
+        console.error("Failed to locate Conan executable path: " + err.message);
         return false;
     }
+
+    /*
+    * Set Conan Environment Variable
+    * Conan User Home is set as a variable in the phase scope so it will be
+    * availabe to every task running after this one
+    */
+    if (!conanUserHome) {
+        conanUserHome = getDefaultConanUserHome();
+    }
+    console.log("Conan User Home: " + conanUserHome);
+    tl.setVariable('CONAN_USER_HOME', conanUserHome);
+
+    // Make sure Conan User Home exists
+    let conanFolder = path.join(conanUserHome, '.conan');
+    fs.mkdirsSync(conanFolder);
+
+    // Empty registry.txt file to remove all existing remotes
+    let registryFile = path.join(conanFolder, 'registry.txt');
+    console.log("Purging Conan remotes by removing content of " + registryFile);
+    try {
+        fs.writeFileSync(registryFile, '');
+    } catch (err) {
+        console.error("Failed to remove registry.txt file content: " + err.message);
+        return false;
+    }
+
+    return true;
 });
 
 /**
