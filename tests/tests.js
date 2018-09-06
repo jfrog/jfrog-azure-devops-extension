@@ -115,7 +115,6 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);
-            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Download fail-no-op", () => {
