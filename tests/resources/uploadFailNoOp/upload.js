@@ -5,7 +5,7 @@ const TEST_NAME = testUtils.getTestName(__dirname);
 let inputs = {
     "fileSpec": JSON.stringify({
         files: [{
-            pattern: testUtils.getTestLocalFilesDir(__dirname) + "ThisPathShouldNotExistButMustContainARegexpChar*",
+            pattern: testUtils.getTestLocalFilesDir(__dirname),
             target: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME)
         }]
     }),

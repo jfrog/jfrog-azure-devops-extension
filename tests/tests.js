@@ -7,7 +7,6 @@ const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
-const debugLogLevel = process.env.VSTS_ARTIFACTORY_LOG_LEVEL === "DEBUG";
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
@@ -116,6 +115,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);
+            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Download fail-no-op", () => {
@@ -262,11 +262,7 @@ function mockTask(testDir, taskName, isNegative) {
     let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
     let mockRunner = new vstsMockTest.MockTestRunner(taskPath);
     mockRunner.run(); // Mock a test
-    if (debugLogLevel) {
-        process.env.JFROG_CLI_LOG_LEVEL = "DEBUG";
-        console.log(mockRunner.stdout);
-    }
-    assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + "\nStdout:\n" + mockRunner.stdout+ "\nStderr:\n" + mockRunner.stderr); // Check the test results
+    assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + "\n" + mockRunner.stdout); // Check the test results
 }
 
 /**
