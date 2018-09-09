@@ -10,7 +10,7 @@ let variables = {
 let inputs = {
     "command": "push",
     "targetDeployRepo": testUtils.localNuGet,
-    "pathToNupkg": testUtils.fixWinPath(path.join(testUtils.getLocalTestDir(TEST_NAME), "nugetTestExample.nupkg")),
+    "pathToNupkg": path.join(testUtils.getLocalTestDir(TEST_NAME), "nugetTest*.nupkg"),
     "collectBuildInfo": true
 };
 
