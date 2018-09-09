@@ -285,7 +285,7 @@ function assertFiles(expectedFiles, resultFiles) {
         for (let i = 0; i < files.length; i++) {
             let fileName = path.basename(files[i]);
             let fileToCheck = path.join(testData, fileName);
-            assert(fs.existsSync(fileToCheck), fileToCheck + " does not exist" + ".\n" + tasksOutput);
+            assert(fs.existsSync(fileToCheck), fileToCheck + " does not exist.\n" + tasksOutput);
             filesToCheck.push(fileName);
         }
     }
@@ -297,7 +297,7 @@ function assertFiles(expectedFiles, resultFiles) {
     let files = fs.readdirSync(testData);
     for (let i = 0; i < files.length; i++) {
         let fileName = path.basename(files[i]);
-        assert(filesToCheck.indexOf(fileName) >= 0, fileName + " should not exist" + ".\n" + tasksOutput);
+        assert(filesToCheck.indexOf(fileName) >= 0, fileName + " should not exist.\n" + tasksOutput);
     }
 }
 
@@ -321,11 +321,11 @@ function getAndAssertBuild(buildName, buildNumber) {
 function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
     let actual = body["buildInfo"]["properties"][key];
-    assert.equal(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'" + ".\n" + tasksOutput);
+    assert.equal(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
 }
 
 function assertBuild(build, buildName, buildNumber) {
-    assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory" + ".\n" + tasksOutput);
+    assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory.\n" + tasksOutput);
 }
 
 function deleteBuild(buildName) {
