@@ -162,22 +162,22 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             deleteBuild("excludeEnv");
         });
 
-        runTest("Build url", () => {
-            let testDir = "buildUrl";
-
-            // Verify build URL of a build pipeline
+        runTest("Build URL build pipeline", () => {
+            let testDir = "buildUrlBuildPipeline";
             mockTask(testDir, "upload");
-            mockTask(testDir, "publishUrlBuildPipeline");
-            let build = getAndAssertBuild("buildUrl", "3");
+            mockTask(testDir, "publish");
+            let build = getAndAssertBuild("buildUrlBuildPipeline", "3");
             assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_build?buildId=5")
-            deleteBuild("buildUrl");
+            deleteBuild("buildUrlBuildPipeline");
+        });
 
-            // Verify build URL of a release pipeline
+        runTest("Build URL release pipeline", () => {
+            let testDir = "buildUrlReleasePipeline";
             mockTask(testDir, "upload");
-            mockTask(testDir, "publishUrlReleasePipeline");
-            build = getAndAssertBuild("buildUrl", "3");
+            mockTask(testDir, "publish");
+            let build = getAndAssertBuild("buildUrlReleasePipeline", "3");
             assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_release?releaseId=6")
-            deleteBuild("buildUrl");
+            deleteBuild("buildUrlReleasePipeline");
         });
     });
 

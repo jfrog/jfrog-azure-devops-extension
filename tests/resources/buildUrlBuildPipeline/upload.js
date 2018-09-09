@@ -3,13 +3,13 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let variables = {
-    "Build.DefinitionName": "buildUrl",
+    "Build.DefinitionName": "buildUrlBuildPipeline",
     "Build.BuildNumber": "3"
 };
 let inputs = {
     "fileSpec": JSON.stringify({
         files: [{
-            pattern: "*",
+            pattern: "*.nothing",
             target: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME)
         }]
     }),
