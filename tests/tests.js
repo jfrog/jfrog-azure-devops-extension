@@ -160,7 +160,25 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertBuildEnv(build, "buildInfo.env.BUILD_NULL", "null");
             assertBuildEnv(build, "buildInfo.env.BUILD_PASSWORD", undefined);
             deleteBuild("excludeEnv");
-        })
+        });
+
+        runTest("Build url", () => {
+            let testDir = "buildUrl";
+
+            // Verify build URL of a build pipeline
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publishUrlBuildPipeline");
+            let build = getAndAssertBuild("buildUrl", "3");
+            assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_build?buildId=5")
+            deleteBuild("buildUrl");
+
+            // Verify build URL of a release pipeline
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publishUrlReleasePipeline");
+            build = getAndAssertBuild("buildUrl", "3");
+            assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_release?releaseId=6")
+            deleteBuild("buildUrl");
+        });
     });
 
     describe("Build Promotion Tests", () => {
@@ -316,6 +334,11 @@ function getAndAssertBuild(buildName, buildNumber) {
 function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
     assert.equal(body["buildInfo"]["properties"][key], value);
+}
+
+function assertBuildUrl(build, url) {
+    let body = JSON.parse(build.getBody('utf8'));
+    assert.strictEqual(body["buildInfo"]["url"], url);
 }
 
 function assertBuild(build, buildName, buildNumber) {

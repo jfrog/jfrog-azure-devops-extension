@@ -55,11 +55,10 @@ function addBuildUrl(cliCommand) {
     let collectionUri = tl.getVariable('System.TeamFoundationCollectionUri');
     let projectName = tl.getVariable('System.TeamProject');
     let buildId = tl.getVariable('Build.BuildId');
+    let releaseId = tl.getVariable('Release.ReleaseId');
 
-    if (collectionUri && projectName && buildId) {
-        let buildUrl = collectionUri + projectName + "/_build/index?buildId=" + buildId;
-        cliCommand = utils.cliJoin(cliCommand, "--build-url=" + utils.quote(buildUrl));
-    }
+    let buildUrl = collectionUri + projectName + "/_" + (releaseId ? "release?releaseId=" + releaseId : "build?buildId=" + buildId);
+    cliCommand = utils.cliJoin(cliCommand, "--build-url=" + utils.quote(buildUrl));
     return cliCommand;
 }
 
