@@ -2,7 +2,7 @@
   "name": "artifactorydocker",
   "version": "1.0.0",
   "description": "",
-  "main": "docker.js",
+  "main": "dockerBuild.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

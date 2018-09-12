@@ -252,12 +252,13 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     describe("Docker Tests", () => {
         if (testUtils.isToolExists("docker")) {
             runTest("Docker push", () => {
-                assert(testUtils.artiactoryDockerTag, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_TAG");
+                assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
+                assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");
 
                 let testDir = "docker";
                 let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
                 // Run docker build + tag
-                execSync("docker build -t " + testUtils.artiactoryDockerTag + " " + path.join(__dirname, "resources", testDir, filesDir));
+                execSync("docker build -t " + testUtils.artifactoryDockerDomain + "/docker-test:1 " + path.join(__dirname, "resources", testDir, filesDir));
                 // run docker push
                 mockTask(testDir, "push");
                 mockTask(testDir, "publish");

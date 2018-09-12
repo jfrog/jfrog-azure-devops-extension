@@ -10,8 +10,8 @@ let variables = {
 
 let inputs = {
     "collectBuildInfo": true,
-    "targetRepo": testUtils.dockerLocalRepoKey,
-    "imageTag": testUtils.artiactoryDockerTag
+    "targetRepo": testUtils.artifactoryDockerRepo,
+    "imageTag": testUtils.artifactoryDockerDomain + "/docker-test:1"
 };
 
 testUtils.runTask(testUtils.docker, variables, inputs);
