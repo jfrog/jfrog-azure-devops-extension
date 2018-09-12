@@ -1,115 +1,115 @@
 {
-  "id": "58521715-7f44-4090-a3a6-28153049ce37",
-  "name": "ArtifactoryBuildPromotion",
-  "friendlyName": "Artifactory Build Promotion",
-  "description": "Promote a published build in Artifactory.",
-  "author": "JFrog",
-  "category": "Utility",
-  "visibility": [
-    "Build",
-    "Release"
-  ],
-  "demands": [],
-  "version": {
-    "Major": "1",
-    "Minor": "0",
-    "Patch": "6"
-  },
-  "minimumAgentVersion": "1.83.0",
-  "instanceNameFormat": "Artifactory Build Promotion",
-  "inputs": [
-    {
-      "name": "artifactoryService",
-      "type": "connectedService:artifactoryService",
-      "label": "Artifactory service",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Artifactory service used for build promotion."
+    "id": "58521715-7f44-4090-a3a6-28153049ce37",
+    "name": "ArtifactoryBuildPromotion",
+    "friendlyName": "Artifactory Build Promotion",
+    "description": "Promote a published build in Artifactory.",
+    "author": "JFrog",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "1",
+        "Patch": "1"
     },
-    {
-      "name": "targetRepo",
-      "type": "pickList",
-      "label": "Target repository",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Sets the target promotion repository.",
-      "properties": {
-        "EditableOptions": "True"
-      }
-    },
-    {
-      "name": "status",
-      "type": "string",
-      "label": "Status",
-      "defaultValue": "Released",
-      "required": true,
-      "helpMarkDown": "Sets the new build status."
-    },
-    {
-      "name": "comment",
-      "type": "string",
-      "label": "Comment",
-      "defaultValue": "",
-      "required": false,
-      "helpMarkDown": "Allows the user to add a comment describing the reason for promotion."
-    },
-    {
-      "name": "sourceRepo",
-      "type": "pickList",
-      "label": "Source repository",
-      "defaultValue": "",
-      "required": false,
-      "helpMarkDown": "Sets the source repository from which to promote the release published artifacts. If not specified, Artifactory would determine from which repository to promote.",
-      "properties": {
-        "EditableOptions": "True"
-      }
-    },
-    {
-      "name": "includeDependencies",
-      "type": "boolean",
-      "label": "Include build dependencies",
-      "defaultValue": "false",
-      "required": true,
-      "helpMarkDown": "When selected the build dependencies will be promoted."
-    },
-    {
-      "name": "copy",
-      "type": "boolean",
-      "label": "Use copy",
-      "defaultValue": "false",
-      "required": true,
-      "helpMarkDown": "Select to copy the promoted artifacts and dependencies. If this field is not selected, they will be moved."
-    },
-    {
-      "name": "dryRun",
-      "type": "boolean",
-      "label": "Dry run",
-      "defaultValue": "false",
-      "required": true,
-      "helpMarkDown": "When selected, the promotion is simulated and the build is not promoted. A failed simulation causes the task to fail."
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "Artifactory Build Promotion",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used for build promotion."
+        },
+        {
+            "name": "targetRepo",
+            "type": "pickList",
+            "label": "Target repository",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Sets the target promotion repository.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "status",
+            "type": "string",
+            "label": "Status",
+            "defaultValue": "Released",
+            "required": true,
+            "helpMarkDown": "Sets the new build status."
+        },
+        {
+            "name": "comment",
+            "type": "string",
+            "label": "Comment",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Allows the user to add a comment describing the reason for promotion."
+        },
+        {
+            "name": "sourceRepo",
+            "type": "pickList",
+            "label": "Source repository",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Sets the source repository from which to promote the release published artifacts. If not specified, Artifactory would determine from which repository to promote.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "includeDependencies",
+            "type": "boolean",
+            "label": "Include build dependencies",
+            "defaultValue": "false",
+            "required": true,
+            "helpMarkDown": "When selected the build dependencies will be promoted."
+        },
+        {
+            "name": "copy",
+            "type": "boolean",
+            "label": "Use copy",
+            "defaultValue": "false",
+            "required": true,
+            "helpMarkDown": "Select to copy the promoted artifacts and dependencies. If this field is not selected, they will be moved."
+        },
+        {
+            "name": "dryRun",
+            "type": "boolean",
+            "label": "Dry run",
+            "defaultValue": "false",
+            "required": true,
+            "helpMarkDown": "When selected, the promotion is simulated and the build is not promoted. A failed simulation causes the task to fail."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "sourceRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='LOCAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "buildPromotion.js",
+            "argumentFormat": "",
+            "workingDirectory": "$(currentDirectory)"
+        }
     }
-  ],
-  "dataSourceBindings": [
-    {
-      "endpointId": "$(artifactoryService)",
-      "endpointURL": "{{endpoint.url}}/api/repositories",
-      "target": "targetRepo",
-      "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
-      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-    },
-    {
-      "endpointId": "$(artifactoryService)",
-      "endpointURL": "{{endpoint.url}}/api/repositories",
-      "target": "sourceRepo",
-      "resultSelector": "jsonpath:$[?(@.type=='LOCAL')]",
-      "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-    }
-  ],
-  "execution": {
-    "Node": {
-      "target": "buildPromotion.js",
-      "argumentFormat": "",
-      "workingDirectory": "$(currentDirectory)"
-    }
-  }
 }

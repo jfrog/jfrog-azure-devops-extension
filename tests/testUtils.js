@@ -2,7 +2,7 @@ const tmrm = require('vsts-task-lib/mock-run');
 const tl = require('vsts-task-lib/task');
 const path = require('path');
 const fs = require('fs');
-const rmdir = require('rmdir-recursive');
+const rimraf = require('rimraf');
 const execSync = require('child_process').execSync;
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
@@ -50,7 +50,6 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
-    fixWinPath: fixWinPath,
     execCli: execCli,
     cleanUpAllTests: cleanUpAllTests,
     isToolExists: isToolExists
@@ -92,7 +91,7 @@ function execCli(command) {
 
 function recreateTestDataDir() {
     if (fs.existsSync(testDataDir)) {
-        rmdir.sync(testDataDir);
+        rimraf.sync(testDataDir);
     }
     fs.mkdirSync(testDataDir);
 }
@@ -115,7 +114,11 @@ function deleteBuild(buildName) {
 
 function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
-        rmdir.sync(testDataDir);
+        rimraf(testDataDir, (err) => {
+            if (err) {
+                console.warn("Tests cleanup issue: " + err)
+            }
+        });
     }
     deleteTestRepositories();
 }
