@@ -7,6 +7,7 @@ const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
+let tasksOutput;
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
@@ -14,6 +15,9 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
     });
+    beforeEach(() => {
+        tasksOutput = "";
+    })
 
     after(() => {
         testUtils.cleanUpAllTests();
@@ -262,7 +266,8 @@ function mockTask(testDir, taskName, isNegative) {
     let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
     let mockRunner = new vstsMockTest.MockTestRunner(taskPath);
     mockRunner.run(); // Mock a test
-    assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + "\n" + mockRunner.stdout); // Check the test results
+    tasksOutput += mockRunner.stderr + "\n" + mockRunner.stdout;
+    assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + ".\n" + tasksOutput); // Check the test results
 }
 
 /**
@@ -280,7 +285,7 @@ function assertFiles(expectedFiles, resultFiles) {
         for (let i = 0; i < files.length; i++) {
             let fileName = path.basename(files[i]);
             let fileToCheck = path.join(testData, fileName);
-            assert(fs.existsSync(fileToCheck), fileToCheck + " does not exist");
+            assert(fs.existsSync(fileToCheck), fileToCheck + " does not exist.\n" + tasksOutput);
             filesToCheck.push(fileName);
         }
     }
@@ -292,7 +297,7 @@ function assertFiles(expectedFiles, resultFiles) {
     let files = fs.readdirSync(testData);
     for (let i = 0; i < files.length; i++) {
         let fileName = path.basename(files[i]);
-        assert(filesToCheck.indexOf(fileName) >= 0, fileName + " should not exist");
+        assert(filesToCheck.indexOf(fileName) >= 0, fileName + " should not exist.\n" + tasksOutput);
     }
 }
 
@@ -315,11 +320,12 @@ function getAndAssertBuild(buildName, buildNumber) {
  */
 function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
-    assert.equal(body["buildInfo"]["properties"][key], value);
+    let actual = body["buildInfo"]["properties"][key];
+    assert.equal(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
 }
 
 function assertBuild(build, buildName, buildNumber) {
-    assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory");
+    assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory.\n" + tasksOutput);
 }
 
 function deleteBuild(buildName) {
