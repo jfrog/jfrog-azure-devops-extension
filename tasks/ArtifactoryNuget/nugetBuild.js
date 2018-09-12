@@ -136,7 +136,7 @@ function addNugetArgsToCommands() {
         nugetArguments = utils.cliJoin(nugetArguments, "-NoCache");
     }
 
-    let packagesDirectory = tl.getInput("packagesDirectory");
+    let packagesDirectory = utils.fixWindowsPaths(tl.getInput("packagesDirectory"));
     if (packagesDirectory) {
         nugetArguments = utils.cliJoin(nugetArguments, "-PackagesDirectory", packagesDirectory);
     }
