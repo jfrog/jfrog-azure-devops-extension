@@ -32,6 +32,7 @@ function RunTaskCbk(cliPath) {
             fileSpec = tl.getInput("fileSpec", true);
         }
         fileSpec = utils.fixWindowsPaths(fileSpec);
+        utils.validateSpecWithoutRegex(fileSpec);
         console.log("Using file spec:");
         console.log(fileSpec);
         // Write provided fileSpec to file

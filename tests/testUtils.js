@@ -43,7 +43,6 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
-    fixWinPath: fixWinPath,
     execCli: execCli,
     cleanUpAllTests: cleanUpAllTests
 };

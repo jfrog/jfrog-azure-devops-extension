@@ -84,7 +84,7 @@ function exec(cliPath, nugetCommand) {
     } else {
         // Perform push command.
         let targetDeployRepo = tl.getInput("targetDeployRepo");
-        let pathToNupkg = tl.getInput("pathToNupkg");
+        let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput("pathToNupkg", true, false));
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, pathToNupkg, targetDeployRepo);
         runNuGet(nugetCommandCli, cliPath, buildDir);
     }
