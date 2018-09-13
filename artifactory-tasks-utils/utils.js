@@ -29,6 +29,7 @@ module.exports = {
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
+    validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
     getArchitecture: getArchitecture
 };
@@ -189,7 +190,7 @@ function downloadCli(attemptNumber) {
                 let trimmedChecksum = rawChecksum.split(',')[0];
                 if (hex === trimmedChecksum) {
                     fs.move(cliTmpPath, versionedCliPath).then(() => {
-                        if (!process.platform.startsWith("win")) {
+                        if (!isWindows()) {
                             fs.chmodSync(versionedCliPath, 0o555);
                         }
                         tl.debug("Finished downloading JFrog cli.");
@@ -222,29 +223,27 @@ function getArchitecture() {
 
 function getCliExecutableName() {
     let executable = "jfrog";
-    if (process.platform.startsWith("win")) {
+    if (isWindows()) {
         executable += ".exe"
     }
     return executable
 }
 
 /**
- * Escape single backslashes in fileSpec.
+ * Escape single backslashes in a string.
  * / -> //
  * // -> //
- * @param fileSpec (String) - The file spec to escape
- * @returns fileSpec (String) - The file spec after escaping
+ * @param string (String) - The string to escape
+ * @returns (String) - The string after escaping
  */
-function fixWindowsPaths(fileSpec) {
-    if (os.type() === "Windows_NT") {
-        fileSpec = fileSpec.replace(/([^\\])\\(?!\\)/g, '$1\\\\');
-        validateSpecWithoutRegex(fileSpec);
-        return fileSpec
-    }
-    return fileSpec;
+function fixWindowsPaths(string) {
+    return isWindows() ? string.replace(/([^\\])\\(?!\\)/g, '$1\\\\') : string;
 }
 
 function validateSpecWithoutRegex(fileSpec) {
+    if (!isWindows()) {
+        return;
+    }
     let files = JSON.parse(fileSpec)["files"];
     for (const file of Object.keys(files)) {
         let values = files[file];
@@ -311,4 +310,8 @@ function collectEnvironmentVariables(cliPath) {
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
     return executeCliCommand(cliEnvVarsCommand, workDir);
+}
+
+function isWindows() {
+    return process.platform.startsWith("win");
 }
