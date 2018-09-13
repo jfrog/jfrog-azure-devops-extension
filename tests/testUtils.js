@@ -11,6 +11,7 @@ let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
 let artifactoryDockerDomain = process.env.VSTS_ARTIFACTORY_DOCKER_DOMAIN;
 let artifactoryDockerRepo = process.env.VSTS_ARTIFACTORY_DOCKER_REPO;
+let skipTests = process.env.VSTS_ARTIFACTORY_SKIP_TESTS ? process.env.VSTS_ARTIFACTORY_SKIP_TESTS.split(',') : undefined;
 
 module.exports = {
     testDataDir: testDataDir,
@@ -52,7 +53,8 @@ module.exports = {
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
     execCli: execCli,
-    cleanUpAllTests: cleanUpAllTests
+    cleanUpAllTests: cleanUpAllTests,
+    isSkipTest: isSkipTest
 };
 
 function initTests() {
@@ -258,4 +260,8 @@ function fixWinPath(path) {
     if (isWindows()) {
         return path.replace(/(\\)/g, "\\\\")
     }
+}
+
+function isSkipTest(skipValue) {
+    return skipTests && skipTests.indexOf(skipValue) !== -1;
 }

@@ -21,9 +21,10 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
     });
+
     beforeEach(() => {
         tasksOutput = "";
-    })
+    });
 
     after(() => {
         testUtils.cleanUpAllTests();
@@ -207,7 +208,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
             getAndAssertBuild("npmTest", "1");
             deleteBuild("npmTest");
-        });
+        }, testUtils.isSkipTest("npm"));
     });
 
     describe("Maven Tests", () => {
@@ -219,55 +220,47 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
             getAndAssertBuild("Maven", "3");
             deleteBuild("Maven");
-        });
+        }, testUtils.isSkipTest("maven"));
     });
 
     describe("NuGet Tests", () => {
-        if (testUtils.isWindows()) {
-            runTest("NuGet restore", () => {
-                let testDir = "nuget";
-                // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
-                assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
-                mockTask(testDir, "restore");
-                mockTask(testDir, "publish");
-                getAndAssertBuild("NuGet", "3");
-                deleteBuild("NuGet");
-            });
-            runTest("NuGet push", () => {
-                let testDir = "nuget";
-                // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
-                assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
-                mockTask(testDir, "push");
-                mockTask(testDir, "publish");
-                mockTask(testDir, "download");
-                assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
-                getAndAssertBuild("NuGet", "3");
-                deleteBuild("NuGet");
-            });
-        } else {
-            console.log("Skipping NuGet tests");
-        }
+        runTest("NuGet restore", () => {
+            let testDir = "nuget";
+            // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
+            assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+            mockTask(testDir, "restore");
+            mockTask(testDir, "publish");
+            getAndAssertBuild("NuGet", "3");
+            deleteBuild("NuGet");
+        }, testUtils.isSkipTest("nuget"));
+        runTest("NuGet push", () => {
+            let testDir = "nuget";
+            // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
+            assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+            mockTask(testDir, "push");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
+            getAndAssertBuild("NuGet", "3");
+            deleteBuild("NuGet");
+        }, testUtils.isSkipTest("nuget"));
     });
 
     describe("Docker Tests", () => {
-        if (jfrogUtils.isToolExists("docker")) {
-            runTest("Docker push", () => {
-                assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
-                assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");
+        runTest("Docker push", () => {
+            assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
+            assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");
 
-                let testDir = "docker";
-                let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
-                // Run docker build + tag
-                execSync("docker build -t " + testUtils.artifactoryDockerDomain + "/docker-test:1 " + path.join(__dirname, "resources", testDir, filesDir));
-                // run docker push
-                mockTask(testDir, "push");
-                mockTask(testDir, "publish");
-                getAndAssertBuild("dockerTest", "1");
-                deleteBuild("dockerTest");
-            })
-        } else {
-            console.log("Could not find 'docker' executable, skipping Docker tests");
-        }
+            let testDir = "docker";
+            let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
+            // Run docker build + tag
+            execSync("docker build -t " + testUtils.artifactoryDockerDomain + "/docker-test:1 " + path.join(__dirname, "resources", testDir, filesDir));
+            // run docker push
+            mockTask(testDir, "push");
+            mockTask(testDir, "publish");
+            getAndAssertBuild("dockerTest", "1");
+            deleteBuild("dockerTest");
+        }, testUtils.isSkipTest("docker"))
     })
 });
 
@@ -275,8 +268,14 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
  * Run a test using mocha suit.
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
+ * @param skip (Boolean) - If should skip the test
  */
-function runTest(description, testFunc) {
+function runTest(description, testFunc, skip) {
+    if (skip) {
+        it.skip(description);
+        return;
+    }
+
     it(description, (done) => {
         testFunc();
         done();
