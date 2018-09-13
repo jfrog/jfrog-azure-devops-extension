@@ -12,6 +12,7 @@ let tasksOutput;
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
+    let CliCommandBuilder;
     before(() => {
         // Validate environment variables exist for tests
         assert(testUtils.artifactoryUrl, "Tests are missing environment variable: VSTS_ARTIFACTORY_URL");
@@ -20,6 +21,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
 
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
+        CliCommandBuilder = jfrogUtils.CliCommandBuilder
     });
 
     beforeEach(() => {
@@ -40,12 +42,21 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assert(!retVal.toString().includes("SUPER_SECRET"), "Output contains password");
         });
 
-        runTest("Cli join", () => {
-            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u"), "jfrog rt u");
-            assert.strictEqual(jfrogUtils.cliJoin("jfrog"), "jfrog");
-            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a/b/c", "a/b/c"), "jfrog rt u a/b/c a/b/c");
-            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\b\c", "a\b\c"), "jfrog rt u a\b\c a\b\c");
-            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\\b\c\\", "a\\b\c\\"), "jfrog rt u a\\b\c\\ a\\b\c\\");
+        runTest("CliCommandBuilder", () => {
+            assert.strictEqual(new CliCommandBuilder("c:\\somefolder\jfrog").build(), "c:\\somefolder\jfrog");
+            assert.strictEqual(new CliCommandBuilder("jfrog").addCommand("rt c").build(), "jfrog \"rt\" \"c\"");
+            assert.strictEqual(new CliCommandBuilder("jfrog").addCommand("rt c").addOption("foo", "bar").build(), "jfrog \"rt\" \"c\" --foo=\"bar\"");
+            assert.strictEqual(new CliCommandBuilder("jfrog").addArguments("foo").build(), "jfrog \"foo\"");
+            assert.strictEqual(new CliCommandBuilder("jfrog").addArguments("foo", "bar", "beer").build(), "jfrog \"foo\" \"bar\" \"beer\"");
+
+        });
+
+        runTest("Join args", () => {
+            assert.strictEqual(jfrogUtils.joinArgs("jfrog", "rt", "u"), "jfrog rt u");
+            assert.strictEqual(jfrogUtils.joinArgs("jfrog"), "jfrog");
+            assert.strictEqual(jfrogUtils.joinArgs("jfrog", "rt", "u", "a/b/c", "a/b/c"), "jfrog rt u a/b/c a/b/c");
+            assert.strictEqual(jfrogUtils.joinArgs("jfrog", "rt", "u", "a\b\c", "a\b\c"), "jfrog rt u a\b\c a\b\c");
+            assert.strictEqual(jfrogUtils.joinArgs("jfrog", "rt", "u", "a\\b\c\\", "a\\b\c\\"), "jfrog rt u a\\b\c\\ a\\b\c\\");
         });
 
         runTest("Fix windows paths", () => {

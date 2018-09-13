@@ -1,4 +1,7 @@
-const os = require('os');
+const CliCommandBuilder = require('./cli-command-builder').CliCommandBuilder;
+const quote = require('./cli-command-builder').quote;
+const getBuildName = require('./cli-command-builder').getBuildName;
+const getBuildNumber = require('./cli-command-builder').getBuildNumber;
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
 const crypto = require('crypto');
@@ -21,19 +24,19 @@ const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog 
 let runTaskCbk = null;
 
 module.exports = {
-    executeCliTask: executeCliTask,
-    executeCliCommand: executeCliCommand,
-    cliJoin: cliJoin,
-    quote: quote,
-    addArtifactoryCredentials: addArtifactoryCredentials,
-    addStringParam: addStringParam,
-    addBoolParam: addBoolParam,
-    fixWindowsPaths: fixWindowsPaths,
-    validateSpecWithoutRegex: validateSpecWithoutRegex,
-    encodePath: encodePath,
-    getArchitecture: getArchitecture,
-    collectEnvIfRequested: collectEnvIfRequested,
-    isToolExists: isToolExists
+    executeCliTask,
+    executeCliCommand,
+    joinArgs,
+    quote,
+    fixWindowsPaths,
+    validateSpecWithoutRegex,
+    encodePath,
+    getArchitecture,
+    CliCommandBuilder,
+    isWindows,
+    isToolExists,
+    getBuildName,
+    getBuildNumber
 };
 
 function executeCliTask(runTaskFunc) {
@@ -54,10 +57,19 @@ function executeCliTask(runTaskFunc) {
 }
 
 function executeCliCommand(cliCommand, runningDir, stdio) {
+    let taskRes = doExecuteCliCommand(cliCommand, runningDir, stdio);
+    if (taskRes) {
+        tl.setResult(tl.TaskResult.Failed, taskRes);
+    }
+    return taskRes
+}
+
+function doExecuteCliCommand(cliCommand, runningDir, stdio) {
     try {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
+        tl.debug("Executing the command: " + cliCommand);
         execSync(cliCommand, {cwd: runningDir, stdio: stdio});
     } catch (ex) {
         // Error occurred
@@ -65,7 +77,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
     }
 }
 
-function cliJoin() {
+function joinArgs() {
     let command = "";
     for (let i = 0; i < arguments.length; ++i) {
         let arg = arguments[i];
@@ -76,41 +88,10 @@ function cliJoin() {
     return command;
 }
 
-function quote(str) {
-    return "\"" + str + "\"";
-}
-
-function addArtifactoryCredentials(cliCommand, artifactoryService) {
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
-    // Check if should make anonymous access to artifactory
-    if (artifactoryUser === "") {
-        artifactoryUser = "anonymous";
-        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
-    } else {
-        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
-    }
-    return cliCommand
-}
-
-function addStringParam(cliCommand, inputParam, cliParam) {
-    let val = tl.getInput(inputParam, false);
-    if (val !== null) {
-        cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val))
-    }
-    return cliCommand
-}
-
-function addBoolParam(cliCommand, inputParam, cliParam) {
-    let val = tl.getBoolInput(inputParam, false);
-    cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + val);
-    return cliCommand
-}
-
 function checkCliVersion(cliPath) {
-    let cliCommand = cliJoin(cliPath, "--version");
+    let command = new CliCommandBuilder(cliPath).addArguments("--version");
     try {
-        let res = execSync(cliCommand);
+        let res = execSync(command.build());
         let detectedVersion = String.fromCharCode.apply(null, res).split(' ')[2].trim();
         if (detectedVersion === jfrogCliVersion) {
             console.log("JFrog CLI version: " + detectedVersion);
@@ -272,23 +253,6 @@ function encodePath(str) {
     }
 
     return encodedPath;
-}
-
-/**
- * Runs collect environment variables JFrog CLI command.
- * @param cliPath - (String) - The cli path.
- * @param buildDefinition - (String) - The build name.
- * @param buildNumber - (String) - The build number.
- * @param workDir - (String) - Task's working directory.
- * @returns (String|void) - String with error message or void if passes successfully.
- */
-function collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir) {
-    let includeEnvVars = tl.getBoolInput("includeEnvVars");
-    if (includeEnvVars) {
-        console.log("Collecting environment variables...");
-        let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
-        return executeCliCommand(cliEnvVarsCommand, workDir);
-    }
 }
 
 function isWindows() {

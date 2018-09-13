@@ -1,67 +1,57 @@
-
 const tl = require('vsts-task-lib/task');
 const utils = require('artifactory-tasks-utils');
+const CliCommandBuilder = utils.CliCommandBuilder;
 const npmUtils = require('./npmUtils');
 
 const npmInstallCommand = "rt npmi";
 const npmPublishCommand = "rt npmp";
+let cliNpmCommand;
+let npmRepository;
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
         return;
     }
 
-    // Get input parameters
-    let artifactoryService = tl.getInput("artifactoryService", false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
-    let npmRepository;
-
-    // Determine working directory for the cli
+    // Determine working directory for the cli and npm command
     let inputWorkingFolder = tl.getInput("workingFolder", false);
     let requiredWorkDir = npmUtils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
-
-    // Determine npm command
-    let inputCommand = tl.getInput("command", true);
-    let cliNpmCommand;
-    if (inputCommand === "install") {
-        cliNpmCommand = npmInstallCommand;
-        npmRepository = tl.getInput("sourceRepo", true);
-    } else if (inputCommand === "pack and publish") {
-        cliNpmCommand = npmPublishCommand;
-        npmRepository = tl.getInput("targetRepo", true);
-    } else {
-        tl.setResult(tl.TaskResult.Failed, "Received invalid npm command: "+ inputCommand);
+    let confRes = configureCommand();
+    if (confRes) {
+        tl.setResult(tl.TaskResult.Failed, confRes);
         return;
     }
 
     // Build the cli command
-    let cliCommand = utils.cliJoin(cliPath, cliNpmCommand, utils.quote(npmRepository), "--url=" + utils.quote(artifactoryUrl));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
-    cliCommand = utils.addStringParam(cliCommand, "arguments", "npm-args");
+    let command = new CliCommandBuilder(cliPath)
+        .addCommand(cliNpmCommand)
+        .addArguments(npmRepository)
+        .addArtifactoryServerWithCredentials("artifactoryService")
+        .addStringOptionFromParam("arguments", "npm-args")
+        .addBuildFlagsIfRequired();
 
-    // Add build info collection
-    if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
-
-        // Collect env vars
-        let taskRes = utils.collectEnvIfRequested(cliPath, buildDefinition, buildNumber, requiredWorkDir);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-            return;
-        }
-    }
-
-    let taskRes = utils.executeCliCommand(cliCommand, requiredWorkDir);
-
+    let taskRes = utils.executeCliCommand(command.build(), requiredWorkDir);
     if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
-        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+        return
+    }
+    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+}
+
+function configureCommand() {
+    let inputCommand = tl.getInput("command", true);
+    switch (inputCommand) {
+        case "install":
+            cliNpmCommand = npmInstallCommand;
+            npmRepository = tl.getInput("sourceRepo", true);
+            break;
+        case "pack and publish":
+            cliNpmCommand = npmPublishCommand;
+            npmRepository = tl.getInput("targetRepo", true);
+            break;
+        default:
+            return "Received invalid npm command: " + inputCommand;
     }
 }
 

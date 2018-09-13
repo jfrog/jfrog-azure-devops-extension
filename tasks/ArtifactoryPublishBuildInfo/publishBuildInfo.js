@@ -1,13 +1,13 @@
-
 const tl = require('vsts-task-lib/task');
 const utils = require('artifactory-tasks-utils');
 const path = require('path');
+const CliCommandBuilder = utils.CliCommandBuilder;
 
 const cliBuildPublishCommand = "rt bp";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let buildName = utils.getBuildName();
+    let buildNumber = utils.getBuildNumber();
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
@@ -15,23 +15,24 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters
-    let artifactoryService = tl.getInput("artifactoryService", false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let excludeEnvVars = tl.getInput("excludeEnvVars", false);
     if (!excludeEnvVars) {
         excludeEnvVars = "_"; // This is a workaround - jfrog-cli v1.18 doesn't support empty env-exclude patterns.
     }
 
-    let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl), "--env-exclude=" + utils.quote(excludeEnvVars));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    let command = new CliCommandBuilder(cliPath)
+        .addCommand(cliBuildPublishCommand)
+        .addArguments(buildName, buildNumber)
+        .addArtifactoryServerWithCredentials("artifactoryService")
+        .addOption("env-exclude", excludeEnvVars);
 
-    let taskRes = utils.executeCliCommand(cliCommand, workDir);
+    let taskRes = utils.executeCliCommand(command.build(), workDir);
     if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
-        attachBuildInfoUrl(buildDefinition, buildNumber, workDir);
-        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+        return;
     }
+
+    attachBuildInfoUrl(buildName, buildNumber, workDir);
+    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 
 function attachBuildInfoUrl(buildName, buildNumber, workDir) {

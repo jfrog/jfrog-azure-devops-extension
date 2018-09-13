@@ -1,34 +1,31 @@
 
 const tl = require('vsts-task-lib/task');
 const utils = require('artifactory-tasks-utils');
+const CliCommandBuilder = utils.CliCommandBuilder;
 
 const cliPromoteCommand = "rt bpr";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
-
-    // Get input parameters
-    let artifactoryService = tl.getInput("artifactoryService", false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    let buildName = utils.getBuildName();
+    let buildNumber = utils.getBuildNumber();
     let targetRepo = tl.getInput("targetRepo", true);
 
-    let cliCommand = utils.cliJoin(cliPath, cliPromoteCommand, utils.quote(buildDefinition), utils.quote(buildNumber), utils.quote(targetRepo), "--url=" + utils.quote(artifactoryUrl));
+    let command = new CliCommandBuilder(cliPath)
+        .addCommand(cliPromoteCommand)
+        .addArguments(buildName, buildNumber, targetRepo)
+        .addArtifactoryServerWithCredentials("artifactoryService")
+        .addStringOptionFromParam("status")
+        .addStringOptionFromParam("comment")
+        .addStringOptionFromParam("sourceRepo", "source-repo")
+        .addBoolOptionFromParam("copy")
+        .addBoolOptionFromParam("includeDependencies", "include-dependencies")
+        .addBoolOptionFromParam("dryRun", "dry-run");
 
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
-    cliCommand = utils.addStringParam(cliCommand, "status", "status");
-    cliCommand = utils.addStringParam(cliCommand, "comment", "comment");
-    cliCommand = utils.addStringParam(cliCommand, "sourceRepo", "source-repo");
-    cliCommand = utils.addBoolParam(cliCommand, "includeDependencies", "include-dependencies");
-    cliCommand = utils.addBoolParam(cliCommand, "copy", "copy");
-    cliCommand = utils.addBoolParam(cliCommand, "dryRun", "dry-run");
-
-    let taskRes = utils.executeCliCommand(cliCommand, process.cwd());
+    let taskRes = utils.executeCliCommand(command.build(), process.cwd());
     if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
-        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+        return;
     }
+    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 
 utils.executeCliTask(RunTaskCbk);
