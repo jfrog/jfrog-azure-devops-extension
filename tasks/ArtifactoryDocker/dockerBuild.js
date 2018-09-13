@@ -6,7 +6,10 @@ const dockerPushCommand = "rt dp";
 
 function RunTaskCbk(cliPath) {
     // Validate docker exists on agent
-    tl.which("docker", true);
+    if (!utils.isToolExists("docker")) {
+        tl.setResult(tl.TaskResult.Failed, "Agent is missing required tool: docker.");
+        return;
+    }
 
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {

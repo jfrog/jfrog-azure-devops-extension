@@ -250,7 +250,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     });
 
     describe("Docker Tests", () => {
-        if (testUtils.isToolExists("docker")) {
+        if (jfrogUtils.isToolExists("docker")) {
             runTest("Docker push", () => {
                 assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
                 assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");

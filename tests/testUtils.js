@@ -52,8 +52,7 @@ module.exports = {
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
     execCli: execCli,
-    cleanUpAllTests: cleanUpAllTests,
-    isToolExists: isToolExists
+    cleanUpAllTests: cleanUpAllTests
 };
 
 function initTests() {
@@ -259,8 +258,4 @@ function fixWinPath(path) {
     if (isWindows()) {
         return path.replace(/(\\)/g, "\\\\")
     }
-}
-
-function isToolExists(toolName) {
-    return !!tl.which(toolName, false);
 }
