@@ -7,11 +7,17 @@ const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
+const execSync = require('child_process').execSync;
 let tasksOutput;
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
     before(() => {
+        // Validate environment variables exist for tests
+        assert(testUtils.artifactoryUrl, "Tests are missing environment variable: VSTS_ARTIFACTORY_URL");
+        assert(testUtils.artifactoryUsername, "Tests are missing environment variable: VSTS_ARTIFACTORY_USERNAME");
+        assert(testUtils.artifactoryPassword, "Tests are missing environment variable: VSTS_ARTIFACTORY_PASSWORD");
+
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
     });
@@ -34,40 +40,40 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         });
 
         runTest("Cli join", () => {
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u"), "jfrog rt u");
-            assert.equal(jfrogUtils.cliJoin("jfrog"), "jfrog");
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a/b/c", "a/b/c"), "jfrog rt u a/b/c a/b/c");
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\b\c", "a\b\c"), "jfrog rt u a\b\c a\b\c");
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\\b\c\\", "a\\b\c\\"), "jfrog rt u a\\b\c\\ a\\b\c\\");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u"), "jfrog rt u");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog"), "jfrog");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a/b/c", "a/b/c"), "jfrog rt u a/b/c a/b/c");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\b\c", "a\b\c"), "jfrog rt u a\b\c a\b\c");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\\b\c\\", "a\\b\c\\"), "jfrog rt u a\\b\c\\ a\\b\c\\");
         });
 
         runTest("Fix windows paths", () => {
             let specBeforeFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specBeforeFix.json"), "utf8");
             let expectedSpecAfterFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specAfterFix.json"), "utf8");
             let specAfterFix = jfrogUtils.fixWindowsPaths(specBeforeFix);
-            assert.equal(specAfterFix, testUtils.isWindows() ? expectedSpecAfterFix : specBeforeFix, "\nSpec after fix:\n" + specAfterFix);
+            assert.strictEqual(specAfterFix, testUtils.isWindows() ? expectedSpecAfterFix : specBeforeFix, "\nSpec after fix:\n" + specAfterFix);
         });
 
         runTest("Encode paths", () => {
             if (testUtils.isWindows()) {
-                assert.equal(jfrogUtils.encodePath("dir1\\dir 2\\dir 3"), "dir1\\\"dir 2\"\\\"dir 3\"");
-                assert.equal(jfrogUtils.encodePath("dir 1\\dir2\\a b.txt"), "\"dir 1\"\\dir2\\\"a b.txt\"");
-                assert.equal(jfrogUtils.encodePath("dir1\\dir2\\a.txt"), "dir1\\dir2\\a.txt");
-                assert.equal(jfrogUtils.encodePath("dir1\\"), "dir1\\");
-                assert.equal(jfrogUtils.encodePath("dir1"), "dir1");
-                assert.equal(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir1\\dir 2\\dir 3"), "dir1\\\"dir 2\"\\\"dir 3\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1\\dir2\\a b.txt"), "\"dir 1\"\\dir2\\\"a b.txt\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir1\\dir2\\a.txt"), "dir1\\dir2\\a.txt");
+                assert.strictEqual(jfrogUtils.encodePath("dir1\\"), "dir1\\");
+                assert.strictEqual(jfrogUtils.encodePath("dir1"), "dir1");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
                 // Avoid double encoding
-                assert.equal(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
             } else {
-                assert.equal(jfrogUtils.encodePath("dir1/dir 2/dir 3"), "dir1/\"dir 2\"/\"dir 3\"");
-                assert.equal(jfrogUtils.encodePath("dir 1/dir2/a b.txt"), "\"dir 1\"/dir2/\"a b.txt\"");
-                assert.equal(jfrogUtils.encodePath("dir1/dir2/a.txt"), "dir1/dir2/a.txt");
-                assert.equal(jfrogUtils.encodePath("dir1/"), "dir1/");
-                assert.equal(jfrogUtils.encodePath("dir1"), "dir1");
-                assert.equal(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
-                assert.equal(jfrogUtils.encodePath("/dir1"), "/dir1");
+                assert.strictEqual(jfrogUtils.encodePath("dir1/dir 2/dir 3"), "dir1/\"dir 2\"/\"dir 3\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1/dir2/a b.txt"), "\"dir 1\"/dir2/\"a b.txt\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir1/dir2/a.txt"), "dir1/dir2/a.txt");
+                assert.strictEqual(jfrogUtils.encodePath("dir1/"), "dir1/");
+                assert.strictEqual(jfrogUtils.encodePath("dir1"), "dir1");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("/dir1"), "/dir1");
                 // Avoid double encoding
-                assert.equal(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
             }
         });
 
@@ -78,25 +84,25 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                     assert(arch.startsWith("linux"));
                     break;
                 case "Darwin":
-                    assert.equal(arch, "mac-386");
+                    assert.strictEqual(arch, "mac-386");
                     break;
                 case "Windows_NT":
-                    assert.equal(arch, "windows-amd64");
+                    assert.strictEqual(arch, "windows-amd64");
                     break;
                 default:
                     assert.fail("Unsupported OS found: " + os.type());
             }
         });
 
-        runTest("npm - Determine cli workdir", () => {
+        runTest("Npm - determine cli workdir", () => {
             if (testUtils.isWindows()) {
-                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
-                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
-                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
+                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
+                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
+                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
             } else {
-                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
-                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
-                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
+                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
+                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
+                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
             }
         });
     });
@@ -109,7 +115,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), testDir);
         });
 
-        runTest("Upload and Download From File", () => {
+        runTest("Upload and download from file", () => {
             let testDir = "uploadAndDownloadFromFile";
             mockTask(testDir, "upload");
             mockTask(testDir, "download");
@@ -128,7 +134,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), testDir);
         });
 
-        runTest("Include Environment Variables", () => {
+        runTest("Include environment variables", () => {
             let testDir = "includeEnv";
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
@@ -242,6 +248,27 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             console.log("Skipping NuGet tests");
         }
     });
+
+    describe("Docker Tests", () => {
+        if (jfrogUtils.isToolExists("docker")) {
+            runTest("Docker push", () => {
+                assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
+                assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");
+
+                let testDir = "docker";
+                let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
+                // Run docker build + tag
+                execSync("docker build -t " + testUtils.artifactoryDockerDomain + "/docker-test:1 " + path.join(__dirname, "resources", testDir, filesDir));
+                // run docker push
+                mockTask(testDir, "push");
+                mockTask(testDir, "publish");
+                getAndAssertBuild("dockerTest", "1");
+                deleteBuild("dockerTest");
+            })
+        } else {
+            console.log("Could not find 'docker' executable, skipping Docker tests");
+        }
+    })
 });
 
 /**

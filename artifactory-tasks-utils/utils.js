@@ -32,7 +32,8 @@ module.exports = {
     validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
-    collectEnvIfRequested: collectEnvIfRequested
+    collectEnvIfRequested: collectEnvIfRequested,
+    isToolExists: isToolExists
 };
 
 function executeCliTask(runTaskFunc) {
@@ -292,4 +293,8 @@ function collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir) {
 
 function isWindows() {
     return process.platform.startsWith("win");
+}
+
+function isToolExists(toolName) {
+    return !!tl.which(toolName, false);
 }
