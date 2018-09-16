@@ -2,9 +2,10 @@ const tl = require('vsts-task-lib/task');
 const path = require('path');
 const utils = require('artifactory-tasks-utils');
 const CliCommandBuilder = utils.CliCommandBuilder;
+const execSync = require('child_process').execSync;
+
 const cliConfigCommand = "rt c";
 const cliMavenCommand = "rt mvn";
-const execSync = require('child_process').execSync;
 const CONFIGURATION = {
     'RESOLUTION' : {
         RESPONSIBILITY: "resolver",

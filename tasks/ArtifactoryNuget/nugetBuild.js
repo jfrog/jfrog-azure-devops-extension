@@ -10,6 +10,7 @@ const await = require('asyncawait/await');
 const solutionPathUtil = require('./util/solutionPathUtil');
 const NUGET_VERSION = "4.7.1";
 const path = require('path');
+
 const cliNuGetCommand = "rt nuget";
 const cliUploadCommand = "rt u";
 
