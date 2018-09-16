@@ -79,7 +79,7 @@ function doDeleteServer(cliPath, serverId, buildDir) {
     return utils.executeCliCommand(deleteCommand.build(), buildDir);
 }
 
-function addToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
+function doAddToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
     configInfo += name + ":\n";
     configInfo += "  snapshotRepo: " + snapshotRepo + "\n";
     configInfo += "  releaseRepo: " + releaseRepo + "\n";
@@ -101,27 +101,20 @@ function writeMavenConfigFile(config, cliPath, buildDir, buildDefinition, buildN
     let configInfo = "version: 1\ntype: maven\n";
     // Get configured parameters
     let serverId = buildDefinition + "-" + buildNumber;
+
     // Configure deployer
-    serverIdDeployer = serverId + "-deployer";
-    let commandRes = configureServer("artifactoryDeployService", serverIdDeployer, cliPath, buildDir);
+    let commandRes = addToConfig("deployer", "artifactoryDeployService", "targetDeployReleaseRepo", "targetDeploySnapshotRepo");
     if (commandRes) {
         return commandRes
     }
-    let targetDeployReleaseRepo = tl.getInput("targetDeployReleaseRepo");
-    let targetDeploySnapshotRepo = tl.getInput("targetDeploySnapshotRepo");
-    configInfo = addToConfig(configInfo, "deployer", targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
 
     // Configure resolver
     let artifactoryResolver = tl.getInput("artifactoryResolverService");
     if (artifactoryResolver != null) {
-        serverIdResolver = serverId + "-resolver";
-        commandRes = configureServer("artifactoryResolverService", serverIdResolver, cliPath, buildDir);
+        commandRes = addToConfig("resolver", "artifactoryResolverService", "targetResolveReleaseRepo", "targetResolveSnapshotRepo");
         if (commandRes) {
             return commandRes
         }
-        let targetResolveReleaseRepo = tl.getInput("targetResolveReleaseRepo");
-        let targetResolveSnapshotRepo = tl.getInput("targetResolveSnapshotRepo");
-        configInfo = addToConfig(configInfo, "resolver", targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
     } else {
         console.log("Resolution from Artifactory is not configured");
     }
@@ -130,6 +123,17 @@ function writeMavenConfigFile(config, cliPath, buildDir, buildDefinition, buildN
         tl.writeFile(config, configInfo);
     } catch (ex) {
         return ex
+    }
+
+    function addToConfig(responsibility, serviceName, targetReleaseRepo, targetSnapshotRepo) {
+        serverIdResolver = serverId + "-" + responsibility;
+        let commandRes = configureServer(serviceName, serverIdResolver, cliPath, buildDir);
+        if (commandRes) {
+            return {commandRes}
+        }
+        let targetResolveReleaseRepo = tl.getInput(targetReleaseRepo);
+        let targetResolveSnapshotRepo = tl.getInput(targetSnapshotRepo);
+        configInfo = doAddToConfig(configInfo, responsibility, targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
     }
 }
 

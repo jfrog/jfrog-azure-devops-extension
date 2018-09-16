@@ -28,10 +28,10 @@ let RunTaskCbk = async(function (cliPath) {
     let localVersions = toolLib.findLocalToolVersions(NUGET_TOOL_NAME);
     if (localVersions === undefined || localVersions.length === 0) {
         await(downloadAndRunNuget(cliPath, nugetCommand));
-    } else {
-        console.log("The following version/s " + localVersions + " were found on the build agent");
-        addToPathAndExec(cliPath, nugetCommand, localVersions[localVersions.length - 1]);
+        return;
     }
+    console.log("The following version/s " + localVersions + " were found on the build agent");
+    addToPathAndExec(cliPath, nugetCommand, localVersions[localVersions.length - 1]);
 });
 
 /**

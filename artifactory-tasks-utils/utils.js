@@ -1,7 +1,7 @@
-const CliCommandBuilder = require('./cli-command-builder').CliCommandBuilder;
-const quote = require('./cli-command-builder').quote;
-const getBuildName = require('./cli-command-builder').getBuildName;
-const getBuildNumber = require('./cli-command-builder').getBuildNumber;
+const CliCommandBuilder = require('./cliCommandBuilder').CliCommandBuilder;
+const quote = require('./cliCommandBuilder').quote;
+const getBuildName = require('./cliCommandBuilder').getBuildName;
+const getBuildNumber = require('./cliCommandBuilder').getBuildNumber;
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
 const crypto = require('crypto');
@@ -69,7 +69,7 @@ function doExecuteCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        tl.debug("Executing the command: " + cliCommand);
+        tl.debug("Executing the command: " + cliCommand.replace(/--password=".*"/g, "--password=***"));
         execSync(cliCommand, {cwd: runningDir, stdio: stdio});
     } catch (ex) {
         // Error occurred
@@ -95,9 +95,9 @@ function checkCliVersion(cliPath) {
         let detectedVersion = String.fromCharCode.apply(null, res).split(' ')[2].trim();
         if (detectedVersion === jfrogCliVersion) {
             console.log("JFrog CLI version: " + detectedVersion);
-        } else {
-            console.warn("Expected to find version " + jfrogCliVersion + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
+            return;
         }
+        console.warn("Expected to find version " + jfrogCliVersion + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
     } catch (ex) {
         console.error("Failed to get JFrog CLI version: " + ex);
     }
