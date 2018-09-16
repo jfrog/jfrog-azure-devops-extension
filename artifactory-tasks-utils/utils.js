@@ -70,6 +70,7 @@ function doExecuteCliCommand(cliCommand, runningDir, stdio) {
             stdio = [0, 1, 2];
         }
         tl.debug("Executing the command: " + cliCommand.replace(/--password=".*"/g, "--password=***"));
+        tl.debug("Working directory: " + runningDir);
         execSync(cliCommand, {cwd: runningDir, stdio: stdio});
     } catch (ex) {
         // Error occurred

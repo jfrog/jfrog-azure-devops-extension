@@ -1,35 +1,50 @@
-let tl = require('vsts-task-lib/task');
+const tl = require('vsts-task-lib/task');
 const path = require('path');
-let utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils');
 const CliCommandBuilder = utils.CliCommandBuilder;
 const cliConfigCommand = "rt c";
 const cliMavenCommand = "rt mvn";
+const execSync = require('child_process').execSync;
+const CONFIGURATION = {
+    'RESOLUTION' : {
+        RESPONSIBILITY: "resolver",
+        SERVICE_NAME: "artifactoryResolverService",
+        TARGET_SNAPSHOT_REPO: "targetResolveSnapshotRepo",
+        TARGET_RELEASE_REPO: "targetResolveReleaseRepo"
+    },
+    'DEPLOYMENT' : {
+        RESPONSIBILITY: "deployer",
+        SERVICE_NAME: "artifactoryDeployService",
+        TARGET_SNAPSHOT_REPO: "targetDeploySnapshotRepo",
+        TARGET_RELEASE_REPO: "targetDeployReleaseRepo"
+    }
+};
+
 let serverIdDeployer;
 let serverIdResolver;
-const execSync = require('child_process').execSync;
+let workDir = tl.getVariable('System.DefaultWorkingDirectory');
 
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
 
-    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
         return;
     }
 
     // Creating the config file for Maven
-    let {config, commandRes} = createMavenConfigFile(workDir, cliPath);
+    let {config, commandRes} = createMavenConfigFile(cliPath);
     if (commandRes) {
         return;
     }
 
     // Running Maven command
-    commandRes = execMavenCommand(cliPath, config, commandRes, workDir);
+    commandRes = execMavenCommand(cliPath, config);
     if (commandRes) {
         return;
     }
 
-    commandRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
+    commandRes = deleteServer(cliPath, serverIdDeployer, serverIdResolver);
     if (commandRes) {
         return;
     }
@@ -53,13 +68,13 @@ function checkAndSetMavenHome() {
     }
 }
 
-function deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver) {
+function deleteServer(cliPath, serverIdDeployer, serverIdResolver) {
     // Now we need to delete the server(s):
     // Delete serverIdResolver even if serverIdDeployer delete failed.
     // Will return at least one failure if one of the delete command fails.
-    let commandRes = doDeleteServer(cliPath, serverIdDeployer, buildDir);
+    let commandRes = doDeleteServer(cliPath, serverIdDeployer);
     if (serverIdResolver) {
-        let commandRes = doDeleteServer(cliPath, serverIdResolver, buildDir);
+        let commandRes = doDeleteServer(cliPath, serverIdResolver);
         if (commandRes) {
             return commandRes;
         }
@@ -71,12 +86,12 @@ function deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver) {
  * Delete by serverId. If fails, fail build and return failure response.
  * @private
  */
-function doDeleteServer(cliPath, serverId, buildDir) {
+function doDeleteServer(cliPath, serverId) {
     let deleteCommand = new CliCommandBuilder(cliPath)
         .addArguments(cliConfigCommand, "delete", serverId)
         .addOption("interactive", "false");
 
-    return utils.executeCliCommand(deleteCommand.build(), buildDir);
+    return utils.executeCliCommand(deleteCommand.build(), workDir);
 }
 
 function doAddToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
@@ -87,31 +102,33 @@ function doAddToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
     return configInfo
 }
 
-function configureServer(artifactoryService, serverId, cliPath, buildDir) {
+function configureServer(artifactoryService, serverId, cliPath) {
     let command = new CliCommandBuilder(cliPath)
         .addCommand(cliConfigCommand)
         .addArguments(serverId)
         .addArtifactoryServerWithCredentials(artifactoryService)
         .addOption("interactive", "false");
 
-    return utils.executeCliCommand(command.build(), buildDir);
+    return utils.executeCliCommand(command.build(), workDir);
 }
 
-function writeMavenConfigFile(config, cliPath, buildDir, buildDefinition, buildNumber) {
+function writeMavenConfigFile(config, cliPath, buildDefinition, buildNumber) {
     let configInfo = "version: 1\ntype: maven\n";
     // Get configured parameters
     let serverId = buildDefinition + "-" + buildNumber;
 
     // Configure deployer
-    let commandRes = addToConfig("deployer", "artifactoryDeployService", "targetDeployReleaseRepo", "targetDeploySnapshotRepo");
+    serverIdDeployer = serverId + "-" + CONFIGURATION.DEPLOYMENT.RESPONSIBILITY;
+    let commandRes = addToConfig(CONFIGURATION.DEPLOYMENT, serverIdDeployer);
     if (commandRes) {
         return commandRes
     }
 
     // Configure resolver
     let artifactoryResolver = tl.getInput("artifactoryResolverService");
-    if (artifactoryResolver != null) {
-        commandRes = addToConfig("resolver", "artifactoryResolverService", "targetResolveReleaseRepo", "targetResolveSnapshotRepo");
+    if (artifactoryResolver) {
+        serverIdResolver = serverId + "-" + CONFIGURATION.RESOLUTION.RESPONSIBILITY;
+        commandRes = addToConfig(CONFIGURATION.RESOLUTION, serverIdResolver);
         if (commandRes) {
             return commandRes
         }
@@ -125,15 +142,15 @@ function writeMavenConfigFile(config, cliPath, buildDir, buildDefinition, buildN
         return ex
     }
 
-    function addToConfig(responsibility, serviceName, targetReleaseRepo, targetSnapshotRepo) {
-        serverIdResolver = serverId + "-" + responsibility;
-        let commandRes = configureServer(serviceName, serverIdResolver, cliPath, buildDir);
+    function addToConfig(configuration, serverId) {
+        serverId = serverId + "-" + configuration.RESPONSIBILITY;
+        let commandRes = configureServer(configuration.SERVICE_NAME, serverId, cliPath);
         if (commandRes) {
-            return {commandRes}
+            return commandRes
         }
-        let targetResolveReleaseRepo = tl.getInput(targetReleaseRepo);
-        let targetResolveSnapshotRepo = tl.getInput(targetSnapshotRepo);
-        configInfo = doAddToConfig(configInfo, responsibility, targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
+        let targetResolveSnapshotRepo = tl.getInput(configuration.TARGET_SNAPSHOT_REPO);
+        let targetResolveReleaseRepo = tl.getInput(configuration.TARGET_RELEASE_REPO);
+        configInfo = doAddToConfig(configInfo, configuration.RESPONSIBILITY, targetResolveSnapshotRepo, targetResolveReleaseRepo, serverId);
     }
 }
 
@@ -148,28 +165,28 @@ function prepareGoals() {
     return goalsAndOptions;
 }
 
-function createMavenConfigFile(workDir, cliPath) {
+function createMavenConfigFile(cliPath) {
     let config = path.join(workDir, "config");
     let buildName = utils.getBuildName();
     let buildNumber = utils.getBuildNumber();
-    let commandRes = writeMavenConfigFile(config, cliPath, workDir, buildName, buildNumber);
+    let commandRes = writeMavenConfigFile(config, cliPath, buildName, buildNumber);
     if (commandRes) {
         tl.setResult(tl.TaskResult.Failed, commandRes);
-        deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
+        deleteServer(cliPath, serverIdDeployer, serverIdResolver);
     }
     return {config, commandRes};
 }
 
-function execMavenCommand(cliPath, config, commandRes, workDir) {
+function execMavenCommand(cliPath, config) {
     let goalsAndOptions = prepareGoals();
     let command = new CliCommandBuilder(cliPath)
         .addCommand(cliMavenCommand)
         .addArguments(goalsAndOptions, config)
         .addBuildFlagsIfRequired();
 
-    commandRes = utils.executeCliCommand(command.build(), workDir);
+    let commandRes = utils.executeCliCommand(command.build(), workDir);
     if (commandRes) {
-        deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
+        deleteServer(cliPath, serverIdDeployer, serverIdResolver);
     }
     return commandRes;
 }
