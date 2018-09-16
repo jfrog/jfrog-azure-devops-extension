@@ -29,15 +29,22 @@ module.exports = {
     joinArgs,
     quote,
     fixWindowsPaths,
-    validateSpecWithoutRegex,
     encodePath,
     getArchitecture,
     CliCommandBuilder,
     isWindows,
     isToolExists,
     getBuildName,
-    getBuildNumber
+    getBuildNumber,
+    prepareFileSpec
 };
+
+
+function runCbk(cliPath) {
+    console.log("Running jfrog-cli from " + cliPath + ".");
+    checkCliVersion(cliPath);
+    runTaskCbk(cliPath)
+}
 
 function executeCliTask(runTaskFunc) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
@@ -102,12 +109,6 @@ function checkCliVersion(cliPath) {
     } catch (ex) {
         console.error("Failed to get JFrog CLI version: " + ex);
     }
-}
-
-function runCbk(cliPath) {
-    console.log("Running jfrog-cli from " + cliPath + ".");
-    checkCliVersion(cliPath);
-    runTaskCbk(cliPath)
 }
 
 function createCliDirs() {
@@ -254,6 +255,29 @@ function encodePath(str) {
     }
 
     return encodedPath;
+}
+
+function prepareFileSpec(specPath) {
+    let specSource = tl.getInput("specSource", false);
+    let fileSpec;
+    try {
+        if (specSource === "file") {
+            let specInputPath = tl.getPathInput("file", true, true);
+            console.log("Using file spec located at " + specInputPath);
+            fileSpec = fs.readFileSync(specInputPath, "utf8");
+        } else {
+            fileSpec = tl.getInput("fileSpec", true);
+        }
+        fileSpec = fixWindowsPaths(fileSpec);
+        validateSpecWithoutRegex(fileSpec);
+        console.log("Using file spec:");
+        console.log(fileSpec);
+        // Write provided fileSpec to file
+        tl.writeFile(specPath, fileSpec);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex.toString());
+        return ex;
+    }
 }
 
 function isWindows() {

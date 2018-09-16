@@ -7,13 +7,13 @@ const execSync = require('child_process').execSync;
 const cliConfigCommand = "rt c";
 const cliMavenCommand = "rt mvn";
 const CONFIGURATION = {
-    'RESOLUTION' : {
+    'RESOLUTION': {
         RESPONSIBILITY: "resolver",
         SERVICE_NAME: "artifactoryResolverService",
         TARGET_SNAPSHOT_REPO: "targetResolveSnapshotRepo",
         TARGET_RELEASE_REPO: "targetResolveReleaseRepo"
     },
-    'DEPLOYMENT' : {
+    'DEPLOYMENT': {
         RESPONSIBILITY: "deployer",
         SERVICE_NAME: "artifactoryDeployService",
         TARGET_SNAPSHOT_REPO: "targetDeploySnapshotRepo",
