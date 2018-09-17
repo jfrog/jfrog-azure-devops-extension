@@ -13,23 +13,47 @@ See the full extension documentation at the [VSTS and TFS Artifactory Extension 
 The extension is available for installation on your VSTS organization in the [VSTS Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension).
 To install the extension on TFS, see the [install extensions for Team Foundation Server (TFS)](https://docs.microsoft.com/en-us/vsts/marketplace/get-tfs-extensions?view=tfs-2018#install-extensions-while-connected-to-tfs) documentation page.
 
-# Building and Testing the Extension
+# Building and Testing the Sources
+## Building
 To build and run the extension sources, please follow these steps:
 1. Clone the code from git.
-2. To run the tests, use the following commands:
-    1. Set the VSTS_ARTIFACTORY_URL, VSTS_ARTIFACTORY_USERNAME and VSTS_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password.
-    2. Run the following commands:
-    ```
-    npm i -g jfrog-cli-go
-    npm t
-    ```
-3. To Build and create the JFrog Artifactory VSTS extension vsix file, run the following command.
+2. To Build and create the JFrog Artifactory VSTS extension vsix file, run the following command.
     ```
     npm run create
     ```
 After the build process is completed, you'll find the vsix file in the project directory.
 The vsix file can be loaded into VSTS and TFS.
 
+## Testing
+To run the tests, use the following commands:
+1. Set the VSTS_ARTIFACTORY_URL, VSTS_ARTIFACTORY_USERNAME and VSTS_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password:
+    ```
+    export VSTS_ARTIFACTORY_URL='http://localhost:8081/artifactory'
+    export VSTS_ARTIFACTORY_USERNAME=admin
+    export VSTS_ARTIFACTORY_PASSWORD=password
+    ```
+    
+2. Set the VSTS_ARTIFACTORY_DOCKER_REGISTRY and VSTS_ARTIFACTORY_DOCKER_REPO environment variables with your Artifactory Docker registry domain and Artifactory Docker repository name:
+    ```
+    export VSTS_ARTIFACTORY_DOCKER_REGISTRY='localhost:8081/docker-local'
+    export VSTS_ARTIFACTORY_DOCKER_REPO=docker-local
+    ```
+    
+3. Run the following commands:
+    ```
+    npm i -g jfrog-cli-go
+    npm t
+    ```
+
+### Skipping Tests
+In order to skip tests, set the VSTS_ARTIFACTORY_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
+The supported values are: maven, npm, nuget and docker.
+
+For example, for setting the nuget and docker tests:  
+```
+export VSTS_ARTIFACTORY_SKIP_TESTS=nuget,docker
+```
+    
 # Pull Requests
 We welcome pull requests from the community!
 ## Guidelines

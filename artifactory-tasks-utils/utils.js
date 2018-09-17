@@ -31,6 +31,9 @@ module.exports = {
     fixWindowsPaths: fixWindowsPaths,
     validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
+    getArchitecture: getArchitecture,
+    collectEnvIfRequested: collectEnvIfRequested,
+    isToolExists: isToolExists,
     getArchitecture: getArchitecture
 };
 
@@ -314,4 +317,8 @@ function collectEnvironmentVariables(cliPath) {
 
 function isWindows() {
     return process.platform.startsWith("win");
+}
+
+function isToolExists(toolName) {
+    return !!tl.which(toolName, false);
 }
