@@ -31,8 +31,6 @@ module.exports = {
     fixWindowsPaths: fixWindowsPaths,
     validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
-    getArchitecture: getArchitecture,
-    collectEnvIfRequested: collectEnvIfRequested,
     isToolExists: isToolExists,
     getArchitecture: getArchitecture
 };
@@ -44,7 +42,7 @@ function executeCliTask(runTaskFunc) {
     runTaskCbk = runTaskFunc;
     getCliPath().then((cliPath) => {
         runCbk(cliPath);
-        collectEnvironmentVariablesIfNeeded(cliPath);
+        collectEnvironmentVariablesIfRequired(cliPath);
     }).catch((error) => tl.setResult(tl.TaskResult.Failed, jfrogCliDownloadErrorMessage + "\n" + error))
 }
 
@@ -291,7 +289,7 @@ function encodePath(str) {
  * Runs collect environment variables JFrog CLI command if includeEnvVars is configured to true.
  * @param cliPath - (String) - The cli path.
  */
-function collectEnvironmentVariablesIfNeeded(cliPath) {
+function collectEnvironmentVariablesIfRequired(cliPath) {
     let includeEnvVars = tl.getBoolInput("includeEnvVars");
     if (includeEnvVars) {
         let taskRes = collectEnvironmentVariables(cliPath);
