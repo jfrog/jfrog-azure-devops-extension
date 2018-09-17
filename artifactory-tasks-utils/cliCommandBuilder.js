@@ -1,4 +1,5 @@
 const tl = require('vsts-task-lib/task');
+const stringUtils = require('./stringUtils');
 
 class CliCommandBuilder {
 
@@ -53,7 +54,7 @@ class CliCommandBuilder {
         for (let i = 0; i < arguments.length; ++i) {
             let arg = arguments[i];
             if (arg.length > 0) {
-                this.command += " " + quote(arg);
+                this.command += " " + stringUtils.quote(arg);
             }
         }
         return this;
@@ -126,7 +127,7 @@ class CliCommandBuilder {
      * @returns {CliCommandBuilder} the updated builder.
      */
     addOption(option, value) {
-        this.command += " --" + option + "=" + quote(value);
+        this.command += " --" + option + "=" + stringUtils.quote(value);
         return this
     }
 
@@ -138,10 +139,6 @@ class CliCommandBuilder {
     build() {
         return this.command;
     }
-}
-
-function quote(str) {
-    return "\"" + str + "\"";
 }
 
 /**
@@ -172,7 +169,6 @@ function getBuildNumber() {
 
 module.exports = {
     CliCommandBuilder,
-    quote,
     getBuildName,
     getBuildNumber
 };

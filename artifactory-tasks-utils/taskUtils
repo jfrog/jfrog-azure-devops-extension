@@ -1,0 +1,210 @@
+const CliCommandBuilder = require('./cliCommandBuilder').CliCommandBuilder;
+const fs = require('fs-extra');
+const tl = require('vsts-task-lib/task');
+const crypto = require('crypto');
+const path = require('path');
+const request = require('request-promise-lite');
+const execSync = require('child_process').execSync;
+const osUtils = require('./osUtils');
+const stringUtils = require('./stringUtils');
+
+const fileName = getCliExecutableName();
+const btPackage = "jfrog-cli-" + osUtils.getArchitecture();
+const jfrogFolderPath = stringUtils.encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
+const jfrogCliVersion = "1.19.1";
+const versionedCliPath = stringUtils.encodePath(path.join(jfrogFolderPath, jfrogCliVersion, fileName)); // Path that depends on jfrog-cli version. The default behaviour.
+const customCliPath = stringUtils.encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
+const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
+const MAX_CLI_DOWNLOADS_RETRIES = 10;
+const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +
+    ". If this build agent cannot access the internet, you can manually download version " + jfrogCliVersion +
+    " of JFrog CLI and place it on the agent in the following path: " + customCliPath;
+
+let runTaskCbk = null;
+
+module.exports = {
+    executeCliTask,
+    executeCliCommand,
+    prepareFileSpec,
+    isToolExists
+};
+
+function runCbk(cliPath) {
+    console.log("Running jfrog-cli from " + cliPath + ".");
+    checkCliVersion(cliPath);
+    runTaskCbk(cliPath)
+}
+
+function executeCliTask(runTaskFunc) {
+    process.env.JFROG_CLI_HOME = jfrogFolderPath;
+    process.env.JFROG_CLI_OFFER_CONFIG = false;
+
+    runTaskCbk = runTaskFunc;
+    if (fs.existsSync(customCliPath)) {
+        runCbk(customCliPath);
+    } else if (fs.existsSync(versionedCliPath)) {
+        runCbk(versionedCliPath);
+    } else {
+        createCliDirs();
+        downloadCli(0).then(() => {
+            runCbk(versionedCliPath);
+        });
+    }
+}
+
+function executeCliCommand(cliCommand, runningDir, stdio) {
+    let taskRes = doExecuteCliCommand(cliCommand, runningDir, stdio);
+    if (taskRes) {
+        tl.setResult(tl.TaskResult.Failed, taskRes);
+    }
+    return taskRes;
+}
+
+function doExecuteCliCommand(cliCommand, runningDir, stdio) {
+    try {
+        if (!stdio) {
+            stdio = [0, 1, 2];
+        }
+        tl.debug("Executing the command: " + cliCommand.replace(/--password=".*"/g, "--password=***"));
+        tl.debug("Working directory: " + runningDir);
+        execSync(cliCommand, {cwd: runningDir, stdio: stdio});
+    } catch (ex) {
+        // Error occurred
+        return ex.toString().replace(/--password=".*"/g, "--password=***");
+    }
+}
+
+function checkCliVersion(cliPath) {
+    let command = new CliCommandBuilder(cliPath).addArguments("--version");
+    try {
+        let res = execSync(command.build());
+        let detectedVersion = String.fromCharCode.apply(null, res).split(' ')[2].trim();
+        if (detectedVersion === jfrogCliVersion) {
+            console.log("JFrog CLI version: " + detectedVersion);
+            return;
+        }
+        console.warn("Expected to find version " + jfrogCliVersion + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
+    } catch (ex) {
+        console.error("Failed to get JFrog CLI version: " + ex);
+    }
+}
+
+function prepareFileSpec(specPath) {
+    let specSource = tl.getInput("specSource", false);
+    let fileSpec;
+    try {
+        if (specSource === "file") {
+            let specInputPath = tl.getPathInput("file", true, true);
+            console.log("Using file spec located at " + specInputPath);
+            fileSpec = fs.readFileSync(specInputPath, "utf8");
+        } else {
+            fileSpec = tl.getInput("fileSpec", true);
+        }
+        fileSpec = stringUtils.fixWindowsPaths(fileSpec);
+        validateSpecWithoutRegex(fileSpec);
+        console.log("Using file spec:");
+        console.log(fileSpec);
+        // Write provided fileSpec to file
+        tl.writeFile(specPath, fileSpec);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex.toString());
+        return ex;
+    }
+}
+
+function isToolExists(toolName) {
+    return !!tl.which(toolName, false);
+}
+
+function createCliDirs() {
+    if (!fs.existsSync(jfrogFolderPath)) {
+        fs.mkdirSync(jfrogFolderPath);
+    }
+
+    if (!fs.existsSync(path.join(jfrogFolderPath, jfrogCliVersion))) {
+        fs.mkdirSync(path.join(jfrogFolderPath, jfrogCliVersion));
+    }
+}
+
+function downloadCli(attemptNumber) {
+    return new Promise((resolve, reject) => {
+        let handleError = (err) => {
+            if (attemptNumber <= MAX_CLI_DOWNLOADS_RETRIES) {
+                console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
+                downloadCli(++attemptNumber);
+            } else {
+                console.error(jfrogCliDownloadErrorMessage);
+                reject(err);
+            }
+        };
+
+        const cliTmpPath = stringUtils.encodePath(versionedCliPath + ".tmp");
+
+        // Perform download
+        request.get(jfrogCliDownloadUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
+            // Check valid response
+            if (response.statusCode < 200 || response.statusCode >= 300) {
+                handleError("Received http response code " + response.statusCode);
+            }
+
+            // Write body to file
+            fs.writeFileSync(cliTmpPath, response.body);
+
+            // Validate checksum
+            let stream = fs.createReadStream(cliTmpPath);
+            let digest = crypto.createHash('sha256');
+
+            stream.on('data', function (data) {
+                digest.update(data, 'utf8')
+            });
+
+            stream.on('end', function () {
+                let hex = digest.digest('hex');
+                let rawChecksum = response.headers['x-checksum-sha256'];
+                if (!rawChecksum) {
+                    handleError("Checksum header is missing from http response, cannot validate downloaded jfrog cli.");
+                }
+
+                let trimmedChecksum = rawChecksum.split(',')[0];
+                if (hex === trimmedChecksum) {
+                    fs.move(cliTmpPath, versionedCliPath).then(() => {
+                        if (!osUtils.isWindows()) {
+                            fs.chmodSync(versionedCliPath, 0o555);
+                        }
+                        console.log("Finished downloading jfrog cli.");
+                        resolve();
+                    });
+                } else {
+                    handleError("Checksum mismatch for downloaded jfrog cli.");
+                }
+            });
+        }).catch((err) => {
+            console.error(jfrogCliDownloadErrorMessage);
+            tl.setResult(tl.TaskResult.Failed, err.message);
+        })
+    });
+}
+
+
+function getCliExecutableName() {
+    let executable = "jfrog";
+    if (osUtils.isWindows()) {
+        executable += ".exe"
+    }
+    return executable
+}
+
+
+function validateSpecWithoutRegex(fileSpec) {
+    if (!osUtils.isWindows()) {
+        return;
+    }
+    let files = JSON.parse(fileSpec)["files"];
+    for (const file of Object.keys(files)) {
+        let values = files[file];
+        let regexp = values["regexp"];
+        if (regexp && regexp.toLowerCase() === "true") {
+            throw ("The File Spec includes 'regexp: true' which is currently not supported.");
+        }
+    }
+}

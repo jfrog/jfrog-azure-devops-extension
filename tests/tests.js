@@ -303,7 +303,7 @@ function mockTask(testDir, taskName, isNegative) {
     let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
     let mockRunner = new vstsMockTest.MockTestRunner(taskPath);
     mockRunner.run(); // Mock a test
-    tasksOutput += mockRunner.stderr + "\n" + mockRunner.stdout;
+    tasksOutput += "***** Output of task '" + taskName + "':\n" + mockRunner.stderr + "\n" + mockRunner.stdout;
     assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + ".\n" + tasksOutput); // Check the test results
 }
 

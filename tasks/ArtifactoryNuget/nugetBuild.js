@@ -72,7 +72,7 @@ function exec(cliPath, nugetCommand) {
 function runNuGet(command, cliPath, buildDir) {
     command
         .addBuildFlagsIfRequired()
-        .addArtifactoryServerWithCredentials();
+        .addArtifactoryServerWithCredentials("artifactoryService");
     let taskRes = utils.executeCliCommand(command.build(), buildDir);
     if (taskRes) {
         return;
