@@ -3,7 +3,7 @@ const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let variables = {
-    "Build.DefinitionName": "Maven",
+    "Build.DefinitionName": "Maven build",
     "Build.BuildNumber": "3"
 };
 

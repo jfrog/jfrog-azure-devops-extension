@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
 
 let variables = {
-    "Build.DefinitionName": "Maven",
+    "Build.DefinitionName": "Maven build",
     "Build.BuildNumber": "3"
 };
 

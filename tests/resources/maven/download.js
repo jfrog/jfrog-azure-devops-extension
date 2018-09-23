@@ -8,7 +8,7 @@ let inputs = {
         files: [{
             pattern: testUtils.localMaven,
             target: path.join(testUtils.getLocalTestDir(TEST_NAME), "files", "/"),
-            build: "Maven/3",
+            build: "Maven build/3",
             flat: "true"
         }]
     }),

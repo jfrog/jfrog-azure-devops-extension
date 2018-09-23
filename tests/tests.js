@@ -218,8 +218,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "publish");
             mockTask(testDir, "download");
             assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
-            getAndAssertBuild("Maven", "3");
-            deleteBuild("Maven");
+            getAndAssertBuild("Maven build", "3");
+            deleteBuild("Maven build");
         }, testUtils.isSkipTest("maven"));
     });
 
