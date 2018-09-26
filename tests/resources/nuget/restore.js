@@ -9,9 +9,9 @@ let variables = {
 
 let inputs = {
     "command": "restore",
-    "solutionPath": testUtils.fixWinPath(testUtils.getLocalTestDir(TEST_NAME), "**", "*.sln"),
+    "solutionPath": path.join(testUtils.getLocalTestDir(TEST_NAME), "**", "*.sln"),
     "targetResolveRepo": testUtils.virtualNuget,
-    "packagesDirectory": testUtils.fixWinPath(path.join(testUtils.getLocalTestDir(TEST_NAME), "packages")),
+    "packagesDirectory": path.join(testUtils.getLocalTestDir(TEST_NAME), "packages"),
     "verbosityRestore": "Detailed",
     "collectBuildInfo": true
 };

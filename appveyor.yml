@@ -1,11 +1,14 @@
-image:
-- Visual Studio 2017
-- Ubuntu
 
 build: off
 stack: node 8
 skip_tags: true
 environment:
+  matrix:
+      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+        VSTS_ARTIFACTORY_SKIP_TESTS: docker
+      - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+        VSTS_ARTIFACTORY_SKIP_TESTS: nuget
+
   nodejs_version: "8"
   VSTS_ARTIFACTORY_URL:
     secure: RIh0gGFDn2JAnLUEEqLsQnZ5H3XFWg1s+Qq8Z4i+Xu+FtQf6Tsu2AnfY4/6AaXJ8
@@ -13,6 +16,10 @@ environment:
     secure: YEB5Wiv9a2vNpUhy+MfL+A==
   VSTS_ARTIFACTORY_PASSWORD:
     secure: Um8o75MQIieSavIemF4ySA==
+  VSTS_ARTIFACTORY_DOCKER_DOMAIN:
+    secure: ppjr6mrLIKXVptLX8WPOlffTwOLtRIoaIpsVEvmje/9mDtLojTqpwI9OIC5VZnx1
+  VSTS_ARTIFACTORY_DOCKER_REPO:
+    secure: UjixvF6E1Bp1p8zgPRLCVA==
 
 install:
 - npm i -g jfrog-cli-go

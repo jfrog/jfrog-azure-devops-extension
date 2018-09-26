@@ -9,9 +9,17 @@ const testDataDir = path.join(__dirname, "testData");
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
+let artifactoryDockerDomain = process.env.VSTS_ARTIFACTORY_DOCKER_DOMAIN;
+let artifactoryDockerRepo = process.env.VSTS_ARTIFACTORY_DOCKER_REPO;
+let skipTests = process.env.VSTS_ARTIFACTORY_SKIP_TESTS ? process.env.VSTS_ARTIFACTORY_SKIP_TESTS.split(',') : [];
 
 module.exports = {
     testDataDir: testDataDir,
+    artifactoryDockerDomain: artifactoryDockerDomain,
+    artifactoryDockerRepo: artifactoryDockerRepo,
+    artifactoryUrl: artifactoryUrl,
+    artifactoryPassword: artifactoryPassword,
+    artifactoryUsername: artifactoryUsername,
 
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
@@ -32,6 +40,7 @@ module.exports = {
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
+    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
     conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
 
     initTests: initTests,
@@ -45,9 +54,9 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
-    fixWinPath: fixWinPath,
     execCli: execCli,
-    cleanUpAllTests: cleanUpAllTests
+    cleanUpAllTests: cleanUpAllTests,
+    isSkipTest: isSkipTest
 };
 
 function initTests() {
@@ -255,4 +264,8 @@ function fixWinPath(path) {
     if (isWindows()) {
         return path.replace(/(\\)/g, "\\\\")
     }
+}
+
+function isSkipTest(skipValue) {
+    return skipTests.indexOf(skipValue) !== -1;
 }
