@@ -5,7 +5,6 @@ node_modules
 pack_publish_extension.sh
 vss-extension-private.json
 artifactory-tasks-utils-*.tgz
-conan-utils-*.tgz
 *package-lock.json
 .DS_Store
 .testData
