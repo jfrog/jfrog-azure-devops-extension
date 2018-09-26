@@ -204,7 +204,7 @@
     ],
     "execution": {
         "Node": {
-          "target": "artifactoryconan.js"
+          "target": "conanBuild.js"
         }
     }
 }

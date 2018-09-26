@@ -1,4 +1,4 @@
-const conanutils = require('./conanutils');
+const conanutils = require('./conanUtils');
 const tl = require('vsts-task-lib/task');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
@@ -51,10 +51,13 @@ let handleConfigInstallCommand = async(function() {
         conanArguments.push(configInstallGit);
     }
 
-    // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
-
-    setTaskResult(taskSuccessful);
+    try {
+        await(conanutils.executeConanTask(conanArguments));
+        setTaskResult(true);
+    } catch (err) {
+        console.error("Failed to execute Conan Task: " + err.message);
+        setTaskResult(false);
+    }
 });
 
 /**
@@ -76,25 +79,36 @@ let handleAddRemoteCommand = async(function() {
 
     // Purge existing
     if (purgeExistingRemotes) {
-        let taskSuccessful = await(conanutils.purgeConanRemotes());
-        if (!taskSuccessful) {
-            setTaskResult(taskSuccessful);
+        try {
+            await(conanutils.purgeConanRemotes());
+        } catch (err) {
+            console.error("Failed to purge Conan Remotes: " + err.message);
+            setTaskResult(false);
             return;
         }
     }
 
     // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
-
-    if (taskSuccessful) {
-        // Add user credentials
-        conanArguments = [
-            "user", artifactoryUser, "-r", remoteName, "-p", artifactoryPassword,
-        ];
-        taskSuccessful = await(conanutils.executeConanTask(conanArguments));
+    try {
+        await(conanutils.executeConanTask(conanArguments));
+    } catch (err) {
+        console.error("Failed to execute Conan Task: " + err.message);
+        setTaskResult(false);
+        return;
     }
 
-    setTaskResult(taskSuccessful);
+    // Add user credentials
+    conanArguments = [
+        "user", artifactoryUser, "-r", remoteName, "-p", artifactoryPassword,
+    ];
+
+    try {
+        await(conanutils.executeConanTask(conanArguments));
+        setTaskResult(true);
+    } catch (err) {
+        console.error("Failed to execute Conan Task: " + err.message);
+        setTaskResult(false);
+    }
 });
 
 /**
@@ -110,10 +124,13 @@ let handleCreateCommand = async(function() {
     conanArguments.push(createPath);
     conanArguments.push(createReference);
 
-    // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
-
-    setTaskResult(taskSuccessful);
+    try {
+        await(conanutils.executeConanTask(conanArguments));
+        setTaskResult(true);
+    } catch (err) {
+        console.error("Failed to execute Conan Task: " + err.message);
+        setTaskResult(false);
+    }
 });
 
 /**
@@ -127,10 +144,13 @@ let handleInstallCommand = async(function() {
     conanArguments = addExtraArguments(conanArguments, extraArguments);
     conanArguments.push(pathOrReference);
 
-    // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
-
-    setTaskResult(taskSuccessful);
+    try {
+        await(conanutils.executeConanTask(conanArguments));
+        setTaskResult(true);
+    } catch (err) {
+        console.error("Failed to execute Conan Task: " + err.message);
+        setTaskResult(false);
+    }
 });
 
 /**
@@ -146,10 +166,14 @@ let handleUploadCommand = async(function() {
     enforceArgumentOrOption(conanArguments, "-c", "--confirm");
     conanArguments.push(patternOrReference);
 
-    // Add remote repo configuration
-    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
+    try {
+        await(conanutils.executeConanTask(conanArguments));
+        setTaskResult(true);
+    } catch (err) {
+        console.error("Failed to execute Conan Task: " + err.message);
+        setTaskResult(false);
+    }
 
-    setTaskResult(taskSuccessful);
 })
 
 /**
@@ -158,9 +182,14 @@ let handleUploadCommand = async(function() {
 let handleCustomCommand = async(function() {
     let customArguments = tl.getInput('customArguments', true);
     let conanArguments = customArguments.split(" ");
-    let taskSuccessful = await(conanutils.executeConanTask(conanArguments));
 
-    setTaskResult(taskSuccessful);
+    try {
+        await(conanutils.executeConanTask(conanArguments));
+        setTaskResult(true);
+    } catch (err) {
+        console.error("Failed to execute Conan Task: " + err.message);
+        setTaskResult(false);
+    }
 });
 
 /**
@@ -185,7 +214,7 @@ function addExtraArguments(conanArguments, extraArguments) {
 * @param longVersion (string) - Long version of option or argument
 */
 function enforceArgumentOrOption(conanArguments, shortVersion, longVersion) {
-    if(conanArguments.indexOf(shortVersion) < 0 && conanArguments.indexOf(longVersion) < 0) {
+    if (conanArguments.indexOf(shortVersion) < 0 && conanArguments.indexOf(longVersion) < 0) {
         conanArguments.push(longVersion);
     }
 }

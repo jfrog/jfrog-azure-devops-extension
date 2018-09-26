@@ -7,7 +7,7 @@ const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
-const conanutils = require("../tasks/ArtifactoryConan/conanutils");
+const conanutils = require("../tasks/ArtifactoryConan/conanUtils");
 const execSync = require('child_process').execSync;
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {

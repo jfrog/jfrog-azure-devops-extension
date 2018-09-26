@@ -30,7 +30,7 @@ let executeConanTask = async(function (commandArgs) {
     let buildNumber = tl.getVariable('Build.BuildNumber');
 
     let conanTaskId = generateConanTaskUUId();
-    console.log("Conan Task Id: " + conanTaskId);
+    tl.debug("Conan Task Id: " + conanTaskId);
     let buildTimestamp = Date.now();
 
     let conanPath = null;
@@ -42,8 +42,7 @@ let executeConanTask = async(function (commandArgs) {
         conanPath = tl.which('conan', true);
         console.log("Running Conan build tool from: " + conanPath);
     } catch (err) {
-        console.error("Failed to locate Conan executable path: " + err.message);
-        return false;
+        throw new Error("Failed to locate Conan executable path: " + err);
     }
 
     /*
@@ -64,35 +63,28 @@ let executeConanTask = async(function (commandArgs) {
             setConanTraceFileLocation(conanUserHome, conanTaskId);
             setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, buildTimestamp);
         } catch (err) {
-            console.error("Failed to setup Build Info collection: " + err.message);
-            return false;
+            throw new Error("Failed to setup Build Info collection: " + err.message);
         }
     }
 
     // Run conan command and set task result
     let exitCode = await(executeConanCommand(conanPath, commandArgs, workingDir));
     if (exitCode !== 0) {
-        console.error("Conan task returned bad exit code: " + exitCode);
-        return false;
+        throw new Error("Conan command returned bad exit code: " + exitCode);
     }
 
     // Generate build info if requested
     if (collectBuildInfo) {
         exitCode = await(generateBuildInfo(conanUserHome, conanTaskId));
         if (exitCode !== 0) {
-            console.error("Failed to generate build info with bad exit code: " + exitCode);
-            return false;
+            throw new Error("Failed to generate build info with bad exit code: " + exitCode);
         }
         try{
             completeBuildInfo(conanUserHome, conanTaskId);
         } catch (err) {
-            console.error("Failed to make Build Info available: " + err.message);
-            return false;
+            throw new Error("Failed to make Build Info available: " + err);
         }
     }
-
-    return true;
-
 });
 
 /**
@@ -150,14 +142,16 @@ function setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, 
     if (fs.existsSync(conanArtifactsPropertiesPath)) {
         let existingContent = fs.readFileSync(conanArtifactsPropertiesPath);
         let propertiesMap = convertConanPropertiesToMap(existingContent.toString());
-        if (buildName === propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME] &&
-            buildNumber === propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER]) {
-            tl.debug("Conan artifacts.properties already set for this build at " + conanArtifactsPropertiesPath);
-            return;
-        } else {
-            console.warn("Conan artifacts.properties file exists at "
-                + conanArtifactsPropertiesPath + " with different build info values. " +
-                "The content of this file will be ovewritten.");
+        if (CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME in propertiesMap &&
+            CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER in propertiesMap) {
+            if (buildName === propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME] &&
+                buildNumber === propertiesMap[CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER]) {
+                tl.debug("Conan artifacts.properties already set for this build at " + conanArtifactsPropertiesPath);
+                return;
+            } else {
+                throw new Error("Conan artifacts.properties file exists at "
+                    + conanArtifactsPropertiesPath + " with different build info values.");
+            }
         }
     }
 
@@ -352,8 +346,7 @@ let purgeConanRemotes = async(function () {
         let conanPath = tl.which('conan', true);
         console.log("Running Conan build tool from: " + conanPath);
     } catch (err) {
-        console.error("Failed to locate Conan executable path: " + err.message);
-        return false;
+        throw new Error("Failed to locate Conan executable path: " + err.message);
     }
 
     /*
@@ -377,11 +370,8 @@ let purgeConanRemotes = async(function () {
     try {
         fs.writeFileSync(registryFile, '');
     } catch (err) {
-        console.error("Failed to remove registry.txt file content: " + err.message);
-        return false;
+        throw new Error("Failed to remove registry.txt file content: " + err.message);
     }
-
-    return true;
 });
 
 /**

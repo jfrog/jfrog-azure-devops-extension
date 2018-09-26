@@ -32,7 +32,7 @@ module.exports = {
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
-    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "artifactoryconan.js"),
+    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
 
     initTests: initTests,
     runTask: runTask,
