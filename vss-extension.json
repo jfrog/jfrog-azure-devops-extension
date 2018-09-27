@@ -201,6 +201,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryDocker"
             }
+        },
+        {
+            "id": "artifactory-conan-build-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryConan"
+            }
         }
     ],
     "files": [
@@ -243,6 +253,9 @@
         },
         {
             "path": "tasks/ArtifactoryDocker"
+        },
+        {
+            "path": "tasks/ArtifactoryConan"
         }
     ]
 }
