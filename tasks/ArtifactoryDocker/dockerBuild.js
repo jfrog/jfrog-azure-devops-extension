@@ -24,10 +24,10 @@ function RunTaskCbk(cliPath) {
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
     let targetRepository = tl.getInput("targetRepo", true);
-    let imageTag = tl.getInput("imageTag", true);
+    let imageName = tl.getInput("imageName", true);
 
     // Build the cli command
-    let cliCommand = utils.cliJoin(cliPath, dockerPushCommand, utils.quote(imageTag), utils.quote(targetRepository), "--url=" + utils.quote(artifactoryUrl));
+    let cliCommand = utils.cliJoin(cliPath, dockerPushCommand, utils.quote(imageName), utils.quote(targetRepository), "--url=" + utils.quote(artifactoryUrl));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
     // Add build info collection

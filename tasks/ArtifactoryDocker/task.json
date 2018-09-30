@@ -45,12 +45,12 @@
             }
         },
         {
-          "name": "imageTag",
+          "name": "imageName",
           "type": "string",
-          "label": "Image tag",
+          "label": "Image name",
           "defaultValue": "",
-          "required": false,
-          "helpMarkDown": "The docker image tag to push."
+          "required": true,
+          "helpMarkDown": "The docker image to push [DOMAIN]/[NAME]:[TAG]."
         },
         {
             "name": "collectBuildInfo",
