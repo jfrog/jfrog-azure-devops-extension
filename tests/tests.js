@@ -355,11 +355,12 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             testDTO.testsBuildNames.forEach(element => runBuildCommand("bc", element, testDTO.testBuildNumber));
         }, testUtils.isSkipTest("conan"));
     });
+
+    function runBuildCommand(command, buildName, buildNumber) {
+        jfrogUtils.executeCliCommand("jfrog rt " + command + " \"" + buildName + "\" " + buildNumber);
+    }
 });
 
-function runBuildCommand(command, buildName, buildNumber) {
-    execSync("jfrog rt " + command + "\"" + buildName + "\" " + buildNumber);
-}
 
 /**
  * Run a test using mocha suit.
@@ -444,7 +445,7 @@ function getAndAssertBuild(buildName, buildNumber) {
 function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
     let actual = body["buildInfo"]["properties"][key];
-    assert.equal(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
+    assert.strictEqual(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
 }
 
 function assertBuild(build, buildName, buildNumber) {
@@ -455,6 +456,6 @@ function deleteBuild(buildName) {
     testUtils.deleteBuild(buildName);
 }
 
-function assertPathExists(_path) {
-    assert(fs.existsSync(_path))
+function assertPathExists(path) {
+    assert(fs.existsSync(path), path + " should exist!");
 }
