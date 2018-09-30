@@ -1,6 +1,6 @@
 {
     "id": "2b8ef770-9bc6-4394-aa81-197d0759e9c8",
-    "name": "Artifactory Conan",
+    "name": "ArtifactoryConan",
     "friendlyName": "Artifactory Conan",
     "description": "This task runs a Conan command.",
     "author": "JFrog",
