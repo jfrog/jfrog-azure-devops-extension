@@ -1,4 +1,3 @@
-const os = require('os');
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
 const crypto = require('crypto');

@@ -3,7 +3,6 @@ const tl = require('vsts-task-lib/task');
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const execSync = require('child_process').execSync;
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
@@ -34,14 +33,14 @@ module.exports = {
     repoConan: "vsts-conan-local",
 
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
+    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
+    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
     download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
     maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
-    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
-    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -54,7 +53,6 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
-    execCli: execCli,
     cleanUpAllTests: cleanUpAllTests,
     isSkipTest: isSkipTest
 };
@@ -82,15 +80,6 @@ function runTask(testMain, variables, inputs) {
 
     tmr.registerMock('vsts-task-lib/mock-task', tl);
     tmr.run();
-}
-
-function execCli(command) {
-    command = fixWinPath(command);
-    try {
-        execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
-    } catch (ex) {
-        console.error("Command failed", "jfrog " + command);
-    }
 }
 
 function recreateTestDataDir() {
@@ -258,12 +247,6 @@ function getRemoteTestDir(repo, testName) {
 
 function isWindows() {
     return process.platform.startsWith("win");
-}
-
-function fixWinPath(path) {
-    if (isWindows()) {
-        return path.replace(/(\\)/g, "\\\\")
-    }
 }
 
 function isSkipTest(skipValue) {

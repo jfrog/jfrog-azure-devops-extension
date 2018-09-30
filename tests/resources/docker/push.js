@@ -1,7 +1,4 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
-
-const TEST_NAME = path.basename(__dirname);
 
 let variables = {
     "Build.DefinitionName": "dockerTest",
