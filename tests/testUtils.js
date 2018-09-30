@@ -31,6 +31,7 @@ module.exports = {
     npmLocalRepoKey: "vsts-npm-local-test",
     npmRemoteRepoKey: "vsts-npm-remote-test",
     npmVirtualRepoKey: "vsts-npm-virtual-test",
+    repoConan: "vsts-conan-local",
 
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
     download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
@@ -40,6 +41,7 @@ module.exports = {
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
     docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
+    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -135,6 +137,7 @@ function createTestRepositories() {
     createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
+    createRepo(module.exports.repoConan, JSON.stringify({rclass: "local", packageType: "conan"}));
 }
 
 function deleteTestRepositories() {
@@ -147,6 +150,7 @@ function deleteTestRepositories() {
     deleteRepo(module.exports.npmVirtualRepoKey);
     deleteRepo(module.exports.npmLocalRepoKey);
     deleteRepo(module.exports.npmRemoteRepoKey);
+    deleteRepo(module.exports.repoConan);
 }
 
 function createRepo(repoKey, body) {
