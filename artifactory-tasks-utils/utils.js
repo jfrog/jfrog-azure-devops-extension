@@ -8,7 +8,7 @@ const execSync = require('child_process').execSync;
 const fileName = getCliExecutableName();
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.19.1";
+const jfrogCliVersion = "1.20.1";
 const versionedCliPath = encodePath(path.join(jfrogFolderPath, jfrogCliVersion, fileName)); // Path that depends on jfrog-cli version. The default behaviour.
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
