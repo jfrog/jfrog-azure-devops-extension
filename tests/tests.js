@@ -262,7 +262,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             getAndAssertBuild("dockerTest", "1");
             deleteBuild("dockerTest");
         }, testUtils.isSkipTest("docker"))
-    })
+    });
 
     describe("Conan Task Tests", () => {
         runTest("Conan Custom Command", () => {

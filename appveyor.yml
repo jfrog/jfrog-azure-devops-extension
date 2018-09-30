@@ -24,6 +24,7 @@ environment:
 install:
 - npm i -g jfrog-cli-go
 - npm i -g tfx-cli
+- pip install conan
 
 test_script:
 - node --version

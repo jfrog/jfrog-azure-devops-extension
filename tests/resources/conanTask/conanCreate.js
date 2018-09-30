@@ -17,7 +17,7 @@ let inputs = {
     "conanCommand": "Create",
     "createPath": path.join(__dirname, "files", "conan-min"),
     "createReference": "user/testing",
-    "extraArguments": "",
+    "extraArguments": "--build missing",
     "collectBuildInfo": true
 };
 

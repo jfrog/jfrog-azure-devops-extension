@@ -17,7 +17,7 @@ let inputs = {
     "conanCommand": "Install",
     "pathOrReference": "..",
     "workingDirectory": path.join(__dirname, "files", "conan-install", "build"),
-    "extraArguments": "",
+    "extraArguments": "--build missing",
     "collectBuildInfo": true
 };
 
