@@ -28,14 +28,14 @@ if (commandLineArgsOptions.help || !commandLineArgsOptions.version) {
 const splitVersion = commandLineArgsOptions.version.split('.');
 
 assertVersion();
-updateTasks();
-updateVssExtension();
+updateTasksVersion();
+updateExtensionVersion();
 
 /**
- * Assert new version above the current version.
+ * Validate the format of the new version and also that it is larger than the existing version.
  */
 function assertVersion() {
-    assert.equal(splitVersion.length, 3, 'Version must be of format X.X.X');
+    assert.equal(splitVersion.length, 3, 'Version have a format of X.Y.Z');
     let vssExtension = fs.readFileSync('vss-extension.json', 'utf8');
     let vssExtensionJson = JSON.parse(vssExtension);
     assert.equal(compareVersions(commandLineArgsOptions.version, vssExtensionJson.version), 1, 'Input version must be bigger than current version');
@@ -43,11 +43,12 @@ function assertVersion() {
 
 /**
  * Update versions of all tasks.
+ * Tasks' versions are set to be the extension's version.
  */
-function updateTasks() {
+function updateTasksVersion() {
     let files = fs.readdirSync(path.join('tasks'));
     files.forEach(taskName => {
-        console.log('Updating ' + taskName);
+        console.log('Updating version of task ' + taskName + ' to ' + commandLineArgsOptions.version);
         let taskDir = path.join('tasks', taskName);
         let taskJsonPath = path.join(taskDir, 'task.json');
         let taskJson = editJsonFile(taskJsonPath, editJsonFileOptions);
@@ -62,8 +63,8 @@ function updateTasks() {
 /**
  * Update version of vss-extension.json.
  */
-function updateVssExtension() {
-    console.log('Updating vss-extension.json');
+function updateExtensionVersion() {
+    console.log('Updating version of vss-extension.json to ' + commandLineArgsOptions.version);
     let vssExtensionJson = editJsonFile('vss-extension.json', editJsonFileOptions);
     vssExtensionJson.set('version', commandLineArgsOptions.version);
 }
