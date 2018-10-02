@@ -18,9 +18,6 @@ function RunTaskCbk(cliPath) {
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let excludeEnvVars = tl.getInput("excludeEnvVars", false);
-    if (!excludeEnvVars) {
-        excludeEnvVars = "_"; // This is a workaround - until v1.19.1, jfrog-cli doesn't support empty env-exclude patterns.
-    }
 
     let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl), "--env-exclude=" + utils.quote(excludeEnvVars));
     cliCommand = addBuildUrl(cliCommand);
