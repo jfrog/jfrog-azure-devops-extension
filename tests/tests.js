@@ -42,7 +42,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assert(!retVal.toString().includes("SUPER_SECRET"), "Output contains password");
         });
 
-        runTest("Proxy", (done) => {
+        runTest("Download JFrog CLI through a proxy", (done) => {
             delete require.cache[require.resolve('artifactory-tasks-utils')];
             delete require.cache[require.resolve('proxy-support')];
             process.env.http_proxy = 'http://localhost:8000';
@@ -56,7 +56,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             proxiedArtifactoryUtils.downloadCli(3).then(() => {
                 proxyServer.close();
                 process.env.http_proxy = "";
-                done(cliDownloadedWithProxy ? "" : new Error("CLI downloaded without using the proxy server."));
+                done(cliDownloadedWithProxy ? "" : new Error("CLI downloaded without using the proxy server"));
             });
         }, false, true);
 
