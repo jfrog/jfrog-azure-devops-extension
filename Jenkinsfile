@@ -29,7 +29,7 @@ node {
         sh("node-v${NPM_VERSION}-linux-x64/bin/node buildScripts/bump-version.js -v ${VSTS_ARTIFACTORY_VERSION}")
     }
 
-    stage('Commit and create version tag') {
+    stage('Commit release version') {
         sh("git commit -am '[artifactory-release] Release version ${VSTS_ARTIFACTORY_VERSION}'")
     }
 
