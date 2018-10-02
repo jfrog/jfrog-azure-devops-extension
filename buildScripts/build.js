@@ -5,7 +5,7 @@ const path = require('path');
 
 cleanExecNpm('pack', 'artifactory-tasks-utils');
 installTasks();
-cleanExecNpm(('i'), 'tests');
+cleanExecNpm('i', 'tests');
 
 /**
  * Install tasks.

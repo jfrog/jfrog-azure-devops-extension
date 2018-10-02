@@ -146,7 +146,6 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);
-            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Download fail-no-op", () => {
@@ -191,7 +190,25 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertBuildEnv(build, "buildInfo.env.BUILD_NULL", "null");
             assertBuildEnv(build, "buildInfo.env.BUILD_PASSWORD", undefined);
             deleteBuild("excludeEnv");
-        })
+        });
+
+        runTest("Build URL build pipeline", () => {
+            let testDir = "buildUrlBuildPipeline";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            let build = getAndAssertBuild("buildUrlBuildPipeline", "3");
+            assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_build?buildId=5")
+            deleteBuild("buildUrlBuildPipeline");
+        });
+
+        runTest("Build URL release pipeline", () => {
+            let testDir = "buildUrlReleasePipeline";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            let build = getAndAssertBuild("buildUrlReleasePipeline", "3");
+            assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_release?releaseId=6")
+            deleteBuild("buildUrlReleasePipeline");
+        });
     });
 
     describe("Build Promotion Tests", () => {
@@ -484,6 +501,11 @@ function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
     let actual = body["buildInfo"]["properties"][key];
     assert.strictEqual(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
+}
+
+function assertBuildUrl(build, url) {
+    let body = JSON.parse(build.getBody('utf8'));
+    assert.strictEqual(body["buildInfo"]["url"], url);
 }
 
 function assertBuild(build, buildName, buildNumber) {
