@@ -8,6 +8,7 @@ const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
 const execSync = require('child_process').execSync;
+const createProxyServer = require('http-tunneling-proxy');
 let tasksOutput;
 const conanutils = require("../tasks/ArtifactoryConan/conanUtils");
 
@@ -40,6 +41,24 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             process.env.VSTS_ARTIFACTORY_PASSWORD = oldPassword;
             assert(!retVal.toString().includes("SUPER_SECRET"), "Output contains password");
         });
+
+        runTest("Proxy", (done) => {
+            delete require.cache[require.resolve('artifactory-tasks-utils')];
+            delete require.cache[require.resolve('proxy-support')];
+            process.env.http_proxy = 'http://localhost:8000';
+            let cliDownloadedWithProxy = false;
+            const proxyServer = createProxyServer(() => {
+                // We are here for each http request
+                cliDownloadedWithProxy = true;
+            }).listen(8000);
+            let proxiedArtifactoryUtils = require("artifactory-tasks-utils");
+            proxiedArtifactoryUtils.createCliDirs();
+            proxiedArtifactoryUtils.downloadCli(3).then(() => {
+                proxyServer.close();
+                process.env.http_proxy = "";
+                done(cliDownloadedWithProxy ? "" : new Error("CLI downloaded without using the proxy server."));
+            });
+        }, false, true);
 
         runTest("Cli join", () => {
             assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u"), "jfrog rt u");
@@ -366,18 +385,37 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
  * Run a test using mocha suit.
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean) - If should skip the test
+ * @param skip (Boolean) - True if should skip the test
+ * @param async (Boolean) - True if test is async
  */
-function runTest(description, testFunc, skip) {
+function runTest(description, testFunc, skip, async) {
     if (skip) {
         it.skip(description);
         return;
     }
 
     it(description, (done) => {
-        testFunc();
-        done();
+        async ? asyncTest(testFunc, done) : syncTest(testFunc, done);
     }).timeout(300000); // 5 minutes
+}
+
+/**
+ * Run a test synchronously by calling the test function and 'done'.
+ * @param testFunc (Function) - The test logic
+ * @param done (Function) - Ends the test
+ */
+function syncTest(testFunc, done) {
+    testFunc();
+    done();
+}
+
+/**
+ * Run a test asynchronously by passing 'done' functor to the test function.
+ * @param testFunc (Function) - The test logic
+ * @param done (Function) - Ends the test
+ */
+function asyncTest(testFunc, done) {
+    testFunc(done);
 }
 
 /**

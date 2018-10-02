@@ -60,7 +60,7 @@ module.exports = {
 function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
-    tl.setVariable("Agent.WorkFolder", "");
+    tl.setVariable("Agent.WorkFolder", testDataDir);
     deleteTestRepositories();
     createTestRepositories();
     recreateTestDataDir();
