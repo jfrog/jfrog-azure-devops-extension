@@ -2,16 +2,23 @@ const tmrm = require('vsts-task-lib/mock-run');
 const tl = require('vsts-task-lib/task');
 const path = require('path');
 const fs = require('fs');
-const rmdir = require('rmdir-recursive');
-const execSync = require('child_process').execSync;
+const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
+let artifactoryDockerDomain = process.env.VSTS_ARTIFACTORY_DOCKER_DOMAIN;
+let artifactoryDockerRepo = process.env.VSTS_ARTIFACTORY_DOCKER_REPO;
+let skipTests = process.env.VSTS_ARTIFACTORY_SKIP_TESTS ? process.env.VSTS_ARTIFACTORY_SKIP_TESTS.split(',') : [];
 
 module.exports = {
     testDataDir: testDataDir,
+    artifactoryDockerDomain: artifactoryDockerDomain,
+    artifactoryDockerRepo: artifactoryDockerRepo,
+    artifactoryUrl: artifactoryUrl,
+    artifactoryPassword: artifactoryPassword,
+    artifactoryUsername: artifactoryUsername,
 
     repoKey1: "vsts-extension-test-repo1",
     repoKey2: "vsts-extension-test-repo2",
@@ -23,8 +30,11 @@ module.exports = {
     npmLocalRepoKey: "vsts-npm-local-test",
     npmRemoteRepoKey: "vsts-npm-remote-test",
     npmVirtualRepoKey: "vsts-npm-virtual-test",
+    repoConan: "vsts-conan-local",
 
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
+    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
+    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
     download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
     maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
@@ -43,9 +53,8 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
-    fixWinPath: fixWinPath,
-    execCli: execCli,
-    cleanUpAllTests: cleanUpAllTests
+    cleanUpAllTests: cleanUpAllTests,
+    isSkipTest: isSkipTest
 };
 
 function initTests() {
@@ -73,18 +82,9 @@ function runTask(testMain, variables, inputs) {
     tmr.run();
 }
 
-function execCli(command) {
-    command = fixWinPath(command);
-    try {
-        execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
-    } catch (ex) {
-        console.error("Command failed", "jfrog " + command);
-    }
-}
-
 function recreateTestDataDir() {
     if (fs.existsSync(testDataDir)) {
-        rmdir.sync(testDataDir);
+        rimraf.sync(testDataDir);
     }
     fs.mkdirSync(testDataDir);
 }
@@ -107,7 +107,11 @@ function deleteBuild(buildName) {
 
 function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
-        rmdir.sync(testDataDir);
+        rimraf(testDataDir, (err) => {
+            if (err) {
+                console.warn("Tests cleanup issue: " + err)
+            }
+        });
     }
     deleteTestRepositories();
 }
@@ -122,6 +126,7 @@ function createTestRepositories() {
     createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
+    createRepo(module.exports.repoConan, JSON.stringify({rclass: "local", packageType: "conan"}));
 }
 
 function deleteTestRepositories() {
@@ -134,6 +139,7 @@ function deleteTestRepositories() {
     deleteRepo(module.exports.npmVirtualRepoKey);
     deleteRepo(module.exports.npmLocalRepoKey);
     deleteRepo(module.exports.npmRemoteRepoKey);
+    deleteRepo(module.exports.repoConan);
 }
 
 function createRepo(repoKey, body) {
@@ -243,8 +249,6 @@ function isWindows() {
     return process.platform.startsWith("win");
 }
 
-function fixWinPath(path) {
-    if (isWindows()) {
-        return path.replace(/(\\)/g, "\\\\")
-    }
+function isSkipTest(skipValue) {
+    return skipTests.indexOf(skipValue) !== -1;
 }

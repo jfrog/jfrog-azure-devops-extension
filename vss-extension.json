@@ -2,7 +2,7 @@
     "manifestversion": 1,
     "public": true,
     "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "name": "JFrog Artifactory",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "JFrog",
@@ -191,6 +191,26 @@
             "properties": {
                 "name": "tasks/ArtifactoryPublishBuildInfo"
             }
+        },
+        {
+            "id": "artifactory-docker",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryDocker"
+            }
+        },
+        {
+            "id": "artifactory-conan-build-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryConan"
+            }
         }
     ],
     "files": [
@@ -230,6 +250,12 @@
         },
         {
             "path": "tasks/ArtifactoryPublishBuildInfo"
+        },
+        {
+            "path": "tasks/ArtifactoryDocker"
+        },
+        {
+            "path": "tasks/ArtifactoryConan"
         }
     ]
 }

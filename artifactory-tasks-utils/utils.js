@@ -1,4 +1,3 @@
-const os = require('os');
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
 const crypto = require('crypto');
@@ -9,7 +8,7 @@ const execSync = require('child_process').execSync;
 const fileName = getCliExecutableName();
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.19.1";
+const jfrogCliVersion = "1.20.1";
 const versionedCliPath = encodePath(path.join(jfrogFolderPath, jfrogCliVersion, fileName)); // Path that depends on jfrog-cli version. The default behaviour.
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
@@ -29,9 +28,11 @@ module.exports = {
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
+    validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
-    collectEnvIfRequested: collectEnvIfRequested
+    collectEnvIfRequested: collectEnvIfRequested,
+    isToolExists: isToolExists
 };
 
 function executeCliTask(runTaskFunc) {
@@ -178,7 +179,7 @@ function downloadCli(attemptNumber) {
                 let trimmedChecksum = rawChecksum.split(',')[0];
                 if (hex === trimmedChecksum) {
                     fs.move(cliTmpPath, versionedCliPath).then(() => {
-                        if (!process.platform.startsWith("win")) {
+                        if (!isWindows()) {
                             fs.chmodSync(versionedCliPath, 0o555);
                         }
                         console.log("Finished downloading jfrog cli.");
@@ -211,29 +212,27 @@ function getArchitecture() {
 
 function getCliExecutableName() {
     let executable = "jfrog";
-    if (process.platform.startsWith("win")) {
+    if (isWindows()) {
         executable += ".exe"
     }
     return executable
 }
 
 /**
- * Escape single backslashes in fileSpec.
+ * Escape single backslashes in a string.
  * / -> //
  * // -> //
- * @param fileSpec (String) - The file spec to escape
- * @returns fileSpec (String) - The file spec after escaping
+ * @param string (String) - The string to escape
+ * @returns (String) - The string after escaping
  */
-function fixWindowsPaths(fileSpec) {
-    if (os.type() === "Windows_NT") {
-        fileSpec = fileSpec.replace(/([^\\])\\(?!\\)/g, '$1\\\\');
-        validateSpecWithoutRegex(fileSpec);
-        return fileSpec
-    }
-    return fileSpec;
+function fixWindowsPaths(string) {
+    return isWindows() ? string.replace(/([^\\])\\(?!\\)/g, '$1\\\\') : string;
 }
 
 function validateSpecWithoutRegex(fileSpec) {
+    if (!isWindows()) {
+        return;
+    }
     let files = JSON.parse(fileSpec)["files"];
     for (const file of Object.keys(files)) {
         let values = files[file];
@@ -289,4 +288,12 @@ function collectEnvIfRequested(cliPath, buildDefinition, buildNumber, workDir) {
         let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
         return executeCliCommand(cliEnvVarsCommand, workDir);
     }
+}
+
+function isWindows() {
+    return process.platform.startsWith("win");
+}
+
+function isToolExists(toolName) {
+    return !!tl.which(toolName, false);
 }

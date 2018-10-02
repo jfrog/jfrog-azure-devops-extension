@@ -7,12 +7,24 @@ const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
+const execSync = require('child_process').execSync;
+let tasksOutput;
+const conanutils = require("../tasks/ArtifactoryConan/conanUtils");
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
     before(() => {
+        // Validate environment variables exist for tests
+        assert(testUtils.artifactoryUrl, "Tests are missing environment variable: VSTS_ARTIFACTORY_URL");
+        assert(testUtils.artifactoryUsername, "Tests are missing environment variable: VSTS_ARTIFACTORY_USERNAME");
+        assert(testUtils.artifactoryPassword, "Tests are missing environment variable: VSTS_ARTIFACTORY_PASSWORD");
+
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
+    });
+
+    beforeEach(() => {
+        tasksOutput = "";
     });
 
     after(() => {
@@ -30,40 +42,40 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         });
 
         runTest("Cli join", () => {
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u"), "jfrog rt u");
-            assert.equal(jfrogUtils.cliJoin("jfrog"), "jfrog");
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a/b/c", "a/b/c"), "jfrog rt u a/b/c a/b/c");
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\b\c", "a\b\c"), "jfrog rt u a\b\c a\b\c");
-            assert.equal(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\\b\c\\", "a\\b\c\\"), "jfrog rt u a\\b\c\\ a\\b\c\\");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u"), "jfrog rt u");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog"), "jfrog");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a/b/c", "a/b/c"), "jfrog rt u a/b/c a/b/c");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\b\c", "a\b\c"), "jfrog rt u a\b\c a\b\c");
+            assert.strictEqual(jfrogUtils.cliJoin("jfrog", "rt", "u", "a\\b\c\\", "a\\b\c\\"), "jfrog rt u a\\b\c\\ a\\b\c\\");
         });
 
         runTest("Fix windows paths", () => {
             let specBeforeFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specBeforeFix.json"), "utf8");
             let expectedSpecAfterFix = fs.readFileSync(path.join(__dirname, "resources", "fixWindowsPaths", "specAfterFix.json"), "utf8");
             let specAfterFix = jfrogUtils.fixWindowsPaths(specBeforeFix);
-            assert.equal(specAfterFix, testUtils.isWindows() ? expectedSpecAfterFix : specBeforeFix, "\nSpec after fix:\n" + specAfterFix);
+            assert.strictEqual(specAfterFix, testUtils.isWindows() ? expectedSpecAfterFix : specBeforeFix, "\nSpec after fix:\n" + specAfterFix);
         });
 
         runTest("Encode paths", () => {
             if (testUtils.isWindows()) {
-                assert.equal(jfrogUtils.encodePath("dir1\\dir 2\\dir 3"), "dir1\\\"dir 2\"\\\"dir 3\"");
-                assert.equal(jfrogUtils.encodePath("dir 1\\dir2\\a b.txt"), "\"dir 1\"\\dir2\\\"a b.txt\"");
-                assert.equal(jfrogUtils.encodePath("dir1\\dir2\\a.txt"), "dir1\\dir2\\a.txt");
-                assert.equal(jfrogUtils.encodePath("dir1\\"), "dir1\\");
-                assert.equal(jfrogUtils.encodePath("dir1"), "dir1");
-                assert.equal(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir1\\dir 2\\dir 3"), "dir1\\\"dir 2\"\\\"dir 3\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1\\dir2\\a b.txt"), "\"dir 1\"\\dir2\\\"a b.txt\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir1\\dir2\\a.txt"), "dir1\\dir2\\a.txt");
+                assert.strictEqual(jfrogUtils.encodePath("dir1\\"), "dir1\\");
+                assert.strictEqual(jfrogUtils.encodePath("dir1"), "dir1");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
                 // Avoid double encoding
-                assert.equal(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
             } else {
-                assert.equal(jfrogUtils.encodePath("dir1/dir 2/dir 3"), "dir1/\"dir 2\"/\"dir 3\"");
-                assert.equal(jfrogUtils.encodePath("dir 1/dir2/a b.txt"), "\"dir 1\"/dir2/\"a b.txt\"");
-                assert.equal(jfrogUtils.encodePath("dir1/dir2/a.txt"), "dir1/dir2/a.txt");
-                assert.equal(jfrogUtils.encodePath("dir1/"), "dir1/");
-                assert.equal(jfrogUtils.encodePath("dir1"), "dir1");
-                assert.equal(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
-                assert.equal(jfrogUtils.encodePath("/dir1"), "/dir1");
+                assert.strictEqual(jfrogUtils.encodePath("dir1/dir 2/dir 3"), "dir1/\"dir 2\"/\"dir 3\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1/dir2/a b.txt"), "\"dir 1\"/dir2/\"a b.txt\"");
+                assert.strictEqual(jfrogUtils.encodePath("dir1/dir2/a.txt"), "dir1/dir2/a.txt");
+                assert.strictEqual(jfrogUtils.encodePath("dir1/"), "dir1/");
+                assert.strictEqual(jfrogUtils.encodePath("dir1"), "dir1");
+                assert.strictEqual(jfrogUtils.encodePath("dir 1"), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("/dir1"), "/dir1");
                 // Avoid double encoding
-                assert.equal(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
+                assert.strictEqual(jfrogUtils.encodePath("\"dir 1\""), "\"dir 1\"");
             }
         });
 
@@ -74,25 +86,25 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
                     assert(arch.startsWith("linux"));
                     break;
                 case "Darwin":
-                    assert.equal(arch, "mac-386");
+                    assert.strictEqual(arch, "mac-386");
                     break;
                 case "Windows_NT":
-                    assert.equal(arch, "windows-amd64");
+                    assert.strictEqual(arch, "windows-amd64");
                     break;
                 default:
                     assert.fail("Unsupported OS found: " + os.type());
             }
         });
 
-        runTest("npm - Determine cli workdir", () => {
+        runTest("Npm - determine cli workdir", () => {
             if (testUtils.isWindows()) {
-                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
-                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
-                assert.equal(determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
+                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
+                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
+                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
             } else {
-                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
-                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
-                assert.equal(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
+                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
+                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
+                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
             }
         });
     });
@@ -105,7 +117,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), testDir);
         });
 
-        runTest("Upload and Download From File", () => {
+        runTest("Upload and download from file", () => {
             let testDir = "uploadAndDownloadFromFile";
             mockTask(testDir, "upload");
             mockTask(testDir, "download");
@@ -124,7 +136,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), testDir);
         });
 
-        runTest("Include Environment Variables", () => {
+        runTest("Include environment variables", () => {
             let testDir = "includeEnv";
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
@@ -215,7 +227,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
             getAndAssertBuild("npmTest", "1");
             deleteBuild("npmTest");
-        });
+        }, testUtils.isSkipTest("npm"));
     });
 
     describe("Maven Tests", () => {
@@ -227,43 +239,159 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
             getAndAssertBuild("Maven", "3");
             deleteBuild("Maven");
-        });
+        }, testUtils.isSkipTest("maven"));
     });
 
     describe("NuGet Tests", () => {
-        if (testUtils.isWindows()) {
-            runTest("NuGet restore", () => {
-                let testDir = "nuget";
-                // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
-                assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
-                mockTask(testDir, "restore");
-                mockTask(testDir, "publish");
-                getAndAssertBuild("NuGet", "3");
-                deleteBuild("NuGet");
-            });
-            runTest("NuGet push", () => {
-                let testDir = "nuget";
-                // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
-                assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
-                mockTask(testDir, "push");
-                mockTask(testDir, "publish");
-                mockTask(testDir, "download");
-                assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
-                getAndAssertBuild("NuGet", "3");
-                deleteBuild("NuGet");
-            });
-        } else {
-            console.log("Skipping NuGet tests");
-        }
+        runTest("NuGet restore", () => {
+            let testDir = "nuget";
+            // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
+            assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+            mockTask(testDir, "restore");
+            mockTask(testDir, "publish");
+            getAndAssertBuild("NuGet", "3");
+            deleteBuild("NuGet");
+        }, testUtils.isSkipTest("nuget"));
+        runTest("NuGet push", () => {
+            let testDir = "nuget";
+            // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
+            assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+            mockTask(testDir, "push");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
+            getAndAssertBuild("NuGet", "3");
+            deleteBuild("NuGet");
+        }, testUtils.isSkipTest("nuget"));
     });
+
+    describe("Docker Tests", () => {
+        runTest("Docker push", () => {
+            assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
+            assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");
+
+            let testDir = "docker";
+            let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
+            // Run docker build + tag
+            execSync("docker build -t " + testUtils.artifactoryDockerDomain + "/docker-test:1 " + path.join(__dirname, "resources", testDir, filesDir));
+            // run docker push
+            mockTask(testDir, "push");
+            mockTask(testDir, "publish");
+            getAndAssertBuild("dockerTest", "1");
+            deleteBuild("dockerTest");
+        }, testUtils.isSkipTest("docker"))
+    });
+
+    describe("Conan Task Tests", () => {
+        runTest("Conan Custom Command", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommand");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Custom Command With Working Dir", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommandWithWorkingDir");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Custom Invalid Command", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomInvalidCommand", true);
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Custom Command With Build Info", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommandWithBuildInfo");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Add Remote", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Add Remote With Purge", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemoteWithPurge");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Create And Upload", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+            mockTask(testDir, "conanCreate");
+            mockTask(testDir, "conanUpload");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Create And Upload in Release", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+            mockTask(testDir, "conanCreate");
+            mockTask(testDir, "conanUploadInRelease");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Install", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanInstall");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Add Config", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanConfigInstall");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Publish Build Info", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+            mockTask(testDir, "conanCreate");
+            mockTask(testDir, "conanUpload");
+            mockTask(testDir, "publishBuildInfo");
+            getAndAssertBuild("conanTask", "1");
+            deleteBuild("conanTask");
+        }, testUtils.isSkipTest("conan"));
+    });
+
+    describe("Conan Utils Tests", () => {
+        /**
+         * This test created to ensure the equality of the created by the CLI build partials and the provided by
+         * getCliPartialsBuildDir method paths.
+         */
+        runTest("Get Cli Partials Build Dir", () => {
+            const testDTO = {
+                testBuildNumber: "777",
+                testsBuildNames: [
+                    "simpleJFrogTestNameExample",
+                    "Some-Special-Chars+:#$%\\/dè<>"
+                ]
+            };
+            // Cleanup old partials
+            testDTO.testsBuildNames.forEach(element => runBuildCommand("bc", element, testDTO.testBuildNumber));
+            // Create new partials using "Build Collect Env" command
+            testDTO.testsBuildNames.forEach(element => runBuildCommand("bce", element, testDTO.testBuildNumber));
+            // Assert the partials created at the generated by getCliPartialsBuildDir() path
+            testDTO.testsBuildNames.forEach(element =>
+                assertPathExists(conanutils.getCliPartialsBuildDir(element, testDTO.testBuildNumber))
+            );
+            // Cleanup the created partials
+            testDTO.testsBuildNames.forEach(element => runBuildCommand("bc", element, testDTO.testBuildNumber));
+        }, testUtils.isSkipTest("conan"));
+    });
+
+    function runBuildCommand(command, buildName, buildNumber) {
+        jfrogUtils.executeCliCommand("jfrog rt " + command + " \"" + buildName + "\" " + buildNumber);
+    }
 });
+
 
 /**
  * Run a test using mocha suit.
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
+ * @param skip (Boolean) - If should skip the test
  */
-function runTest(description, testFunc) {
+function runTest(description, testFunc, skip) {
+    if (skip) {
+        it.skip(description);
+        return;
+    }
+
     it(description, (done) => {
         testFunc();
         done();
@@ -280,7 +408,8 @@ function mockTask(testDir, taskName, isNegative) {
     let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
     let mockRunner = new vstsMockTest.MockTestRunner(taskPath);
     mockRunner.run(); // Mock a test
-    assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + "\n" + mockRunner.stdout); // Check the test results
+    tasksOutput += mockRunner.stderr + "\n" + mockRunner.stdout;
+    assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + ".\n" + tasksOutput); // Check the test results
 }
 
 /**
@@ -298,7 +427,7 @@ function assertFiles(expectedFiles, resultFiles) {
         for (let i = 0; i < files.length; i++) {
             let fileName = path.basename(files[i]);
             let fileToCheck = path.join(testData, fileName);
-            assert(fs.existsSync(fileToCheck), fileToCheck + " does not exist");
+            assert(fs.existsSync(fileToCheck), fileToCheck + " does not exist.\n" + tasksOutput);
             filesToCheck.push(fileName);
         }
     }
@@ -310,7 +439,7 @@ function assertFiles(expectedFiles, resultFiles) {
     let files = fs.readdirSync(testData);
     for (let i = 0; i < files.length; i++) {
         let fileName = path.basename(files[i]);
-        assert(filesToCheck.indexOf(fileName) >= 0, fileName + " should not exist");
+        assert(filesToCheck.indexOf(fileName) >= 0, fileName + " should not exist.\n" + tasksOutput);
     }
 }
 
@@ -333,7 +462,8 @@ function getAndAssertBuild(buildName, buildNumber) {
  */
 function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
-    assert.equal(body["buildInfo"]["properties"][key], value);
+    let actual = body["buildInfo"]["properties"][key];
+    assert.strictEqual(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
 }
 
 function assertBuildUrl(build, url) {
@@ -342,9 +472,13 @@ function assertBuildUrl(build, url) {
 }
 
 function assertBuild(build, buildName, buildNumber) {
-    assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory");
+    assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory.\n" + tasksOutput);
 }
 
 function deleteBuild(buildName) {
     testUtils.deleteBuild(buildName);
+}
+
+function assertPathExists(path) {
+    assert(fs.existsSync(path), path + " should exist!");
 }

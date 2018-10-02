@@ -1,0 +1,210 @@
+{
+    "id": "2b8ef770-9bc6-4394-aa81-197d0759e9c8",
+    "name": "ArtifactoryConan",
+    "friendlyName": "Artifactory Conan",
+    "description": "This task runs a Conan command.",
+    "author": "JFrog",
+    "helpMarkDown": "Run Conan command.",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "2",
+        "Patch": "0"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "Conan $(conanCommand)",
+    "groups": [
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "conanCommand",
+            "type": "pickList",
+            "label": "Conan Command",
+            "defaultValue": "",
+            "options": {
+                "Config Install": "Config Install",
+                "Add Remote": "Add Remote",
+                "Install": "Install",
+                "Create": "Create",
+                "Upload": "Upload",
+                "Custom": "Custom"
+            },
+            "required": true,
+            "helpMarkDown": "The conan command to be run by this task."
+        },
+        {
+            "name": "remoteName",
+            "type": "string",
+            "label": "Conan Remote Name",
+            "visibleRule": "conanCommand = Add Remote",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Alias that can be used to reference this Conan remote repository."
+        },
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory Service",
+            "visibleRule": "conanCommand = Add Remote",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used by this remote configuration."
+        },
+        {
+            "name": "conanRepo",
+            "type": "pickList",
+            "label": "Conan Repository",
+            "visibleRule": "conanCommand = Add Remote",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Conan repository used by this remote configuration.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "purgeExistingRemotes",
+            "type": "boolean",
+            "label": "Purge Existing Remotes",
+            "visibleRule": "conanCommand = Add Remote",
+            "defaultValue": "false",
+            "required": true,
+            "helpMarkDown": "Purge existing remotes before adding this new one."
+        },
+        {
+            "name": "configSourceType",
+            "type": "radio",
+            "label": "Source Type",
+            "visibleRule": "conanCommand = Config Install",
+            "required": true,
+            "defaultValue": "zip",
+            "helpMarkDown": "Source type of the configuration file to use.",
+            "options": {
+                "zip": "Zip",
+                "git": "Git"
+            }
+        },
+        {
+            "name": "configZipPath",
+            "type": "string",
+            "label": "Zip File location",
+            "visibleRule": "conanCommand = Config Install && configSourceType = zip",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "Path or URL to configuration zip file to be installed."
+        },
+        {
+            "name": "configInstallGit",
+            "type": "string",
+            "label": "Git Repository URL",
+            "visibleRule": "conanCommand = Config Install && configSourceType = git",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "Path to configuration on Git to be installed."
+        },
+        {
+            "name": "pathOrReference",
+            "type": "string",
+            "label": "Path or Reference",
+            "visibleRule": "conanCommand = Install",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "Path to a folder containing a recipe (conanfile.py or conanfile.txt) or to a recipe file. e.g., ./my_project/conanfile.txt. It could also be a reference."
+        },
+        {
+            "name": "patternOrReference",
+            "type": "string",
+            "label": "Pattern or Reference",
+            "visibleRule": "conanCommand = Upload",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "Pattern or package recipe reference, e.g., boost/*, MyPackage/1.2@user/channel."
+        },
+        {
+            "name": "createPath",
+            "type": "filePath",
+            "label": "Path",
+            "visibleRule": "conanCommand = Create",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "Path to a folder containing a conanfile.py or to a recipe file e.g., my_folder/conanfile.py."
+        },
+        {
+            "name": "createReference",
+            "type": "string",
+            "label": "Reference",
+            "visibleRule": "conanCommand = Create",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "user/channel or pkg/version@user/channel (if name and version not declared in conanfile.py) where the package will be created."
+        },
+        {
+            "name": "extraArguments",
+            "type": "string",
+            "label": "Conan arguments and options",
+            "visibleRule": "conanCommand = Config Install || conanCommand = Install || conanCommand = Upload || conanCommand = Create",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "Conan command extra arguments and options."
+        },
+        {
+            "name": "customArguments",
+            "type": "string",
+            "label": "Conan command to execute",
+            "visibleRule": "conanCommand = Custom",
+            "required": true,
+            "defaultValue": "",
+            "helpMarkDown": "Conan command with options and arguments."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "visibleRule": "conanCommand = Install || conanCommand = Upload || conanCommand = Create || conanCommand = Custom",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "Select to collect build info."
+        },
+        {
+            "name": "conanUserHome",
+            "type": "string",
+            "label": "Conan User Home",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Conan User Home folder location. The default values for build and release pipelines are $(Agent.WorkFolder)/$(System.DefinitionId)/$(Build.BuildId) and $(Agent.WorkFolder)/$(Build.DefinitionId)/$(Build.BuildId) respectively.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory.",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advanced"
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "conanRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "conanBuild.js"
+        }
+    }
+}
