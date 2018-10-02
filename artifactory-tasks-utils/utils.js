@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const path = require('path');
 const request = require('request-promise-lite');
 const execSync = require('child_process').execSync;
+require('proxy-support'); // Replaces globalAgent with tunnel-agent
 
 const fileName = getCliExecutableName();
 const btPackage = "jfrog-cli-" + getArchitecture();
@@ -22,6 +23,8 @@ let runTaskCbk = null;
 module.exports = {
     executeCliTask: executeCliTask,
     executeCliCommand: executeCliCommand,
+    createCliDirs: createCliDirs,
+    downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
     addArtifactoryCredentials: addArtifactoryCredentials,
