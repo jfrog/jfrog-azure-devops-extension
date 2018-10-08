@@ -14,6 +14,10 @@ node {
         '''
     }
 
+    stage('Merge to master') {
+        sh("git merge origin/dev")
+    }
+    
     stage ('Create extension') {
         sh '''#!/bin/bash
             set -euxo pipefail
