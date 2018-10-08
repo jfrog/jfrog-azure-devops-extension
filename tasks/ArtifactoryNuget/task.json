@@ -13,10 +13,9 @@
     "version": {
         "Major": "1",
         "Minor": "2",
-        "Patch": "0"
+        "Patch": "1"
     },
-    "demands": [
-    ],
+    "demands": [],
     "minimumAgentVersion": "2.115.0",
     "instanceNameFormat": "Artifactory NuGet $(command)",
     "groups": [
