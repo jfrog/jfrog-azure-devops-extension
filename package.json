@@ -11,6 +11,6 @@
         "install": "node buildScripts/build.js",
         "create": "npm i && tfx extension create",
         "test": "npm i && npm t --prefix=tests",
-        "publish-private": "npm i && buildScripts/publish-private.sh"
+        "publish-private": "npm i && bash buildScripts/publish-private.sh"
     }
 }
