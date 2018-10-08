@@ -17,7 +17,11 @@ node {
     stage('Merge to master') {
         sh("git merge origin/dev")
     }
-    
+
+    stage ('Bump version') {
+        sh("node-v${NPM_VERSION}-linux-x64/bin/node buildScripts/bump-version.js -v ${VSTS_ARTIFACTORY_VERSION}")
+    }
+
     stage ('Create extension') {
         sh '''#!/bin/bash
             set -euxo pipefail
@@ -29,24 +33,37 @@ node {
         '''
     }
 
-    stage ('Bump version') {
-        sh("node-v${NPM_VERSION}-linux-x64/bin/node buildScripts/bump-version.js -v ${VSTS_ARTIFACTORY_VERSION}")
-    }
-
     stage('Commit release version') {
         sh("git commit -am '[artifactory-release] Release version ${VSTS_ARTIFACTORY_VERSION}'")
     }
 
-    stage('Push changes') {
-        sh("git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/jfrog/artifactory-vsts-extension.git 2>&1 | grep -v http")
+    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: '$GITHUB_PASSWORD', var: 'SECRET']]]) {
+        stage('Push changes') {
+            sh("git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/jfrog/artifactory-vsts-extension.git")
+        }
+
+        stage('Create tag') {
+            sh("git tag '${VSTS_ARTIFACTORY_VERSION}'")
+            sh("git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/jfrog/artifactory-vsts-extension.git --tags")
+        }
+
+        stage('Merge to dev') {
+            sh '''#!/bin/bash
+                set -euxo pipefail
+                git checkout dev
+                git merge origin/master
+                git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/jfrog/artifactory-vsts-extension.git
+            '''
+        }
     }
 
     stage('Publish extension') {
-        sh("tfx extension publish -t ${VSTS_PUBLISHER_API_KEY}")
-    }
-
-    stage('Create tag') {
-        sh("git tag '${VSTS_ARTIFACTORY_VERSION}'")
-        sh("git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/jfrog/artifactory-vsts-extension.git --tags 2>&1 | grep -v http")
+        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: '$VSTS_PUBLISHER_API_KEY', var: 'SECRET']]]) {
+            sh '''#!/bin/bash
+                set -euxo pipefail
+                export PATH="${PWD}/node-v${NPM_VERSION}-linux-x64/bin:${PATH}"
+                tfx extension publish -t ${VSTS_PUBLISHER_API_KEY}
+            '''
+        }
     }
 }
