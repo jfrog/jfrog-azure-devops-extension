@@ -2,6 +2,7 @@
     "name": "artifactory-publish-buildinfo",
     "version": "1.0.0",
     "author": "JFrog",
+    "private": true,
     "license": "Apache-2.0",
     "description": "This task publishes the Build Info collected in previous tasks.",
     "main": "publishBuildInfo.js",

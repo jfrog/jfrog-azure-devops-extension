@@ -2,6 +2,7 @@
     "name": "artifactory-vsts-extension",
     "version": "1.0.0",
     "author": "JFrog",
+    "private": true,
     "license": "Apache-2.0",
     "dependencies": {
         "tfx-cli": "^0.6.1"

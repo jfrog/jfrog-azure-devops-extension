@@ -39,5 +39,5 @@ function clean(cwd) {
  */
 function cleanExecNpm(command, cwd) {
     clean(cwd);
-    exec('npm ' + command, {cwd: cwd, stdio: [0, 1, 2]});
+    exec('npm ' + command + ' -q', {cwd: cwd, stdio: [0, 1, 2]});
 }

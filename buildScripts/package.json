@@ -2,6 +2,7 @@
     "name": "build-scripts",
     "version": "1.0.0",
     "author": "JFrog",
+    "private": true,
     "license": "Apache-2.0",
     "dependencies": {
         "edit-json-file": "^1.1.0",

@@ -2,6 +2,7 @@
     "name": "artifactory-generic-download",
     "version": "1.0.0",
     "author": "JFrog",
+    "private": true,
     "license": "Apache-2.0",
     "description": "This task downloads artifacts from Artifactory.",
     "main": "downloadArtifacts.js",
