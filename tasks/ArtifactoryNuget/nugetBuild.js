@@ -97,12 +97,6 @@ function runNuGet(nugetCommandCli, cliPath, buildDir) {
 
     if (collectBuildInfo) {
         nugetCommandCli = utils.cliJoin(nugetCommandCli, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
-        // Collect env vars
-        let taskRes = utils.collectEnvIfRequested(cliPath, buildDefinition, buildNumber, buildDir);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-            return;
-        }
     }
 
     nugetCommandCli = addArtifactoryServer(nugetCommandCli);
