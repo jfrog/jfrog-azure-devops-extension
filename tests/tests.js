@@ -43,19 +43,15 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         });
 
         runTest("Download JFrog CLI through a proxy", (done) => {
-            delete require.cache[require.resolve('artifactory-tasks-utils')];
-            delete require.cache[require.resolve('proxy-support')];
-            process.env.http_proxy = 'http://localhost:8000';
+            process.env.HTTP_PROXY = 'http://localhost:8000';
             let cliDownloadedWithProxy = false;
             const proxyServer = createProxyServer(() => {
                 // We are here for each http request
                 cliDownloadedWithProxy = true;
             }).listen(8000);
-            let proxiedArtifactoryUtils = require("artifactory-tasks-utils");
-            proxiedArtifactoryUtils.createCliDirs();
-            proxiedArtifactoryUtils.downloadCli(3).then(() => {
+            jfrogUtils.downloadCli().then(() => {
                 proxyServer.close();
-                process.env.http_proxy = "";
+                process.env.HTTP_PROXY = "";
                 done(cliDownloadedWithProxy ? "" : new Error("CLI downloaded without using the proxy server"));
             });
         }, false, true);

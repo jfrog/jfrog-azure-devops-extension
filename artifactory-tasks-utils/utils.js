@@ -1,19 +1,16 @@
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
-const crypto = require('crypto');
 const path = require('path');
-const request = require('request-promise-lite');
 const execSync = require('child_process').execSync;
-require('proxy-support'); // Replaces globalAgent with tunnel-agent
+const toolLib = require('vsts-task-tool-lib/tool');
 
 const fileName = getCliExecutableName();
+const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
 const jfrogCliVersion = "1.20.1";
-const versionedCliPath = encodePath(path.join(jfrogFolderPath, jfrogCliVersion, fileName)); // Path that depends on jfrog-cli version. The default behaviour.
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
-const MAX_CLI_DOWNLOADS_RETRIES = 10;
 const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +
     ". If this build agent cannot access the internet, you can manually download version " + jfrogCliVersion +
     " of JFrog CLI and place it on the agent in the following path: " + customCliPath;
@@ -23,7 +20,6 @@ let runTaskCbk = null;
 module.exports = {
     executeCliTask: executeCliTask,
     executeCliCommand: executeCliCommand,
-    createCliDirs: createCliDirs,
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
@@ -51,15 +47,17 @@ function executeCliTask(runTaskFunc) {
 function getCliPath() {
     return new Promise(
         function (resolve, reject) {
+            let cliDir = toolLib.findLocalTool(toolName, jfrogCliVersion);
             if (fs.existsSync(customCliPath)) {
                 tl.debug("Using cli from custom cli path: " + customCliPath);
                 resolve(customCliPath);
-            } else if (fs.existsSync(versionedCliPath)) {
-                tl.debug("Using existing versioned cli path: " + versionedCliPath);
-                resolve(versionedCliPath);
+            } else if (cliDir) {
+                let cliPath = path.join(cliDir, fileName);
+                tl.debug("Using existing versioned cli path: " + cliPath);
+                resolve(cliPath);
             } else {
                 createCliDirs();
-                return downloadCli(0)
+                return downloadCli()
                     .then((cliPath) => resolve(cliPath))
                     .catch((error) => reject(error));
             }
@@ -146,68 +144,22 @@ function createCliDirs() {
     if (!fs.existsSync(jfrogFolderPath)) {
         fs.mkdirSync(jfrogFolderPath);
     }
-
-    if (!fs.existsSync(path.join(jfrogFolderPath, jfrogCliVersion))) {
-        fs.mkdirSync(path.join(jfrogFolderPath, jfrogCliVersion));
-    }
 }
 
-function downloadCli(attemptNumber) {
+function downloadCli() {
     return new Promise((resolve, reject) => {
-        let handleError = (err) => {
-            if (attemptNumber <= MAX_CLI_DOWNLOADS_RETRIES) {
-                console.warn("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
-                downloadCli(++attemptNumber);
-            } else {
-                console.error(jfrogCliDownloadErrorMessage);
-                reject(err);
-            }
-        };
-
-        const cliTmpPath = encodePath(versionedCliPath + ".tmp");
-
-        // Perform download
-        request.get(jfrogCliDownloadUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
-            // Check valid response
-            if (response.statusCode < 200 || response.statusCode >= 300) {
-                handleError("Received http response code " + response.statusCode);
-            }
-
-            // Write body to file
-            fs.writeFileSync(cliTmpPath, response.body);
-
-            // Validate checksum
-            let stream = fs.createReadStream(cliTmpPath);
-            let digest = crypto.createHash('sha256');
-
-            stream.on('data', function (data) {
-                digest.update(data, 'utf8')
-            });
-
-            stream.on('end', function () {
-                let hex = digest.digest('hex');
-                let rawChecksum = response.headers['x-checksum-sha256'];
-                if (!rawChecksum) {
-                    handleError("Checksum header is missing from http response, cannot validate downloaded JFrog cli.");
+        toolLib.downloadTool(jfrogCliDownloadUrl).then((downloadPath) => {
+            toolLib.cacheFile(downloadPath, fileName, toolName, jfrogCliVersion).then((cliDir) => {
+                let cliPath = path.join(cliDir, fileName);
+                if (!isWindows()) {
+                    fs.chmodSync(cliPath, 0o555);
                 }
-
-                let trimmedChecksum = rawChecksum.split(',')[0];
-                if (hex === trimmedChecksum) {
-                    fs.move(cliTmpPath, versionedCliPath).then(() => {
-                        if (!isWindows()) {
-                            fs.chmodSync(versionedCliPath, 0o555);
-                        }
-                        tl.debug("Finished downloading JFrog cli.");
-                        resolve(versionedCliPath);
-                    });
-                } else {
-                    handleError("Checksum mismatch for downloaded JFrog cli.");
-                }
-            });
+                tl.debug("Finished downloading JFrog cli.");
+                resolve(cliPath);
+            })
         }).catch((err) => {
-            console.error(jfrogCliDownloadErrorMessage);
-            tl.setResult(tl.TaskResult.Failed, err.message);
-        })
+            reject(err);
+        });
     });
 }
 
