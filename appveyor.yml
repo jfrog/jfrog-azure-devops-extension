@@ -22,10 +22,10 @@ environment:
     secure: UjixvF6E1Bp1p8zgPRLCVA==
 
 install:
-- npm i -g jfrog-cli-go
-- npm i -g tfx-cli
-- sh: sudo pip install conan
-- cmd: pip install conan
+- npm i -gq jfrog-cli-go
+- npm i -gq tfx-cli
+- sh: sudo pip install conan -q
+- cmd: pip install conan -q
 
 test_script:
 - node --version

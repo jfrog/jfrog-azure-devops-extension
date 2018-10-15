@@ -5,6 +5,7 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
+const devnull = require('dev-null');
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
@@ -60,6 +61,7 @@ module.exports = {
 function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
+    tl.setStdStream(devnull());
     tl.setVariable("Agent.WorkFolder", testDataDir);
     tl.setVariable("Agent.TempDirectory", testDataDir);
     tl.setVariable("Agent.ToolsDirectory", testDataDir);
