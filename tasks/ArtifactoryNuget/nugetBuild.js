@@ -125,7 +125,7 @@ function execPushCommand(command, cliPath, buildDir) {
     runNuGet(command, cliPath, buildDir);
 }
 
-if (utils.isWindows()) {
+if (!utils.isWindows()) {
     throw new Error("This task currently supports Windows agents only.");
 }
 

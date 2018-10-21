@@ -1,7 +1,6 @@
 const path = require('path');
 const osUtils = require('./osUtils');
 
-
 function joinArgs() {
     let command = "";
     for (let i = 0; i < arguments.length; ++i) {

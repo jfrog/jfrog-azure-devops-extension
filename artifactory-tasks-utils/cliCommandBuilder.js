@@ -24,7 +24,7 @@ class CliCommandBuilder {
 
     /**
      * Adds to the command the flags "url", "user" and "password" according the configured in task artifactoryService endpoint parameter.
-     * If an username is not associated with the artifactoryService, the username will be "anonymous" and no password wil set.
+     * If no username is associated with the artifactoryService, the username will be "anonymous" and no password will be set.
      *
      * @param artifactoryServiceParam the endpoint parameter
      * @returns {CliCommandBuilder} the updated builder

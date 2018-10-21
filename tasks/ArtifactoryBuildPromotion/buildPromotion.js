@@ -1,4 +1,3 @@
-
 const tl = require('vsts-task-lib/task');
 const utils = require('artifactory-tasks-utils');
 const CliCommandBuilder = utils.CliCommandBuilder;

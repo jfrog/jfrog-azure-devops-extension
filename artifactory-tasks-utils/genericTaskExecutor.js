@@ -2,7 +2,6 @@ const tl = require('vsts-task-lib/task');
 const taskUtils = require('./taskUtils');
 const CliCommandBuilder = require('./cliCommandBuilder').CliCommandBuilder;
 const path = require('path');
-
 const CONFIGURATION = {
     'DOWNLOAD': {
         COMMAND: "rt dl",
@@ -15,7 +14,6 @@ const CONFIGURATION = {
 };
 
 class GenericTaskExecutor {
-
     constructor(configuration, cliPath) {
         this.command = configuration.COMMAND;
         this.specName = configuration.SPEC_NAME;
@@ -47,7 +45,7 @@ class GenericTaskExecutor {
             // Remove created fileSpec from file system
             tl.rmRF(specPath);
         } catch (ex) {
-            throw new Error("Failed cleaning temporary FileSpec file: " + ex);
+            throw new Error("Failed removing temporary FileSpec file: " + ex);
         }
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }

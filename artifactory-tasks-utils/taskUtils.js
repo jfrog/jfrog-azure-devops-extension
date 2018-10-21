@@ -159,7 +159,6 @@ function getCliExecutableName() {
     return executable
 }
 
-
 function validateSpecWithoutRegex(fileSpec) {
     if (!osUtils.isWindows()) {
         return;
