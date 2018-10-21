@@ -27,27 +27,28 @@ let workDir = tl.getVariable('System.DefaultWorkingDirectory');
 
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
-
     if (!workDir) {
-        tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
-        return;
+        throw new Error("Failed getting default working directory.");
     }
 
     // Creating the config file for Maven
-    let {config, commandRes} = createMavenConfigFile(cliPath);
-    if (commandRes) {
-        return;
+    let config;
+    try {
+        config = createMavenConfigFile(cliPath);
+    } catch (e) {
+        throw new Error("Maven configuration creation failed: " + e);
     }
-
     // Running Maven command
-    commandRes = execMavenCommand(cliPath, config);
-    if (commandRes) {
-        return;
+    try {
+        execMavenCommand(cliPath, config);
+    } catch (e) {
+        throw new Error("Maven execution failed: " + e);
     }
-
-    commandRes = deleteServer(cliPath, serverIdDeployer, serverIdResolver);
-    if (commandRes) {
-        return;
+    // Deleting Server Configuration
+    try {
+        deleteServer(cliPath, serverIdDeployer, serverIdResolver);
+    } catch (e) {
+        throw new Error("Maven post build cleanup failed: " + e);
     }
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
 }
@@ -72,15 +73,19 @@ function checkAndSetMavenHome() {
 function deleteServer(cliPath, serverIdDeployer, serverIdResolver) {
     // Now we need to delete the server(s):
     // Delete serverIdResolver even if serverIdDeployer delete failed.
-    // Will return at least one failure if one of the delete command fails.
-    let commandRes = doDeleteServer(cliPath, serverIdDeployer);
-    if (serverIdResolver) {
-        let commandRes = doDeleteServer(cliPath, serverIdResolver);
-        if (commandRes) {
-            return commandRes;
+    // Will throw an exception if one of the delete command fails.
+    try {
+        doDeleteServer(cliPath, serverIdDeployer);
+    } catch (e) {
+        // In case of error try to delete the resolver server
+        if (serverIdResolver) {
+            doDeleteServer(cliPath, serverIdResolver);
         }
+        throw new Error(e);
     }
-    return commandRes;
+    if (serverIdResolver) {
+        doDeleteServer(cliPath, serverIdResolver);
+    }
 }
 
 /**
@@ -89,10 +94,11 @@ function deleteServer(cliPath, serverIdDeployer, serverIdResolver) {
  */
 function doDeleteServer(cliPath, serverId) {
     let deleteCommand = new CliCommandBuilder(cliPath)
-        .addArguments(cliConfigCommand, "delete", serverId)
+        .addCommand(cliConfigCommand)
+        .addArguments("delete", serverId)
         .addOption("interactive", "false");
 
-    return utils.executeCliCommand(deleteCommand.build(), workDir);
+    utils.executeCliCommand(deleteCommand.build(), workDir);
 }
 
 function doAddToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
@@ -110,7 +116,7 @@ function configureServer(artifactoryService, serverId, cliPath) {
         .addArtifactoryServerWithCredentials(artifactoryService)
         .addOption("interactive", "false");
 
-    return utils.executeCliCommand(command.build(), workDir);
+    utils.executeCliCommand(command.build(), workDir);
 }
 
 function writeMavenConfigFile(config, cliPath, buildDefinition, buildNumber) {
@@ -120,35 +126,21 @@ function writeMavenConfigFile(config, cliPath, buildDefinition, buildNumber) {
 
     // Configure deployer
     serverIdDeployer = serverId + "-" + CONFIGURATION.DEPLOYMENT.RESPONSIBILITY;
-    let commandRes = addToConfig(CONFIGURATION.DEPLOYMENT, serverIdDeployer);
-    if (commandRes) {
-        return commandRes
-    }
+    addToConfig(CONFIGURATION.DEPLOYMENT, serverIdDeployer);
 
     // Configure resolver
     let artifactoryResolver = tl.getInput("artifactoryResolverService");
     if (artifactoryResolver) {
         serverIdResolver = serverId + "-" + CONFIGURATION.RESOLUTION.RESPONSIBILITY;
-        commandRes = addToConfig(CONFIGURATION.RESOLUTION, serverIdResolver);
-        if (commandRes) {
-            return commandRes
-        }
+        addToConfig(CONFIGURATION.RESOLUTION, serverIdResolver);
     } else {
         console.log("Resolution from Artifactory is not configured");
     }
     console.log(configInfo);
-    try {
-        tl.writeFile(config, configInfo);
-    } catch (ex) {
-        return ex
-    }
+    tl.writeFile(config, configInfo);
 
     function addToConfig(configuration, serverId) {
-        serverId = serverId + "-" + configuration.RESPONSIBILITY;
-        let commandRes = configureServer(configuration.SERVICE_NAME, serverId, cliPath);
-        if (commandRes) {
-            return commandRes
-        }
+        configureServer(configuration.SERVICE_NAME, serverId, cliPath);
         let targetResolveSnapshotRepo = tl.getInput(configuration.TARGET_SNAPSHOT_REPO);
         let targetResolveReleaseRepo = tl.getInput(configuration.TARGET_RELEASE_REPO);
         configInfo = doAddToConfig(configInfo, configuration.RESPONSIBILITY, targetResolveSnapshotRepo, targetResolveReleaseRepo, serverId);
@@ -170,12 +162,8 @@ function createMavenConfigFile(cliPath) {
     let config = path.join(workDir, "config");
     let buildName = utils.getBuildName();
     let buildNumber = utils.getBuildNumber();
-    let commandRes = writeMavenConfigFile(config, cliPath, buildName, buildNumber);
-    if (commandRes) {
-        tl.setResult(tl.TaskResult.Failed, commandRes);
-        deleteServer(cliPath, serverIdDeployer, serverIdResolver);
-    }
-    return {config, commandRes};
+    writeMavenConfigFile(config, cliPath, buildName, buildNumber);
+    return config;
 }
 
 function execMavenCommand(cliPath, config) {
@@ -185,11 +173,16 @@ function execMavenCommand(cliPath, config) {
         .addArguments(goalsAndOptions, config)
         .addBuildFlagsIfRequired();
 
-    let commandRes = utils.executeCliCommand(command.build(), workDir);
-    if (commandRes) {
-        deleteServer(cliPath, serverIdDeployer, serverIdResolver);
+    try {
+        utils.executeCliCommand(command.build(), workDir);
+    } catch (e) {
+        try {
+            deleteServer(cliPath, serverIdDeployer, serverIdResolver);
+        } catch (deleteError) {
+            throw new Error(e + "\n" + deleteError)
+        }
+        throw new Error(e);
     }
-    return commandRes;
 }
 
 utils.executeCliTask(RunTaskCbk);

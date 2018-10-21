@@ -12,6 +12,8 @@ module.exports = {
     executeCliCommand: taskUtils.executeCliCommand,
     prepareFileSpec: taskUtils.prepareFileSpec,
     isToolExists: taskUtils.isToolExists,
+    createCliDirs: taskUtils.createCliDirs,
+    downloadCli: taskUtils.downloadCli,
     joinArgs: stringUtils.joinArgs,
     quote: stringUtils.quote,
     fixWindowsPaths: stringUtils.fixWindowsPaths,

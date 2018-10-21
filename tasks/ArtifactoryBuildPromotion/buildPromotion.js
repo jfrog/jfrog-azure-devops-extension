@@ -21,10 +21,7 @@ function RunTaskCbk(cliPath) {
         .addBoolOptionFromParam("includeDependencies", "include-dependencies")
         .addBoolOptionFromParam("dryRun", "dry-run");
 
-    let taskRes = utils.executeCliCommand(command.build(), process.cwd());
-    if (taskRes) {
-        return;
-    }
+    utils.executeCliCommand(command.build(), process.cwd());
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 

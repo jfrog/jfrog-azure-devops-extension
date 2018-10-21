@@ -8,7 +8,9 @@ const testUtils = require("./testUtils");
 const os = require("os");
 const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
 const execSync = require('child_process').execSync;
+const createProxyServer = require('http-tunneling-proxy');
 let tasksOutput;
+const conanutils = require("../tasks/ArtifactoryConan/conanUtils");
 
 describe("JFrog Artifactory VSTS Extension Tests", () => {
     let jfrogUtils;
@@ -37,10 +39,31 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         runTest("Mask password", () => {
             let oldPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
             process.env.VSTS_ARTIFACTORY_PASSWORD = "SUPER_SECRET";
-            let retVal = jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
+            let retVal;
+            try {
+                jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
+            } catch (e) {
+                retVal = e;
+            }
             process.env.VSTS_ARTIFACTORY_PASSWORD = oldPassword;
+            assert(retVal, "Command error expected but got nothing");
             assert(!retVal.toString().includes("SUPER_SECRET"), "Output contains password");
         });
+
+        runTest("Download JFrog CLI through a proxy", (done) => {
+            process.env.HTTP_PROXY = 'http://localhost:8000';
+            let cliDownloadedWithProxy = false;
+            const proxyServer = createProxyServer(() => {
+                // We are here for each http request
+                cliDownloadedWithProxy = true;
+            }).listen(8000);
+
+            jfrogUtils.downloadCli().then(() => {
+                proxyServer.close();
+                process.env.HTTP_PROXY = "";
+                done(cliDownloadedWithProxy ? "" : new Error("CLI downloaded without using the proxy server"));
+            });
+        }, false, true);
 
         runTest("CliCommandBuilder", () => {
             assert.strictEqual(new CliCommandBuilder("c:\\somefolder\jfrog").build(), "c:\\somefolder\jfrog");
@@ -48,7 +71,6 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             assert.strictEqual(new CliCommandBuilder("jfrog").addCommand("rt c").addOption("foo", "bar").build(), "jfrog \"rt\" \"c\" --foo=\"bar\"");
             assert.strictEqual(new CliCommandBuilder("jfrog").addArguments("foo").build(), "jfrog \"foo\"");
             assert.strictEqual(new CliCommandBuilder("jfrog").addArguments("foo", "bar", "beer").build(), "jfrog \"foo\" \"bar\" \"beer\"");
-
         });
 
         runTest("Join args", () => {
@@ -137,7 +159,6 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);
-            assertFiles(path.join(testDir, "files"), testDir);
         });
 
         runTest("Download fail-no-op", () => {
@@ -176,13 +197,32 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             mockTask(testDir, "upload");
             mockTask(testDir, "publish");
             let build = getAndAssertBuild("excludeEnv", "3");
+
             assertBuildEnv(build, "buildInfo.env.BUILD_DEFINITIONNAME", "excludeEnv");
             assertBuildEnv(build, "buildInfo.env.BUILD_BUILDNUMBER", "3");
             assertBuildEnv(build, "buildInfo.env.BUILD_UNDEFINED", "undefined");
             assertBuildEnv(build, "buildInfo.env.BUILD_NULL", "null");
             assertBuildEnv(build, "buildInfo.env.BUILD_PASSWORD", undefined);
             deleteBuild("excludeEnv");
-        })
+        });
+
+        runTest("Build URL build pipeline", () => {
+            let testDir = "buildUrlBuildPipeline";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            let build = getAndAssertBuild("buildUrlBuildPipeline", "3");
+            assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_build?buildId=5")
+            deleteBuild("buildUrlBuildPipeline");
+        });
+
+        runTest("Build URL release pipeline", () => {
+            let testDir = "buildUrlReleasePipeline";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            let build = getAndAssertBuild("buildUrlReleasePipeline", "3");
+            assertBuildUrl(build, "https://ecosys.visualstudio.com/ecosys/_release?releaseId=6")
+            deleteBuild("buildUrlReleasePipeline");
+        });
     });
 
     describe("Build Promotion Tests", () => {
@@ -272,25 +312,141 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             getAndAssertBuild("dockerTest", "1");
             deleteBuild("dockerTest");
         }, testUtils.isSkipTest("docker"))
-    })
+    });
+
+    describe("Conan Task Tests", () => {
+        runTest("Conan Custom Command", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommand");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Custom Command With Working Dir", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommandWithWorkingDir");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Custom Invalid Command", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomInvalidCommand", true);
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Custom Command With Build Info", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanCustomCommandWithBuildInfo");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Add Remote", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Add Remote With Purge", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemoteWithPurge");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Create And Upload", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+            mockTask(testDir, "conanCreate");
+            mockTask(testDir, "conanUpload");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Create And Upload in Release", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+            mockTask(testDir, "conanCreate");
+            mockTask(testDir, "conanUploadInRelease");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Install", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanInstall");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Add Config", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanConfigInstall");
+        }, testUtils.isSkipTest("conan"));
+
+        runTest("Conan Publish Build Info", () => {
+            let testDir = "conanTask";
+            mockTask(testDir, "conanAddRemote");
+            mockTask(testDir, "conanCreate");
+            mockTask(testDir, "conanUpload");
+            mockTask(testDir, "publishBuildInfo");
+            getAndAssertBuild("conanTask", "1");
+            deleteBuild("conanTask");
+        }, testUtils.isSkipTest("conan"));
+    });
+
+    describe("Conan Utils Tests", () => {
+        /**
+         * This test created to ensure the equality of the created by the CLI build partials and the provided by
+         * getCliPartialsBuildDir method paths.
+         */
+        runTest("Get Cli Partials Build Dir", () => {
+            const testDTO = {
+                testBuildNumber: "777",
+                testsBuildNames: [
+                    "simpleJFrogTestNameExample",
+                    "Some-Special-Chars+:#$%\\/dè<>"
+                ]
+            };
+            // Cleanup old partials
+            testDTO.testsBuildNames.forEach(element => runBuildCommand("bc", element, testDTO.testBuildNumber));
+            // Create new partials using "Build Collect Env" command
+            testDTO.testsBuildNames.forEach(element => runBuildCommand("bce", element, testDTO.testBuildNumber));
+            // Assert the partials created at the generated by getCliPartialsBuildDir() path
+            testDTO.testsBuildNames.forEach(element =>
+                assertPathExists(conanutils.getCliPartialsBuildDir(element, testDTO.testBuildNumber))
+            );
+            // Cleanup the created partials
+            testDTO.testsBuildNames.forEach(element => runBuildCommand("bc", element, testDTO.testBuildNumber));
+        }, testUtils.isSkipTest("conan"));
+    });
+
+    function runBuildCommand(command, buildName, buildNumber) {
+        jfrogUtils.executeCliCommand("jfrog rt " + command + " \"" + buildName + "\" " + buildNumber);
+    }
 });
+
 
 /**
  * Run a test using mocha suit.
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean) - If should skip the test
+ * @param skip (Boolean) - True if should skip the test
+ * @param async (Boolean) - True if test is async
  */
-function runTest(description, testFunc, skip) {
+function runTest(description, testFunc, skip, async) {
     if (skip) {
         it.skip(description);
         return;
     }
 
     it(description, (done) => {
-        testFunc();
-        done();
+        async ? asyncTest(testFunc, done) : syncTest(testFunc, done);
     }).timeout(300000); // 5 minutes
+}
+
+/**
+ * Run a test synchronously by calling the test function and 'done'.
+ * @param testFunc (Function) - The test logic
+ * @param done (Function) - Ends the test
+ */
+function syncTest(testFunc, done) {
+    testFunc();
+    done();
+}
+
+/**
+ * Run a test asynchronously by passing 'done' functor to the test function.
+ * @param testFunc (Function) - The test logic
+ * @param done (Function) - Ends the test
+ */
+function asyncTest(testFunc, done) {
+    testFunc(done);
 }
 
 /**
@@ -357,8 +513,14 @@ function getAndAssertBuild(buildName, buildNumber) {
  */
 function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
+    assert.ok(body["buildInfo"]["properties"] != null, "BuildInfo is missing properties section");
     let actual = body["buildInfo"]["properties"][key];
-    assert.equal(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
+    assert.strictEqual(actual, value, "Expected: '" + key + " = " + value + "'. Actual: '" + key + " = " + actual + "'.\n" + tasksOutput);
+}
+
+function assertBuildUrl(build, url) {
+    let body = JSON.parse(build.getBody('utf8'));
+    assert.strictEqual(body["buildInfo"]["url"], url);
 }
 
 function assertBuild(build, buildName, buildNumber) {
@@ -367,4 +529,8 @@ function assertBuild(build, buildName, buildNumber) {
 
 function deleteBuild(buildName) {
     testUtils.deleteBuild(buildName);
+}
+
+function assertPathExists(path) {
+    assert(fs.existsSync(path), path + " should exist!");
 }

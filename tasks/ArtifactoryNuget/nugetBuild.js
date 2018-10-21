@@ -73,10 +73,7 @@ function runNuGet(command, cliPath, buildDir) {
     command
         .addBuildFlagsIfRequired()
         .addArtifactoryServerWithCredentials("artifactoryService");
-    let taskRes = utils.executeCliCommand(command.build(), buildDir);
-    if (taskRes) {
-        return;
-    }
+    utils.executeCliCommand(command.build(), buildDir);
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
 }
 
@@ -97,9 +94,7 @@ function addNugetArgsToCommands() {
     }
 
     let verbosityRestore = tl.getInput("verbosityRestore");
-    nugetArguments = utils.joinArgs(nugetArguments, "-Verbosity", verbosityRestore);
-
-    return nugetArguments;
+    return utils.joinArgs(nugetArguments, "-Verbosity", verbosityRestore);
 }
 
 function execRestoreCommand(command, nugetCommand, cliPath, buildDir) {
@@ -131,8 +126,7 @@ function execPushCommand(command, cliPath, buildDir) {
 }
 
 if (utils.isWindows()) {
-    tl.setResult(tl.TaskResult.Failed, "This task currently supports Windows agents only.");
-    return;
+    throw new Error("This task currently supports Windows agents only.");
 }
 
 utils.executeCliTask(RunTaskCbk);

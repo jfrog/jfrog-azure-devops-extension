@@ -11,18 +11,13 @@ let npmRepository;
 function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
-        tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
-        return;
+        throw new Error("Failed getting default working directory.");
     }
 
     // Determine working directory for the cli and npm command
     let inputWorkingFolder = tl.getInput("workingFolder", false);
     let requiredWorkDir = npmUtils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
-    let confRes = configureCommand();
-    if (confRes) {
-        tl.setResult(tl.TaskResult.Failed, confRes);
-        return;
-    }
+    configureCommand();
 
     // Build the cli command
     let command = new CliCommandBuilder(cliPath)
@@ -32,10 +27,7 @@ function RunTaskCbk(cliPath) {
         .addStringOptionFromParam("arguments", "npm-args")
         .addBuildFlagsIfRequired();
 
-    let taskRes = utils.executeCliCommand(command.build(), requiredWorkDir);
-    if (taskRes) {
-        return
-    }
+    utils.executeCliCommand(command.build(), requiredWorkDir);
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 
@@ -51,7 +43,7 @@ function configureCommand() {
             npmRepository = tl.getInput("targetRepo", true);
             break;
         default:
-            return "Received invalid npm command: " + inputCommand;
+            throw new Error("Received invalid npm command: " + inputCommand);
     }
 }
 

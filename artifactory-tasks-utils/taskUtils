@@ -1,21 +1,19 @@
 const CliCommandBuilder = require('./cliCommandBuilder').CliCommandBuilder;
 const fs = require('fs-extra');
 const tl = require('vsts-task-lib/task');
-const crypto = require('crypto');
 const path = require('path');
-const request = require('request-promise-lite');
 const execSync = require('child_process').execSync;
+const toolLib = require('vsts-task-tool-lib/tool');
 const osUtils = require('./osUtils');
 const stringUtils = require('./stringUtils');
 
 const fileName = getCliExecutableName();
+const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + osUtils.getArchitecture();
 const jfrogFolderPath = stringUtils.encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
 const jfrogCliVersion = "1.19.1";
-const versionedCliPath = stringUtils.encodePath(path.join(jfrogFolderPath, jfrogCliVersion, fileName)); // Path that depends on jfrog-cli version. The default behaviour.
 const customCliPath = stringUtils.encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
-const MAX_CLI_DOWNLOADS_RETRIES = 10;
 const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +
     ". If this build agent cannot access the internet, you can manually download version " + jfrogCliVersion +
     " of JFrog CLI and place it on the agent in the following path: " + customCliPath;
@@ -26,11 +24,15 @@ module.exports = {
     executeCliTask,
     executeCliCommand,
     prepareFileSpec,
-    isToolExists
+    isToolExists,
+    getBuildName,
+    getBuildNumber,
+    createCliDirs,
+    downloadCli
 };
 
 function runCbk(cliPath) {
-    console.log("Running jfrog-cli from " + cliPath + ".");
+    console.log("Running jfrog-cli from " + cliPath);
     checkCliVersion(cliPath);
     runTaskCbk(cliPath)
 }
@@ -40,27 +42,37 @@ function executeCliTask(runTaskFunc) {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
 
     runTaskCbk = runTaskFunc;
-    if (fs.existsSync(customCliPath)) {
-        runCbk(customCliPath);
-    } else if (fs.existsSync(versionedCliPath)) {
-        runCbk(versionedCliPath);
-    } else {
-        createCliDirs();
-        downloadCli(0).then(() => {
-            runCbk(versionedCliPath);
-        });
-    }
+    getCliPath().then((cliPath) => {
+        runCbk(cliPath);
+        collectEnvVarsIfNeeded(cliPath);
+    }).catch((error) => tl.setResult(tl.TaskResult.Failed, error))
+}
+
+function getCliPath() {
+    return new Promise(
+        function (resolve, reject) {
+            let cliDir = toolLib.findLocalTool(toolName, jfrogCliVersion);
+            if (fs.existsSync(customCliPath)) {
+                tl.debug("Using cli from custom cli path: " + customCliPath);
+                resolve(customCliPath);
+            } else if (cliDir) {
+                let cliPath = path.join(cliDir, fileName);
+                tl.debug("Using existing versioned cli path: " + cliPath);
+                resolve(cliPath);
+            } else {
+                createCliDirs();
+                return downloadCli()
+                    .then((cliPath) => resolve(cliPath))
+                    .catch((error) => {
+                        tl.setResult(tl.TaskResult.Failed, jfrogCliDownloadErrorMessage + "\n" + error);
+                        reject(error)
+                    });
+            }
+        }
+    );
 }
 
 function executeCliCommand(cliCommand, runningDir, stdio) {
-    let taskRes = doExecuteCliCommand(cliCommand, runningDir, stdio);
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    }
-    return taskRes;
-}
-
-function doExecuteCliCommand(cliCommand, runningDir, stdio) {
     try {
         if (!stdio) {
             stdio = [0, 1, 2];
@@ -70,7 +82,7 @@ function doExecuteCliCommand(cliCommand, runningDir, stdio) {
         execSync(cliCommand, {cwd: runningDir, stdio: stdio});
     } catch (ex) {
         // Error occurred
-        return ex.toString().replace(/--password=".*"/g, "--password=***");
+        throw ex.toString().replace(/--password=".*"/g, "--password=***");
     }
 }
 
@@ -92,24 +104,19 @@ function checkCliVersion(cliPath) {
 function prepareFileSpec(specPath) {
     let specSource = tl.getInput("specSource", false);
     let fileSpec;
-    try {
-        if (specSource === "file") {
-            let specInputPath = tl.getPathInput("file", true, true);
-            console.log("Using file spec located at " + specInputPath);
-            fileSpec = fs.readFileSync(specInputPath, "utf8");
-        } else {
-            fileSpec = tl.getInput("fileSpec", true);
-        }
-        fileSpec = stringUtils.fixWindowsPaths(fileSpec);
-        validateSpecWithoutRegex(fileSpec);
-        console.log("Using file spec:");
-        console.log(fileSpec);
-        // Write provided fileSpec to file
-        tl.writeFile(specPath, fileSpec);
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex.toString());
-        return ex;
+    if (specSource === "file") {
+        let specInputPath = tl.getPathInput("file", true, true);
+        console.log("Using file spec located at " + specInputPath);
+        fileSpec = fs.readFileSync(specInputPath, "utf8");
+    } else {
+        fileSpec = tl.getInput("fileSpec", true);
     }
+    fileSpec = stringUtils.fixWindowsPaths(fileSpec);
+    validateSpecWithoutRegex(fileSpec);
+    console.log("Using file spec:");
+    console.log(fileSpec);
+    // Write provided fileSpec to file
+    tl.writeFile(specPath, fileSpec);
 }
 
 function isToolExists(toolName) {
@@ -126,61 +133,19 @@ function createCliDirs() {
     }
 }
 
-function downloadCli(attemptNumber) {
+function downloadCli() {
     return new Promise((resolve, reject) => {
-        let handleError = (err) => {
-            if (attemptNumber <= MAX_CLI_DOWNLOADS_RETRIES) {
-                console.log("Attempt #" + attemptNumber + " to download jfrog-cli failed with message:\n" + err + "\nRetrying download.");
-                downloadCli(++attemptNumber);
-            } else {
-                console.error(jfrogCliDownloadErrorMessage);
-                reject(err);
-            }
-        };
-
-        const cliTmpPath = stringUtils.encodePath(versionedCliPath + ".tmp");
-
-        // Perform download
-        request.get(jfrogCliDownloadUrl, {json: false, resolveWithFullResponse: true}).then((response) => {
-            // Check valid response
-            if (response.statusCode < 200 || response.statusCode >= 300) {
-                handleError("Received http response code " + response.statusCode);
-            }
-
-            // Write body to file
-            fs.writeFileSync(cliTmpPath, response.body);
-
-            // Validate checksum
-            let stream = fs.createReadStream(cliTmpPath);
-            let digest = crypto.createHash('sha256');
-
-            stream.on('data', function (data) {
-                digest.update(data, 'utf8')
-            });
-
-            stream.on('end', function () {
-                let hex = digest.digest('hex');
-                let rawChecksum = response.headers['x-checksum-sha256'];
-                if (!rawChecksum) {
-                    handleError("Checksum header is missing from http response, cannot validate downloaded jfrog cli.");
+        toolLib.downloadTool(jfrogCliDownloadUrl).then((downloadPath) => {
+            toolLib.cacheFile(downloadPath, fileName, toolName, jfrogCliVersion).then((cliDir) => {
+                let cliPath = path.join(cliDir, fileName);
+                if (!osUtils.isWindows()) {
+                    fs.chmodSync(cliPath, 0o555);
                 }
-
-                let trimmedChecksum = rawChecksum.split(',')[0];
-                if (hex === trimmedChecksum) {
-                    fs.move(cliTmpPath, versionedCliPath).then(() => {
-                        if (!osUtils.isWindows()) {
-                            fs.chmodSync(versionedCliPath, 0o555);
-                        }
-                        console.log("Finished downloading jfrog cli.");
-                        resolve();
-                    });
-                } else {
-                    handleError("Checksum mismatch for downloaded jfrog cli.");
-                }
-            });
+                tl.debug("Finished downloading JFrog cli.");
+                resolve(cliPath);
+            })
         }).catch((err) => {
-            console.error(jfrogCliDownloadErrorMessage);
-            tl.setResult(tl.TaskResult.Failed, err.message);
+            reject(err);
         })
     });
 }
@@ -207,4 +172,55 @@ function validateSpecWithoutRegex(fileSpec) {
             throw ("The File Spec includes 'regexp: true' which is currently not supported.");
         }
     }
+}
+
+/**
+ * Runs collect environment variables JFrog CLI command if includeEnvVars is configured to true.
+ * @param cliPath - (String) - The cli path.
+ */
+function collectEnvVarsIfNeeded(cliPath) {
+    let includeEnvVars = tl.getBoolInput("includeEnvVars");
+    if (includeEnvVars) {
+        collectEnvVars(cliPath);
+    }
+}
+
+/**
+ * Runs collect environment variables JFrog CLI command.
+ * @param cliPath - (String) - The cli path.
+ * @returns (String|void) - String with error message or void if passes successfully.
+ */
+function collectEnvVars(cliPath) {
+    console.log("Collecting environment variables...");
+    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
+    let command = new CliCommandBuilder(cliPath)
+        .addCommand("rt bce")
+        .addArguments(getBuildName(), getBuildNumber());
+    executeCliCommand(command.build(), workDir);
+}
+
+/**
+ * Returns the build name. In case of release, the param "Release.DefinitionName" will be used, "Build.DefinitionName" will be used otherwise.
+ *
+ * @returns {String} - The build name of the task. In case of release, the param "Release.DefinitionName" will be used, "Build.DefinitionName" will be used otherwise.
+ */
+function getBuildName() {
+    let bn = tl.getVariable('Release.DefinitionName');
+    if (bn) {
+        return bn;
+    }
+    return tl.getVariable('Build.DefinitionName')
+}
+
+/**
+ * Returns the build number of the task. In case of release, the param "Release.DeploymentID" will be used, "Build.BuildNumber" will be used otherwise.
+ *
+ * @returns {String} - The build number of the task. In case of release, the param "Release.DeploymentID" will be used, "Build.BuildNumber" will be used otherwise.
+ */
+function getBuildNumber() {
+    let bn = tl.getVariable('Release.DeploymentID');
+    if (bn) {
+        return bn;
+    }
+    return tl.getVariable('Build.BuildNumber')
 }

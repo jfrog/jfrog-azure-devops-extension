@@ -25,14 +25,14 @@ class GenericTaskExecutor {
     run() {
         let workDir = tl.getVariable('System.DefaultWorkingDirectory');
         if (!workDir) {
-            tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
-            return;
+            throw new Error("Failed getting default working directory.");
         }
 
         let specPath = path.join(workDir, this.specName + Date.now() + ".json");
-        let error = taskUtils.prepareFileSpec(specPath);
-        if (error) {
-            return;
+        try {
+            taskUtils.prepareFileSpec(specPath);
+        } catch (e) {
+            throw new Error("FileSpec parsing failed: " + e);
         }
 
         let command = new CliCommandBuilder(this.cliPath)
@@ -42,17 +42,12 @@ class GenericTaskExecutor {
             .addBoolOptionFromParam("failNoOp", "fail-no-op")
             .addBuildFlagsIfRequired();
 
-        let taskRes = taskUtils.executeCliCommand(command.build(), workDir);
-        // Remove created fileSpec from file system
+        taskUtils.executeCliCommand(command.build(), workDir);
         try {
+            // Remove created fileSpec from file system
             tl.rmRF(specPath);
         } catch (ex) {
-            taskRes = "Failed cleaning temporary FileSpec file.";
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-        }
-
-        if (taskRes) {
-            return;
+            throw new Error("Failed cleaning temporary FileSpec file: " + ex);
         }
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }
