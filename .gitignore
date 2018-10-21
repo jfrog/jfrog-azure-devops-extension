@@ -9,3 +9,4 @@ artifactory-tasks-utils-*.tgz
 .DS_Store
 .testData
 .taskkey
+*.log

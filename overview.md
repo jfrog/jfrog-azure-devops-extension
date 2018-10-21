@@ -33,7 +33,7 @@ The task can be also configured to capture build-info and stores the uploaded fi
 
 ## Trigger maven builds
 The **Artifactory Maven** task allows triggering maven builds, while resolvong dependencies and deploying artifacts from and to Artifactory. 
-The task can also be configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![BuildInfo](images/marketplace/maven.png)
 
@@ -49,6 +49,18 @@ It also allows publishing nuget packages to Artifactory.
 The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![BuildInfo](images/marketplace/nuget.png)
+
+## Trigger conan builds
+The **Artifactory Conan** task allows triggering [conan](https://conan.io/) builds, while resolvong dependencies and deploying artifacts from and to Artifactory. 
+The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+
+![BuildInfo](images/marketplace/conan.png)
+
+## Push docker images
+The **Artifactory Docker** task allows pushing your docker images to Artifactory.
+The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+
+![BuildInfo](images/marketplace/docker.png)
 
 ## Promote published builds 
 Artifactory supports promoting published builds from one repository to another, 

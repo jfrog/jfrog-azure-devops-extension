@@ -3,9 +3,9 @@ const tl = require('vsts-task-lib/task');
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const execSync = require('child_process').execSync;
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
+const devnull = require('dev-null');
 let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
@@ -31,15 +31,17 @@ module.exports = {
     npmLocalRepoKey: "vsts-npm-local-test",
     npmRemoteRepoKey: "vsts-npm-remote-test",
     npmVirtualRepoKey: "vsts-npm-virtual-test",
+    repoConan: "vsts-conan-local",
 
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
+    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
+    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
     download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
     maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
-    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -52,7 +54,6 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
-    execCli: execCli,
     cleanUpAllTests: cleanUpAllTests,
     isSkipTest: isSkipTest
 };
@@ -60,7 +61,11 @@ module.exports = {
 function initTests() {
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
-    tl.setVariable("Agent.WorkFolder", "");
+    tl.setStdStream(devnull());
+    tl.setVariable("Agent.WorkFolder", testDataDir);
+    tl.setVariable("Agent.TempDirectory", testDataDir);
+    tl.setVariable("Agent.ToolsDirectory", testDataDir);
+
     deleteTestRepositories();
     createTestRepositories();
     recreateTestDataDir();
@@ -80,15 +85,6 @@ function runTask(testMain, variables, inputs) {
 
     tmr.registerMock('vsts-task-lib/mock-task', tl);
     tmr.run();
-}
-
-function execCli(command) {
-    command = fixWinPath(command);
-    try {
-        execSync("jfrog " + command + " --url=" + artifactoryUrl + " --user=" + artifactoryUsername + " --password=" + artifactoryPassword);
-    } catch (ex) {
-        console.error("Command failed", "jfrog " + command);
-    }
 }
 
 function recreateTestDataDir() {
@@ -135,6 +131,7 @@ function createTestRepositories() {
     createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
+    createRepo(module.exports.repoConan, JSON.stringify({rclass: "local", packageType: "conan"}));
 }
 
 function deleteTestRepositories() {
@@ -147,6 +144,7 @@ function deleteTestRepositories() {
     deleteRepo(module.exports.npmVirtualRepoKey);
     deleteRepo(module.exports.npmLocalRepoKey);
     deleteRepo(module.exports.npmRemoteRepoKey);
+    deleteRepo(module.exports.repoConan);
 }
 
 function createRepo(repoKey, body) {
@@ -254,12 +252,6 @@ function getRemoteTestDir(repo, testName) {
 
 function isWindows() {
     return process.platform.startsWith("win");
-}
-
-function fixWinPath(path) {
-    if (isWindows()) {
-        return path.replace(/(\\)/g, "\\\\")
-    }
 }
 
 function isSkipTest(skipValue) {

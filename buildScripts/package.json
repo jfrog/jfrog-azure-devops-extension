@@ -1,0 +1,15 @@
+{
+    "name": "build-scripts",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "private": true,
+    "license": "Apache-2.0",
+    "dependencies": {
+        "edit-json-file": "^1.1.0",
+        "command-line-args": "^5.0.2",
+        "command-line-usage": "^5.0.5",
+        "compare-versions": "^3.4.0",
+        "assert": "^1.4.1",
+        "rimraf": "^2.6.2"
+    }
+}

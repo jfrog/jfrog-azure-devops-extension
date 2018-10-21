@@ -2,6 +2,7 @@
     "name": "artifactory-test-utils",
     "version": "1.0.0",
     "author": "JFrog",
+    "private": true,
     "license": "Apache-2.0",
     "description": "Test utils",
     "main": "testUtils.js",
@@ -9,10 +10,12 @@
         "artifactory-tasks-utils": "file:../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz",
         "mocha": "^5.2.0",
         "path": "^0.12.7",
+        "http-tunneling-proxy": "^0.3.4",
         "rmdir-recursive": "^0.0.1",
         "sync-request": "^6.0.0",
         "vsts-task-lib": "^2.6.0",
-        "fs-extra": "^7.0.0"
+        "fs-extra": "^7.0.0",
+        "dev-null": "^0.1.1"
     },
     "scripts": {
         "test": "npm i && mocha tests.js -t 600000"
