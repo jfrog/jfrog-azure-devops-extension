@@ -1,0 +1,44 @@
+{
+    "id": "07a15c20-6352-1d11-abde-aa01c4d0331d",
+    "name": "ArtifactoryXrayScan",
+    "friendlyName": "Artifactory Xray Scan",
+    "description": "Scan build for vulnerabilities using Artifactory with Xray integration.\nThe scanned build must be published to Artifactory prior to scanning, using the 'Publish Build Info' task.",
+    "author": "JFrog",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "2",
+        "Patch": "2"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "Artifactory Xray Scan",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used for scanning artifacts."
+        },
+        {
+            "name": "allowFailBuild",
+            "type": "boolean",
+            "label": "Allow fail build",
+            "defaultValue": "true",
+            "required": true,
+            "helpMarkDown": "Uncheck if you do not wish to fail the build if Xray scan matches a rule with 'Fail Build' action."
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "xrayScan.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

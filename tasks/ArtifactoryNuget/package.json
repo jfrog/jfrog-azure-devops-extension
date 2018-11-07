@@ -10,7 +10,7 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "vsts-task-lib": "^2.6.0",
+        "azure-pipelines-task-lib": "^2.7.1",
         "asyncawait": "^1.0.7",
         "vsts-task-tool-lib": "^0.10.0",
         "fs-extra": "^7.0.0",

@@ -6,7 +6,7 @@
   "description": "Utilities for the Artifactory VSTS extension",
   "main": "utils.js",
   "dependencies": {
-    "vsts-task-lib": "^2.6.0",
+    "azure-pipelines-task-lib": "^2.7.1",
     "vsts-task-tool-lib": "^0.10.0",
     "fs-extra": "^7.0.0"
   },
