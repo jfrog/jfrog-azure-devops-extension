@@ -16,7 +16,7 @@
         "Patch": "2"
     },
     "minimumAgentVersion": "1.91.0",
-    "instanceNameFormat": "Artifactory docker push",
+    "instanceNameFormat": "Artifactory docker $(command)",
     "groups": [
         {
             "name": "advanced",
@@ -25,6 +25,21 @@
         }
     ],
     "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "push",
+            "helpMarkDown": "The docker command to run.",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "push": "push",
+                "pull": "pull"
+            }
+        },
         {
             "name": "artifactoryService",
             "type": "connectedService:artifactoryService",
@@ -39,7 +54,20 @@
             "label": "Docker target repository",
             "defaultValue": "",
             "required": true,
+            "visibleRule": "command = push",
             "helpMarkDown": "The target docker repository\nCan be local, or a virtual docker repository containing local repositories.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "sourceRepo",
+            "type": "pickList",
+            "label": "Docker source repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = pull",
+            "helpMarkDown": "The source docker repository\nCan be local, remote, or a virtual npm repository.",
             "properties": {
                 "EditableOptions": "True"
             }
@@ -77,7 +105,13 @@
             "target": "targetRepo",
             "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-        }
+        },
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "sourceRepo",
+            "resultSelector": "jsonpath:$[*].key"
+        },
     ],
     "execution": {
         "Node": {

@@ -2,13 +2,13 @@ const testUtils = require('../../testUtils');
 
 let variables = {
     "Build.DefinitionName": "dockerTest",
-    "Build.BuildNumber": "1"
+    "Build.BuildNumber": "2"
 };
 
 let inputs = {
-    "command": "push",
+    "command": "pull",
     "collectBuildInfo": true,
-    "targetRepo": testUtils.artifactoryDockerRepo,
+    "sourceRepo": testUtils.artifactoryDockerRepo,
     "imageName": testUtils.artifactoryDockerDomain + "/docker-test:1"
 };
 
