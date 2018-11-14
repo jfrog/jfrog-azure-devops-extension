@@ -2,7 +2,7 @@
     "id": "07fc5c20-6882-a1c2-cbcd-6531d5a72113",
     "name": "ArtifactoryDocker",
     "friendlyName": "Artifactory Docker",
-    "description": "Push docker images to Artifactory, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "description": "Pull and push docker images from and to Artifactory, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Docker+Registry)",
     "category": "Utility",
@@ -17,13 +17,6 @@
     },
     "minimumAgentVersion": "1.91.0",
     "instanceNameFormat": "Artifactory docker $(command)",
-    "groups": [
-        {
-            "name": "advanced",
-            "displayName": "Advanced",
-            "isExpanded": false
-        }
-    ],
     "inputs": [
         {
             "name": "command",
