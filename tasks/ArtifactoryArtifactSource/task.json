@@ -1,0 +1,42 @@
+{
+    "id": "07fc5c20-6772-11e5-abde-6901d3c00755",
+    "name": "ArtifactoryArtifactSource",
+    "friendlyName": "Download Artifacts - Artifactory",
+    "description": "Download artifacts from Artifactory.",
+    "author": "JFrog",
+    "category": "Utility",
+    "version": {
+        "Major": "1",
+        "Minor": "2",
+        "Patch": "2"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "inputs": [
+        {
+            "name": "connection",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true
+        },
+        {
+            "name": "definition",
+            "type": "pickList",
+            "label": "Build Name",
+            "defaultValue": "",
+            "required": true,
+        },
+        {
+            "name": "version",
+            "type": "pickList",
+            "label": "Build Number",
+            "defaultValue": "",
+            "required": true,
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "getArtifacts.js"
+        }
+    }
+}
