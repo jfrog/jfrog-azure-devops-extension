@@ -1,5 +1,5 @@
 
-const tl = require('vsts-task-lib/task');
+const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils');
 const path = require('path');
 

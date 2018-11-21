@@ -1,5 +1,5 @@
 // This util will return a list of all files matching the pattern configured in the UI in the solution path.
-const tl = require('vsts-task-lib/task');
+const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 
 module.exports = {

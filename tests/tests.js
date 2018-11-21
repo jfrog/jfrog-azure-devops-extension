@@ -2,7 +2,7 @@
 
 const assert = require("assert");
 const path = require("path");
-const vstsMockTest = require("vsts-task-lib/mock-test");
+const vstsMockTest = require("azure-pipelines-task-lib/mock-test");
 const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");

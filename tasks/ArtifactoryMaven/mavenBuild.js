@@ -1,4 +1,4 @@
-let tl = require('vsts-task-lib/task');
+let tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 let utils = require('artifactory-tasks-utils');
 const cliConfigCommand = "rt c";

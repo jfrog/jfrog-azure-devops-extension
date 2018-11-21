@@ -1,8 +1,8 @@
 const fs = require('fs-extra');
-const tl = require('vsts-task-lib/task');
+const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
-const toolLib = require('vsts-task-tool-lib/tool');
+const toolLib = require('azure-pipelines-tool-lib/tool');
 
 const fileName = getCliExecutableName();
 const toolName = "jfrog";
