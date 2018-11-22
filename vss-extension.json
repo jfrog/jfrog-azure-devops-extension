@@ -2,7 +2,7 @@
     "manifestversion": 1,
     "public": false,
     "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.5.175",
+    "version": "1.5.182",
     "name": "JFrog Artifactory",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "BarBelity",
@@ -195,7 +195,7 @@
                     },
                     {
                         "target": "artifactDetails",
-                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"{{endpoint.url}}\" }"
+                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"BABABABAAB.com\" }"
                     },
                     {
                         "target": "buildNumber",
@@ -316,7 +316,17 @@
           "properties": {
             "name": "tasks/ArtifactoryXrayScan"
           }
-        }
+        },
+        {
+          "id": "artifactory-artifact-source-task",
+          "type": "ms.vss-distributed-task.task",
+          "targets": [
+            "ms.vss-distributed-task.tasks"
+          ],
+          "properties": {
+            "name": "tasks/ArtifactoryArtifactSource"
+          }
+      }
     ],
     "files": [
         {
@@ -364,6 +374,9 @@
         },
         {
           "path": "tasks/ArtifactoryXrayScan"
+        },
+        {
+          "path": "tasks/ArtifactoryArtifactSource"
         }
     ]
 }

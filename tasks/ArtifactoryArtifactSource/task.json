@@ -1,5 +1,5 @@
 {
-    "id": "07fc5c20-6772-11e5-abde-6901d3c00755",
+    "id": "07fc5c20-6772-11c5-abde-6f1113c00a7b",
     "name": "ArtifactoryArtifactSource",
     "friendlyName": "Download Artifacts - Artifactory",
     "description": "Download artifacts from Artifactory.",
