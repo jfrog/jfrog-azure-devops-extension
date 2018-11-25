@@ -48,7 +48,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "command = push",
-            "helpMarkDown": "The target docker repository\nCan be local, or a virtual docker repository containing local repositories.",
+            "helpMarkDown": "The Artifactory repository to push the image.\nCan be local, or a virtual docker repository containing local repositories.",
             "properties": {
                 "EditableOptions": "True"
             }
@@ -60,7 +60,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "command = pull",
-            "helpMarkDown": "The source docker repository\nCan be local, remote, or a virtual npm repository.",
+            "helpMarkDown": "The Artifactory repository to pull the image from.\nCan be local, remote, or a virtual docker repository.",
             "properties": {
                 "EditableOptions": "True"
             }
