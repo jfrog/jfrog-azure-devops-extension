@@ -3,7 +3,7 @@
 
 [Learn more](https://jfrog.com/artifactory/)
 
-Artifactory provides tight integration with TFS and VSTS through the **JFrog Artifactory Extension.** 
+Artifactory provides tight integration with TFS and Azure DevOps through the **JFrog Artifactory Extension.** 
 In addition to managing efficient deployment of your artifacts to Artifactory, 
 the extension lets you capture information about deployed artifacts, 
 and resolved dependencies Gain full traceability for your builds as the environment data associated with your build is automatically collected.
@@ -11,7 +11,7 @@ and resolved dependencies Gain full traceability for your builds as the environm
 The extension currently support generic, maven, npm and nuget builds. 
 
 ## Documentation and Source Code
-The full extension documentation is available [here](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension).
+The full extension documentation is available [here](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension).
 <br>
 See the source code is on [GitHub](https://github.com/jfrog/artifactory-vsts-extension).
 
@@ -71,7 +71,7 @@ This task can be added as part of a Release pipeline, to support the release pro
 ![BuildInfo](images/marketplace/build-promotion.png)
 
 ## Access the Build-Info
-You can access the build-info from the Build Results in VSTS, if your build pipeline has published the build-info to Artifactory.
+You can access the build-info from the Build Results in Azure DevOps, if your build pipeline has published the build-info to Artifactory.
 
 ![BuildInfo](images/marketplace/build-info.png)
 ![BuildInfo](images/marketplace/build-info-in-artifactory.png)
