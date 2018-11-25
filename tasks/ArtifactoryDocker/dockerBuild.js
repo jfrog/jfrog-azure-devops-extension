@@ -3,6 +3,7 @@ const tl = require('vsts-task-lib/task');
 const utils = require('artifactory-tasks-utils');
 
 const dockerPushCommand = "rt dp";
+const dockerPullCommand = "rt dpl";
 
 function RunTaskCbk(cliPath) {
     // Validate docker exists on agent
@@ -23,11 +24,25 @@ function RunTaskCbk(cliPath) {
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
-    let targetRepository = tl.getInput("targetRepo", true);
     let imageName = tl.getInput("imageName", true);
+    let dockerRepository;
+
+    // Determine docker command
+    let inputCommand = tl.getInput("command", true);
+    let cliDockerCommand;
+    if (inputCommand === "push") {
+        cliDockerCommand = dockerPushCommand;
+        dockerRepository = tl.getInput("targetRepo", true);
+    } else if (inputCommand === "pull") {
+        cliDockerCommand = dockerPullCommand;
+        dockerRepository = tl.getInput("sourceRepo", true);
+    } else {
+        tl.setResult(tl.TaskResult.Failed, "Received invalid docker command: "+ inputCommand);
+        return;
+    }
 
     // Build the cli command
-    let cliCommand = utils.cliJoin(cliPath, dockerPushCommand, utils.quote(imageName), utils.quote(targetRepository), "--url=" + utils.quote(artifactoryUrl));
+    let cliCommand = utils.cliJoin(cliPath, cliDockerCommand, utils.quote(imageName), utils.quote(dockerRepository), "--url=" + utils.quote(artifactoryUrl));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
     // Add build info collection

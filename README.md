@@ -33,9 +33,9 @@ To run the tests, use the following commands:
     export VSTS_ARTIFACTORY_PASSWORD=password
     ```
     
-2. Set the VSTS_ARTIFACTORY_DOCKER_REGISTRY and VSTS_ARTIFACTORY_DOCKER_REPO environment variables with your Artifactory Docker registry domain and Artifactory Docker repository name:
+2. Set the VSTS_ARTIFACTORY_DOCKER_DOMAIN and VSTS_ARTIFACTORY_DOCKER_REPO environment variables with your Artifactory Docker registry domain and Artifactory Docker repository name:
     ```
-    export VSTS_ARTIFACTORY_DOCKER_REGISTRY='localhost:8081/docker-local'
+    export VSTS_ARTIFACTORY_DOCKER_DOMAIN='localhost:8081/docker-local'
     export VSTS_ARTIFACTORY_DOCKER_REPO=docker-local
     ```
     

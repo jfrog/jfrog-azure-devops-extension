@@ -280,7 +280,7 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     });
 
     describe("Docker Tests", () => {
-        runTest("Docker push", () => {
+        runTest("Docker push and pull", () => {
             assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
             assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");
 
@@ -288,12 +288,20 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
             let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
             // Run docker build + tag
             execSync("docker build -t " + testUtils.artifactoryDockerDomain + "/docker-test:1 " + path.join(__dirname, "resources", testDir, filesDir));
+
             // run docker push
             mockTask(testDir, "push");
-            mockTask(testDir, "publish");
+            mockTask(testDir, "publishPush");
             getAndAssertBuild("dockerTest", "1");
+
+            // Run docker pull
+            mockTask(testDir, "pull");
+            mockTask(testDir, "publishPull");
+            getAndAssertBuild("dockerTest", "2")
+
+            // Clean
             deleteBuild("dockerTest");
-        }, testUtils.isSkipTest("docker"))
+        }, testUtils.isSkipTest("docker"));
     });
 
     describe("Conan Task Tests", () => {
