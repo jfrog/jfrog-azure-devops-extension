@@ -1,5 +1,5 @@
-const tmrm = require('vsts-task-lib/mock-run');
-const tl = require('vsts-task-lib/task');
+const tmrm = require('azure-pipelines-task-lib/mock-run');
+const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -83,7 +83,7 @@ function runTask(testMain, variables, inputs) {
     setArtifactoryCredentials();
     mockGetInputs(inputs);
 
-    tmr.registerMock('vsts-task-lib/mock-task', tl);
+    tmr.registerMock('azure-pipelines-task-lib/mock-task', tl);
     tmr.run();
 }
 

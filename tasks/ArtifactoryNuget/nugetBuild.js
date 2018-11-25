@@ -1,5 +1,5 @@
-const tl = require('vsts-task-lib/task');
-const toolLib = require('vsts-task-tool-lib/tool');
+const tl = require('azure-pipelines-task-lib/task');
+const toolLib = require('azure-pipelines-tool-lib/tool');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
 const NUGET_TOOL_NAME = 'NuGet';

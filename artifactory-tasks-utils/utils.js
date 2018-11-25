@@ -1,14 +1,14 @@
 const fs = require('fs-extra');
-const tl = require('vsts-task-lib/task');
+const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
-const toolLib = require('vsts-task-tool-lib/tool');
+const toolLib = require('azure-pipelines-tool-lib/tool');
 
 const fileName = getCliExecutableName();
 const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.20.1";
+const jfrogCliVersion = "1.22.0";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +

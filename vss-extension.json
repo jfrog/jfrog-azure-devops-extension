@@ -211,6 +211,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryConan"
             }
+        },
+        {
+          "id": "artifactory-xray-scan-task",
+          "type": "ms.vss-distributed-task.task",
+          "targets": [
+            "ms.vss-distributed-task.tasks"
+          ],
+          "properties": {
+            "name": "tasks/ArtifactoryXrayScan"
+          }
         }
     ],
     "files": [
@@ -256,6 +266,9 @@
         },
         {
             "path": "tasks/ArtifactoryConan"
+        },
+        {
+          "path": "tasks/ArtifactoryXrayScan"
         }
     ]
 }

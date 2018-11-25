@@ -1,4 +1,4 @@
-const tl = require('vsts-task-lib/task');
+const tl = require('azure-pipelines-task-lib/task');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
 const uuid = require('uuid/v1');
