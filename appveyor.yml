@@ -27,6 +27,9 @@ install:
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 
+services:
+- docker
+
 test_script:
 - node --version
 - npm --version
