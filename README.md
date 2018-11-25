@@ -4,13 +4,13 @@
 |dev|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-vsts-extension/branch/dev)|
 
 # Overview
-JFrog Artifactory provides tight integration with VSTS and TFS through the **JFrog Artifactory VSTS Extension**.
+JFrog Artifactory provides tight integration with Azure DevOps and TFS through the **JFrog Artifactory VSTS Extension**.
 Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about artifacts deployed, dependencies resolved, environment data associated with the build runs and more, 
 that effectively facilitates fully traceable builds.
-See the full extension documentation at the [VSTS and TFS Artifactory Extension User Guide](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension).
+See the full extension documentation at the [Azure DevOps and TFS Artifactory Extension User Guide](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension).
 
 # Download and Installation
-The extension is available for installation on your VSTS organization in the [VSTS Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension).
+The extension is available for installation on your Azure DevOps organization in the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension).
 To install the extension on TFS, see the [install extensions for Team Foundation Server (TFS)](https://docs.microsoft.com/en-us/vsts/marketplace/get-tfs-extensions?view=tfs-2018#install-extensions-while-connected-to-tfs) documentation page.
 
 # Building and Testing the Sources
@@ -22,7 +22,7 @@ To build and run the extension sources, please follow these steps:
     npm run create
     ```
 After the build process is completed, you'll find the vsix file in the project directory.
-The vsix file can be loaded into VSTS and TFS.
+The vsix file can be loaded into Azure DevOps and TFS.
 
 ## Testing
 To run the tests, use the following commands:
@@ -62,4 +62,4 @@ We welcome pull requests from the community!
 * Please make sure the code is covered by tests. 
 
 # Release Notes
-See the release notes [here](https://www.jfrog.com/confluence/display/RTF/VSTS+and+TFS+Artifactory+Extension#VSTSandTFSArtifactoryExtension-ReleaseNotes).
+See the release notes [here](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension#AzureDevOpsandTFSArtifactoryExtension-ReleaseNotes).
