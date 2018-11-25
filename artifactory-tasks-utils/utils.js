@@ -8,7 +8,7 @@ const fileName = getCliExecutableName();
 const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.21.1";
+const jfrogCliVersion = "1.22.0";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +

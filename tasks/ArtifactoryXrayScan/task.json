@@ -2,7 +2,7 @@
     "id": "07a15c20-6352-1d11-abde-aa01c4d0331d",
     "name": "ArtifactoryXrayScan",
     "friendlyName": "Artifactory Xray Scan",
-    "description": "Scan build for vulnerabilities using Artifactory with Xray integration.\nThe scanned build must be published to Artifactory prior to scanning, using the 'Publish Build Info' task.",
+    "description": "Scan a build with JFrog Xray.\nThe scanned build must be published to Artifactory prior to scanning, using the 'Publish Build Info' task.",
     "author": "JFrog",
     "category": "Utility",
     "visibility": [
@@ -24,7 +24,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service used for scanning artifacts."
+            "helpMarkDown": "Artifactory service used for scanning the build."
         },
         {
             "name": "allowFailBuild",
