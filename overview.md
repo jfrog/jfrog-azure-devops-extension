@@ -62,9 +62,9 @@ The task can also be configured to capture build-info for the build. The capture
 
 ![Docker](images/marketplace/docker.png)
 
-## Perform Xray scan build
+## Scan builds with Xray
 The JFrog Artifactory extension is integrated with JFrog Xray through JFrog Artifactory, allowing you to have build artifacts scanned for vulnerabilities and other issues using the **Artifactory Xray Scan** task.
-If issues or vulnerabilities are found, you may choose to fail a build job. This integration requires JFrog Artifactory v4.16 and above and JFrog Xray v1.6 and above.
+If issues or vulnerabilities are found, you may choose to fail a build.
 
 ![Xray](images/marketplace/xray.png)
 
