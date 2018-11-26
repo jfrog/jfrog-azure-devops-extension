@@ -1,7 +1,114 @@
 {
+    "id": "07fc5c20-6882-a1c2-cbcd-6531d5a72113",
+    "name": "ArtifactoryDocker",
+    "friendlyName": "Artifactory Docker",
+    "description": "Pull and push docker images from and to Artifactory, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Docker+Registry)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
     "version": {
         "Major": "1",
-        "Minor": "3",
-        "Patch": "0"
+        "Minor": "2",
+        "Patch": "2"
+    },
+    "minimumAgentVersion": "1.91.0",
+    "instanceNameFormat": "Artifactory docker $(command)",
+    "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "push",
+            "helpMarkDown": "The docker command to run.",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "push": "push",
+                "pull": "pull"
+            }
+        },
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The Artifactory service used by the task."
+        },
+        {
+            "name": "targetRepo",
+            "type": "pickList",
+            "label": "Docker target repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = push",
+            "helpMarkDown": "The Artifactory repository to push the image.\nCan be local, or a virtual docker repository containing local repositories.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "sourceRepo",
+            "type": "pickList",
+            "label": "Docker source repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = pull",
+            "helpMarkDown": "The Artifactory repository to pull the image from.\nCan be local, remote, or a virtual docker repository.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "imageName",
+            "type": "string",
+            "label": "Image name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The docker image to push [DOMAIN]/[NAME]:[TAG]."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "sourceRepo",
+            "resultSelector": "jsonpath:$[*].key"
+        },
+    ],
+    "execution": {
+        "Node": {
+            "target": "dockerBuild.js"
+        }
     }
 }

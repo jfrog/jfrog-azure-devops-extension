@@ -12,8 +12,8 @@
     "demands": [],
     "version": {
         "Major": "1",
-        "Minor": "3",
-        "Patch": "0"
+        "Minor": "2",
+        "Patch": "2"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "Artifactory Xray Scan",
