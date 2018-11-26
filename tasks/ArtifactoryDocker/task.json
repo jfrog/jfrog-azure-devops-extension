@@ -104,7 +104,7 @@
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "sourceRepo",
             "resultSelector": "jsonpath:$[*].key"
-        },
+        }
     ],
     "execution": {
         "Node": {
