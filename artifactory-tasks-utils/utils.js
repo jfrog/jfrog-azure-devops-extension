@@ -41,7 +41,7 @@ function executeCliTask(runTaskFunc) {
     getCliPath().then((cliPath) => {
         runCbk(cliPath);
         collectEnvVarsIfNeeded(cliPath);
-    }).catch((error) => tl.setResult(tl.TaskResult.Failed, jfrogCliDownloadErrorMessage + "\n" + error))
+    }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error))
 }
 
 function getCliPath() {
@@ -59,7 +59,7 @@ function getCliPath() {
                 createCliDirs();
                 return downloadCli()
                     .then((cliPath) => resolve(cliPath))
-                    .catch((error) => reject(error));
+                    .catch((error) => reject(jfrogCliDownloadErrorMessage + "\n" + error));
             }
         }
     );
