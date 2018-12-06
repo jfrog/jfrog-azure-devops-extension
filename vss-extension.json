@@ -2,7 +2,7 @@
     "manifestversion": 1,
     "public": false,
     "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.5.182",
+    "version": "1.5.212",
     "name": "JFrog Artifactory",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "BarBelity",
@@ -130,7 +130,7 @@
                 "displayName": "Artifactory",
                 "endpointTypeId": "artifactoryService",
                 "uniqueSourceIdentifier": "{{connection}}:{{definition}}:{{buildNumber}}",
-                "downloadTaskId": "07fc5c20-6772-11c5-abde-6f1113c00a7b",
+                "downloadTaskId": "07fc5c20-6772-11e5-abde-6901d3c00755",
                 "artifactType": "Build",
                 "inputDescriptors": [
                     {
@@ -147,8 +147,9 @@
                     },
                     {
                         "id": "definition",
-                        "name": "definition",
+                        "name": "Build Name",
                         "description": "Name of the build.",
+                        "hasDynamicValueInformation": true,
                         "inputMode": "combo",
                         "isConfidential": false,
                         "dependencyInputIds": [
@@ -161,17 +162,50 @@
                         }
                     },
                     {
-                        "id": "buildNumber",
+                        "id": "defaultVersionType",
+                        "name": "Default version",
+                        "description": "",
+                        "inputMode": "Combo",
+                        "isConfidential": false,
+                        "hasDynamicValueInformation": false,
+                        "values": {
+                            "inputId": "defaultVersionTypeValues",
+                            "defaultValue": "latestType",
+                            "possibleValues": [
+                                {
+                                    "value": "latestType",
+                                    "displayValue": "Latest"
+                                },
+                                {
+                                    "value": "selectDuringReleaseCreationType",
+                                    "displayValue": "Specify at the time of release creation"
+                                },
+                                {
+                                    "value": "specificVersionType",
+                                    "displayValue": "Default to a specific build-number"
+                                }
+                            ],
+                            "isLimitedToPossibleValues": true
+                        },
+                        "validation": {
+                            "isRequired": true,
+                            "dataType": "string"
+                        }
+                    },
+                    {
+                        "id": "defaultVersionSpecific",
                         "name": "Build Number",
                         "description": "Number of the build.",
+                        "hasDynamicValueInformation": true,
                         "inputMode": "combo",
                         "isConfidential": false,
                         "dependencyInputIds": [
                             "connection",
-                            "definition"
+                            "definition",
+                            "defaultVersionType"
                         ],
                         "validation": {
-                            "isRequired": true,
+                            "isRequired": false,
                             "dataType": "string",
                             "maxLength": 300
                         }
@@ -190,17 +224,16 @@
                     },
                     {
                         "target": "latestVersion",
+                        "resultTemplate": "{ Value : \"Latest\", DisplayValue : \"Latest\" }"
+                    },
+                    {
+                        "target": "defaultVersionSpecific",
                         "dataSourceName": "BuildNumbers",
                         "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
                     },
                     {
                         "target": "artifactDetails",
-                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"BABABABAAB.com\" }"
-                    },
-                    {
-                        "target": "buildNumber",
-                        "dataSourceName": "BuildNumbers",
-                        "resultTemplate": "{ Value : \"{{uri}}\", DisplayValue : \"{{uri}}\" }"
+                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"AAA.com\" }"
                     }
                 ]
             }
@@ -316,17 +349,7 @@
           "properties": {
             "name": "tasks/ArtifactoryXrayScan"
           }
-        },
-        {
-          "id": "artifactory-artifact-source-task",
-          "type": "ms.vss-distributed-task.task",
-          "targets": [
-            "ms.vss-distributed-task.tasks"
-          ],
-          "properties": {
-            "name": "tasks/ArtifactoryArtifactSource"
-          }
-      }
+        }
     ],
     "files": [
         {
@@ -374,9 +397,6 @@
         },
         {
           "path": "tasks/ArtifactoryXrayScan"
-        },
-        {
-          "path": "tasks/ArtifactoryArtifactSource"
         }
     ]
 }
