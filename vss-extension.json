@@ -78,6 +78,16 @@
                         "resultSelector": "jsonpath:$.values[*]",
                         "headers": [],
                         "authenticationScheme": null
+                    },
+                    {
+                        "name": "BuildNames",
+                        "endpointUrl": "{{endpoint.url}}/api/build",
+                        "resultSelector": "jsonpath:$.builds[*]"
+                    },
+                    {
+                        "name": "BuildNumbers",
+                        "endpointUrl": "{{endpoint.url}}/api/build{{definition}}",
+                        "resultSelector": "jsonpath:$.buildsNumbers[*]"
                     }
                 ],
                 "authenticationSchemes": [
@@ -106,6 +116,125 @@
                                 }
                             }
                         ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "artifactory-release-artifact-type",
+            "description": "Artifactory",
+            "type": "ms.vss-releaseartifact.release-artifact-type",
+            "targets": [ "ms.vss-releaseartifact.artifact-types" ],
+            "properties": {
+                "name": "Artifactory",
+                "displayName": "Artifactory",
+                "endpointTypeId": "artifactoryService",
+                "uniqueSourceIdentifier": "{{connection}}:{{definition}}:{{buildNumber}}",
+                "downloadTaskId": "07fc5c20-6772-11e5-abde-6901d3c00755",
+                "artifactType": "Build",
+                "inputDescriptors": [
+                    {
+                        "id": "connection",
+                        "name": "Artifactory service",
+                        "inputMode": "Combo",
+                        "isConfidential": false,
+                        "hasDynamicValueInformation": true,
+                        "validation": {
+                            "isRequired": true,
+                            "dataType": "string",
+                            "maxLength": 300
+                        }
+                    },
+                    {
+                        "id": "definition",
+                        "name": "Build Name",
+                        "hasDynamicValueInformation": true,
+                        "inputMode": "Combo",
+                        "isConfidential": false,
+                        "dependencyInputIds": [
+                            "connection"
+                        ],
+                        "validation": {
+                            "isRequired": true,
+                            "dataType": "string",
+                            "maxLength": 300
+                        }
+                    },
+                    {
+                        "id": "defaultVersionType",
+                        "name": "Build Number",
+                        "inputMode": "Combo",
+                        "isConfidential": false,
+                        "hasDynamicValueInformation": false,
+                        "values": {
+                            "inputId": "defaultVersionTypeValues",
+                            "defaultValue": "latestType",
+                            "possibleValues": [
+                                {
+                                    "value": "latestType",
+                                    "displayValue": "Latest build"
+                                },
+                                {
+                                    "value": "selectDuringReleaseCreationType",
+                                    "displayValue": "Specify at the time of release creation"
+                                },
+                                {
+                                    "value": "specificVersionType",
+                                    "displayValue": "Specify a specific build number"
+                                }
+                            ],
+                            "isLimitedToPossibleValues": true
+                        },
+                        "validation": {
+                            "isRequired": true,
+                            "dataType": "string"
+                        }
+                    },
+                    {
+                        "id": "defaultVersionSpecific",
+                        "name": "Build Number",
+                        "hasDynamicValueInformation": true,
+                        "inputMode": "Combo",
+                        "isConfidential": false,
+                        "groupName": "[{ \"Key\": \"defaultVersionType\", \"Value\": \"specificVersionType\"}]",
+                        "properties": {
+                            "visibleRule": "defaultVersionType == specificVersionType"
+                        },
+                        "dependencyInputIds": [
+                            "connection",
+                            "definition",
+                            "defaultVersionType"
+                        ],
+                        "validation": {
+                            "isRequired": true,
+                            "dataType": "string"
+                        }
+                    }
+                ],
+                "dataSourceBindings": [
+                    {
+                        "target": "definition",
+                        "dataSourceName": "BuildNames",
+                        "resultTemplate": "{ \"Value\" : \"{{{uri}}}\", \"DisplayValue\" : \"{{{uri}}}\" }"
+                    },
+                    {
+                        "target": "versions",
+                        "dataSourceName": "BuildNumbers",
+                        "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
+                    },
+                    {
+                        "target": "latestversion",
+                        "dataSourceName": "BuildNumbers",
+                        "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
+                    },
+                    {
+                        "target": "defaultVersionSpecific",
+                        "dataSourceName": "BuildNumbers",
+                        "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
+                    },
+                    {
+                        "target": "artifactDetails",
+                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"{{endpoint.url}}\" }"
                     }
                 ]
             }
