@@ -15,7 +15,7 @@ function RunTaskCbk(cliPath) {
     let artifactoryService = tl.getInput("connection", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
 
-    // Decide if artifact-source or generic download
+    // Decide if the task runs as generic download or artifact-source
     let definition = tl.getInput("definition", false);
     if (definition) {
         console.log("Artifact source download...");
@@ -27,11 +27,12 @@ function RunTaskCbk(cliPath) {
 }
 
 function performArtifactSourceDownload(cliPath, workDir, artifactoryService, artifactoryUrl) {
-    let buildNumber = tl.getInput("version", false);
-    let buildName = tl.getInput("definition", false);
+    let buildNumber = tl.getInput("version", true);
+    let buildName = tl.getInput("definition", true);
+    let downloadPath = tl.getInput("downloadPath", true);
     buildName = buildName.substr(1);
 
-    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, utils.quote("*"), "--build=" + buildName + buildNumber, "--url=" + utils.quote(artifactoryUrl));
+    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, utils.quote("*"), utils.quote(downloadPath), "--build=" + buildName + buildNumber, "--url=" + utils.quote(artifactoryUrl), "--flat=true");
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
     let taskRes = utils.executeCliCommand(cliCommand, workDir);
 

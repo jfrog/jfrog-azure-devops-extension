@@ -136,7 +136,7 @@
                     {
                         "id": "connection",
                         "name": "Artifactory service",
-                        "inputMode": "combo",
+                        "inputMode": "Combo",
                         "isConfidential": false,
                         "hasDynamicValueInformation": true,
                         "validation": {
@@ -148,9 +148,8 @@
                     {
                         "id": "definition",
                         "name": "Build Name",
-                        "description": "Name of the build.",
                         "hasDynamicValueInformation": true,
-                        "inputMode": "combo",
+                        "inputMode": "Combo",
                         "isConfidential": false,
                         "dependencyInputIds": [
                             "connection"
@@ -163,8 +162,7 @@
                     },
                     {
                         "id": "defaultVersionType",
-                        "name": "Default version",
-                        "description": "",
+                        "name": "Build Number",
                         "inputMode": "Combo",
                         "isConfidential": false,
                         "hasDynamicValueInformation": false,
@@ -174,7 +172,7 @@
                             "possibleValues": [
                                 {
                                     "value": "latestType",
-                                    "displayValue": "Latest"
+                                    "displayValue": "Latest build"
                                 },
                                 {
                                     "value": "selectDuringReleaseCreationType",
@@ -182,7 +180,7 @@
                                 },
                                 {
                                     "value": "specificVersionType",
-                                    "displayValue": "Default to a specific build-number"
+                                    "displayValue": "Specify a specific build number"
                                 }
                             ],
                             "isLimitedToPossibleValues": true
@@ -195,19 +193,21 @@
                     {
                         "id": "defaultVersionSpecific",
                         "name": "Build Number",
-                        "description": "Number of the build.",
                         "hasDynamicValueInformation": true,
-                        "inputMode": "combo",
+                        "inputMode": "Combo",
                         "isConfidential": false,
+                        "groupName": "[{ \"Key\": \"defaultVersionType\", \"Value\": \"specificVersionType\"}]",
+                        "properties": {
+                            "visibleRule": "defaultVersionType == specificVersionType"
+                        },
                         "dependencyInputIds": [
                             "connection",
                             "definition",
                             "defaultVersionType"
                         ],
                         "validation": {
-                            "isRequired": false,
-                            "dataType": "string",
-                            "maxLength": 300
+                            "isRequired": true,
+                            "dataType": "string"
                         }
                     }
                 ],
@@ -223,8 +223,9 @@
                         "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
                     },
                     {
-                        "target": "latestVersion",
-                        "resultTemplate": "{ Value : \"Latest\", DisplayValue : \"Latest\" }"
+                        "target": "latestversion",
+                        "dataSourceName": "BuildNumbers",
+                        "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
                     },
                     {
                         "target": "defaultVersionSpecific",
@@ -233,7 +234,7 @@
                     },
                     {
                         "target": "artifactDetails",
-                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"AAA.com\" }"
+                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"{{endpoint.url}}\" }"
                     }
                 ]
             }
