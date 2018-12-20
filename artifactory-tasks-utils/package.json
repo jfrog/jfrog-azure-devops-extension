@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "JFrog",
   "license": "Apache-2.0",
-  "description": "Utilities for the Artifactory VSTS extension",
+  "description": "Utilities for the JFrog Artifactory extension",
   "main": "utils.js",
   "dependencies": {
     "azure-pipelines-task-lib": "^2.7.1",
