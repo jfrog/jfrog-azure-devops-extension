@@ -29,14 +29,14 @@ function checkAndSetMavenHome() {
 // Removing the servers from the config
 function deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver) {
     // Now we need to delete the server(s):
-    let deleteServerIDCommand = utils.cliJoin(cliPath, cliConfigCommand, "delete", serverIdDeployer, "--interactive=false");
+    let deleteServerIDCommand = utils.cliJoin(cliPath, cliConfigCommand, "delete", utils.quote(serverIdDeployer), "--interactive=false");
     let taskRes = utils.executeCliCommand(deleteServerIDCommand, buildDir);
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
         return taskRes;
     }
     if (serverIdResolver) {
-        deleteServerIDCommand = utils.cliJoin(cliPath, cliConfigCommand, "delete", serverIdResolver, "--interactive=false");
+        deleteServerIDCommand = utils.cliJoin(cliPath, cliConfigCommand, "delete", utils.quote(serverIdResolver), "--interactive=false");
         taskRes = utils.executeCliCommand(deleteServerIDCommand, buildDir);
         if (taskRes) {
             tl.setResult(tl.TaskResult.Failed, taskRes);
@@ -113,7 +113,7 @@ function configureServer(artifactory, serverId, cliPath, buildDir) {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username");
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password");
 
-    let cliCommand = utils.cliJoin(cliPath, cliConfigCommand, "--url=" + utils.quote(artifactoryUrl), "--user=" + utils.quote(artifactoryUser), "--password=" + utils.quote(artifactoryPassword), "--interactive=false", serverId);
+    let cliCommand = utils.cliJoin(cliPath, cliConfigCommand, "--url=" + utils.quote(artifactoryUrl), "--user=" + utils.quote(artifactoryUser), "--password=" + utils.quote(artifactoryPassword), "--interactive=false", utils.quote(serverId));
     let taskRes = utils.executeCliCommand(cliCommand, buildDir);
     if (taskRes) {
         return taskRes;
