@@ -19,7 +19,7 @@ node {
     }
 
     stage ('Bump version') {
-        sh("node-v${NPM_VERSION}-linux-x64/bin/node buildScripts/bump-version.js -v ${VSTS_ARTIFACTORY_VERSION}")
+        sh("node-v${NPM_VERSION}-linux-x64/bin/node buildScripts/bump-version.js -v ${ADO_ARTIFACTORY_VERSION}")
     }
 
     stage ('Create extension') {
@@ -34,7 +34,7 @@ node {
     }
 
     stage('Commit release version') {
-        sh("git commit -am '[artifactory-release] Release version ${VSTS_ARTIFACTORY_VERSION}'")
+        sh("git commit -am '[artifactory-release] Release version ${ADO_ARTIFACTORY_VERSION}'")
     }
 
     wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: '$GITHUB_PASSWORD', var: 'SECRET']]]) {
@@ -43,7 +43,7 @@ node {
         }
 
         stage('Create tag') {
-            sh("git tag '${VSTS_ARTIFACTORY_VERSION}'")
+            sh("git tag '${ADO_ARTIFACTORY_VERSION}'")
             sh("git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/jfrog/artifactory-vsts-extension.git --tags")
         }
 
@@ -58,11 +58,11 @@ node {
     }
 
     stage('Publish extension') {
-        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: '$VSTS_PUBLISHER_API_KEY', var: 'SECRET']]]) {
+        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: '$ADO_PUBLISHER_API_KEY', var: 'SECRET']]]) {
             sh '''#!/bin/bash
                 set -euxo pipefail
                 export PATH="${PWD}/node-v${NPM_VERSION}-linux-x64/bin:${PATH}"
-                tfx extension publish -t ${VSTS_PUBLISHER_API_KEY}
+                tfx extension publish -t ${ADO_PUBLISHER_API_KEY}
             '''
         }
     }

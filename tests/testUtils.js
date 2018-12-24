@@ -6,12 +6,12 @@ const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
 const devnull = require('dev-null');
-let artifactoryUrl = process.env.VSTS_ARTIFACTORY_URL;
-let artifactoryUsername = process.env.VSTS_ARTIFACTORY_USERNAME;
-let artifactoryPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
-let artifactoryDockerDomain = process.env.VSTS_ARTIFACTORY_DOCKER_DOMAIN;
-let artifactoryDockerRepo = process.env.VSTS_ARTIFACTORY_DOCKER_REPO;
-let skipTests = process.env.VSTS_ARTIFACTORY_SKIP_TESTS ? process.env.VSTS_ARTIFACTORY_SKIP_TESTS.split(',') : [];
+let artifactoryUrl = process.env.ADO_ARTIFACTORY_URL;
+let artifactoryUsername = process.env.ADO_ARTIFACTORY_USERNAME;
+let artifactoryPassword = process.env.ADO_ARTIFACTORY_PASSWORD;
+let artifactoryDockerDomain = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN;
+let artifactoryDockerRepo = process.env.ADO_ARTIFACTORY_DOCKER_REPO;
+let skipTests = process.env.ADO_ARTIFACTORY_SKIP_TESTS ? process.env.ADO_ARTIFACTORY_SKIP_TESTS.split(',') : [];
 
 module.exports = {
     testDataDir: testDataDir,
@@ -21,17 +21,17 @@ module.exports = {
     artifactoryPassword: artifactoryPassword,
     artifactoryUsername: artifactoryUsername,
 
-    repoKey1: "vsts-extension-test-repo1",
-    repoKey2: "vsts-extension-test-repo2",
-    remoteMaven: "vsts-extension-test-maven-remote",
-    localMaven: "vsts-extension-test-maven-local",
-    virtualNuget: "vsts-extension-test-nuget-virtual",
-    remoteNuGet: "vsts-extension-test-nuget-remote",
-    localNuGet: "vsts-extension-test-nuget-local",
-    npmLocalRepoKey: "vsts-npm-local-test",
-    npmRemoteRepoKey: "vsts-npm-remote-test",
-    npmVirtualRepoKey: "vsts-npm-virtual-test",
-    repoConan: "vsts-conan-local",
+    repoKey1: "ado-extension-test-repo1",
+    repoKey2: "ado-extension-test-repo2",
+    remoteMaven: "ado-extension-test-maven-remote",
+    localMaven: "ado-extension-test-maven-local",
+    virtualNuget: "ado-extension-test-nuget-virtual",
+    remoteNuGet: "ado-extension-test-nuget-remote",
+    localNuGet: "ado-extension-test-nuget-local",
+    npmLocalRepoKey: "ado-npm-local-test",
+    npmRemoteRepoKey: "ado-npm-remote-test",
+    npmVirtualRepoKey: "ado-npm-virtual-test",
+    repoConan: "ado-conan-local",
 
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
     conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
@@ -130,7 +130,7 @@ function createTestRepositories() {
     createRepo(module.exports.virtualNuget, JSON.stringify({rclass: "virtual", packageType: "nuget", repositories: [module.exports.remoteNuGet, module.exports.localNuGet]}));
     createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
-    createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["vsts-npm-local-test", "vsts-npm-remote-test"]}));
+    createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["ado-npm-local-test", "ado-npm-remote-test"]}));
     createRepo(module.exports.repoConan, JSON.stringify({rclass: "local", packageType: "conan"}));
 }
 

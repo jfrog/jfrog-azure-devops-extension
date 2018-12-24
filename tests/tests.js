@@ -2,7 +2,7 @@
 
 const assert = require("assert");
 const path = require("path");
-const vstsMockTest = require("azure-pipelines-task-lib/mock-test");
+const adoMockTest = require("azure-pipelines-task-lib/mock-test");
 const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
@@ -12,13 +12,13 @@ const createProxyServer = require('http-tunneling-proxy');
 let tasksOutput;
 const conanutils = require("../tasks/ArtifactoryConan/conanUtils");
 
-describe("JFrog Artifactory VSTS Extension Tests", () => {
+describe("JFrog Artifactory Extension Tests", () => {
     let jfrogUtils;
     before(() => {
         // Validate environment variables exist for tests
-        assert(testUtils.artifactoryUrl, "Tests are missing environment variable: VSTS_ARTIFACTORY_URL");
-        assert(testUtils.artifactoryUsername, "Tests are missing environment variable: VSTS_ARTIFACTORY_USERNAME");
-        assert(testUtils.artifactoryPassword, "Tests are missing environment variable: VSTS_ARTIFACTORY_PASSWORD");
+        assert(testUtils.artifactoryUrl, "Tests are missing environment variable: ADO_ARTIFACTORY_URL");
+        assert(testUtils.artifactoryUsername, "Tests are missing environment variable: ADO_ARTIFACTORY_USERNAME");
+        assert(testUtils.artifactoryPassword, "Tests are missing environment variable: ADO_ARTIFACTORY_PASSWORD");
 
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
@@ -35,10 +35,10 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
     describe("Unit Tests", () => {
         console.log("OS:", os.type());
         runTest("Mask password", () => {
-            let oldPassword = process.env.VSTS_ARTIFACTORY_PASSWORD;
-            process.env.VSTS_ARTIFACTORY_PASSWORD = "SUPER_SECRET";
-            let retVal = jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.VSTS_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
-            process.env.VSTS_ARTIFACTORY_PASSWORD = oldPassword;
+            let oldPassword = process.env.ADO_ARTIFACTORY_PASSWORD;
+            process.env.ADO_ARTIFACTORY_PASSWORD = "SUPER_SECRET";
+            let retVal = jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
+            process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;
             assert(!retVal.toString().includes("SUPER_SECRET"), "Output contains password");
         });
 
@@ -281,8 +281,8 @@ describe("JFrog Artifactory VSTS Extension Tests", () => {
 
     describe("Docker Tests", () => {
         runTest("Docker push and pull", () => {
-            assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_DOMAIN");
-            assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: VSTS_ARTIFACTORY_DOCKER_REPO");
+            assert(testUtils.artifactoryDockerDomain, "Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_DOMAIN");
+            assert(testUtils.artifactoryDockerRepo, "Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_REPO");
 
             let testDir = "docker";
             let filesDir = testUtils.isWindows() ? "windowsFiles" : "unixFiles";
@@ -447,7 +447,7 @@ function asyncTest(testFunc, done) {
  */
 function mockTask(testDir, taskName, isNegative) {
     let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
-    let mockRunner = new vstsMockTest.MockTestRunner(taskPath);
+    let mockRunner = new adoMockTest.MockTestRunner(taskPath);
     mockRunner.run(); // Mock a test
     tasksOutput += mockRunner.stderr + "\n" + mockRunner.stdout;
     assert(isNegative ? mockRunner.failed : mockRunner.succeeded, "\nFailure in: " + taskPath + ".\n" + tasksOutput); // Check the test results
