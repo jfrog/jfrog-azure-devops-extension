@@ -48,22 +48,20 @@ function assertVersion() {
 function updateTasksVersion() {
     let files = fs.readdirSync(path.join('tasks'));
     files.forEach(taskName => {
-        console.log('Updating version of task ' + taskName + ' to X.' + splitVersion[1] + "." + splitVersion[2]);
         let taskDir = path.join('tasks', taskName);
         let taskJsonPath = path.join(taskDir, 'task.json');
         if (fs.existsSync(taskJsonPath)) {
+            console.log('Updating version of task ' + taskName + ' to X.' + splitVersion[1] + "." + splitVersion[2]);
             updateTaskJsonWithNewVersion(taskJsonPath)
         } else {
             fs.readdir(taskDir, (err, taskVersionDirs) => {
-                if (taskVersionDirs) {
-                    taskVersionDirs.forEach(versToBuild => {
-                        let taskVersionDir = path.join(taskDir, versToBuild);
-                        let taskJsonPath = path.join(taskVersionDir, 'task.json');
-                        if (fs.existsSync(taskJsonPath)) {
-                            updateTaskJsonWithNewVersion(taskJsonPath);
-                        }
-                    })
-                }
+                taskVersionDirs.forEach(versToBuild => {
+                    let taskVersionDirJson = path.join(taskDir, versToBuild, 'task.json');
+                    if (fs.existsSync(taskVersionDirJson)) {
+                        console.log('Updating version of task ' + taskName + ', version: ' + versToBuild + ' to X.' + splitVersion[1] + "." + splitVersion[2]);
+                        updateTaskJsonWithNewVersion(taskVersionDirJson);
+                    }
+                })
             });
         }
     });
