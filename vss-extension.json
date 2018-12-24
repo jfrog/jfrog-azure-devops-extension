@@ -162,7 +162,8 @@
                     },
                     {
                         "id": "defaultVersionType",
-                        "name": "Build Number",
+                        "name": "Default Version",
+                        "description": "The default version will be deployed when new releases are created. The version can be changed for manually created releases at the time of release creation",
                         "inputMode": "Combo",
                         "isConfidential": false,
                         "hasDynamicValueInformation": false,

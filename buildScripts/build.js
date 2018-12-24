@@ -18,12 +18,12 @@ function installTasks() {
             if (fs.existsSync(path.join(taskDir, "package.json"))) {
                 cleanExecNpm('i', taskDir);
             } else {
-                fs.readdir(taskDir, (err, innerDirs) => {
-                    if (innerDirs) {
-                        innerDirs.forEach(versToBuild => {
-                            let taskNewDir = path.join(taskDir, versToBuild);
-                            if (fs.existsSync(path.join(taskNewDir, "package.json"))) {
-                                cleanExecNpm('i', taskNewDir);
+                fs.readdir(taskDir, (err, taskVersionDirs) => {
+                    if (taskVersionDirs) {
+                        taskVersionDirs.forEach(versToBuild => {
+                            let taskVersionDir = path.join(taskDir, versToBuild);
+                            if (fs.existsSync(path.join(taskVersionDir, "package.json"))) {
+                                cleanExecNpm('i', taskVersionDir);
                             }
                         })
                     }
