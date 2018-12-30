@@ -35,10 +35,10 @@ updateExtensionVersion();
  * Validate the format of the new version and also that it is larger than the existing version.
  */
 function assertVersion() {
-    assert.equal(splitVersion.length, 3, 'Version have a format of X.Y.Z');
+    assert.strictEqual(splitVersion.length, 3, 'Version have a format of X.Y.Z');
     let vssExtension = fs.readFileSync('vss-extension.json', 'utf8');
     let vssExtensionJson = JSON.parse(vssExtension);
-    assert.equal(compareVersions(commandLineArgsOptions.version, vssExtensionJson.version), 1, 'Input version must be bigger than current version');
+    assert.strictEqual(compareVersions(commandLineArgsOptions.version, vssExtensionJson.version), 1, 'Input version must be bigger than current version');
 }
 
 /**
@@ -48,15 +48,30 @@ function assertVersion() {
 function updateTasksVersion() {
     let files = fs.readdirSync(path.join('tasks'));
     files.forEach(taskName => {
-        console.log('Updating version of task ' + taskName + ' to ' + commandLineArgsOptions.version);
         let taskDir = path.join('tasks', taskName);
         let taskJsonPath = path.join(taskDir, 'task.json');
-        let taskJson = editJsonFile(taskJsonPath, editJsonFileOptions);
-        taskJson.set('version', {
-            'Major': splitVersion[0],
-            'Minor': splitVersion[1],
-            'Patch': splitVersion[2]
-        });
+        if (fs.existsSync(taskJsonPath)) {
+            console.log('Updating version of task ' + taskName + ' to X.' + splitVersion[1] + "." + splitVersion[2]);
+            updateTaskJsonWithNewVersion(taskJsonPath)
+        } else {
+            fs.readdir(taskDir, (err, taskVersionDirs) => {
+                taskVersionDirs.forEach(versToBuild => {
+                    let taskVersionDirJson = path.join(taskDir, versToBuild, 'task.json');
+                    if (fs.existsSync(taskVersionDirJson)) {
+                        console.log('Updating version of task ' + taskName + ', version: ' + versToBuild + ' to X.' + splitVersion[1] + "." + splitVersion[2]);
+                        updateTaskJsonWithNewVersion(taskVersionDirJson);
+                    }
+                })
+            });
+        }
+    });
+}
+
+function updateTaskJsonWithNewVersion(taskJsonPath) {
+    let taskJson = editJsonFile(taskJsonPath, editJsonFileOptions);
+    taskJson.set('version', {
+        'Minor': splitVersion[1],
+        'Patch': splitVersion[2]
     });
 }
 

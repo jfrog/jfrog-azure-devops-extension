@@ -139,6 +139,14 @@ describe("JFrog Artifactory Extension Tests", () => {
             assertFiles(path.join(testDir, "files"), testDir);
         });
 
+        runTest("Download artifact source", () => {
+            let testDir = "downloadArtifactSource";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "publish");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "files"), testDir);
+        });
+
         runTest("Upload fail-no-op", () => {
             let testDir = "uploadFailNoOp";
             mockTask(testDir, "upload", true);

@@ -8,7 +8,7 @@ const fileName = getCliExecutableName();
 const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.22.0";
+const jfrogCliVersion = "1.23.0";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +
@@ -41,7 +41,7 @@ function executeCliTask(runTaskFunc) {
     getCliPath().then((cliPath) => {
         runCbk(cliPath);
         collectEnvVarsIfNeeded(cliPath);
-    }).catch((error) => tl.setResult(tl.TaskResult.Failed, jfrogCliDownloadErrorMessage + "\n" + error))
+    }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error))
 }
 
 function getCliPath() {
@@ -59,7 +59,7 @@ function getCliPath() {
                 createCliDirs();
                 return downloadCli()
                     .then((cliPath) => resolve(cliPath))
-                    .catch((error) => reject(error));
+                    .catch((error) => reject(jfrogCliDownloadErrorMessage + "\n" + error));
             }
         }
     );

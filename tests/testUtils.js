@@ -36,7 +36,7 @@ module.exports = {
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
     conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
     docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
-    download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "downloadArtifacts.js"),
+    download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "Ver2", "downloadArtifacts.js"),
     upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
     maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
