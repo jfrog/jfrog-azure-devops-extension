@@ -81,3 +81,9 @@ You can access the build-info from the Build Results in Azure DevOps, if your bu
 
 ![BuildInfo](images/marketplace/build-info.png)
 ![BuildInfo](images/marketplace/build-info-in-artifactory.png)
+
+## Release Published Builds
+The Publish Build Info task allows publishing builds to Artifactory. By choosing Artifactory as an artifacts source in a Release, 
+you can select a published build, to make its artifacts available for the release.
+
+![ArtifactsSource](images/marketplace/artifacts-source.png)
