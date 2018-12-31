@@ -169,7 +169,7 @@
                         "hasDynamicValueInformation": false,
                         "values": {
                             "inputId": "defaultVersionTypeValues",
-                            "defaultValue": "latestType",
+                            "defaultValue": "selectDuringReleaseCreationType",
                             "possibleValues": [
                                 {
                                     "value": "selectDuringReleaseCreationType",
