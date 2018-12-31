@@ -172,10 +172,6 @@
                             "defaultValue": "latestType",
                             "possibleValues": [
                                 {
-                                    "value": "latestType",
-                                    "displayValue": "Latest build"
-                                },
-                                {
                                     "value": "selectDuringReleaseCreationType",
                                     "displayValue": "Specify at the time of release creation"
                                 },
