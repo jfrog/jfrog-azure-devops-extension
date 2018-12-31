@@ -169,12 +169,8 @@
                         "hasDynamicValueInformation": false,
                         "values": {
                             "inputId": "defaultVersionTypeValues",
-                            "defaultValue": "latestType",
+                            "defaultValue": "selectDuringReleaseCreationType",
                             "possibleValues": [
-                                {
-                                    "value": "latestType",
-                                    "displayValue": "Latest build"
-                                },
                                 {
                                     "value": "selectDuringReleaseCreationType",
                                     "displayValue": "Specify at the time of release creation"
