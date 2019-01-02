@@ -133,7 +133,7 @@
                 "endpointTypeId": "artifactoryService",
                 "uniqueSourceIdentifier": "{{connection}}:{{definition}}:{{buildNumber}}",
                 "downloadTaskId": "07fc5c20-6772-11e5-abde-6901d3c00755",
-                "artifactType": "Build",
+                "artifactType": "Package",
                 "inputDescriptors": [
                     {
                         "id": "connection",
