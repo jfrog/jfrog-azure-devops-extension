@@ -30,7 +30,11 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
     let buildNumber = tl.getInput("version", true);
     let buildName = tl.getInput("definition", true);
     // 'downloadPath' is provided by server when artifact-source is used.
-    let downloadPath = utils.fixWindowsPaths(tl.getInput("downloadPath", true));
+    let downloadPath = tl.getInput("downloadPath", true);
+    if (!downloadPath.endsWith("/") && !downloadPath.endsWith("\\")) {
+        downloadPath += "/";
+    }
+    downloadPath = utils.fixWindowsPaths(downloadPath);
 
     // Remove '/' as Artifactory's api returns build name and number with this prefix.
     buildName = buildName.replace(/^\//, '');
