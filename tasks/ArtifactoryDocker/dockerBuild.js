@@ -17,8 +17,6 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
         return;
     }
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
@@ -47,7 +45,9 @@ function RunTaskCbk(cliPath) {
 
     // Add build info collection
     if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
+        let buildName = tl.getInput('buildName',true);
+        let buildNumber = tl.getInput('buildNumber',true);
+        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
     let taskRes = utils.executeCliCommand(cliCommand, defaultWorkDir);

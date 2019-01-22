@@ -48,8 +48,6 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
 }
 
 function performGenericDownload(cliPath, workDir, artifactoryService, artifactoryUrl) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
     let specPath = path.join(workDir, "downloadSpec" + Date.now() + ".json");
 
     // Get input parameters
@@ -70,7 +68,9 @@ function performGenericDownload(cliPath, workDir, artifactoryService, artifactor
     cliCommand = utils.addBoolParam(cliCommand, "failNoOp", "fail-no-op");
     // Add build info collection
     if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
+        let buildName = tl.getInput('buildName',true);
+        let buildNumber = tl.getInput('buildNumber',true);
+        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
     // Execute the cli command

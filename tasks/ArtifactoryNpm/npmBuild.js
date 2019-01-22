@@ -7,8 +7,6 @@ const npmInstallCommand = "rt npmi";
 const npmPublishCommand = "rt npmp";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
@@ -46,7 +44,9 @@ function RunTaskCbk(cliPath) {
 
     // Add build info collection
     if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
+        let buildName = tl.getInput('buildName',true);
+        let buildNumber = tl.getInput('buildNumber',true);
+        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
     let taskRes = utils.executeCliCommand(cliCommand, requiredWorkDir);

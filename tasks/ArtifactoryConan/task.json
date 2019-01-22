@@ -176,6 +176,24 @@
             "helpMarkDown": "Select to collect build info."
         },
         {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build Name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build name to collect build info to.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build Number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build number to collect build info to.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
+        },
+        {
             "name": "conanUserHome",
             "type": "string",
             "label": "Conan User Home",

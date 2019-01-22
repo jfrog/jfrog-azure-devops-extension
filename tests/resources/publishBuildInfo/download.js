@@ -3,11 +3,9 @@ const path = require('path');
 
 const TEST_NAME = path.basename(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "buildPublish",
-    "Build.BuildNumber": "3"
-};
 let inputs = {
+    "buildName": "buildPublish",
+    "buildNumber": "3",
     "fileSpec": JSON.stringify({
         files: [{
             pattern: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME),
@@ -18,4 +16,4 @@ let inputs = {
     "failNoOp": true
 };
 
-testUtils.runTask(testUtils.download, variables, inputs);
+testUtils.runTask(testUtils.download, {}, inputs);

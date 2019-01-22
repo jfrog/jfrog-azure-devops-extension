@@ -1,12 +1,9 @@
 const testUtils = require('../../testUtils');
 
-let variables = {
-    "Build.DefinitionName": "excludeEnv",
-    "Build.BuildNumber": "3"
+let inputs = {
+    "buildName": "excludeEnv",
+    "buildNumber": "3",
+    "excludeEnvVars": "*password*"
 };
 
-let inputs = {
-    "excludeEnvVars": "*password*"
-}
-
-testUtils.runTask(testUtils.publish, variables, inputs);
+testUtils.runTask(testUtils.publish, {}, inputs);

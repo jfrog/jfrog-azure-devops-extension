@@ -261,10 +261,10 @@ function collectEnvVarsIfNeeded(cliPath) {
  */
 function collectEnvVars(cliPath) {
     console.log("Collecting environment variables...");
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let buildName = tl.getInput('buildName',true);
+    let buildNumber = tl.getInput('buildNumber',true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
-    let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildDefinition), quote(buildNumber));
+    let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildName), quote(buildNumber));
     return executeCliCommand(cliEnvVarsCommand, workDir);
 }
 

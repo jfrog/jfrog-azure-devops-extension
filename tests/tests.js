@@ -239,6 +239,37 @@ describe("JFrog Artifactory Extension Tests", () => {
         });
     });
 
+    describe("Discard Builds Tests", () => {
+        runTest("Discard builds", () => {
+            let testDir = "discard";
+            for (let i = 1; i <= 4; i++){
+                mockTask(testDir, "upload" + i.toString());
+                mockTask(testDir, "publish" + i.toString());
+            }
+
+            // Discard with MaxBuilds 3
+            getAndAssertBuild("buildDiscard", "1");
+            mockTask(testDir, "discardMaxBuilds");
+            assertDiscardedBuild("buildDiscard", "1");
+            for (let i = 2; i <= 4; i++){
+                getAndAssertBuild("buildDiscard", i.toString());
+            }
+
+            // Discard with MaxDays -1 and Exclude 2,3
+            mockTask(testDir, "discardMaxDaysExclude");
+            getAndAssertBuild("buildDiscard", "2");
+            getAndAssertBuild("buildDiscard", "3");
+            assertDiscardedBuild("buildDiscard", "4");
+
+            // Discard with MaxDays -1
+            mockTask(testDir, "discardMaxDays");
+            assertDiscardedBuild("buildDiscard", "2");
+            assertDiscardedBuild("buildDiscard", "3");
+
+            deleteBuild("buildDiscard");
+        });
+    });
+
     describe("Npm Tests", () => {
         runTest("Npm", () => {
             let testDir = "npm";
@@ -504,6 +535,17 @@ function getAndAssertBuild(buildName, buildNumber) {
 }
 
 /**
+ * Assert that a build DOESN'T exist in artifactory.
+ * @param buildName - (String) - The build name
+ * @param buildNumber - (String) - The build number
+ */
+function assertDiscardedBuild(buildName, buildNumber) {
+    let build = testUtils.getBuild(buildName, buildNumber);
+    assertBuildDiscarded(build, buildName, buildNumber);
+    return build;
+}
+
+/**
  * Assert build environment in the build.
  * @param build - (Object) - The build object returned from Artifactory
  * @param key - (String) - The build environment key
@@ -522,6 +564,10 @@ function assertBuildUrl(build, url) {
 
 function assertBuild(build, buildName, buildNumber) {
     assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory.\n" + tasksOutput);
+}
+
+function assertBuildDiscarded(build, buildName, buildNumber) {
+    assert(build.statusCode === 404, "Build " + buildName + "/" + buildNumber + " exist in Artifactory and is not discarded.\n" + tasksOutput);
 }
 
 function deleteBuild(buildName) {

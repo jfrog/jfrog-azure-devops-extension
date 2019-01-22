@@ -2,9 +2,10 @@
 
 # This script publishes JFrog Artifactory extension privately for sanity tests.
 # Currently it will work only on Unix and Linux.
+# Run it from the project's directory.
 # Precondition: Set 2 environment variables:
-# 1. ADO_ARTIFACTORY_DEVELOPER - Developer ID in Visual Studio
-# 2. ADO_ARTIFACTORY_API_KEY - API key in Visual Studio (Personal access tokens under 'Security' menu)
+# 1. ADO_ARTIFACTORY_DEVELOPER - Developer ID in Visual Studio (Organization name in Azure DevOps)
+# 2. ADO_ARTIFACTORY_API_KEY - API key in Visual Studio (Personal access tokens under 'Security' menu, configured to 'All accessible organizations' in 'Organization' and 'Full access' in 'Scopes'.)
 
 if [ -z "$ADO_ARTIFACTORY_DEVELOPER" ]; then
     echo "Please set ADO_ARTIFACTORY_DEVELOPER first"
@@ -19,6 +20,11 @@ fi
 export PUBLISHER=$ADO_ARTIFACTORY_DEVELOPER-private
 
 cp vss-extension.json vss-extension-private.json
+# Replaces the category in the temporary vss-extension file to a category supported by Azure DevOps
+sed -i '' 's/Build and release/Azure Pipelines/g' vss-extension-private.json
+# Replaces the version to a random version (required for azure to load the changes)
+sed -i '' "s/\"version\": \".*..*..*\"/\"version\": \"${RANDOM}.${RANDOM}.${RANDOM}\"/g" vss-extension-private.json
+
 
 tfx extension unshare -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-artifactory-vsts-extension --publisher $PUBLISHER --unshare-with $ADO_ARTIFACTORY_DEVELOPER 2>/dev/null
 tfx extension publisher delete -t $ADO_ARTIFACTORY_API_KEY --publisher $PUBLISHER 2>/dev/null

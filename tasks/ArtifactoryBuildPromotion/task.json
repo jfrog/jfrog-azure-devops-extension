@@ -27,6 +27,22 @@
             "helpMarkDown": "Artifactory service used for build promotion."
         },
         {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build Name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "helpMarkDown": "Name of the build to be promoted.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build Number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "helpMarkDown": "Number of the build to be promoted.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
+        },
+        {
             "name": "targetRepo",
             "type": "pickList",
             "label": "Target repository",

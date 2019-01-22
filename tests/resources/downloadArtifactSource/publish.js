@@ -1,8 +1,8 @@
 const testUtils = require('../../testUtils');
 
-let variables = {
-    "Build.DefinitionName": "downloadArtifactSource",
-    "Build.BuildNumber": "5"
+let inputs = {
+    "buildName": "downloadArtifactSource",
+    "buildNumber": "5"
 };
 
-testUtils.runTask(testUtils.publish, variables, {});
+testUtils.runTask(testUtils.publish, {}, inputs);

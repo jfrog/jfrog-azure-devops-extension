@@ -26,8 +26,6 @@ let executeConanTask = async(function (commandArgs) {
     let workingDir = tl.getPathInput('workingDirectory', false, false);
     let conanUserHome = tl.getInput('conanUserHome', false);
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo', false);
-    let buildName = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
 
     let conanTaskId = generateConanTaskUUId();
     tl.debug("Conan Task Id: " + conanTaskId);
@@ -48,7 +46,7 @@ let executeConanTask = async(function (commandArgs) {
     /*
     * Set Conan Environment Variable
     * Conan User Home is set as a variable in the phase scope so it will be
-    * availabe to every task running after this one
+    * available to every task running after this one
     */
     if (!conanUserHome) {
         conanUserHome = getDefaultConanUserHome();
@@ -58,6 +56,8 @@ let executeConanTask = async(function (commandArgs) {
 
     // Prepare Conan to generate build info
     if (collectBuildInfo) {
+        let buildName = tl.getInput('buildName',true);
+        let buildNumber = tl.getInput('buildNumber',true);
         try {
             initCliPartialsBuildDir(buildName, buildNumber);
             setConanTraceFileLocation(conanUserHome, conanTaskId);
@@ -106,7 +106,7 @@ function generateConanTaskUUId() {
 function getDefaultConanUserHome() {
     let hostType = tl.getVariable('System.HostType');
     let workFolder = tl.getVariable('Agent.WorkFolder');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let buildNumber = tl.getInput('buildNumber',true);
 
     // Get Build Id during build process
     let buildId = tl.getVariable('System.DefinitionId');

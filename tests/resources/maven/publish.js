@@ -1,8 +1,8 @@
 const testUtils = require('../../testUtils');
 
-let variables = {
-    "Build.DefinitionName": "Maven build",
-    "Build.BuildNumber": "3"
+let inputs = {
+    "buildName": "Maven build",
+    "buildNumber": "3"
 };
 
-testUtils.runTask(testUtils.publish, variables, {});
+testUtils.runTask(testUtils.publish, {}, inputs);

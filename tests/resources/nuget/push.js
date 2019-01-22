@@ -2,12 +2,9 @@ const testUtils = require('../../testUtils');
 const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "NuGet",
-    "Build.BuildNumber": "3"
-};
-
 let inputs = {
+    "buildName": "NuGet",
+    "buildNumber": "3",
     "command": "push",
     "targetDeployRepo": testUtils.localNuGet,
     "pathToNupkg": path.join(testUtils.getLocalTestDir(TEST_NAME), "nugetTest*.nupkg"),
@@ -15,4 +12,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, "push");
-testUtils.runTask(testUtils.nuget, variables, inputs);
+testUtils.runTask(testUtils.nuget, {}, inputs);

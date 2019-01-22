@@ -3,12 +3,9 @@ const path = require('path');
 
 const TEST_NAME = path.basename(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "npmTest",
-    "Build.BuildNumber": "1"
-};
-
 let inputs = {
+    "buildName": "npmTest",
+    "buildNumber": "1",
     "collectBuildInfo": true,
     "workingFolder": "npm",
     "command": "install",
@@ -17,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, "resources");
-testUtils.runTask(testUtils.npm, variables, inputs);
+testUtils.runTask(testUtils.npm, {}, inputs);
