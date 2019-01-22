@@ -541,8 +541,7 @@ function getAndAssertBuild(buildName, buildNumber) {
  */
 function assertDiscardedBuild(buildName, buildNumber) {
     let build = testUtils.getBuild(buildName, buildNumber);
-    assertBuildDiscarded(build, buildName, buildNumber);
-    return build;
+    assert(build.statusCode === 404, "Build " + buildName + "/" + buildNumber + " exist in Artifactory and is not discarded.\n" + tasksOutput);
 }
 
 /**
@@ -564,10 +563,6 @@ function assertBuildUrl(build, url) {
 
 function assertBuild(build, buildName, buildNumber) {
     assert(build.statusCode < 300 && build.statusCode >= 200, "Build " + buildName + "/" + buildNumber + " doesn't exist in Artifactory.\n" + tasksOutput);
-}
-
-function assertBuildDiscarded(build, buildName, buildNumber) {
-    assert(build.statusCode === 404, "Build " + buildName + "/" + buildNumber + " exist in Artifactory and is not discarded.\n" + tasksOutput);
 }
 
 function deleteBuild(buildName) {
