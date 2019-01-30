@@ -73,7 +73,7 @@
             "defaultValue": "$(Build.DefinitionName)",
             "required": true,
             "visibleRule": "collectBuildInfo=true",
-            "helpMarkDown": "Build name to collect build info to.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
         },
         {
             "name": "buildNumber",
@@ -82,7 +82,7 @@
             "defaultValue": "$(Build.BuildNumber)",
             "required": true,
             "visibleRule": "collectBuildInfo=true",
-            "helpMarkDown": "Build number to collect build info to.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
         },
         {
             "name": "includeEnvVars",

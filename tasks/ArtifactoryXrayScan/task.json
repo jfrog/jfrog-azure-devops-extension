@@ -32,7 +32,7 @@
             "label": "Build Name",
             "defaultValue": "$(Build.DefinitionName)",
             "required": true,
-            "helpMarkDown": "Build name to scan.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
+            "helpMarkDown": "Build name to scan.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe build should already be published to Artifactory."
         },
         {
             "name": "buildNumber",
@@ -40,7 +40,7 @@
             "label": "Build Number",
             "defaultValue": "$(Build.BuildNumber)",
             "required": true,
-            "helpMarkDown": "Build number to scan.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
+            "helpMarkDown": "Build number to scan.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe build should already be published to Artifactory."
         },
         {
             "name": "allowFailBuild",

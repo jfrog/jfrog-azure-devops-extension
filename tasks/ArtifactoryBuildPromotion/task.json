@@ -32,7 +32,7 @@
             "label": "Build Name",
             "defaultValue": "$(Build.DefinitionName)",
             "required": true,
-            "helpMarkDown": "Name of the build to be promoted.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
+            "helpMarkDown": "Name of a build, which is already published to Artifactory, to be promoted.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
         },
         {
             "name": "buildNumber",
@@ -40,7 +40,7 @@
             "label": "Build Number",
             "defaultValue": "$(Build.BuildNumber)",
             "required": true,
-            "helpMarkDown": "Number of the build to be promoted.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
+            "helpMarkDown": "Number of a build, which is already published to Artifactory, to be promoted.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
         },
         {
             "name": "targetRepo",

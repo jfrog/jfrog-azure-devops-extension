@@ -256,6 +256,7 @@ describe("JFrog Artifactory Extension Tests", () => {
             }
 
             // Discard with MaxDays -1 and Exclude 2,3
+            // MaxDays = -1 means the earliest build date to store is tomorrow, i.e. all builds discarded.
             mockTask(testDir, "discardMaxDaysExclude");
             getAndAssertBuild("buildDiscard", "2");
             getAndAssertBuild("buildDiscard", "3");
