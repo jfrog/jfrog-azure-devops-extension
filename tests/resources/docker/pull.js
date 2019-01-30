@@ -1,15 +1,12 @@
 const testUtils = require('../../testUtils');
 
-let variables = {
-    "Build.DefinitionName": "dockerTest",
-    "Build.BuildNumber": "2"
-};
-
 let inputs = {
+    "buildName": "dockerTest",
+    "buildNumber": "2",
     "command": "pull",
     "collectBuildInfo": true,
     "sourceRepo": testUtils.artifactoryDockerRepo,
     "imageName": testUtils.artifactoryDockerDomain + "/docker-test:1"
 };
 
-testUtils.runTask(testUtils.docker, variables, inputs);
+testUtils.runTask(testUtils.docker, {}, inputs);

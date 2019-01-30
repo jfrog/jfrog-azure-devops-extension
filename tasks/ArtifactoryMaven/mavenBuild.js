@@ -48,8 +48,15 @@ function deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver) {
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
 
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
+    let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
+    let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
+    // Overwrite build name & number with custom values if collectBuildInfo is selected.
+    if (collectBuildInfo) {
+        buildName = tl.getInput('buildName',true);
+        buildNumber = tl.getInput('buildNumber',true);
+    }
+
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
@@ -58,7 +65,7 @@ function RunTaskCbk(cliPath) {
 
     // Creating the config file for Maven
     let config = path.join(workDir, "config");
-    let taskRes = createMavenConfigFile(config, cliPath, workDir, buildDefinition, buildNumber);
+    let taskRes = createMavenConfigFile(config, cliPath, workDir, buildName, buildNumber);
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
         taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
@@ -77,9 +84,8 @@ function RunTaskCbk(cliPath) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options)
     }
     let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), config);
-    let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
     if (collectBuildInfo) {
-        mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
+        mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
     taskRes = utils.executeCliCommand(mavenCommand, workDir);
@@ -120,11 +126,11 @@ function configureServer(artifactory, serverId, cliPath, buildDir) {
     }
 }
 
-function createMavenConfigFile(config, cliPath, buildDir, buildDefinition, buildNumber) {
+function createMavenConfigFile(config, cliPath, buildDir, buildName, buildNumber) {
     let configInfo = "version: 1\ntype: maven\n";
     // Get configured parameters
     let artifactoryDeployer = tl.getInput("artifactoryDeployService");
-    let serverId = buildDefinition + "-" + buildNumber;
+    let serverId = buildName + "-" + buildNumber;
     serverIdDeployer = serverId + "-deployer";
     let taskRes = configureServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
     if (taskRes) {

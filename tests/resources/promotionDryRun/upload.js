@@ -2,11 +2,9 @@ const testUtils = require('../../testUtils');
 
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "buildPromoteDryRun",
-    "Build.BuildNumber": "3"
-};
 let inputs = {
+    "buildName": "buildPromoteDryRun",
+    "buildNumber": "3",
     "fileSpec": JSON.stringify({
         files: [{
             pattern: testUtils.getTestLocalFilesDir(__dirname),
@@ -17,4 +15,4 @@ let inputs = {
     "failNoOp": true
 };
 
-testUtils.runTask(testUtils.upload, variables, inputs);
+testUtils.runTask(testUtils.upload, {}, inputs);

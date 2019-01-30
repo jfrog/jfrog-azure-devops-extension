@@ -2,11 +2,9 @@ const testUtils = require('../../testUtils');
 
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "buildPromote",
-    "Build.BuildNumber": "3"
-};
 let inputs = {
+    "buildName": "buildPromote",
+    "buildNumber": "3",
     "fileSpec": JSON.stringify({
         files: [{
             pattern: testUtils.getRemoteTestDir(testUtils.repoKey2, TEST_NAME),
@@ -18,4 +16,4 @@ let inputs = {
     "failNoOp": true
 };
 
-testUtils.runTask(testUtils.download, variables, inputs);
+testUtils.runTask(testUtils.download, {}, inputs);

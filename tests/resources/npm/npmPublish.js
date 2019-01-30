@@ -3,12 +3,9 @@ const path = require('path');
 
 const TEST_NAME = path.basename(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "npmTest",
-    "Build.BuildNumber": "1"
-};
-
 let inputs = {
+    "buildName": "npmTest",
+    "buildNumber": "1",
     "collectBuildInfo": true,
     "workingFolder": "npm",
     "command": "pack and publish",
@@ -16,4 +13,4 @@ let inputs = {
     "arguments": ""
 };
 
-testUtils.runTask(testUtils.npm, variables, inputs);
+testUtils.runTask(testUtils.npm, {}, inputs);

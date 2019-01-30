@@ -2,11 +2,9 @@ const testUtils = require('../../testUtils');
 
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "downloadArtifactSource",
-    "Build.BuildNumber": "5"
-};
 let inputs = {
+    "buildName": "downloadArtifactSource",
+    "buildNumber": "5",
     "fileSpec": JSON.stringify({
         files: [{
             pattern: testUtils.getTestLocalFilesDir(__dirname),
@@ -17,4 +15,4 @@ let inputs = {
     "collectBuildInfo": true
 };
 
-testUtils.runTask(testUtils.upload, variables, inputs);
+testUtils.runTask(testUtils.upload, {}, inputs);

@@ -5,14 +5,14 @@ const utils = require('artifactory-tasks-utils');
 const cliXrayScanCommand = "rt bs";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let buildName = tl.getInput('buildName',true);
+    let buildNumber = tl.getInput('buildNumber',true);
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
 
-    let cliCommand = utils.cliJoin(cliPath, cliXrayScanCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl));
+    let cliCommand = utils.cliJoin(cliPath, cliXrayScanCommand, utils.quote(buildName), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addBoolParam(cliCommand, "allowFailBuild", "fail");
 

@@ -1,10 +1,8 @@
 const testUtils = require('../../testUtils');
 
-let variables = {
-    "Build.DefinitionName": "buildPromoteDryRun",
-    "Build.BuildNumber": "3"
-};
 let inputs = {
+    "buildName": "buildPromoteDryRun",
+    "buildNumber": "3",
     "sourceRepo": testUtils.repoKey1,
     "targetRepo": testUtils.repoKey2,
     "status": "testStatus",
@@ -14,4 +12,4 @@ let inputs = {
     "dryRun": "true"
 };
 
-testUtils.runTask(testUtils.promote, variables, inputs);
+testUtils.runTask(testUtils.promote, {}, inputs);

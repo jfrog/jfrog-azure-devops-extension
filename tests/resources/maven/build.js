@@ -2,12 +2,17 @@ const testUtils = require('../../testUtils');
 const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
+let BUILD_NAME = "Maven build";
+let BUILD_NUMBER = "3";
+
 let variables = {
-    "Build.DefinitionName": "Maven build",
-    "Build.BuildNumber": "3"
+    "Build.DefinitionName": BUILD_NAME,
+    "Build.BuildNumber": BUILD_NUMBER
 };
 
 let inputs = {
+    "buildName": BUILD_NAME,
+    "buildNumber": BUILD_NUMBER,
     "artifactoryResolverService": "mock-service",
     "targetResolveSnapshotRepo": testUtils.remoteMaven,
     "targetResolveReleaseRepo": testUtils.remoteMaven,

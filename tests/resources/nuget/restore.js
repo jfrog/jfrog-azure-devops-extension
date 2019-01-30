@@ -2,12 +2,9 @@ const testUtils = require('../../testUtils');
 const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "NuGet",
-    "Build.BuildNumber": "3"
-};
-
 let inputs = {
+    "buildName": "NuGet",
+    "buildNumber": "3",
     "command": "restore",
     "solutionPath": path.join(testUtils.getLocalTestDir(TEST_NAME), "**", "*.sln"),
     "targetResolveRepo": testUtils.virtualNuget,
@@ -17,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, "restore");
-testUtils.runTask(testUtils.nuget, variables, inputs);
+testUtils.runTask(testUtils.nuget, {}, inputs);

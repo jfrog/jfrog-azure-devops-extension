@@ -2,11 +2,9 @@ const testUtils = require('../../testUtils');
 
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let variables = {
-    "Build.DefinitionName": "buildUrlReleasePipeline",
-    "Build.BuildNumber": "3"
-};
 let inputs = {
+    "buildName": "buildUrlReleasePipeline",
+    "buildNumber": "3",
     "fileSpec": JSON.stringify({
         files: [{
             pattern: "*.nothing",
@@ -17,4 +15,4 @@ let inputs = {
     "failNoOp": false
 };
 
-testUtils.runTask(testUtils.upload, variables, inputs);
+testUtils.runTask(testUtils.upload, {}, inputs);

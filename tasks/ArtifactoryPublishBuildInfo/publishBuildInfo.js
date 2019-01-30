@@ -6,8 +6,8 @@ const path = require('path');
 const cliBuildPublishCommand = "rt bp";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
+    let buildName = tl.getInput('buildName',true);
+    let buildNumber = tl.getInput('buildNumber',true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
@@ -19,7 +19,7 @@ function RunTaskCbk(cliPath) {
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let excludeEnvVars = tl.getInput("excludeEnvVars", false);
 
-    let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildDefinition), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl), "--env-exclude=" + utils.quote(excludeEnvVars));
+    let cliCommand = utils.cliJoin(cliPath, cliBuildPublishCommand, utils.quote(buildName), utils.quote(buildNumber), "--url=" + utils.quote(artifactoryUrl), "--env-exclude=" + utils.quote(excludeEnvVars));
     cliCommand = addBuildUrl(cliCommand);
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
@@ -27,7 +27,7 @@ function RunTaskCbk(cliPath) {
     if (taskRes) {
         tl.setResult(tl.TaskResult.Failed, taskRes);
     } else {
-        attachBuildInfoUrl(buildDefinition, buildNumber, workDir);
+        attachBuildInfoUrl(buildName, buildNumber, workDir);
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }
 }

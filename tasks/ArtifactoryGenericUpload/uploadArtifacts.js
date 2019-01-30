@@ -4,11 +4,9 @@ const utils = require('artifactory-tasks-utils');
 const path = require('path');
 const fs = require('fs-extra');
 
-const cliDownloadCommand = "rt u";
+const cliUploadCommand = "rt u";
 
 function RunTaskCbk(cliPath) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
@@ -42,13 +40,15 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
+    let cliCommand = utils.cliJoin(cliPath, cliUploadCommand, "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addBoolParam(cliCommand, "failNoOp", "fail-no-op");
 
     // Add build info collection
     if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
+        let buildName = tl.getInput('buildName',true);
+        let buildNumber = tl.getInput('buildNumber',true);
+        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
     let taskRes = utils.executeCliCommand(cliCommand, workDir);

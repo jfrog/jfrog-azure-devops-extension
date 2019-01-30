@@ -42,6 +42,7 @@ module.exports = {
     npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
+    discard: path.join(__dirname, "..", "tasks", "ArtifactoryDiscardBuilds", "discardBuilds.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -125,7 +126,7 @@ function createTestRepositories() {
     createRepo(module.exports.repoKey1, JSON.stringify({rclass: "local", packageType: "generic"}));
     createRepo(module.exports.repoKey2, JSON.stringify({rclass: "local", packageType: "generic"}));
     createRepo(module.exports.localMaven, JSON.stringify({rclass: "local", packageType: "maven"}));
-    createRepo(module.exports.remoteMaven, JSON.stringify({rclass: "remote", packageType: "nuget", url: "https://jcenter.bintray.com"}));
+    createRepo(module.exports.remoteMaven, JSON.stringify({rclass: "remote", packageType: "maven", url: "https://jcenter.bintray.com"}));
     createRepo(module.exports.localNuGet, JSON.stringify({rclass: "local", packageType: "nuget"}));
     createRepo(module.exports.virtualNuget, JSON.stringify({rclass: "virtual", packageType: "nuget", repositories: [module.exports.remoteNuGet, module.exports.localNuGet]}));
     createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));

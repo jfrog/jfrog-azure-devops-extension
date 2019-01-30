@@ -349,6 +349,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryXrayScan"
             }
+        },
+        {
+            "id": "artifactory-discard-builds-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryDiscardBuilds"
+            }
         }
     ],
     "files": [
@@ -397,6 +407,9 @@
         },
         {
             "path": "tasks/ArtifactoryXrayScan"
+        },
+        {
+            "path": "tasks/ArtifactoryDiscardBuilds"
         }
     ]
 }

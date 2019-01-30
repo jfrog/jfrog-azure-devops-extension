@@ -91,12 +91,12 @@ function exec(cliPath, nugetCommand) {
 }
 
 function runNuGet(nugetCommandCli, cliPath, buildDir) {
-    let buildDefinition = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
     if (collectBuildInfo) {
-        nugetCommandCli = utils.cliJoin(nugetCommandCli, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
+        let buildName = tl.getInput('buildName',true);
+        let buildNumber = tl.getInput('buildNumber',true);
+        nugetCommandCli = utils.cliJoin(nugetCommandCli, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
     nugetCommandCli = addArtifactoryServer(nugetCommandCli);

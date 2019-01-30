@@ -27,6 +27,22 @@
             "helpMarkDown": "Artifactory service used for publishing the build info."
         },
         {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build Name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "helpMarkDown": "Build name to publish.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build Number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "helpMarkDown": "Build number to publish.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
+        },
+        {
             "name": "excludeEnvVars",
             "type": "string",
             "label": "Exclude environment variables",

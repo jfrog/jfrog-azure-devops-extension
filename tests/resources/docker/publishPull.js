@@ -1,8 +1,8 @@
 const testUtils = require('../../testUtils');
 
-let variables = {
-    "Build.DefinitionName": "dockerTest",
-    "Build.BuildNumber": "2"
+let inputs = {
+    "buildName": "dockerTest",
+    "buildNumber": "2"
 };
 
-testUtils.runTask(testUtils.publish, variables, {});
+testUtils.runTask(testUtils.publish, {}, inputs);

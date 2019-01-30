@@ -239,6 +239,38 @@ describe("JFrog Artifactory Extension Tests", () => {
         });
     });
 
+    describe("Discard Builds Tests", () => {
+        runTest("Discard builds", () => {
+            let testDir = "discard";
+            for (let i = 1; i <= 4; i++){
+                mockTask(testDir, "upload" + i.toString());
+                mockTask(testDir, "publish" + i.toString());
+            }
+
+            // Discard with MaxBuilds 3
+            getAndAssertBuild("buildDiscard", "1");
+            mockTask(testDir, "discardMaxBuilds");
+            assertDiscardedBuild("buildDiscard", "1");
+            for (let i = 2; i <= 4; i++){
+                getAndAssertBuild("buildDiscard", i.toString());
+            }
+
+            // Discard with MaxDays -1 and Exclude 2,3
+            // MaxDays = -1 means the earliest build date to store is tomorrow, i.e. all builds discarded.
+            mockTask(testDir, "discardMaxDaysExclude");
+            getAndAssertBuild("buildDiscard", "2");
+            getAndAssertBuild("buildDiscard", "3");
+            assertDiscardedBuild("buildDiscard", "4");
+
+            // Discard with MaxDays -1
+            mockTask(testDir, "discardMaxDays");
+            assertDiscardedBuild("buildDiscard", "2");
+            assertDiscardedBuild("buildDiscard", "3");
+
+            deleteBuild("buildDiscard");
+        });
+    });
+
     describe("Npm Tests", () => {
         runTest("Npm", () => {
             let testDir = "npm";
@@ -501,6 +533,16 @@ function getAndAssertBuild(buildName, buildNumber) {
     let build = testUtils.getBuild(buildName, buildNumber);
     assertBuild(build, buildName, buildNumber);
     return build;
+}
+
+/**
+ * Assert that a build DOESN'T exist in artifactory.
+ * @param buildName - (String) - The build name
+ * @param buildNumber - (String) - The build number
+ */
+function assertDiscardedBuild(buildName, buildNumber) {
+    let build = testUtils.getBuild(buildName, buildNumber);
+    assert(build.statusCode === 404, "Build " + buildName + "/" + buildNumber + " exist in Artifactory and is not discarded.\n" + tasksOutput);
 }
 
 /**
