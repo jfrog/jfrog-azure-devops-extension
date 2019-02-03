@@ -3,6 +3,8 @@ const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
+const clientHandlers = require('typed-rest-client/Handlers');
+const localTools = require('./tools');
 
 const fileName = getCliExecutableName();
 const toolName = "jfrog";
@@ -10,11 +12,9 @@ const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
 const jfrogCliVersion = "1.23.1";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
-const jfrogCliDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
-const jfrogCliDownloadErrorMessage = "Failed while attempting to download JFrog CLI from " + jfrogCliDownloadUrl +
-    ". If this build agent cannot access the internet, you can manually download version " + jfrogCliVersion +
-    " of JFrog CLI and place it on the agent in the following path: " + customCliPath;
+const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 
+let cliConfigCommand = "rt c";
 let runTaskCbk = null;
 
 module.exports = {
@@ -30,21 +30,33 @@ module.exports = {
     validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
-    isToolExists: isToolExists
+    isToolExists: isToolExists,
+    buildCliArtifactoryDownloadUrl: buildCliArtifactoryDownloadUrl,
+    createAuthHandlers: createAuthHandlers,
+    configureCliServer: configureCliServer,
+    deleteCliServers: deleteCliServers,
+    setResultFailedIfError: setResultFailedIfError
 };
 
-function executeCliTask(runTaskFunc) {
+// Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
+function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
+    // If unspecified, use the default cliDownloadUrl of Bintray.
+    if (!cliDownloadUrl) {
+        cliDownloadUrl = jfrogCliBintrayDownloadUrl;
+        cliAuthHandlers = [];
+    }
 
     runTaskCbk = runTaskFunc;
-    getCliPath().then((cliPath) => {
+    getCliPath(cliDownloadUrl, cliAuthHandlers).then((cliPath) => {
         runCbk(cliPath);
         collectEnvVarsIfNeeded(cliPath);
     }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error))
 }
 
-function getCliPath() {
+// Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
+function getCliPath(cliDownloadUrl, cliAuthHandlers) {
     return new Promise(
         function (resolve, reject) {
             let cliDir = toolLib.findLocalTool(toolName, jfrogCliVersion);
@@ -56,13 +68,42 @@ function getCliPath() {
                 tl.debug("Using existing versioned cli path: " + cliPath);
                 resolve(cliPath);
             } else {
+                const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl);
                 createCliDirs();
-                return downloadCli()
+                return downloadCli(cliDownloadUrl, cliAuthHandlers)
                     .then((cliPath) => resolve(cliPath))
-                    .catch((error) => reject(jfrogCliDownloadErrorMessage + "\n" + error));
+                    .catch((error) => reject(errMsg + "\n" + error));
             }
         }
     );
+}
+
+function buildCliArtifactoryDownloadUrl(rtUrl, repoName) {
+    if (rtUrl.slice(-1) !== '/') {
+        rtUrl += '/';
+    }
+    return rtUrl + repoName + '/' + jfrogCliVersion + '/' + btPackage + '/' + fileName;
+}
+
+function createAuthHandlers(artifactoryService) {
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+    // Check if Artifactory should be accessed anonymously.
+    if (artifactoryUser === "") {
+        return [];
+    }
+    return [new clientHandlers.BasicCredentialHandler(artifactoryUser, artifactoryPassword)];
+}
+
+function generateDownloadCliErrorMessage(downloadUrl) {
+    let errMsg = "Failed while attempting to download JFrog CLI from " + downloadUrl + ". ";
+    if (downloadUrl === jfrogCliBintrayDownloadUrl) {
+        errMsg += "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " + jfrogCliBintrayDownloadUrl + ". You ";
+    } else {
+        errMsg += "If the chosen Artifactory Service cannot access the internet, you ";
+    }
+    errMsg += "may also manually download version " + jfrogCliVersion + " of JFrog CLI and place it on the agent in the following path: " + customCliPath;
+    return errMsg;
 }
 
 function executeCliCommand(cliCommand, runningDir, stdio) {
@@ -74,6 +115,44 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
     } catch (ex) {
         // Error occurred
         return ex.toString().replace(/--password=".*"/g, "--password=***");
+    }
+}
+
+// Configuring a server in the cli config
+function configureCliServer(artifactory, serverId, cliPath, buildDir) {
+    let artifactoryUrl = tl.getEndpointUrl(artifactory);
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username");
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password");
+
+    let cliCommand = cliJoin(cliPath, cliConfigCommand, "--url=" + quote(artifactoryUrl), "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword), "--interactive=false", quote(serverId));
+    let taskRes = executeCliCommand(cliCommand, buildDir);
+    if (taskRes) {
+        return taskRes;
+    }
+}
+
+// Removing the servers from the cli config
+function deleteCliServers(cliPath, buildDir, serverIdArray) {
+    let deleteServerIDCommand;
+    let taskRes;
+    for (let i = 0, len = serverIdArray.length; i < len; i++) {
+        deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, "delete", quote(serverIdArray[i]), "--interactive=false");
+        taskRes = executeCliCommand(deleteServerIDCommand, buildDir);
+        if (taskRes) {
+            return taskRes;
+        }
+    }
+    return taskRes;
+}
+
+// Does not stop the task. If set to 'Failed', calls of setting to 'Succeeded' are ignored.
+function setResultFailedIfError(taskRes, customMsg) {
+    if (taskRes) {
+        if (customMsg) {
+            tl.setResult(tl.TaskResult.Failed, customMsg);
+        } else {
+            tl.setResult(tl.TaskResult.Failed, taskRes);
+        }
     }
 }
 
@@ -95,7 +174,7 @@ function quote(str) {
 function addArtifactoryCredentials(cliCommand, artifactoryService) {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
-    // Check if should make anonymous access to artifactory
+    // Check if Artifactory should be accessed anonymously.
     if (artifactoryUser === "") {
         artifactoryUser = "anonymous";
         cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
@@ -146,9 +225,15 @@ function createCliDirs() {
     }
 }
 
-function downloadCli() {
+// Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
+function downloadCli(cliDownloadUrl, cliAuthHandlers) {
+    // If unspecified, use the default cliDownloadUrl of Bintray.
+    if (!cliDownloadUrl) {
+        cliDownloadUrl = jfrogCliBintrayDownloadUrl;
+        cliAuthHandlers = [];
+    }
     return new Promise((resolve, reject) => {
-        toolLib.downloadTool(jfrogCliDownloadUrl).then((downloadPath) => {
+        localTools.downloadTool(cliDownloadUrl, null, cliAuthHandlers).then((downloadPath) => {
             toolLib.cacheFile(downloadPath, fileName, toolName, jfrogCliVersion).then((cliDir) => {
                 let cliPath = path.join(cliDir, fileName);
                 if (!isWindows()) {

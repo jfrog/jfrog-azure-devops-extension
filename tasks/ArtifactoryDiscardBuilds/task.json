@@ -29,7 +29,7 @@
         {
             "name": "buildName",
             "type": "string",
-            "label": "Build Name",
+            "label": "Build name",
             "defaultValue": "$(Build.DefinitionName)",
             "required": true,
             "helpMarkDown": "Build name to discard builds from.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
@@ -37,7 +37,7 @@
         {
             "name": "maxDays",
             "type": "string",
-            "label": "Max Days",
+            "label": "Max days",
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "The maximum number of days to keep builds in Artifactory."
@@ -45,7 +45,7 @@
         {
             "name": "maxBuilds",
             "type": "string",
-            "label": "Max Builds",
+            "label": "Max builds",
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "The maximum number of builds to store in Artifactory."
@@ -53,7 +53,7 @@
         {
             "name": "excludeBuilds",
             "type": "string",
-            "label": "Exclude Builds",
+            "label": "Exclude builds",
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "List of build numbers in the form of \"value1,value2,...\", that should not be removed from Artifactory."
@@ -61,7 +61,7 @@
         {
             "name": "deleteArtifacts",
             "type": "boolean",
-            "label": "Delete Artifacts",
+            "label": "Delete artifacts",
             "defaultValue": "false",
             "required": false,
             "helpMarkDown": "If set to true, automatically removes build artifacts stored in Artifactory."

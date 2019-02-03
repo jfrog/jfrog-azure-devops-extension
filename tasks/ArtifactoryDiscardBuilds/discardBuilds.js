@@ -20,11 +20,9 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addBoolParam(cliCommand, "async", "async");
 
     let taskRes = utils.executeCliCommand(cliCommand, process.cwd());
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
-        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
-    }
+    utils.setResultFailedIfError(taskRes);
+    // Ignored if previously set to 'Failed'
+    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
 }
 
 utils.executeCliTask(RunTaskCbk);

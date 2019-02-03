@@ -1,0 +1,84 @@
+{
+    "id": "5916aacf-ed6c-4580-bf28-cf4b21c2b521",
+    "name": "ArtifactoryToolsInstaller",
+    "friendlyName": "Artifactory Tools Installer",
+    "description": "Installs tools necessary for all Artifactory integration tasks.",
+    "author": "JFrog",
+    "category": "Tool",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "4",
+        "Patch": "1"
+    },
+    "demands": [],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "Artifactory Tools Installer",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to download tools from. The service should proxy Bintray, to allow downloading the tools."
+        },
+        {
+            "name": "cliInstallationRepo",
+            "type": "pickList",
+            "label": "Install JFrog CLI from:",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jfrog.bintray.com/jfrog-cli-go/\".",
+            "visibleRule": "artifactoryService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "installMavenExtractor",
+            "type": "boolean",
+            "label": "Install Maven Extractor",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to make the JFrog Cli install the Maven Extractor from Artifactory.\nThe Maven Extractor is used by the 'Artifactory Maven' task."
+        },
+        {
+            "name": "mavenInstallationRepo",
+            "type": "pickList",
+            "label": "From:",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the repository from which the Maven Extractor should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"http://jcenter.bintray.com\".",
+            "visibleRule": "installMavenExtractor == true && artifactoryService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "cliInstallationRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='REMOTE' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "mavenInstallationRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='REMOTE' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "toolsInstaller.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

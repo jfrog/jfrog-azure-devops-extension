@@ -106,7 +106,7 @@ function generateConanTaskUUId() {
 function getDefaultConanUserHome() {
     let hostType = tl.getVariable('System.HostType');
     let workFolder = tl.getVariable('Agent.WorkFolder');
-    let buildNumber = tl.getInput('buildNumber',true);
+    let buildNumber = tl.getVariable('Build.BuildNumber');
 
     // Get Build Id during build process
     let buildId = tl.getVariable('System.DefinitionId');

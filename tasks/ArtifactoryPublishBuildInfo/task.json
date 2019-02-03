@@ -29,7 +29,7 @@
         {
             "name": "buildName",
             "type": "string",
-            "label": "Build Name",
+            "label": "Build name",
             "defaultValue": "$(Build.DefinitionName)",
             "required": true,
             "helpMarkDown": "Build name to publish.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
@@ -37,7 +37,7 @@
         {
             "name": "buildNumber",
             "type": "string",
-            "label": "Build Number",
+            "label": "Build number",
             "defaultValue": "$(Build.BuildNumber)",
             "required": true,
             "helpMarkDown": "Build number to publish.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
