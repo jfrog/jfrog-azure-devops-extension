@@ -42,6 +42,7 @@ function RunTaskCbk(cliPath) {
     }
 
     // Set the environment variables needed for the cli to download the extractor from artifactory
+    // The extractor download will occur during the execution of the Artifactory Maven task, then the config and environment variables will be removed
     tl.setVariable("JFROG_CLI_JCENTER_REMOTE_SERVER", serverId);
     tl.setVariable("JFROG_CLI_JCENTER_REMOTE_REPO", tl.getInput("mavenInstallationRepo"));
     tl.setResult(tl.TaskResult.Succeeded, "Tools installed successfully.")

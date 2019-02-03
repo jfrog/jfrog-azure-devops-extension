@@ -76,6 +76,12 @@ This task can be added as part of a Release pipeline, to support the release pro
 
 ![BuildPromotion](images/marketplace/build-promotion.png)
 
+## Discard published builds 
+The **Artifactory Discard Builds** task is used to discard previously published builds from Artifactory.
+Builds are discarded according to the retention parameters configured in the task.
+
+![Discard](images/marketplace/discard.png)
+
 ## Access the Build-Info
 You can access the build-info from the Build Results in Azure DevOps, if your build pipeline has published the build-info to Artifactory.
 

@@ -2,7 +2,7 @@
     "id": "5916aacf-ed6c-4580-bf28-cf4b21c2b521",
     "name": "ArtifactoryToolsInstaller",
     "friendlyName": "Artifactory Tools Installer",
-    "description": "Installs tools necessary for artifactory integration tasks.",
+    "description": "Installs tools necessary for all Artifactory integration tasks.",
     "author": "JFrog",
     "category": "Tool",
     "visibility": [
@@ -24,7 +24,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service for tools download and installation."
+            "helpMarkDown": "Artifactory service to download tools from. The service should proxy Bintray, to allow downloading the tools."
         },
         {
             "name": "cliInstallationRepo",
@@ -32,7 +32,7 @@
             "label": "Install JFrog CLI from:",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Sets the repository from which the JFrog CLI will be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jfrog.bintray.com/jfrog-cli-go/\".",
+            "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jfrog.bintray.com/jfrog-cli-go/\".",
             "visibleRule": "artifactoryService != \"\"",
             "properties": {
                 "EditableOptions": "True"
@@ -44,7 +44,7 @@
             "label": "Install Maven Extractor",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Select to make the JFrog Cli install the Maven Extractor from Artifactory."
+            "helpMarkDown": "Select to make the JFrog Cli install the Maven Extractor from Artifactory.\nThe Maven Extractor is used by the 'Artifactory Maven' task."
         },
         {
             "name": "mavenInstallationRepo",
@@ -52,7 +52,7 @@
             "label": "From:",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Sets the repository from which the Maven Extractor will be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"http://jcenter.bintray.com\".",
+            "helpMarkDown": "Sets the repository from which the Maven Extractor should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"http://jcenter.bintray.com\".",
             "visibleRule": "installMavenExtractor == true && artifactoryService != \"\"",
             "properties": {
                 "EditableOptions": "True"

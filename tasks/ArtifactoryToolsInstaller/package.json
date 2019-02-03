@@ -4,7 +4,7 @@
     "author": "JFrog",
     "private": true,
     "license": "Apache-2.0",
-    "description": "This task installs tools necessary for all artifactory integration tasks.",
+    "description": "This task installs tools necessary for all Artifactory integration tasks.",
     "main": "toolsInstaller.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
