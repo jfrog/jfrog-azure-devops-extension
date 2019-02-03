@@ -69,7 +69,7 @@
         {
             "name": "buildName",
             "type": "string",
-            "label": "Build Name",
+            "label": "Build name",
             "defaultValue": "$(Build.DefinitionName)",
             "required": true,
             "visibleRule": "collectBuildInfo=true",
@@ -78,7 +78,7 @@
         {
             "name": "buildNumber",
             "type": "string",
-            "label": "Build Number",
+            "label": "Build number",
             "defaultValue": "$(Build.BuildNumber)",
             "required": true,
             "visibleRule": "collectBuildInfo=true",

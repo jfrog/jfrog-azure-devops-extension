@@ -1,7 +1,6 @@
 let tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 let utils = require('artifactory-tasks-utils');
-const cliConfigCommand = "rt c";
 const cliMavenCommand = "rt mvn";
 let serverIdDeployer;
 let serverIdResolver;
@@ -26,37 +25,12 @@ function checkAndSetMavenHome() {
     }
 }
 
-// Removing the servers from the config
-function deleteServer(cliPath, buildDir, serverIdDeployer, serverIdResolver) {
-    // Now we need to delete the server(s):
-    let deleteServerIDCommand = utils.cliJoin(cliPath, cliConfigCommand, "delete", utils.quote(serverIdDeployer), "--interactive=false");
-    let taskRes = utils.executeCliCommand(deleteServerIDCommand, buildDir);
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-        return taskRes;
-    }
-    if (serverIdResolver) {
-        deleteServerIDCommand = utils.cliJoin(cliPath, cliConfigCommand, "delete", utils.quote(serverIdResolver), "--interactive=false");
-        taskRes = utils.executeCliCommand(deleteServerIDCommand, buildDir);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-        }
-    }
-    return taskRes;
-}
-
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
 
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
-    // Overwrite build name & number with custom values if collectBuildInfo is selected.
-    if (collectBuildInfo) {
-        buildName = tl.getInput('buildName',true);
-        buildNumber = tl.getInput('buildNumber',true);
-    }
-
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
@@ -67,11 +41,11 @@ function RunTaskCbk(cliPath) {
     let config = path.join(workDir, "config");
     let taskRes = createMavenConfigFile(config, cliPath, workDir, buildName, buildNumber);
     if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-        taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-        }
+        utils.setResultFailedIfError(taskRes);
+        taskRes = utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
+        utils.setResultFailedIfError(taskRes);
+        taskRes = removeExtractorDownloadVariables(cliPath, workDir);
+        utils.setResultFailedIfError(taskRes);
         return;
     }
 
@@ -85,24 +59,19 @@ function RunTaskCbk(cliPath) {
     }
     let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), config);
     if (collectBuildInfo) {
+        // Overwrite build name & number with custom values if collectBuildInfo is selected.
+        buildName = tl.getInput('buildName',true);
+        buildNumber = tl.getInput('buildNumber',true);
         mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
     taskRes = utils.executeCliCommand(mavenCommand, workDir);
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-        taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-        }
-        return;
-    }
-
-    taskRes = deleteServer(cliPath, workDir, serverIdDeployer, serverIdResolver);
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-        return;
-    }
+    utils.setResultFailedIfError(taskRes);
+    taskRes = utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
+    utils.setResultFailedIfError(taskRes);
+    taskRes = removeExtractorDownloadVariables(cliPath, workDir);
+    utils.setResultFailedIfError(taskRes);
+    // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
 }
 
@@ -114,25 +83,13 @@ function addToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
     return configInfo
 }
 
-function configureServer(artifactory, serverId, cliPath, buildDir) {
-    let artifactoryUrl = tl.getEndpointUrl(artifactory);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username");
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password");
-
-    let cliCommand = utils.cliJoin(cliPath, cliConfigCommand, "--url=" + utils.quote(artifactoryUrl), "--user=" + utils.quote(artifactoryUser), "--password=" + utils.quote(artifactoryPassword), "--interactive=false", utils.quote(serverId));
-    let taskRes = utils.executeCliCommand(cliCommand, buildDir);
-    if (taskRes) {
-        return taskRes;
-    }
-}
-
 function createMavenConfigFile(config, cliPath, buildDir, buildName, buildNumber) {
     let configInfo = "version: 1\ntype: maven\n";
     // Get configured parameters
     let artifactoryDeployer = tl.getInput("artifactoryDeployService");
     let serverId = buildName + "-" + buildNumber;
     serverIdDeployer = serverId + "-deployer";
-    let taskRes = configureServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
+    let taskRes = utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
     if (taskRes) {
         return taskRes
     }
@@ -140,7 +97,7 @@ function createMavenConfigFile(config, cliPath, buildDir, buildName, buildNumber
 
     if (artifactoryResolver != null) {
         serverIdResolver = serverId + "-resolver";
-        taskRes = configureServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
+        taskRes = utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
         if (taskRes) {
             return taskRes
         }
@@ -161,4 +118,16 @@ function createMavenConfigFile(config, cliPath, buildDir, buildName, buildNumber
     } catch (ex) {
         return ex
     }
+}
+
+// Removes the cli server config and env variables set in ToolsInstaller task
+function removeExtractorDownloadVariables(cliPath, workDir) {
+    let taskRes;
+    let serverId = tl.getVariable("JFROG_CLI_JCENTER_REMOTE_SERVER");
+    if (serverId && serverId !== "") {
+        taskRes = utils.deleteCliServers(cliPath, workDir, [serverId]);
+        tl.setVariable("JFROG_CLI_JCENTER_REMOTE_SERVER", "");
+        tl.setVariable("JFROG_CLI_JCENTER_REMOTE_REPO", "");
+    }
+    return taskRes;
 }

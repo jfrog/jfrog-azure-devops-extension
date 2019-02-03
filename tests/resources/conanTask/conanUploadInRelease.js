@@ -7,7 +7,9 @@ const BUILD_NUMBER = "1";
 
 let variables = {
     "System.HostType": "release",
-    "Build.DefinitionId": BUILD_NAME
+    "Build.DefinitionId": BUILD_NAME,
+    "Build.DefinitionName": BUILD_NAME,
+    "Build.BuildNumber": BUILD_NUMBER
 };
 
 let inputs = {

@@ -8,7 +8,9 @@ const BUILD_NUMBER = "2";
 let variables = {
     "System.HostType": "build",
     "System.DefinitionId": BUILD_NAME,
-    "Build.BuildDirectory": "/tmp/" + BUILD_NAME
+    "Build.BuildDirectory": "/tmp/" + BUILD_NAME,
+    "Build.DefinitionName": BUILD_NAME,
+    "Build.BuildNumber": BUILD_NUMBER
 };
 
 let inputs = {

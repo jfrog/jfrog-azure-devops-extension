@@ -359,6 +359,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryDiscardBuilds"
             }
+        },
+        {
+            "id": "artifactory-tools-installer-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryToolsInstaller"
+            }
         }
     ],
     "files": [
@@ -410,6 +420,9 @@
         },
         {
             "path": "tasks/ArtifactoryDiscardBuilds"
+        },
+        {
+            "path": "tasks/ArtifactoryToolsInstaller"
         }
     ]
 }
