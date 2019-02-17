@@ -86,9 +86,9 @@
         {
             "name": "solutionPath",
             "type": "filePath",
-            "label": "Path to the solution (The root of working directory by default)",
+            "label": "Path to the root directory of the solution or to a file inside the root directory.",
             "defaultValue": "**/*.sln",
-            "helpMarkDown": "The path to the solution (*.sln). Accepts Ant-style patterns.",
+            "helpMarkDown": "Path to the root directory of the solution or to a file inside the root directory. If the directory includes more than one sln files, then the first argument passed in the Arguments field should be the name (not the path) of the sln file. Accepts Ant-style patterns.",
             "required": "true",
             "visibleRule": "command = restore"
         },
