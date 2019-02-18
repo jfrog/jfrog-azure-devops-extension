@@ -19,7 +19,7 @@ See the source code is on [GitHub](https://github.com/jfrog/artifactory-vsts-ext
 The **Artifactory Generic Download** task supports downloading your build dependencies from Artifactory to the build agent. 
 The task triggers the [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) to perform the download. The downloaded dependencies are defined using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs) 
 and can be also configured to capture the build-info. 
-It will store the downloaded files as dependencies in the build-info which can later be published to Artifactory using the Artifactory Publish Build-Info task.
+It will store the downloaded files as dependencies in the build-info which can later be published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![GenericDownload](images/marketplace/generic-download.png)
 
@@ -68,6 +68,12 @@ If issues or vulnerabilities are found, you may choose to fail a build.
 
 ![Xray](images/marketplace/xray.png)
 
+## Publish build-info
+Build-info captured in preceding tasks can be published to Artifactory using the **Artifactory Publish Build-Info** task.
+The configured build name & number should match the ones specified when the build-info was captured.
+
+![BuildPublish](images/marketplace/build-publish.png)
+
 ## Promote published builds 
 Artifactory supports promoting published builds from one repository to another, 
 to support the artifacts life-cycle. 
@@ -89,7 +95,7 @@ You can access the build-info from the Build Results in Azure DevOps, if your bu
 ![BuildInfo](images/marketplace/build-info-in-artifactory.png)
 
 ## Release Published Builds
-The Publish Build Info task allows publishing builds to Artifactory. By choosing Artifactory as an artifacts source in a Release, 
+The **Artifactory Publish Build-Info** task allows publishing builds to Artifactory. By choosing Artifactory as an artifacts source in a Release, 
 you can select a published build, to make its artifacts available for the release.
 
 ![ArtifactsSource](images/marketplace/artifacts-source.png)
