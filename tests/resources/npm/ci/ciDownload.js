@@ -1,13 +1,13 @@
-const testUtils = require('../../testUtils');
+const testUtils = require('../../../testUtils');
 const path = require('path');
 
-const TEST_NAME = path.basename(__dirname);
+const TEST_NAME = "npm";
 
 let inputs = {
     "fileSpec": JSON.stringify({
         files: [{
             pattern: testUtils.npmLocalRepoKey,
-            target: path.join(testUtils.getLocalTestDir(TEST_NAME), "1", "/"),
+            target: path.join(testUtils.getLocalTestDir(TEST_NAME), "2", "/"),
             flat: "true"
         }]
     }),

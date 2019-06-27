@@ -10,7 +10,7 @@ const fileName = getCliExecutableName();
 const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.23.1";
+const jfrogCliVersion = "1.26.1";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 
@@ -107,6 +107,9 @@ function generateDownloadCliErrorMessage(downloadUrl) {
 }
 
 function executeCliCommand(cliCommand, runningDir, stdio) {
+    if (!fs.existsSync(runningDir)) {
+        return "Invalid path to run JFrog CLI from: " + runningDir;
+    }
     try {
         if (!stdio) {
             stdio = [0, 1, 2];
@@ -206,7 +209,7 @@ function checkCliVersion(cliPath) {
         if (detectedVersion === jfrogCliVersion) {
             console.log("JFrog CLI version: " + detectedVersion);
         } else {
-            console.warn("Expected to find version " + jfrogCliVersion + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
+            console.log("Expected to find version " + jfrogCliVersion + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
         }
     } catch (ex) {
         console.error("Failed to get JFrog CLI version: " + ex);

@@ -272,14 +272,24 @@ describe("JFrog Artifactory Extension Tests", () => {
     });
 
     describe("Npm Tests", () => {
-        runTest("Npm", () => {
+        runTest("Npm install", () => {
             let testDir = "npm";
-            mockTask(testDir, "npmInstall");
-            mockTask(testDir, "npmPublish");
-            mockTask(testDir, "download");
-            mockTask(testDir, "publish");
+            mockTask(testDir, path.join("install", "npmInstall"));
+            mockTask(testDir, path.join("install", "installNpmPublish"));
+            mockTask(testDir, path.join("install", "installDownload"));
+            mockTask(testDir, path.join("install", "installPublish"));
             assertFiles(path.join(testDir, "files"), path.join(testDir, "1"));
             getAndAssertBuild("npmTest", "1");
+            deleteBuild("npmTest");
+        }, testUtils.isSkipTest("npm"));
+        runTest("Npm ci", () => {
+            let testDir = "npm";
+            mockTask(testDir, path.join("ci", "npmCi"));
+            mockTask(testDir, path.join("ci", "ciNpmPublish"));
+            mockTask(testDir, path.join("ci", "ciDownload"));
+            mockTask(testDir, path.join("ci", "ciPublish"));
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "2"));
+            getAndAssertBuild("npmTest", "2");
             deleteBuild("npmTest");
         }, testUtils.isSkipTest("npm"));
     });
