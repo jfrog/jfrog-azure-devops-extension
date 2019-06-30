@@ -71,7 +71,7 @@
         },
         {
             "name": "workingFolder",
-            "type": "string",
+            "type": "filePath",
             "label": "Working folder with package.json",
             "defaultValue": "",
             "required": false,

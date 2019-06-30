@@ -15,20 +15,20 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    // Get input parameters
+    // Get input parameters.
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
-    // Determine working directory for the cli
+    // Determine working directory for the cli.
     let inputWorkingFolder = tl.getInput("workingFolder", false);
     let requiredWorkDir = npmUtils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
-    if (!fs.existsSync(requiredWorkDir)) {
-        tl.setResult(tl.TaskResult.Failed, "Provided 'Working folder with package.json' does not exist.");
+    if (!fs.existsSync(requiredWorkDir) || !fs.lstatSync(requiredWorkDir).isDirectory()) {
+        tl.setResult(tl.TaskResult.Failed, "Provided 'Working folder with package.json': " + requiredWorkDir + " neither exists nor a directory.");
         return;
     }
 
-    // Determine npm command
+    // Determine npm command.
     let inputCommand = tl.getInput("command", true);
     let npmRepository;
     switch(inputCommand) {
