@@ -60,8 +60,8 @@ function RunTaskCbk(cliPath) {
     let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), config);
     if (collectBuildInfo) {
         // Overwrite build name & number with custom values if collectBuildInfo is selected.
-        buildName = tl.getInput('buildName',true);
-        buildNumber = tl.getInput('buildNumber',true);
+        buildName = tl.getInput('buildName', true);
+        buildNumber = tl.getInput('buildNumber', true);
         mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 

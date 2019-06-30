@@ -94,8 +94,8 @@ function runNuGet(nugetCommandCli, cliPath, buildDir) {
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
     if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName',true);
-        let buildNumber = tl.getInput('buildNumber',true);
+        let buildName = tl.getInput('buildName', true);
+        let buildNumber = tl.getInput('buildNumber', true);
         nugetCommandCli = utils.cliJoin(nugetCommandCli, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 

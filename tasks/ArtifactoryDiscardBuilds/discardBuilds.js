@@ -5,7 +5,7 @@ const utils = require('artifactory-tasks-utils');
 const cliDiscardCommand = "rt bdi";
 
 function RunTaskCbk(cliPath) {
-    let buildName = tl.getInput('buildName',true);
+    let buildName = tl.getInput('buildName', true);
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);

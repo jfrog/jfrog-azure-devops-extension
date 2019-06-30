@@ -30,55 +30,47 @@ function RunTaskCbk(cliPath) {
 
     // Determine npm command
     let inputCommand = tl.getInput("command", true);
+    let npmRepository;
     switch(inputCommand) {
         case 'install':
-            performNpmInstallCi(npmInstallCommand, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
+            npmRepository = tl.getInput("sourceRepo", true);
+            performNpmCommand(npmInstallCommand, npmRepository, true, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
             break;
         case 'ci':
-            performNpmInstallCi(npmCiCommand, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
+            npmRepository = tl.getInput("sourceRepo", true);
+            performNpmCommand(npmCiCommand, npmRepository, true, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
             break;
         case 'pack and publish':
-            performNpmPublish(npmPublishCommand, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
+            npmRepository = tl.getInput("targetRepo", true);
+            performNpmCommand(npmPublishCommand, npmRepository, false, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
             break;
     }
 }
 
-function performNpmInstallCi(cliNpmCommand, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir) {
-    let npmRepository = tl.getInput("sourceRepo", true);
-
-    // Build the cli command
+function performNpmCommand(cliNpmCommand, npmRepository, addThreads, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir) {
+    // Build the cli command.
     let cliCommand = utils.cliJoin(cliPath, cliNpmCommand, utils.quote(npmRepository), "--url=" + utils.quote(artifactoryUrl));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addStringParam(cliCommand, "arguments", "npm-args");
 
-    // Add build info collection
+    // Add build info collection.
     if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, getCollectBuildInfoFlags(true));
+        cliCommand = utils.cliJoin(cliCommand, getCollectBuildInfoFlags(addThreads));
     }
 
-    executeNpmTask(cliCommand, requiredWorkDir);
-}
-
-function performNpmPublish(cliNpmCommand, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir) {
-    let npmRepository = tl.getInput("targetRepo", true);
-
-    // Build the cli command
-    let cliCommand = utils.cliJoin(cliPath, cliNpmCommand, utils.quote(npmRepository), "--url=" + utils.quote(artifactoryUrl));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
-    cliCommand = utils.addStringParam(cliCommand, "arguments", "npm-args");
-
-    // Add build info collection
-    if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, getCollectBuildInfoFlags(false));
+    // Execute cli.
+    let taskRes = utils.executeCliCommand(cliCommand, requiredWorkDir);
+    if (taskRes) {
+        tl.setResult(tl.TaskResult.Failed, taskRes);
+    } else {
+        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }
-
-    executeNpmTask(cliCommand, requiredWorkDir);
 }
 
 function getCollectBuildInfoFlags(addThreads) {
     // Construct the build-info collection flags.
-    let buildName = tl.getInput('buildName',true);
-    let buildNumber = tl.getInput('buildNumber',true);
+    let buildName = tl.getInput('buildName', true);
+    let buildNumber = tl.getInput('buildNumber', true);
     let commandAddition = utils.cliJoin("--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
 
     // Check if need to add threads.
@@ -88,16 +80,6 @@ function getCollectBuildInfoFlags(addThreads) {
     }
 
     return commandAddition;
-}
-
-function executeNpmTask(cliCommand, requiredWorkDir) {
-    let taskRes = utils.executeCliCommand(cliCommand, requiredWorkDir);
-
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
-        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
-    }
 }
 
 utils.executeCliTask(RunTaskCbk);

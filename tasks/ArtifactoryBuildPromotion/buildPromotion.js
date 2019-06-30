@@ -5,8 +5,8 @@ const utils = require('artifactory-tasks-utils');
 const cliPromoteCommand = "rt bpr";
 
 function RunTaskCbk(cliPath) {
-    let buildName = tl.getInput('buildName',true);
-    let buildNumber = tl.getInput('buildNumber',true);
+    let buildName = tl.getInput('buildName', true);
+    let buildNumber = tl.getInput('buildNumber', true);
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);

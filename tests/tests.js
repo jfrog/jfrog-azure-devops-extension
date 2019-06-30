@@ -272,7 +272,7 @@ describe("JFrog Artifactory Extension Tests", () => {
     });
 
     describe("Npm Tests", () => {
-        runTest("Npm install", () => {
+        runTest("Npm install and publish", () => {
             let testDir = "npm";
             mockTask(testDir, path.join("install", "npmInstall"));
             mockTask(testDir, path.join("install", "installNpmPublish"));
@@ -282,7 +282,7 @@ describe("JFrog Artifactory Extension Tests", () => {
             getAndAssertBuild("npmTest", "1");
             deleteBuild("npmTest");
         }, testUtils.isSkipTest("npm"));
-        runTest("Npm ci", () => {
+        runTest("Npm ci and publish", () => {
             let testDir = "npm";
             mockTask(testDir, path.join("ci", "npmCi"));
             mockTask(testDir, path.join("ci", "ciNpmPublish"));

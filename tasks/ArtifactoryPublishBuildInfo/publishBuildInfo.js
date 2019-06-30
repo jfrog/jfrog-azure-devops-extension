@@ -6,8 +6,8 @@ const path = require('path');
 const cliBuildPublishCommand = "rt bp";
 
 function RunTaskCbk(cliPath) {
-    let buildName = tl.getInput('buildName',true);
-    let buildNumber = tl.getInput('buildNumber',true);
+    let buildName = tl.getInput('buildName', true);
+    let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");

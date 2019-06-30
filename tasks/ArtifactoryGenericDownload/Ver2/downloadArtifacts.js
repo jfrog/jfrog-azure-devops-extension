@@ -68,8 +68,8 @@ function performGenericDownload(cliPath, workDir, artifactoryService, artifactor
     cliCommand = utils.addBoolParam(cliCommand, "failNoOp", "fail-no-op");
     // Add build info collection
     if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName',true);
-        let buildNumber = tl.getInput('buildNumber',true);
+        let buildName = tl.getInput('buildName', true);
+        let buildNumber = tl.getInput('buildNumber', true);
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
