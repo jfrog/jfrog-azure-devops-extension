@@ -26,6 +26,7 @@ install:
 - npm i -gq tfx-cli
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
+- cmd: nuget update -self
 
 services:
 - docker
