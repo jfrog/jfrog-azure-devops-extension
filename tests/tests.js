@@ -447,7 +447,7 @@ describe("JFrog Artifactory Extension Tests", () => {
     });
 
     function runBuildCommand(command, buildName, buildNumber) {
-        jfrogUtils.executeCliCommand("jfrog rt " + command + " \"" + buildName + "\" " + buildNumber);
+        jfrogUtils.executeCliCommand("jfrog rt " + command + " \"" + buildName + "\" " + buildNumber, testUtils.testDataDir);
     }
 });
 
