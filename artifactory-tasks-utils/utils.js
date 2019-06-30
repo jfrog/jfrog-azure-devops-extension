@@ -10,7 +10,7 @@ const fileName = getCliExecutableName();
 const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.23.1";
+const jfrogCliVersion = "1.26.1";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 
@@ -107,6 +107,9 @@ function generateDownloadCliErrorMessage(downloadUrl) {
 }
 
 function executeCliCommand(cliCommand, runningDir, stdio) {
+    if (!fs.existsSync(runningDir)) {
+        return "JFrog CLI execution path doesn't exist: " + runningDir;
+    }
     try {
         if (!stdio) {
             stdio = [0, 1, 2];
@@ -198,16 +201,12 @@ function addBoolParam(cliCommand, inputParam, cliParam) {
     return cliCommand
 }
 
-function checkCliVersion(cliPath) {
+function logCliVersion(cliPath) {
     let cliCommand = cliJoin(cliPath, "--version");
     try {
         let res = execSync(cliCommand);
         let detectedVersion = String.fromCharCode.apply(null, res).split(' ')[2].trim();
-        if (detectedVersion === jfrogCliVersion) {
-            console.log("JFrog CLI version: " + detectedVersion);
-        } else {
-            console.warn("Expected to find version " + jfrogCliVersion + " of JFrog CLI at " + cliPath + ". Found version " + detectedVersion + " instead.");
-        }
+        console.log("JFrog CLI version: " + detectedVersion);
     } catch (ex) {
         console.error("Failed to get JFrog CLI version: " + ex);
     }
@@ -215,7 +214,7 @@ function checkCliVersion(cliPath) {
 
 function runCbk(cliPath) {
     console.log("Running jfrog-cli from " + cliPath + ".");
-    checkCliVersion(cliPath);
+    logCliVersion(cliPath);
     runTaskCbk(cliPath)
 }
 
@@ -346,8 +345,8 @@ function collectEnvVarsIfNeeded(cliPath) {
  */
 function collectEnvVars(cliPath) {
     console.log("Collecting environment variables...");
-    let buildName = tl.getInput('buildName',true);
-    let buildNumber = tl.getInput('buildNumber',true);
+    let buildName = tl.getInput('buildName', true);
+    let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildName), quote(buildNumber));
     return executeCliCommand(cliEnvVarsCommand, workDir);

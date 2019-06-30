@@ -1,16 +1,16 @@
-const testUtils = require('../../testUtils');
-const path = require('path');
+const testUtils = require('../../../testUtils');
 
-const TEST_NAME = path.basename(__dirname);
+const TEST_NAME = "npm";
 
 let inputs = {
     "buildName": "npmTest",
-    "buildNumber": "1",
+    "buildNumber": "2",
     "collectBuildInfo": true,
     "workingFolder": "npm",
-    "command": "install",
+    "command": "ci",
     "sourceRepo": testUtils.npmVirtualRepoKey,
-    "arguments": ""
+    "arguments": "",
+    "threads": "4"
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, "resources");

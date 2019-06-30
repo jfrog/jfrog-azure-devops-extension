@@ -56,8 +56,8 @@ let executeConanTask = async(function (commandArgs) {
 
     // Prepare Conan to generate build info
     if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName',true);
-        let buildNumber = tl.getInput('buildNumber',true);
+        let buildName = tl.getInput('buildName', true);
+        let buildNumber = tl.getInput('buildNumber', true);
         try {
             initCliPartialsBuildDir(buildName, buildNumber);
             setConanTraceFileLocation(conanUserHome, conanTaskId);

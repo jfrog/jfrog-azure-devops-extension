@@ -33,7 +33,8 @@
             },
             "options": {
                 "install": "install",
-                "pack and publish": "pack and publish"
+                "pack and publish": "pack and publish",
+                "ci": "ci"
             }
         },
         {
@@ -50,7 +51,7 @@
             "label": "Npm source repository",
             "defaultValue": "",
             "required": true,
-            "visibleRule": "command = install",
+            "visibleRule": "command != pack and publish",
             "helpMarkDown": "The source npm repository.\nCan be local, remote, or a virtual npm repository.",
             "properties": {
                 "EditableOptions": "True"
@@ -70,7 +71,7 @@
         },
         {
             "name": "workingFolder",
-            "type": "string",
+            "type": "filePath",
             "label": "Working folder with package.json",
             "defaultValue": "",
             "required": false,
@@ -82,6 +83,7 @@
             "label": "Npm arguments",
             "defaultValue": "",
             "required": false,
+            "visibleRule": "command != ci",
             "helpMarkDown": "A list of npm arguments and options in the form of \"--arg1=value1 --arg2=value2\"."
         },
         {
@@ -91,6 +93,27 @@
             "defaultValue": "false",
             "required": false,
             "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "threads",
+            "type": "pickList",
+            "label": "Build info threads",
+            "defaultValue": "1",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true && command != pack and publish",
+            "options": {
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7",
+                "8": "8",
+                "9": "9",
+                "10": "10"
+            },
+            "helpMarkDown": "Number of working threads for build-info collection.\nCalculating the build-info requires sending a series of requests to Artifactory.\nSince some build agents may have limited network resources, the default for 'Build info threads' is set to 1.\nIncreasing the threads amount should consume more resources, but can also improve performance."
         },
         {
             "name": "buildName",
