@@ -42,6 +42,7 @@ module.exports = {
 function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
+    process.env.JFROG_CLI_REPORT_USAGE = false;
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
         cliDownloadUrl = jfrogCliBintrayDownloadUrl;
