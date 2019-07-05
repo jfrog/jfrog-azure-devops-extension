@@ -9,7 +9,7 @@ const localTools = require('./tools');
 const fileName = getCliExecutableName();
 const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
-const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
+const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.ToolsDirectory"), "_jfrog"));
 const jfrogCliVersion = "1.26.1";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
