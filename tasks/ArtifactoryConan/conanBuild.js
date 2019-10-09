@@ -2,6 +2,11 @@ const conanutils = require('./conanUtils');
 const tl = require('azure-pipelines-task-lib/task');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
+const stripTrailingSlash = (str) => {
+    return str.endsWith('/') ?
+        str.slice(0, -1) :
+        str;
+};
 
 function run() {
     let conanCommand = tl.getInput('conanCommand', true);
@@ -73,7 +78,7 @@ let handleAddRemoteCommand = async(function() {
     let purgeExistingRemotes = tl.getBoolInput("purgeExistingRemotes", true);
 
     let conanArguments = [
-        "remote", "add", remoteName, artifactoryUrl + "/api/conan/" + conanRepo,
+        "remote", "add", remoteName, stripTrailingSlash(artifactoryUrl) + "/api/conan/" + conanRepo,
         "--insert", "--force"
     ];
 

@@ -13,6 +13,12 @@ let artifactoryDockerDomain = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN;
 let artifactoryDockerRepo = process.env.ADO_ARTIFACTORY_DOCKER_REPO;
 let skipTests = process.env.ADO_ARTIFACTORY_SKIP_TESTS ? process.env.ADO_ARTIFACTORY_SKIP_TESTS.split(',') : [];
 
+const stripTrailingSlash = (str) => {
+    return str.endsWith('/') ?
+        str.slice(0, -1) :
+        str;
+};
+
 module.exports = {
     testDataDir: testDataDir,
     artifactoryDockerDomain: artifactoryDockerDomain,
@@ -95,8 +101,8 @@ function recreateTestDataDir() {
     fs.mkdirSync(testDataDir);
 }
 
-function getBuild(buildName, buildNumber) {
-    return syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
+function getBuild(buildName, buildNumber) {    
+    return syncRequest('GET', stripTrailingSlash(artifactoryUrl) + "api/build/" + buildName + "/" + buildNumber, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
         }
@@ -104,7 +110,7 @@ function getBuild(buildName, buildNumber) {
 }
 
 function deleteBuild(buildName) {
-    syncRequest('DELETE', artifactoryUrl + "/api/build/" + buildName + "?deleteAll=1", {
+    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "?deleteAll=1", {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
         }
@@ -149,7 +155,7 @@ function deleteTestRepositories() {
 }
 
 function createRepo(repoKey, body) {
-    syncRequest('PUT', artifactoryUrl + "/api/repositories/" + repoKey, {
+    syncRequest('PUT', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
             "Content-Type": "application/json"
@@ -159,7 +165,7 @@ function createRepo(repoKey, body) {
 }
 
 function isRepoExists(repoKey) {
-    let res = syncRequest('GET', artifactoryUrl + "/api/repositories/" + repoKey, {
+    let res = syncRequest('GET', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
         }
@@ -168,7 +174,7 @@ function isRepoExists(repoKey) {
 }
 
 function deleteRepo(repoKey) {
-    syncRequest('DELETE', artifactoryUrl + "/api/repositories/" + repoKey, {
+     syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
             "Content-Type": "application/json"

@@ -1,4 +1,11 @@
 "use strict";
+
+const stripTrailingSlash = (str) => {
+    return str.endsWith('/') ?
+        str.slice(0, -1) :
+        str;
+};
+
 define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
     let sharedConfig = VSS.getConfiguration();
     let vsoContext = VSS.getWebContext();
@@ -44,7 +51,7 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
 
         buildInfoIcon.src = "images/artifactory-build-info.png";
         buildInfoUrlDiv.classList.add("build-info-url");
-        buildInfoUrlDiv.href = buildDetails.artifactoryUrl + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        buildInfoUrlDiv.href = stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
         buildInfoUrlDiv.text = "Artifactory Build Info";
         buildInfoUrlDiv.target = "_blank";
         buildInfoDiv.append(buildInfoIcon);
