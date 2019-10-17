@@ -52,7 +52,7 @@ function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     getCliPath(cliDownloadUrl, cliAuthHandlers).then((cliPath) => {
         runCbk(cliPath);
         collectEnvVarsIfNeeded(cliPath);
-    }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error))
+    }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error));
 }
 
 // Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
@@ -88,10 +88,19 @@ function buildCliArtifactoryDownloadUrl(rtUrl, repoName) {
 function createAuthHandlers(artifactoryService) {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
+
+    // Check if Artifactory should be accessed using access-token.
+    if (artifactoryAccessToken) {
+        return [new clientHandlers.BearerCredentialHandler(artifactoryAccessToken)]
+    }
+
     // Check if Artifactory should be accessed anonymously.
     if (artifactoryUser === "") {
         return [];
     }
+
+    // Use basic authentication.
     return [new clientHandlers.BasicCredentialHandler(artifactoryUser, artifactoryPassword)];
 }
 
@@ -136,11 +145,23 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  */
 function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     let artifactoryUrl = tl.getEndpointUrl(artifactory);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username");
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password");
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username", true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password", true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
+    let cliCommand = cliJoin(cliPath, cliConfigCommand, "--url=" + quote(artifactoryUrl), "--interactive=false", quote(serverId));
 
-    let cliCommand = cliJoin(cliPath, cliConfigCommand, "--url=" + quote(artifactoryUrl), "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword), "--interactive=false", quote(serverId));
-    executeCliCommand(cliCommand, buildDir);
+    if (artifactoryAccessToken) {
+        // Add access-token if required.
+        cliCommand = cliJoin(cliCommand, "--access-token=" + quote(artifactoryAccessToken));
+    } else {
+        // Add username and password.
+        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
+    }
+
+    let taskRes = executeCliCommand(cliCommand, buildDir);
+    if (taskRes) {
+        return taskRes;
+    }
 }
 
 /**
@@ -175,28 +196,34 @@ function quote(str) {
 function addArtifactoryCredentials(cliCommand, artifactoryService) {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
+
+    // Check if should use Access Token.
+    if (artifactoryAccessToken) {
+        return cliJoin(cliCommand, "--access-token=" + quote(artifactoryAccessToken));
+    }
+
     // Check if Artifactory should be accessed anonymously.
     if (artifactoryUser === "") {
         artifactoryUser = "anonymous";
-        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
-    } else {
-        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
+        return cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
     }
-    return cliCommand
+
+    return cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
 }
 
 function addStringParam(cliCommand, inputParam, cliParam) {
     let val = tl.getInput(inputParam, false);
     if (val !== null) {
-        cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val))
+        cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val));
     }
-    return cliCommand
+    return cliCommand;
 }
 
 function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
     cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + val);
-    return cliCommand
+    return cliCommand;
 }
 
 function logCliVersion(cliPath) {
@@ -213,7 +240,7 @@ function logCliVersion(cliPath) {
 function runCbk(cliPath) {
     console.log("Running jfrog-cli from " + cliPath + ".");
     logCliVersion(cliPath);
-    runTaskCbk(cliPath)
+    runTaskCbk(cliPath);
 }
 
 function createCliDirs() {
@@ -248,23 +275,23 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers) {
 function getArchitecture() {
     let platform = process.platform;
     if (platform.startsWith("win")) {
-        return "windows-amd64"
+        return "windows-amd64";
     }
     if (platform.includes("darwin")) {
-        return "mac-386"
+        return "mac-386";
     }
     if (process.arch.includes("64")) {
-        return "linux-amd64"
+        return "linux-amd64";
     }
-    return "linux-386"
+    return "linux-386";
 }
 
 function getCliExecutableName() {
     let executable = "jfrog";
     if (isWindows()) {
-        executable += ".exe"
+        executable += ".exe";
     }
-    return executable
+    return executable;
 }
 
 /**

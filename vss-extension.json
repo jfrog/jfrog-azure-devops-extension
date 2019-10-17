@@ -74,10 +74,7 @@
                     {
                         "name": "TestConnection",
                         "endpointUrl": "{{endpoint.url}}/api/plugins",
-                        "resourceUrl": "",
-                        "resultSelector": "jsonpath:$.values[*]",
-                        "headers": [],
-                        "authenticationScheme": null
+                        "resultSelector": "jsonpath:$.values[*]"
                     },
                     {
                         "name": "BuildNames",
@@ -112,6 +109,28 @@
                                 "isConfidential": true,
                                 "validation": {
                                     "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+                        "headers": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{ endpoint.apitoken }}"
+                            }
+                        ],
+                        "inputDescriptors": [
+                            {
+                                "id": "apitoken",
+                                "name": "Access Token",
+                                "description": "Access token of a user with deploy permissions. Click <a href=\"https://https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Token.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
                                     "dataType": "string"
                                 }
                             }
