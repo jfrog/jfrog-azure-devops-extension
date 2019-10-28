@@ -2,11 +2,7 @@ const conanutils = require('./conanUtils');
 const tl = require('azure-pipelines-task-lib/task');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
-const stripTrailingSlash = (str) => {
-    return str.endsWith('/') ?
-        str.slice(0, -1) :
-        str;
-};
+const utils = require('artifactory-tasks-utils');
 
 function run() {
     let conanCommand = tl.getInput('conanCommand', true);
@@ -39,7 +35,7 @@ function run() {
 /**
 * Handle Conan Config Install Command
 */
-let handleConfigInstallCommand = async(function() {
+let handleConfigInstallCommand = async(function () {
     let configSourceType = tl.getInput('configSourceType', true);
     let extraArguments = tl.getInput("extraArguments", false);
 
@@ -68,7 +64,7 @@ let handleConfigInstallCommand = async(function() {
 /**
 * Handle Conan Add Remote Command
 */
-let handleAddRemoteCommand = async(function() {
+let handleAddRemoteCommand = async(function () {
     let remoteName = tl.getInput("remoteName", true);
     let artifactoryService = tl.getInput("artifactoryService", true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
@@ -78,7 +74,7 @@ let handleAddRemoteCommand = async(function() {
     let purgeExistingRemotes = tl.getBoolInput("purgeExistingRemotes", true);
 
     let conanArguments = [
-        "remote", "add", remoteName, stripTrailingSlash(artifactoryUrl) + "/api/conan/" + conanRepo,
+        "remote", "add", remoteName, utils.stripTrailingSlash(artifactoryUrl) + "/api/conan/" + conanRepo,
         "--insert", "--force"
     ];
 
@@ -119,7 +115,7 @@ let handleAddRemoteCommand = async(function() {
 /**
 * Handle Conan Create Command
 */
-let handleCreateCommand = async(function() {
+let handleCreateCommand = async(function () {
     let createPath = tl.getPathInput("createPath", true, true);
     let createReference = tl.getInput("createReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
@@ -141,7 +137,7 @@ let handleCreateCommand = async(function() {
 /**
 * Handle Conan Install Command
 */
-let handleInstallCommand = async(function() {
+let handleInstallCommand = async(function () {
     let pathOrReference = tl.getInput("pathOrReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
 
@@ -161,7 +157,7 @@ let handleInstallCommand = async(function() {
 /**
 * Handle Conan Upload Command
 */
-let handleUploadCommand = async(function() {
+let handleUploadCommand = async(function () {
     let patternOrReference = tl.getInput("patternOrReference", true);
     let extraArguments = tl.getInput("extraArguments", false);
 
@@ -184,7 +180,7 @@ let handleUploadCommand = async(function() {
 /**
 * Handle Conan Custom Command
 */
-let handleCustomCommand = async(function() {
+let handleCustomCommand = async(function () {
     let customArguments = tl.getInput('customArguments', true);
     let conanArguments = customArguments.split(" ");
 
