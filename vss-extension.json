@@ -126,7 +126,7 @@
                             {
                                 "id": "apitoken",
                                 "name": "Access Token",
-                                "description": "Access token of a user with deploy permissions. Click <a href=\"https://https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Token.",
+                                "description": "Access Token with deploy permissions. Click <a href=\"https://https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
