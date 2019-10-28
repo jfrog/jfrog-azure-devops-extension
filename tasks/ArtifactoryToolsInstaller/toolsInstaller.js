@@ -33,12 +33,16 @@ function RunTaskCbk(cliPath) {
 
     // Config a temporary serverId for maven extractor download:
     let serverId = buildName + "-" + buildNumber + "-forextractordownload";
-    let taskRes = utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
-    if (taskRes) {
-        utils.setResultFailedIfError(taskRes);
-        taskRes = utils.deleteCliServers(cliPath, workDir, [serverId]);
-        utils.setResultFailedIfError(taskRes);
-        return;
+    try {
+        utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+        try {
+            utils.deleteCliServers(cliPath, workDir, [serverId]);
+        } catch (deleteServersException) {
+            tl.setResult(tl.TaskResult.Failed, deleteServersException);
+        }
+        return
     }
 
     // Set the environment variables needed for the cli to download the extractor from artifactory

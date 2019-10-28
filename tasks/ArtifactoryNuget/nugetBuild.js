@@ -100,13 +100,12 @@ function runNuGet(nugetCommandCli, cliPath, buildDir) {
     }
 
     nugetCommandCli = addArtifactoryServer(nugetCommandCli);
-    let taskRes = utils.executeCliCommand(nugetCommandCli, buildDir);
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-        console.log(taskRes);
-        return;
+    try {
+        utils.executeCliCommand(nugetCommandCli, buildDir);
+        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
     }
-    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
 }
 
 // Adds the Artifactory information to the command

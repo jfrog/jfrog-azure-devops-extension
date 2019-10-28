@@ -34,8 +34,7 @@ module.exports = {
     buildCliArtifactoryDownloadUrl: buildCliArtifactoryDownloadUrl,
     createAuthHandlers: createAuthHandlers,
     configureCliServer: configureCliServer,
-    deleteCliServers: deleteCliServers,
-    setResultFailedIfError: setResultFailedIfError
+    deleteCliServers: deleteCliServers
 };
 
 // Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
@@ -107,6 +106,14 @@ function generateDownloadCliErrorMessage(downloadUrl) {
     return errMsg;
 }
 
+/**
+ * Execute provided CLI command in a child process. In order to receive execution's stdout, pass stdio=null.
+ * @param {string} cliCommand
+ * @param {string} runningDir
+ * @param {string|Array} stdio - stdio to use for CLI execution.
+ * @returns {Buffer|string} - execSync output.
+ * @throws In CLI execution failure.
+ */
 function executeCliCommand(cliCommand, runningDir, stdio) {
     if (!fs.existsSync(runningDir)) {
         return "JFrog CLI execution path doesn't exist: " + runningDir;
@@ -115,48 +122,38 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        execSync(cliCommand, {cwd: runningDir, stdio: stdio});
+        return execSync(cliCommand, {cwd: runningDir, stdio: stdio});
     } catch (ex) {
         // Error occurred
-        return ex.toString().replace(/--password=".*"/g, "--password=***");
+        throw ex.toString().replace(/--password=".*"/g, "--password=***");
     }
 }
 
-// Configuring a server in the cli config
+/**
+ * Add a new server to the CLI config.
+ * @returns {Buffer|string}
+ * @throws In CLI execution failure.
+ */
 function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     let artifactoryUrl = tl.getEndpointUrl(artifactory);
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username");
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password");
 
     let cliCommand = cliJoin(cliPath, cliConfigCommand, "--url=" + quote(artifactoryUrl), "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword), "--interactive=false", quote(serverId));
-    let taskRes = executeCliCommand(cliCommand, buildDir);
-    if (taskRes) {
-        return taskRes;
-    }
+    executeCliCommand(cliCommand, buildDir);
 }
 
-// Removing the servers from the cli config
+/**
+ * Remove servers from the cli config.
+ * @returns (Buffer|string) CLI execution output.
+ * @throws In CLI execution failure.
+ */
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
     let deleteServerIDCommand;
-    let taskRes;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
         deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, "delete", quote(serverIdArray[i]), "--interactive=false");
-        taskRes = executeCliCommand(deleteServerIDCommand, buildDir);
-        if (taskRes) {
-            return taskRes;
-        }
-    }
-    return taskRes;
-}
-
-// Does not stop the task. If set to 'Failed', calls of setting to 'Succeeded' are ignored.
-function setResultFailedIfError(taskRes, customMsg) {
-    if (taskRes) {
-        if (customMsg) {
-            tl.setResult(tl.TaskResult.Failed, customMsg);
-        } else {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-        }
+        // This operation throws an exception in case of failure.
+        executeCliCommand(deleteServerIDCommand, buildDir);
     }
 }
 
@@ -343,6 +340,7 @@ function collectEnvVarsIfNeeded(cliPath) {
  * Runs collect environment variables JFrog CLI command.
  * @param cliPath - (String) - The cli path.
  * @returns (String|void) - String with error message or void if passes successfully.
+ * @throws In CLI execution failure.
  */
 function collectEnvVars(cliPath) {
     console.log("Collecting environment variables...");
@@ -350,7 +348,7 @@ function collectEnvVars(cliPath) {
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildName), quote(buildNumber));
-    return executeCliCommand(cliEnvVarsCommand, workDir);
+    executeCliCommand(cliEnvVarsCommand, workDir);
 }
 
 function isWindows() {
