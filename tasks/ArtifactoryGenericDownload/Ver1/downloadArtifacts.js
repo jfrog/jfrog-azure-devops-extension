@@ -16,7 +16,7 @@ function RunTaskCbk(cliPath) {
     }
     let specPath = path.join(workDir, "downloadSpec" + Date.now() + ".json");
 
-    // Get input parameters
+    // Get input parameters.
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let specSource = tl.getInput("specSource", false);
@@ -35,7 +35,7 @@ function RunTaskCbk(cliPath) {
         utils.validateSpecWithoutRegex(fileSpec);
         console.log("Using file spec:");
         console.log(fileSpec);
-        // Write provided fileSpec to file
+        // Write provided fileSpec to file.
         tl.writeFile(specPath, fileSpec);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -46,25 +46,26 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addBoolParam(cliCommand, "failNoOp", "fail-no-op");
 
-    // Add build info collection
+    // Add build info collection.
     if (collectBuildInfo) {
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildDefinition), "--build-number=" + utils.quote(buildNumber));
     }
 
-    let taskRes = utils.executeCliCommand(cliCommand, workDir);
-
-    // Remove created fileSpec from file system
     try {
-        tl.rmRF(specPath);
-    } catch (ex) {
-        taskRes = "Failed cleaning temporary FileSpec file.";
+        utils.executeCliCommand(cliCommand, workDir);
+
+    } catch (executionException) {
+        tl.setResult(tl.TaskResult.Failed, executionException);
+    } finally {
+        try {
+            tl.rmRF(specPath);
+        } catch (fileException) {
+            tl.setResult(tl.TaskResult.Failed, "Failed cleaning temporary FileSpec file.");
+        }
     }
 
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
-        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
-    }
+    // Ignored if previously failed.
+    tl.setResult(tl.TaskResult.Succeeded, "Download Succeeded.");
 }
 
 utils.executeCliTask(RunTaskCbk);

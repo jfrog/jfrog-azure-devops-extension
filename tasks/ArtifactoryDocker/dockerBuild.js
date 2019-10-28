@@ -50,12 +50,11 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
-    let taskRes = utils.executeCliCommand(cliCommand, defaultWorkDir);
-
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
+    try {
+        utils.executeCliCommand(cliCommand, defaultWorkDir);
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
     }
 }
 

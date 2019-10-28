@@ -37,15 +37,13 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    // Creating the config file for Maven
+    // Create Maven config file.
     let config = path.join(workDir, "config");
-    let taskRes = createMavenConfigFile(config, cliPath, workDir, buildName, buildNumber);
-    if (taskRes) {
-        utils.setResultFailedIfError(taskRes);
-        taskRes = utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
-        utils.setResultFailedIfError(taskRes);
-        taskRes = removeExtractorDownloadVariables(cliPath, workDir);
-        utils.setResultFailedIfError(taskRes);
+    try {
+        createMavenConfigFile(config, cliPath, workDir, buildName, buildNumber);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+        cleanup(cliPath, workDir);
         return;
     }
 
@@ -65,12 +63,13 @@ function RunTaskCbk(cliPath) {
         mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
-    taskRes = utils.executeCliCommand(mavenCommand, workDir);
-    utils.setResultFailedIfError(taskRes);
-    taskRes = utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
-    utils.setResultFailedIfError(taskRes);
-    taskRes = removeExtractorDownloadVariables(cliPath, workDir);
-    utils.setResultFailedIfError(taskRes);
+    try {
+        utils.executeCliCommand(mavenCommand, workDir);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    } finally {
+        cleanup(cliPath, workDir);
+    }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
 }
@@ -85,49 +84,61 @@ function addToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
 
 function createMavenConfigFile(config, cliPath, buildDir, buildName, buildNumber) {
     let configInfo = "version: 1\ntype: maven\n";
-    // Get configured parameters
+
+    // Configure deployer server, throws on failure.
     let artifactoryDeployer = tl.getInput("artifactoryDeployService");
     let serverId = buildName + "-" + buildNumber;
     serverIdDeployer = serverId + "-deployer";
-    let taskRes = utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
-    if (taskRes) {
-        return taskRes
-    }
-    let artifactoryResolver = tl.getInput("artifactoryResolverService");
+    utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
 
+    // Configure resolver server, throws on failure.
+    let artifactoryResolver = tl.getInput("artifactoryResolverService");
     if (artifactoryResolver != null) {
         serverIdResolver = serverId + "-resolver";
-        taskRes = utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
-        if (taskRes) {
-            return taskRes
-        }
+        utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
         let targetResolveReleaseRepo = tl.getInput("targetResolveReleaseRepo");
         let targetResolveSnapshotRepo = tl.getInput("targetResolveSnapshotRepo");
         configInfo = addToConfig(configInfo, "resolver", targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
     } else {
         console.log("Resolution from Artifactory is not configured");
-
     }
 
+    // Create configuration file, throws on failure.
     let targetDeployReleaseRepo = tl.getInput("targetDeployReleaseRepo");
     let targetDeploySnapshotRepo = tl.getInput("targetDeploySnapshotRepo");
     configInfo = addToConfig(configInfo, "deployer", targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
     console.log(configInfo);
-    try {
-        tl.writeFile(config, configInfo);
-    } catch (ex) {
-        return ex
-    }
+    tl.writeFile(config, configInfo);
 }
 
-// Removes the cli server config and env variables set in ToolsInstaller task
+/**
+ * Removes the cli server config and env variables set in ToolsInstaller task.
+ * @throws In CLI execution failure.
+ */
 function removeExtractorDownloadVariables(cliPath, workDir) {
-    let taskRes;
     let serverId = tl.getVariable("JFROG_CLI_JCENTER_REMOTE_SERVER");
-    if (serverId && serverId !== "") {
-        taskRes = utils.deleteCliServers(cliPath, workDir, [serverId]);
-        tl.setVariable("JFROG_CLI_JCENTER_REMOTE_SERVER", "");
-        tl.setVariable("JFROG_CLI_JCENTER_REMOTE_REPO", "");
+    if (!serverId) {
+        return;
     }
-    return taskRes;
+    tl.setVariable("JFROG_CLI_JCENTER_REMOTE_SERVER", "");
+    tl.setVariable("JFROG_CLI_JCENTER_REMOTE_REPO", "");
+    utils.deleteCliServers(cliPath, workDir, [serverId]);
+}
+
+/**
+ * Cleanup in case of task failure.
+ */
+function cleanup(cliPath, workDir) {
+    // Delete servers.
+    try {
+        utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
+    } catch (deleteServersException) {
+        tl.setResult(tl.TaskResult.Failed, deleteServersException);
+    }
+    // Remove extractor variables.
+    try {
+        removeExtractorDownloadVariables(cliPath, workDir);
+    } catch (removeVariablesException) {
+        tl.setResult(tl.TaskResult.Failed, removeVariablesException);
+    }
 }
