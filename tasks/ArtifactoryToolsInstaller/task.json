@@ -52,7 +52,7 @@
             "label": "From:",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Sets the repository from which the Maven Extractor should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"http://jcenter.bintray.com\".",
+            "helpMarkDown": "Sets the repository from which the Maven Extractor should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jcenter.bintray.com\".",
             "visibleRule": "installMavenExtractor == true && artifactoryService != \"\"",
             "properties": {
                 "EditableOptions": "True"
