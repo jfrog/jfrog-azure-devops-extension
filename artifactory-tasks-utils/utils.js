@@ -134,7 +134,8 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         return execSync(cliCommand, {cwd: runningDir, stdio: stdio});
     } catch (ex) {
         // Error occurred
-        throw ex.toString().replace(/--password=".*"/g, "--password=***");
+        let errorMsg = ex.toString().replace(/--password=".*"/g, "--password=***");
+        throw errorMsg.replace(/--access-token=".*"/g, "--access-token=***");
     }
 }
 
@@ -147,9 +148,8 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     let artifactoryUrl = tl.getEndpointUrl(artifactory);
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password", true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
-    let cliCommand = cliJoin(cliPath, cliConfigCommand, "--url=" + quote(artifactoryUrl), "--interactive=false", quote(serverId));
-
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactory, "apitoken", true);
+    let cliCommand = cliJoin(cliPath, cliConfigCommand, quote(serverId), "--url=" + quote(artifactoryUrl), "--interactive=false");
     if (artifactoryAccessToken) {
         // Add access-token if required.
         cliCommand = cliJoin(cliCommand, "--access-token=" + quote(artifactoryAccessToken));
@@ -157,11 +157,7 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
         // Add username and password.
         cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
     }
-
-    let taskRes = executeCliCommand(cliCommand, buildDir);
-    if (taskRes) {
-        return taskRes;
-    }
+    executeCliCommand(cliCommand, buildDir);
 }
 
 /**
@@ -356,9 +352,11 @@ function encodePath(str) {
 function collectEnvVarsIfNeeded(cliPath) {
     let includeEnvVars = tl.getBoolInput("includeEnvVars");
     if (includeEnvVars) {
-        let taskRes = collectEnvVars(cliPath);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
+        try {
+            collectEnvVars(cliPath);
+        }
+        catch (ex) {
+            tl.setResult(tl.TaskResult.Failed, ex);
         }
     }
 }

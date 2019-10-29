@@ -8,23 +8,6 @@ const execSync = require('child_process').execSync;
 
 utils.executeCliTask(RunTaskCbk);
 
-function checkAndSetMavenHome() {
-    let m2HomeEnvVar = tl.getVariable('M2_HOME');
-    if (!m2HomeEnvVar) {
-        console.log("M2_HOME is not defined. Retrieving Maven home using mvn --version.");
-        // The M2_HOME environment variable is not defined.
-        // Since Maven installation can be located in different locations,
-        // depending on the installation type and the OS (for example: For Mac with brew install: /usr/local/Cellar/maven/{version}/libexec or Ubuntu with debian: /usr/share/maven),
-        // we need to grab the location using the mvn --version command
-        let mvnCommand = "mvn --version";
-        let res = execSync(mvnCommand);
-        let mavenHomeLine = String.fromCharCode.apply(null, res).split('\n')[1].trim();
-        let mavenHome = mavenHomeLine.split(" ")[2];
-        console.log("The Maven home location: " + mavenHome);
-        process.env["M2_HOME"] = mavenHome;
-    }
-}
-
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
 
@@ -72,6 +55,23 @@ function RunTaskCbk(cliPath) {
     }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
+}
+
+function checkAndSetMavenHome() {
+    let m2HomeEnvVar = tl.getVariable('M2_HOME');
+    if (!m2HomeEnvVar) {
+        console.log("M2_HOME is not defined. Retrieving Maven home using mvn --version.");
+        // The M2_HOME environment variable is not defined.
+        // Since Maven installation can be located in different locations,
+        // depending on the installation type and the OS (for example: For Mac with brew install: /usr/local/Cellar/maven/{version}/libexec or Ubuntu with debian: /usr/share/maven),
+        // we need to grab the location using the mvn --version command
+        let mvnCommand = "mvn --version";
+        let res = execSync(mvnCommand);
+        let mavenHomeLine = String.fromCharCode.apply(null, res).split('\n')[1].trim();
+        let mavenHome = mavenHomeLine.split(" ")[2];
+        console.log("The Maven home location: " + mavenHome);
+        process.env["M2_HOME"] = mavenHome;
+    }
 }
 
 function addToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
