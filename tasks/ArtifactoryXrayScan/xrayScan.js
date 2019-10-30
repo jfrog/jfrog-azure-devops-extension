@@ -31,6 +31,8 @@ function RunTaskCbk(cliPath) {
         }
         let scanUrlFile = path.join(workDir, "scanUrlFile");
         tl.writeFile(scanUrlFile, JSON.stringify(scanUrl));
+
+        // Upload and attach the scan-url file, to be available for reading from the build 'Artifactory' summary tab.
         console.log("##vso[task.addattachment type=xrayType;name=scanDetails;]" + scanUrlFile);
 
         // Check if should fail build.
