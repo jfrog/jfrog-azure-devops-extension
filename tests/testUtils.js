@@ -10,6 +10,7 @@ const utils = require('artifactory-tasks-utils');
 let artifactoryUrl = process.env.ADO_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.ADO_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.ADO_ARTIFACTORY_PASSWORD;
+let artifactoryAccessToken = process.env.ADO_ARTIFACTORY_ACCESS_TOKEN;
 let artifactoryDockerDomain = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN;
 let artifactoryDockerRepo = process.env.ADO_ARTIFACTORY_DOCKER_REPO;
 let skipTests = process.env.ADO_ARTIFACTORY_SKIP_TESTS ? process.env.ADO_ARTIFACTORY_SKIP_TESTS.split(',') : [];
@@ -99,7 +100,7 @@ function recreateTestDataDir() {
 function getBuild(buildName, buildNumber) {
     return syncRequest('GET', utils.stripTrailingSlash(artifactoryUrl) + "api/build/" + buildName + "/" + buildNumber, {
         headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+            "Authorization": getAuthorizationHeaderValue()
         }
     });
 }
@@ -107,7 +108,7 @@ function getBuild(buildName, buildNumber) {
 function deleteBuild(buildName) {
     syncRequest('DELETE', utils.stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "?deleteAll=1", {
         headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+            "Authorization": getAuthorizationHeaderValue()
         }
     });
 }
@@ -152,7 +153,7 @@ function deleteTestRepositories() {
 function createRepo(repoKey, body) {
     syncRequest('PUT', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
+            "Authorization": getAuthorizationHeaderValue(),
             "Content-Type": "application/json"
         },
         body: body
@@ -162,7 +163,7 @@ function createRepo(repoKey, body) {
 function isRepoExists(repoKey) {
     let res = syncRequest('GET', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64")
+            "Authorization": getAuthorizationHeaderValue()
         }
     });
     return res.statusCode === 200;
@@ -171,10 +172,18 @@ function isRepoExists(repoKey) {
 function deleteRepo(repoKey) {
     syncRequest('DELETE', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
-            "Authorization": "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64"),
+            "Authorization": getAuthorizationHeaderValue(),
             "Content-Type": "application/json"
         }
     });
+}
+
+function getAuthorizationHeaderValue() {
+    if (artifactoryAccessToken) {
+        return "Bearer " + artifactoryAccessToken;
+    } else {
+        return "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64");
+    }
 }
 
 function setArtifactoryCredentials() {
@@ -185,7 +194,12 @@ function setArtifactoryCredentials() {
         if (key === "username") {
             return artifactoryUsername;
         }
-        return artifactoryPassword;
+        if (key === "password") {
+            return artifactoryPassword;
+        }
+        if (key === "apitoken") {
+            return artifactoryAccessToken;
+        }
     };
 }
 

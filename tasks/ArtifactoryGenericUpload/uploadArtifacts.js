@@ -51,17 +51,22 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
     }
 
-    let taskRes = utils.executeCliCommand(cliCommand, workDir);
-
-    // Remove created fileSpec from file system
+    let errorMessage;
     try {
-        tl.rmRF(specPath);
+        utils.executeCliCommand(cliCommand, workDir);
     } catch (ex) {
-        taskRes = "Failed cleaning temporary FileSpec file.";
+        errorMessage = ex.toString();
+    } finally {
+        // Remove created fileSpec from file system.
+        try {
+            tl.rmRF(specPath);
+        } catch (err) {
+            errorMessage = "Failed cleaning temporary FileSpec file.";
+        }
     }
 
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
+    if (errorMessage) {
+        tl.setResult(tl.TaskResult.Failed, errorMessage);
     } else {
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
     }

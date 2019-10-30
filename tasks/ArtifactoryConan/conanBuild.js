@@ -70,8 +70,17 @@ let handleAddRemoteCommand = async(function () {
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
     let conanRepo = tl.getInput("conanRepo", true);
     let purgeExistingRemotes = tl.getBoolInput("purgeExistingRemotes", true);
+
+    if (artifactoryAccessToken) {
+        // Access token is not supported.
+        console.error("Access Token is not supported for authentication with Artifactory, please configure Artifactory service connection" +
+            " to work with basic authentication.");
+        setTaskResult(false);
+        return;
+    }
 
     let conanArguments = [
         "remote", "add", remoteName, utils.stripTrailingSlash(artifactoryUrl) + "/api/conan/" + conanRepo,

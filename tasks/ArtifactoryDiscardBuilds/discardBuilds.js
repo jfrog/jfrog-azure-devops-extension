@@ -19,10 +19,12 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addBoolParam(cliCommand, "deleteArtifacts", "delete-artifacts");
     cliCommand = utils.addBoolParam(cliCommand, "async", "async");
 
-    let taskRes = utils.executeCliCommand(cliCommand, process.cwd());
-    utils.setResultFailedIfError(taskRes);
-    // Ignored if previously set to 'Failed'
-    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    try {
+        utils.executeCliCommand(cliCommand, process.cwd());
+        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
 }
 
 utils.executeCliTask(RunTaskCbk);

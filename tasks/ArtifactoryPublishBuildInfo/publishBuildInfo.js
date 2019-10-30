@@ -23,12 +23,12 @@ function RunTaskCbk(cliPath) {
     cliCommand = addBuildUrl(cliCommand);
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
-    let taskRes = utils.executeCliCommand(cliCommand, workDir);
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
+    try {
+        utils.executeCliCommand(cliCommand, workDir);
         attachBuildInfoUrl(buildName, buildNumber, workDir);
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
     }
 }
 

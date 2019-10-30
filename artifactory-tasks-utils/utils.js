@@ -54,7 +54,7 @@ function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     getCliPath(cliDownloadUrl, cliAuthHandlers).then((cliPath) => {
         runCbk(cliPath);
         collectEnvVarsIfNeeded(cliPath);
-    }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error))
+    }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error));
 }
 
 // Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
@@ -90,10 +90,19 @@ function buildCliArtifactoryDownloadUrl(rtUrl, repoName) {
 function createAuthHandlers(artifactoryService) {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
+
+    // Check if Artifactory should be accessed using access-token.
+    if (artifactoryAccessToken) {
+        return [new clientHandlers.BearerCredentialHandler(artifactoryAccessToken)]
+    }
+
     // Check if Artifactory should be accessed anonymously.
     if (artifactoryUser === "") {
         return [];
     }
+
+    // Use basic authentication.
     return [new clientHandlers.BasicCredentialHandler(artifactoryUser, artifactoryPassword)];
 }
 
@@ -108,6 +117,14 @@ function generateDownloadCliErrorMessage(downloadUrl) {
     return errMsg;
 }
 
+/**
+ * Execute provided CLI command in a child process. In order to receive execution's stdout, pass stdio=null.
+ * @param {string} cliCommand
+ * @param {string} runningDir
+ * @param {string|Array} stdio - stdio to use for CLI execution.
+ * @returns {Buffer|string} - execSync output.
+ * @throws In CLI execution failure.
+ */
 function executeCliCommand(cliCommand, runningDir, stdio) {
     if (!fs.existsSync(runningDir)) {
         return "JFrog CLI execution path doesn't exist: " + runningDir;
@@ -119,45 +136,43 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
-        return ex.toString().replace(/--password=".*"/g, "--password=***");
+        let errorMsg = ex.toString().replace(/--password=".*"/g, "--password=***");
+        throw errorMsg.replace(/--access-token=".*"/g, "--access-token=***");
     }
 }
 
-// Configuring a server in the cli config
+/**
+ * Add a new server to the CLI config.
+ * @returns {Buffer|string}
+ * @throws In CLI execution failure.
+ */
 function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     let artifactoryUrl = tl.getEndpointUrl(artifactory);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username");
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password");
-
-    let cliCommand = cliJoin(cliPath, cliConfigCommand, "--url=" + quote(artifactoryUrl), "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword), "--interactive=false", quote(serverId));
-    let taskRes = executeCliCommand(cliCommand, buildDir);
-    if (taskRes) {
-        return taskRes;
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username", true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password", true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactory, "apitoken", true);
+    let cliCommand = cliJoin(cliPath, cliConfigCommand, quote(serverId), "--url=" + quote(artifactoryUrl), "--interactive=false");
+    if (artifactoryAccessToken) {
+        // Add access-token if required.
+        cliCommand = cliJoin(cliCommand, "--access-token=" + quote(artifactoryAccessToken));
+    } else {
+        // Add username and password.
+        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
     }
+    executeCliCommand(cliCommand, buildDir);
 }
 
-// Removing the servers from the cli config
+/**
+ * Remove servers from the cli config.
+ * @returns (Buffer|string) CLI execution output.
+ * @throws In CLI execution failure.
+ */
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
     let deleteServerIDCommand;
-    let taskRes;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
         deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, "delete", quote(serverIdArray[i]), "--interactive=false");
-        taskRes = executeCliCommand(deleteServerIDCommand, buildDir);
-        if (taskRes) {
-            return taskRes;
-        }
-    }
-    return taskRes;
-}
-
-// Does not stop the task. If set to 'Failed', calls of setting to 'Succeeded' are ignored.
-function setResultFailedIfError(taskRes, customMsg) {
-    if (taskRes) {
-        if (customMsg) {
-            tl.setResult(tl.TaskResult.Failed, customMsg);
-        } else {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
-        }
+        // This operation throws an exception in case of failure.
+        executeCliCommand(deleteServerIDCommand, buildDir);
     }
 }
 
@@ -179,28 +194,34 @@ function quote(str) {
 function addArtifactoryCredentials(cliCommand, artifactoryService) {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
+
+    // Check if should use Access Token.
+    if (artifactoryAccessToken) {
+        return cliJoin(cliCommand, "--access-token=" + quote(artifactoryAccessToken));
+    }
+
     // Check if Artifactory should be accessed anonymously.
     if (artifactoryUser === "") {
         artifactoryUser = "anonymous";
-        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
-    } else {
-        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
+        return cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
     }
-    return cliCommand
+
+    return cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
 }
 
 function addStringParam(cliCommand, inputParam, cliParam) {
     let val = tl.getInput(inputParam, false);
     if (val !== null) {
-        cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val))
+        cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val));
     }
-    return cliCommand
+    return cliCommand;
 }
 
 function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
     cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + val);
-    return cliCommand
+    return cliCommand;
 }
 
 function logCliVersion(cliPath) {
@@ -217,7 +238,7 @@ function logCliVersion(cliPath) {
 function runCbk(cliPath) {
     console.log("Running jfrog-cli from " + cliPath + ".");
     logCliVersion(cliPath);
-    runTaskCbk(cliPath)
+    runTaskCbk(cliPath);
 }
 
 function createCliDirs() {
@@ -252,23 +273,23 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers) {
 function getArchitecture() {
     let platform = process.platform;
     if (platform.startsWith("win")) {
-        return "windows-amd64"
+        return "windows-amd64";
     }
     if (platform.includes("darwin")) {
-        return "mac-386"
+        return "mac-386";
     }
     if (process.arch.includes("64")) {
-        return "linux-amd64"
+        return "linux-amd64";
     }
-    return "linux-386"
+    return "linux-386";
 }
 
 function getCliExecutableName() {
     let executable = "jfrog";
     if (isWindows()) {
-        executable += ".exe"
+        executable += ".exe";
     }
-    return executable
+    return executable;
 }
 
 /**
@@ -333,9 +354,11 @@ function encodePath(str) {
 function collectEnvVarsIfNeeded(cliPath) {
     let includeEnvVars = tl.getBoolInput("includeEnvVars");
     if (includeEnvVars) {
-        let taskRes = collectEnvVars(cliPath);
-        if (taskRes) {
-            tl.setResult(tl.TaskResult.Failed, taskRes);
+        try {
+            collectEnvVars(cliPath);
+        }
+        catch (ex) {
+            tl.setResult(tl.TaskResult.Failed, ex);
         }
     }
 }
@@ -344,6 +367,7 @@ function collectEnvVarsIfNeeded(cliPath) {
  * Runs collect environment variables JFrog CLI command.
  * @param cliPath - (String) - The cli path.
  * @returns (String|void) - String with error message or void if passes successfully.
+ * @throws In CLI execution failure.
  */
 function collectEnvVars(cliPath) {
     console.log("Collecting environment variables...");
@@ -351,7 +375,7 @@ function collectEnvVars(cliPath) {
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildName), quote(buildNumber));
-    return executeCliCommand(cliEnvVarsCommand, workDir);
+    executeCliCommand(cliEnvVarsCommand, workDir);
 }
 
 function isWindows() {

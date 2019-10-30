@@ -37,7 +37,12 @@ describe("JFrog Artifactory Extension Tests", () => {
         runTest("Mask password", () => {
             let oldPassword = process.env.ADO_ARTIFACTORY_PASSWORD;
             process.env.ADO_ARTIFACTORY_PASSWORD = "SUPER_SECRET";
-            let retVal = jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
+            let retVal;
+            try {
+                jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
+            } catch (ex) {
+                retVal = ex.toString();
+            }
             process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;
             assert(!retVal.toString().includes("SUPER_SECRET"), "Output contains password");
         });

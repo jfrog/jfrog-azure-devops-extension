@@ -59,11 +59,11 @@ function performNpmCommand(cliNpmCommand, npmRepository, addThreads, cliPath, ar
     }
 
     // Execute cli.
-    let taskRes = utils.executeCliCommand(cliCommand, requiredWorkDir);
-    if (taskRes) {
-        tl.setResult(tl.TaskResult.Failed, taskRes);
-    } else {
+    try {
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
         tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
     }
 }
 
