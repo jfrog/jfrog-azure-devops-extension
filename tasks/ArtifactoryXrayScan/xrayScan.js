@@ -23,7 +23,7 @@ function RunTaskCbk(cliPath) {
         let resJson = JSON.parse(taskRes);
         let scanUrl = resJson['summary']['more_details_url'];
 
-        // Save build-scan link in file.
+        // Save build-scan link to a file.
         let workDir = tl.getVariable('System.DefaultWorkingDirectory');
         if (!workDir) {
             tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");

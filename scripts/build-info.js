@@ -92,7 +92,7 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
         xrayScanIcon.src = "images/artifactory-xray-scan.png";
         xrayScanUrlDiv.classList.add("xray-scan-url");
         xrayScanUrlDiv.href = scanUrl;
-        xrayScanUrlDiv.text = "Build Scan Report";
+        xrayScanUrlDiv.text = "Xray Build Scan Report";
         xrayScanUrlDiv.target = "_blank";
         xrayScanDiv.append(xrayScanIcon);
         xrayScanDiv.append(xrayScanUrlDiv);
