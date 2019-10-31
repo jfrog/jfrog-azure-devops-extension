@@ -25,7 +25,10 @@ function RunTaskCbk(cliPath) {
     // Determine go command and run cli.
     let inputCommand = tl.getInput("command", true);
     switch(inputCommand) {
-        case 'build' || 'test' || 'get':
+        // Fall-through if command is build / test / get
+        case 'build':
+        case 'test':
+        case 'get':
             performGoNativeCommand(inputCommand, cliPath, requiredWorkDir);
             break;
         case 'custom':
