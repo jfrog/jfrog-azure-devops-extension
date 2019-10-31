@@ -1,16 +1,19 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
 
-const TEST_NAME = path.basename(__dirname);
+const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
+    "buildName": "setAndDeleteProps",
+    "buildNumber": "4",
     "fileSpec": JSON.stringify({
         files: [{
             pattern: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME),
             target: testUtils.getLocalTestDir(TEST_NAME),
-            flat: "true"
+            flat: "true",
+            props: "propKey1=propVal1;propKey2=propVal2"
         }]
     }),
+    "collectBuildInfo": false,
     "failNoOp": true,
     "specSource": "taskConfiguration"
 };

@@ -388,6 +388,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryToolsInstaller"
             }
+        },
+        {
+            "id": "artifactory-properties-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryProperties"
+            }
         }
     ],
     "files": [
@@ -442,6 +452,9 @@
         },
         {
             "path": "tasks/ArtifactoryToolsInstaller"
+        },
+        {
+            "path": "tasks/ArtifactoryProperties"
         }
     ]
 }

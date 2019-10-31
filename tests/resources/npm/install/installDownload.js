@@ -11,7 +11,8 @@ let inputs = {
             flat: "true"
         }]
     }),
-    "failNoOp": true
+    "failNoOp": true,
+    "specSource": "taskConfiguration"
 };
 
 testUtils.runTask(testUtils.download, {}, inputs);

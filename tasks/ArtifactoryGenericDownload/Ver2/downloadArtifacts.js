@@ -2,7 +2,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils');
 const path = require('path');
-const fs = require('fs-extra');
 
 const cliDownloadCommand = "rt dl";
 
@@ -61,7 +60,7 @@ function performGenericDownload(cliPath, workDir, artifactoryService, artifactor
 
     // Create download FileSpec.
     try {
-        writeSpecContentToSpecPath(specSource, specPath);
+        utils.writeSpecContentToSpecPath(specSource, specPath);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;
@@ -84,6 +83,7 @@ function performGenericDownload(cliPath, workDir, artifactoryService, artifactor
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
+        // Remove created fileSpec from file system.
         try {
             tl.rmRF(specPath);
         } catch (fileException) {
@@ -93,23 +93,6 @@ function performGenericDownload(cliPath, workDir, artifactoryService, artifactor
 
     // Ignored if previously failed.
     tl.setResult(tl.TaskResult.Succeeded, "Download Succeeded.");
-}
-
-function writeSpecContentToSpecPath(specSource, specPath) {
-    let fileSpec;
-    if (specSource === "file") {
-        let specInputPath = tl.getPathInput("file", true, true);
-        console.log("Using file spec located at " + specInputPath);
-        fileSpec = fs.readFileSync(specInputPath, "utf8");
-    } else {
-        fileSpec = tl.getInput("fileSpec", true);
-    }
-    fileSpec = utils.fixWindowsPaths(fileSpec);
-    utils.validateSpecWithoutRegex(fileSpec);
-    console.log("Using file spec:");
-    console.log(fileSpec);
-    // Write provided fileSpec to file
-    tl.writeFile(specPath, fileSpec);
 }
 
 utils.executeCliTask(RunTaskCbk);

@@ -3,7 +3,8 @@ const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils');
 const path = require('path');
 
-const cliUploadCommand = "rt u";
+const setPropsCommand = "rt sp";
+const deletePropsCommand = "rt delp";
 
 function RunTaskCbk(cliPath) {
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -11,15 +12,26 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
         return;
     }
-    let specPath = path.join(workDir, "uploadSpec" + Date.now() + ".json");
+    let specPath = path.join(workDir, "propsSpec" + Date.now() + ".json");
 
     // Get input parameters
     let artifactoryService = tl.getInput("artifactoryService", false);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    let command = tl.getInput("command", false);
     let specSource = tl.getInput("specSource", false);
-    let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
 
-    // Create upload FileSpec.
+    // Get file properties.
+    let fileProps;
+    let propsCommand;
+    if (command === "set") {
+        propsCommand = setPropsCommand;
+        fileProps = tl.getInput("setProps", false);
+    } else {
+        propsCommand = deletePropsCommand;
+        fileProps = tl.getInput("deleteProps", false);
+    }
+
+    // Create file-spec.
     try {
         utils.writeSpecContentToSpecPath(specSource, specPath);
     } catch (ex) {
@@ -27,16 +39,8 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    let cliCommand = utils.cliJoin(cliPath, cliUploadCommand, "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
+    let cliCommand = utils.cliJoin(cliPath, propsCommand, utils.quote(fileProps), "--url=" + utils.quote(artifactoryUrl), "--spec=" + utils.quote(specPath));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
-    cliCommand = utils.addBoolParam(cliCommand, "failNoOp", "fail-no-op");
-
-    // Add build info collection
-    if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName', true);
-        let buildNumber = tl.getInput('buildNumber', true);
-        cliCommand = utils.cliJoin(cliCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
-    }
 
     try {
         utils.executeCliCommand(cliCommand, workDir);

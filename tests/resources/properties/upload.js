@@ -3,7 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    "buildName": "buildDiscard",
+    "buildName": "setAndDeleteProps",
     "buildNumber": "4",
     "fileSpec": JSON.stringify({
         files: [{
@@ -11,7 +11,7 @@ let inputs = {
             target: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME)
         }]
     }),
-    "collectBuildInfo": true,
+    "collectBuildInfo": false,
     "failNoOp": true,
     "specSource": "taskConfiguration"
 };

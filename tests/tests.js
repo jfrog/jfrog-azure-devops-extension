@@ -276,6 +276,25 @@ describe("JFrog Artifactory Extension Tests", () => {
         });
     });
 
+    describe("Properties Tests", () => {
+        runTest("Set properties", () => {
+            let testDir = "setProperties";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "set");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "files"), testDir);
+        });
+
+        runTest("Delete properties", () => {
+            let testDir = "deleteProperties";
+            mockTask(testDir, "upload");
+            mockTask(testDir, "set");
+            mockTask(testDir, "delete");
+            mockTask(testDir, "download");
+            assertFiles(path.join(testDir, "filesExpectedDelete"), testDir);
+        });
+    });
+
     describe("Npm Tests", () => {
         runTest("Npm install and publish", () => {
             let testDir = "npm";

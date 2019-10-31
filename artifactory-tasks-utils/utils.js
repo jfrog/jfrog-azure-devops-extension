@@ -10,7 +10,7 @@ const fileName = getCliExecutableName();
 const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.26.2";
+const jfrogCliVersion = "1.30.1";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 
@@ -35,7 +35,7 @@ module.exports = {
     createAuthHandlers: createAuthHandlers,
     configureCliServer: configureCliServer,
     deleteCliServers: deleteCliServers,
-    setResultFailedIfError: setResultFailedIfError,
+    writeSpecContentToSpecPath: writeSpecContentToSpecPath,
     stripTrailingSlash: stripTrailingSlash
 };
 
@@ -133,7 +133,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        execSync(cliCommand, { cwd: runningDir, stdio: stdio });
+        return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
         let errorMsg = ex.toString().replace(/--password=".*"/g, "--password=***");
@@ -174,6 +174,33 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
         // This operation throws an exception in case of failure.
         executeCliCommand(deleteServerIDCommand, buildDir);
     }
+}
+
+/**
+ * Write file-spec to a file, based on the provided specSource input.
+ * Tasks which use this function, must have PathInput named 'file', and input named 'taskConfiguration' determining the source of file-spec content.
+ * File-spec content is written to provided specPath.
+ * @param specSource - Value of 'file' uses PathInput 'file', value of 'taskConfiguration' uses input of 'fileSpec'.
+ * @param specPath - File destination for the file-spec.
+ * @throws - On input read error, or write-file error.
+ */
+function writeSpecContentToSpecPath(specSource, specPath) {
+    let fileSpec;
+    if (specSource === "file") {
+        let specInputPath = tl.getPathInput("file", true, true);
+        console.log("Using file spec located at " + specInputPath);
+        fileSpec = fs.readFileSync(specInputPath, "utf8");
+    } else if (specSource === "taskConfiguration") {
+        fileSpec = tl.getInput("fileSpec", true);
+    } else {
+        throw "Failed creating File-Spec, since the provided File-Spec source value is invalid."
+    }
+    fileSpec = fixWindowsPaths(fileSpec);
+    validateSpecWithoutRegex(fileSpec);
+    console.log("Using file spec:");
+    console.log(fileSpec);
+    // Write provided fileSpec to file
+    tl.writeFile(specPath, fileSpec);
 }
 
 function cliJoin() {
@@ -386,8 +413,8 @@ function isToolExists(toolName) {
     return !!tl.which(toolName, false);
 }
 
-const stripTrailingSlash = (str) => {
+function stripTrailingSlash(str) {
     return str.endsWith('/') ?
         str.slice(0, -1) :
         str;
-};
+}
