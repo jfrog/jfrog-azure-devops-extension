@@ -63,7 +63,7 @@ function performGoNativeCommand(goCommand, cliPath, requiredWorkDir) {
 function createGoConfigFile(configPath, cliPath, requiredWorkDir) {
     configureGoCliServer(cliPath, requiredWorkDir, "resolver");
     let resolutionRepo = tl.getInput("resolutionRepo", true);
-    let resolverObj = {serverID: configuredServerId, repo: resolutionRepo};
+    let resolverObj = {serverId: configuredServerId, repo: resolutionRepo};
     utils.createBuildToolConfigFile(configPath, 'go', resolverObj, {});
 }
 

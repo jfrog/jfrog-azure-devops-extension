@@ -310,6 +310,19 @@ describe("JFrog Artifactory Extension Tests", () => {
         }, testUtils.isSkipTest("maven"));
     });
 
+    describe("Go Tests", () => {
+        runTest("Go", () => {
+            let testDir = "go";
+            mockTask(testDir, "build");
+            mockTask(testDir, "goPublish");
+            mockTask(testDir, "download");
+            mockTask(testDir, "publishBuildInfo");
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
+            getAndAssertBuild("Go test", "3");
+            deleteBuild("Go build");
+        }, testUtils.isSkipTest("go"));
+    });
+
     describe("NuGet Tests", () => {
         runTest("NuGet restore", () => {
             let testDir = "nuget";
@@ -500,6 +513,7 @@ function asyncTest(testFunc, done) {
  * @param isNegative (Boolean) - True if the task supposed to fail
  */
 function mockTask(testDir, taskName, isNegative) {
+    console.log("mocking task: %s", taskName);
     let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
     let mockRunner = new adoMockTest.MockTestRunner(taskPath);
     mockRunner.run(); // Mock a test
