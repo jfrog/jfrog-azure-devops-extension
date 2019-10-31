@@ -532,7 +532,6 @@ function asyncTest(testFunc, done) {
  * @param isNegative (Boolean) - True if the task supposed to fail
  */
 function mockTask(testDir, taskName, isNegative) {
-    console.log("mocking task: %s", taskName);
     let taskPath = path.join(__dirname, "resources", testDir, taskName + ".js");
     let mockRunner = new adoMockTest.MockTestRunner(taskPath);
     mockRunner.run(); // Mock a test
