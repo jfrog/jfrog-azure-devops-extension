@@ -9,7 +9,8 @@ let inputs = {
             target: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME)
         }]
     }),
-    "failNoOp": true
+    "failNoOp": true,
+    "specSource": "taskConfiguration"
 };
 
 testUtils.runTask(testUtils.upload, {}, inputs);
