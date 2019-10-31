@@ -83,7 +83,7 @@
                     },
                     {
                         "name": "BuildNumbers",
-                        "endpointUrl": "{{endpoint.url}}/api/build{{definition}}",
+                        "endpointUrl": "{{endpoint.url}}/api/build/{{definition}}",
                         "resultSelector": "jsonpath:$.buildsNumbers[*]"
                     }
                 ],
@@ -233,12 +233,12 @@
                     {
                         "target": "definition",
                         "dataSourceName": "BuildNames",
-                        "resultTemplate": "{ \"Value\" : \"{{{uri}}}\", \"DisplayValue\" : \"{{{uri}}}\" }"
+                        "resultTemplate": "{ \"Value\" : \"{{{ #regex \/?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex \/?(.*$) uri}}}\" }"
                     },
                     {
                         "target": "versions",
                         "dataSourceName": "BuildNumbers",
-                        "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
+                        "resultTemplate": "{ \"Value\" : \"{{{ #regex \/?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex \/?(.*$) uri}}}\" }"
                     },
                     {
                         "target": "latestversion",
@@ -248,11 +248,11 @@
                     {
                         "target": "defaultVersionSpecific",
                         "dataSourceName": "BuildNumbers",
-                        "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
+                        "resultTemplate": "{ \"Value\" : \"{{{ #regex \/?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex \/?(.*$) uri}}}\" }"
                     },
                     {
                         "target": "artifactDetails",
-                        "resultTemplate": "{ Name: \"{{version}}\", downloadUrl : \"{{endpoint.url}}\" }"
+                        "resultTemplate": "{ \"Name\": \"{{version}}\", \"downloadUrl\" : \"{{endpoint.url}}\" }"
                     }
                 ]
             }
