@@ -44,6 +44,7 @@ module.exports = {
     nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
     discard: path.join(__dirname, "..", "tasks", "ArtifactoryDiscardBuilds", "discardBuilds.js"),
+    properties: path.join(__dirname, "..", "tasks", "ArtifactoryProperties", "properties.js"),
 
     initTests: initTests,
     runTask: runTask,
