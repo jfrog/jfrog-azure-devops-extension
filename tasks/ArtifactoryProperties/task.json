@@ -23,7 +23,7 @@
             "type": "pickList",
             "label": "Command",
             "defaultValue": "set",
-            "helpMarkDown": "The npm command to run.",
+            "helpMarkDown": "Choose whether to set or delete properties.",
             "required": "true",
             "properties": {
                 "EditableOptions": "False"
@@ -39,7 +39,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service used for properties change."
+            "helpMarkDown": "The Artifactory service used by the task."
         },
         {
             "name": "setProps",

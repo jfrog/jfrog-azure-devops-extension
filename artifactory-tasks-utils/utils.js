@@ -178,7 +178,7 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
 
 /**
  * Write file-spec to a file, based on the provided specSource input.
- * Task using this function, must have PathInput named 'file', and input named 'taskConfiguration' determining the source of file-spec content.
+ * Tasks which use this function, must have PathInput named 'file', and input named 'taskConfiguration' determining the source of file-spec content.
  * File-spec content is written to provided specPath.
  * @param specSource - Value of 'file' uses PathInput 'file', value of 'taskConfiguration' uses input of 'fileSpec'.
  * @param specPath - File destination for the file-spec.
@@ -193,7 +193,7 @@ function writeSpecContentToSpecPath(specSource, specPath) {
     } else if (specSource === "taskConfiguration") {
         fileSpec = tl.getInput("fileSpec", true);
     } else {
-        throw "Provided invalid File-Spec source value, failed creating File-Spec."
+        throw "Failed creating File-Spec, since the provided File-Spec source value is invalid."
     }
     fileSpec = fixWindowsPaths(fileSpec);
     validateSpecWithoutRegex(fileSpec);

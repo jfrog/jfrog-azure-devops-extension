@@ -4,7 +4,7 @@
     "author": "JFrog",
     "private": true,
     "license": "Apache-2.0",
-    "description": "This task manipulates properties on existing files in Artifactory",
+    "description": "This task sets or deletes properties on existing files in Artifactory",
     "main": "properties.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
