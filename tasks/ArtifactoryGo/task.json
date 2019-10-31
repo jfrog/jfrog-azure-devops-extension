@@ -98,7 +98,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "command = publish",
-            "helpMarkDown": "The target Go repository\nCan be a local repository or a virtual Go repository containing local repositories.",
+            "helpMarkDown": "The target Go repository\nCan be a local repository or a virtual Go repository with a Default Deployment Repository.",
             "properties": {
                 "EditableOptions": "True"
             }

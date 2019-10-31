@@ -14,7 +14,7 @@ const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"),
 const jfrogCliVersion = "1.26.2";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
-const BUILD_TOOLS_CONFIG_VERSION = 1;
+const buildToolsConfigVersion = 1;
 
 let cliConfigCommand = "rt c";
 let runTaskCbk = null;
@@ -411,7 +411,7 @@ function determineCliWorkDir(defaultPath, providedPath) {
  */
 function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
     let yamlDocument = {};
-    yamlDocument.version = BUILD_TOOLS_CONFIG_VERSION;
+    yamlDocument.version = buildToolsConfigVersion;
     yamlDocument.type = buildToolType;
     if (resolverObj && Object.keys(resolverObj).length > 0) {
         yamlDocument.resolver = resolverObj;

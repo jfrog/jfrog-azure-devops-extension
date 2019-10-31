@@ -115,7 +115,7 @@ describe("JFrog Artifactory Extension Tests", () => {
             }
         });
 
-        runTest("Npm - determine cli workdir", () => {
+        runTest("Utils - determine cli workdir", () => {
             if (testUtils.isWindows()) {
                 assert.strictEqual(jfrogUtils.determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
                 assert.strictEqual(jfrogUtils.determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
