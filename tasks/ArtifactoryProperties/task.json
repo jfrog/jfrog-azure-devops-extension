@@ -1,0 +1,101 @@
+{
+    "id": "07fc5c20-6772-11e5-abde-1951c3dc0326",
+    "name": "ArtifactoryProperties",
+    "friendlyName": "Artifactory Properties",
+    "description": "Set and delete properties on and from existing files in Artifactory.",
+    "author": "JFrog",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "6",
+        "Patch": "2"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "Artifactory $(command) Properties",
+    "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "set",
+            "helpMarkDown": "The npm command to run.",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "set": "set",
+                "delete": "delete"
+            }
+        },
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used for properties change."
+        },
+        {
+            "name": "setProps",
+            "type": "string",
+            "label": "Properties to set",
+            "visibleRule": "command = set",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The list of properties, in the form of key1=value1;key2=value2,..., to be set on the matching artifacts."
+        },
+        {
+            "name": "deleteProps",
+            "type": "string",
+            "label": "Properties to delete",
+            "visibleRule": "command = delete",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The list of properties, in the form of key1,key2,..., to be deleted from the matching artifacts."
+        },
+        {
+            "name": "specSource",
+            "type": "radio",
+            "label": "File spec source",
+            "required": true,
+            "defaultValue": "taskConfiguration",
+            "helpMarkDown": "To specify the artifacts you wish to perform the operation on, please create a File Spec. \nTo read more about the File Spec schema click <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>.",
+            "options": {
+                "taskConfiguration": "Task Configuration",
+                "file": "File"
+            }
+        },
+        {
+            "name": "fileSpec",
+            "type": "multiLine",
+            "label": "Spec",
+            "visibleRule": "specSource = taskConfiguration",
+            "defaultValue": "{\n  \"files\": [\n    {\n      \"pattern\": \"REPLACE_ME\"\n    }\n  ]\n}",
+            "properties": {
+                "resizable": "true",
+                "rows": "10",
+                "maxLength": "10000"
+            },
+            "helpMarkDown": "Use file spec from task configuration."
+        },
+        {
+            "name": "file",
+            "type": "filePath",
+            "label": "File path",
+            "visibleRule": "specSource = file",
+            "helpMarkDown": "Use file spec from a local file."
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "properties.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

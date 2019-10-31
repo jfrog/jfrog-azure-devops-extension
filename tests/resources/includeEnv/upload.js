@@ -23,7 +23,8 @@ let inputs = {
     }),
     "failNoOp": true,
     "includeEnvVars": true,
-    "collectBuildInfo": true
+    "collectBuildInfo": true,
+    "specSource": "taskConfiguration"
 };
 
 testUtils.runTask(testUtils.upload, variables, inputs);

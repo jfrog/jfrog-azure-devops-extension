@@ -13,7 +13,8 @@ let inputs = {
         }]
     }),
     "collectBuildInfo": true,
-    "failNoOp": true
+    "failNoOp": true,
+    "specSource": "taskConfiguration"
 };
 
 testUtils.runTask(testUtils.download, {}, inputs);
