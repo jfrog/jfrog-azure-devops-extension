@@ -6,7 +6,6 @@ const adoMockTest = require("azure-pipelines-task-lib/mock-test");
 const fs = require("fs-extra");
 const testUtils = require("./testUtils");
 const os = require("os");
-const determineCliWorkDir = require("../tasks/ArtifactoryNpm/npmUtils").determineCliWorkDir;
 const execSync = require('child_process').execSync;
 const createProxyServer = require('http-tunneling-proxy');
 let tasksOutput;
@@ -116,15 +115,15 @@ describe("JFrog Artifactory Extension Tests", () => {
             }
         });
 
-        runTest("Npm - determine cli workdir", () => {
+        runTest("Utils - determine cli workdir", () => {
             if (testUtils.isWindows()) {
-                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
-                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
-                assert.strictEqual(determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
+                assert.strictEqual(jfrogUtils.determineCliWorkDir("C:\\myAgent\\_work\\1", "C:\\myAgent\\_work\\1\\myFolder"), "C:\\myAgent\\_work\\1\\myFolder");
+                assert.strictEqual(jfrogUtils.determineCliWorkDir("C:\\myAgent\\_work\\1", ""), "C:\\myAgent\\_work\\1");
+                assert.strictEqual(jfrogUtils.determineCliWorkDir("C:\\myAgent\\_work\\1", "myFolder\\123"), "C:\\myAgent\\_work\\1\\myFolder\\123");
             } else {
-                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
-                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
-                assert.strictEqual(determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
+                assert.strictEqual(jfrogUtils.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "/Users/myUser/myAgent/_work/1/myFolder"), "/Users/myUser/myAgent/_work/1/myFolder");
+                assert.strictEqual(jfrogUtils.determineCliWorkDir("/Users/myUser/myAgent/_work/1", ""), "/Users/myUser/myAgent/_work/1");
+                assert.strictEqual(jfrogUtils.determineCliWorkDir("/Users/myUser/myAgent/_work/1", "myFolder/123"), "/Users/myUser/myAgent/_work/1/myFolder/123");
             }
         });
     });
@@ -328,6 +327,19 @@ describe("JFrog Artifactory Extension Tests", () => {
             getAndAssertBuild("Maven build", "3");
             deleteBuild("Maven build");
         }, testUtils.isSkipTest("maven"));
+    });
+
+    describe("Go Tests", () => {
+        runTest("Go", () => {
+            let testDir = "go";
+            mockTask(testDir, "build");
+            mockTask(testDir, "goPublish");
+            mockTask(testDir, "download");
+            mockTask(testDir, "publishBuildInfo");
+            assertFiles(path.join(testDir, "files"), path.join(testDir, "files"));
+            getAndAssertBuild("Go test", "3");
+            deleteBuild("Go build");
+        }, testUtils.isSkipTest("go"));
     });
 
     describe("NuGet Tests", () => {

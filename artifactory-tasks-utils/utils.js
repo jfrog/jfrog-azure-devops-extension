@@ -5,6 +5,7 @@ const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const clientHandlers = require('typed-rest-client/Handlers');
 const localTools = require('./tools');
+const yaml = require('js-yaml');
 
 const fileName = getCliExecutableName();
 const toolName = "jfrog";
@@ -13,6 +14,7 @@ const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"),
 const jfrogCliVersion = "1.30.1";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
+const buildToolsConfigVersion = 1;
 
 let cliConfigCommand = "rt c";
 let runTaskCbk = null;
@@ -36,7 +38,11 @@ module.exports = {
     configureCliServer: configureCliServer,
     deleteCliServers: deleteCliServers,
     writeSpecContentToSpecPath: writeSpecContentToSpecPath,
-    stripTrailingSlash: stripTrailingSlash
+    stripTrailingSlash: stripTrailingSlash,
+    determineCliWorkDir: determineCliWorkDir,
+    createBuildToolConfigFile: createBuildToolConfigFile,
+    assembleBuildToolServerId: assembleBuildToolServerId,
+    appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand
 };
 
 // Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
@@ -417,4 +423,56 @@ function stripTrailingSlash(str) {
     return str.endsWith('/') ?
         str.slice(0, -1) :
         str;
+}
+
+/**
+ * Determines the required working directory for running the cli.
+ * Decision is based on the default path to run, and the provided path by the user.
+ */
+function determineCliWorkDir(defaultPath, providedPath) {
+    if (providedPath) {
+        if (path.isAbsolute(providedPath)) {
+            return providedPath;
+        }
+        return path.join(defaultPath, providedPath);
+    }
+    return defaultPath;
+}
+
+/**
+ * Creates a build tool config file at a desired absolute path.
+ * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example, for maven:
+ * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
+ */
+function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
+    let yamlDocument = {};
+    yamlDocument.version = buildToolsConfigVersion;
+    yamlDocument.type = buildToolType;
+    if (resolverObj && Object.keys(resolverObj).length > 0) {
+        yamlDocument.resolver = resolverObj;
+    }
+    if (deployerObj && Object.keys(deployerObj).length > 0) {
+        yamlDocument.deployer = deployerObj;
+    }
+    let configInfo = yaml.safeDump(yamlDocument);
+    console.log(configInfo);
+    fs.outputFileSync(configPath, configInfo);
+}
+
+function assembleBuildToolServerId(buildToolType, serverType) {
+    let buildName = tl.getVariable('Build.DefinitionName');
+    let buildNumber = tl.getVariable('Build.BuildNumber');
+    return [buildName, buildNumber, buildToolType, serverType].join("-");
+}
+
+/**
+ * Appends build name and number to provided cli command if collectBuildInfo is selected.
+ * */
+function appendBuildFlagsToCliCommand(cliCommand) {
+    if (tl.getBoolInput("collectBuildInfo")) {
+        // Construct the build-info collection flags.
+        let buildName = tl.getInput('buildName', true);
+        let buildNumber = tl.getInput('buildNumber', true);
+        return cliJoin(cliCommand, "--build-name=" + quote(buildName), "--build-number=" + quote(buildNumber));
+    }
 }

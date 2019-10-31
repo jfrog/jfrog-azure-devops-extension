@@ -33,6 +33,9 @@ module.exports = {
     npmRemoteRepoKey: "ado-npm-remote-test",
     npmVirtualRepoKey: "ado-npm-virtual-test",
     repoConan: "ado-conan-local",
+    virtualGo: "ado-extension-test-go-virtual",
+    remoteGo: "ado-extension-test-go-remote",
+    localGo: "ado-extension-test-go-local",
 
     promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
     conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
@@ -45,6 +48,7 @@ module.exports = {
     publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
     discard: path.join(__dirname, "..", "tasks", "ArtifactoryDiscardBuilds", "discardBuilds.js"),
     properties: path.join(__dirname, "..", "tasks", "ArtifactoryProperties", "properties.js"),
+    go: path.join(__dirname, "..", "tasks", "ArtifactoryGo", "goBuild.js"),
 
     initTests: initTests,
     runTask: runTask,
@@ -135,6 +139,9 @@ function createTestRepositories() {
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({ rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org" }));
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({ rclass: "virtual", packageType: "npm", repositories: ["ado-npm-local-test", "ado-npm-remote-test"] }));
     createRepo(module.exports.repoConan, JSON.stringify({ rclass: "local", packageType: "conan" }));
+    createRepo(module.exports.localGo, JSON.stringify({ rclass: "local", packageType: "go" }));
+    createRepo(module.exports.remoteGo, JSON.stringify({ rclass: "remote", packageType: "go", url: "https://gocenter.io" }));
+    createRepo(module.exports.virtualGo, JSON.stringify({ rclass: "virtual", packageType: "go", repositories: ["ado-extension-test-go-local", "ado-extension-test-go-remote"] }));
 }
 
 function deleteTestRepositories() {
@@ -148,6 +155,9 @@ function deleteTestRepositories() {
     deleteRepo(module.exports.npmLocalRepoKey);
     deleteRepo(module.exports.npmRemoteRepoKey);
     deleteRepo(module.exports.repoConan);
+    deleteRepo(module.exports.localGo);
+    deleteRepo(module.exports.remoteGo);
+    deleteRepo(module.exports.virtualGo);
 }
 
 function createRepo(repoKey, body) {

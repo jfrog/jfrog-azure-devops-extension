@@ -2,7 +2,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
-const npmUtils = require('./npmUtils');
 
 const npmInstallCommand = "rt npmi";
 const npmPublishCommand = "rt npmp";
@@ -22,7 +21,7 @@ function RunTaskCbk(cliPath) {
 
     // Determine working directory for the cli.
     let inputWorkingFolder = tl.getInput("workingFolder", false);
-    let requiredWorkDir = npmUtils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
+    let requiredWorkDir = utils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
     if (!fs.existsSync(requiredWorkDir) || !fs.lstatSync(requiredWorkDir).isDirectory()) {
         tl.setResult(tl.TaskResult.Failed, "Provided 'Working folder with package.json': " + requiredWorkDir + " neither exists nor a directory.");
         return;
