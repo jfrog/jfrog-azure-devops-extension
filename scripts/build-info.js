@@ -1,4 +1,7 @@
 "use strict";
+
+const utils = require('artifactory-tasks-utils');
+
 define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
     let sharedConfig = VSS.getConfiguration();
     let vsoContext = VSS.getWebContext();
@@ -65,7 +68,7 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
 
         buildInfoIcon.src = "images/artifactory-build-info.png";
         buildInfoUrlDiv.classList.add("build-info-url");
-        buildInfoUrlDiv.href = buildDetails.artifactoryUrl + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        buildInfoUrlDiv.href = utils.stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
         buildInfoUrlDiv.text = "Artifactory Build Info";
         buildInfoUrlDiv.target = "_blank";
         buildInfoDiv.append(buildInfoIcon);

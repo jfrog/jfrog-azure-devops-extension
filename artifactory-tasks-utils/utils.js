@@ -40,7 +40,8 @@ module.exports = {
     determineCliWorkDir: determineCliWorkDir,
     createBuildToolConfigFile: createBuildToolConfigFile,
     assembleBuildToolServerId: assembleBuildToolServerId,
-    appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand
+    appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
+    stripTrailingSlash: stripTrailingSlash
 };
 
 // Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
@@ -440,4 +441,10 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         let buildNumber = tl.getInput('buildNumber', true);
         return cliJoin(cliCommand, "--build-name=" + quote(buildName), "--build-number=" + quote(buildNumber));
     }
+}
+
+function stripTrailingSlash(str) {
+    return str.endsWith('/') ?
+        str.slice(0, -1) :
+        str;
 }
