@@ -80,9 +80,6 @@ function createMavenConfigFile(configPath, cliPath, buildDir) {
     } else {
         console.log("Resolution from Artifactory is not configured");
     }
-    //todo remove:
-    console.log("************ resolverObj obj:");
-    console.log(resolverObj);
 
     // Configure deployer server, throws on failure.
     let artifactoryDeployer = tl.getInput("artifactoryDeployService");
