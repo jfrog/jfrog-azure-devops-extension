@@ -11,8 +11,6 @@ utils.executeCliTask(RunTaskCbk);
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
 
-    let buildName = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
@@ -21,9 +19,9 @@ function RunTaskCbk(cliPath) {
     }
 
     // Create Maven config file.
-    let config = path.join(workDir, "config");
+    let configPath = path.join(workDir, "config");
     try {
-        createMavenConfigFile(config, cliPath, workDir, buildName, buildNumber);
+        createMavenConfigFile(configPath, cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         cleanup(cliPath, workDir);
@@ -38,13 +36,8 @@ function RunTaskCbk(cliPath) {
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options)
     }
-    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), config);
-    if (collectBuildInfo) {
-        // Overwrite build name & number with custom values if collectBuildInfo is selected.
-        buildName = tl.getInput('buildName', true);
-        buildNumber = tl.getInput('buildNumber', true);
-        mavenCommand = utils.cliJoin(mavenCommand, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
-    }
+    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
+    mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
 
     try {
         utils.executeCliCommand(mavenCommand, workDir);
@@ -74,41 +67,35 @@ function checkAndSetMavenHome() {
     }
 }
 
-function addToConfig(configInfo, name, snapshotRepo, releaseRepo, serverID) {
-    configInfo += name + ":\n";
-    configInfo += "  snapshotRepo: " + snapshotRepo + "\n";
-    configInfo += "  releaseRepo: " + releaseRepo + "\n";
-    configInfo += "  serverID: " + serverID + "\n";
-    return configInfo
-}
-
-function createMavenConfigFile(config, cliPath, buildDir, buildName, buildNumber) {
-    let configInfo = "version: 1\ntype: maven\n";
-
-    // Configure deployer server, throws on failure.
-    let artifactoryDeployer = tl.getInput("artifactoryDeployService");
-    let serverId = buildName + "-" + buildNumber;
-    serverIdDeployer = serverId + "-deployer";
-    utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
-
+function createMavenConfigFile(configPath, cliPath, buildDir) {
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput("artifactoryResolverService");
+    let resolverObj = {};
     if (artifactoryResolver != null) {
-        serverIdResolver = serverId + "-resolver";
+        serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
         let targetResolveReleaseRepo = tl.getInput("targetResolveReleaseRepo");
         let targetResolveSnapshotRepo = tl.getInput("targetResolveSnapshotRepo");
-        configInfo = addToConfig(configInfo, "resolver", targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
+        resolverObj = getDeployerResolverObj(targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
     } else {
         console.log("Resolution from Artifactory is not configured");
     }
+    //todo remove:
+    console.log("************ resolverObj obj:");
+    console.log(resolverObj);
 
-    // Create configuration file, throws on failure.
+    // Configure deployer server, throws on failure.
+    let artifactoryDeployer = tl.getInput("artifactoryDeployService");
+    serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
+    utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
     let targetDeployReleaseRepo = tl.getInput("targetDeployReleaseRepo");
     let targetDeploySnapshotRepo = tl.getInput("targetDeploySnapshotRepo");
-    configInfo = addToConfig(configInfo, "deployer", targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
-    console.log(configInfo);
-    tl.writeFile(config, configInfo);
+    let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
+    utils.createBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
+}
+
+function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
+    return {snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverID: serverID};
 }
 
 /**
@@ -125,9 +112,6 @@ function removeExtractorDownloadVariables(cliPath, workDir) {
     utils.deleteCliServers(cliPath, workDir, [serverId]);
 }
 
-/**
- * Cleanup in case of task failure.
- */
 function cleanup(cliPath, workDir) {
     // Delete servers.
     try {
