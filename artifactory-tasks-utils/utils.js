@@ -34,7 +34,9 @@ module.exports = {
     buildCliArtifactoryDownloadUrl: buildCliArtifactoryDownloadUrl,
     createAuthHandlers: createAuthHandlers,
     configureCliServer: configureCliServer,
-    deleteCliServers: deleteCliServers
+    deleteCliServers: deleteCliServers,
+    setResultFailedIfError: setResultFailedIfError,
+    stripTrailingSlash: stripTrailingSlash
 };
 
 // Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
@@ -131,7 +133,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        return execSync(cliCommand, {cwd: runningDir, stdio: stdio});
+        execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
         let errorMsg = ex.toString().replace(/--password=".*"/g, "--password=***");
@@ -383,3 +385,9 @@ function isWindows() {
 function isToolExists(toolName) {
     return !!tl.which(toolName, false);
 }
+
+const stripTrailingSlash = (str) => {
+    return str.endsWith('/') ?
+        str.slice(0, -1) :
+        str;
+};

@@ -6,6 +6,7 @@ const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
 const devnull = require('dev-null');
+const utils = require('artifactory-tasks-utils');
 let artifactoryUrl = process.env.ADO_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.ADO_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.ADO_ARTIFACTORY_PASSWORD;
@@ -97,7 +98,7 @@ function recreateTestDataDir() {
 }
 
 function getBuild(buildName, buildNumber) {
-    return syncRequest('GET', artifactoryUrl + "/api/build/" + buildName + "/" + buildNumber, {
+    return syncRequest('GET', utils.stripTrailingSlash(artifactoryUrl) + "api/build/" + buildName + "/" + buildNumber, {
         headers: {
             "Authorization": getAuthorizationHeaderValue()
         }
@@ -105,7 +106,7 @@ function getBuild(buildName, buildNumber) {
 }
 
 function deleteBuild(buildName) {
-    syncRequest('DELETE', artifactoryUrl + "/api/build/" + buildName + "?deleteAll=1", {
+    syncRequest('DELETE', utils.stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "?deleteAll=1", {
         headers: {
             "Authorization": getAuthorizationHeaderValue()
         }
@@ -124,16 +125,16 @@ function cleanUpAllTests() {
 }
 
 function createTestRepositories() {
-    createRepo(module.exports.repoKey1, JSON.stringify({rclass: "local", packageType: "generic"}));
-    createRepo(module.exports.repoKey2, JSON.stringify({rclass: "local", packageType: "generic"}));
-    createRepo(module.exports.localMaven, JSON.stringify({rclass: "local", packageType: "maven"}));
-    createRepo(module.exports.remoteMaven, JSON.stringify({rclass: "remote", packageType: "maven", url: "https://jcenter.bintray.com"}));
-    createRepo(module.exports.localNuGet, JSON.stringify({rclass: "local", packageType: "nuget"}));
-    createRepo(module.exports.virtualNuget, JSON.stringify({rclass: "virtual", packageType: "nuget", repositories: [module.exports.remoteNuGet, module.exports.localNuGet]}));
-    createRepo(module.exports.npmLocalRepoKey, JSON.stringify({rclass: "local", packageType: "npm"}));
-    createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org"}));
-    createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({rclass: "virtual", packageType: "npm", repositories: ["ado-npm-local-test", "ado-npm-remote-test"]}));
-    createRepo(module.exports.repoConan, JSON.stringify({rclass: "local", packageType: "conan"}));
+    createRepo(module.exports.repoKey1, JSON.stringify({ rclass: "local", packageType: "generic" }));
+    createRepo(module.exports.repoKey2, JSON.stringify({ rclass: "local", packageType: "generic" }));
+    createRepo(module.exports.localMaven, JSON.stringify({ rclass: "local", packageType: "maven" }));
+    createRepo(module.exports.remoteMaven, JSON.stringify({ rclass: "remote", packageType: "maven", url: "https://jcenter.bintray.com" }));
+    createRepo(module.exports.localNuGet, JSON.stringify({ rclass: "local", packageType: "nuget" }));
+    createRepo(module.exports.virtualNuget, JSON.stringify({ rclass: "virtual", packageType: "nuget", repositories: [module.exports.remoteNuGet, module.exports.localNuGet] }));
+    createRepo(module.exports.npmLocalRepoKey, JSON.stringify({ rclass: "local", packageType: "npm" }));
+    createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({ rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org" }));
+    createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({ rclass: "virtual", packageType: "npm", repositories: ["ado-npm-local-test", "ado-npm-remote-test"] }));
+    createRepo(module.exports.repoConan, JSON.stringify({ rclass: "local", packageType: "conan" }));
 }
 
 function deleteTestRepositories() {
@@ -150,7 +151,7 @@ function deleteTestRepositories() {
 }
 
 function createRepo(repoKey, body) {
-    syncRequest('PUT', artifactoryUrl + "/api/repositories/" + repoKey, {
+    syncRequest('PUT', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": getAuthorizationHeaderValue(),
             "Content-Type": "application/json"
@@ -160,7 +161,7 @@ function createRepo(repoKey, body) {
 }
 
 function isRepoExists(repoKey) {
-    let res = syncRequest('GET', artifactoryUrl + "/api/repositories/" + repoKey, {
+    let res = syncRequest('GET', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": getAuthorizationHeaderValue()
         }
@@ -169,7 +170,7 @@ function isRepoExists(repoKey) {
 }
 
 function deleteRepo(repoKey) {
-    syncRequest('DELETE', artifactoryUrl + "/api/repositories/" + repoKey, {
+    syncRequest('DELETE', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": getAuthorizationHeaderValue(),
             "Content-Type": "application/json"
