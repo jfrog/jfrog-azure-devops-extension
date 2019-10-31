@@ -6,7 +6,6 @@ const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, "testData");
 const devnull = require('dev-null');
-const utils = require('artifactory-tasks-utils');
 let artifactoryUrl = process.env.ADO_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.ADO_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.ADO_ARTIFACTORY_PASSWORD;
@@ -98,7 +97,7 @@ function recreateTestDataDir() {
 }
 
 function getBuild(buildName, buildNumber) {
-    return syncRequest('GET', utils.stripTrailingSlash(artifactoryUrl) + "api/build/" + buildName + "/" + buildNumber, {
+    return syncRequest('GET', stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "/" + buildNumber, {
         headers: {
             "Authorization": getAuthorizationHeaderValue()
         }
@@ -106,7 +105,7 @@ function getBuild(buildName, buildNumber) {
 }
 
 function deleteBuild(buildName) {
-    syncRequest('DELETE', utils.stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "?deleteAll=1", {
+    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "?deleteAll=1", {
         headers: {
             "Authorization": getAuthorizationHeaderValue()
         }
@@ -151,7 +150,7 @@ function deleteTestRepositories() {
 }
 
 function createRepo(repoKey, body) {
-    syncRequest('PUT', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
+    syncRequest('PUT', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": getAuthorizationHeaderValue(),
             "Content-Type": "application/json"
@@ -161,7 +160,7 @@ function createRepo(repoKey, body) {
 }
 
 function isRepoExists(repoKey) {
-    let res = syncRequest('GET', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
+    let res = syncRequest('GET', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": getAuthorizationHeaderValue()
         }
@@ -170,7 +169,7 @@ function isRepoExists(repoKey) {
 }
 
 function deleteRepo(repoKey) {
-    syncRequest('DELETE', utils.stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
+    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
         headers: {
             "Authorization": getAuthorizationHeaderValue(),
             "Content-Type": "application/json"
@@ -272,4 +271,10 @@ function isWindows() {
 
 function isSkipTest(skipValue) {
     return skipTests.indexOf(skipValue) !== -1;
+}
+
+function stripTrailingSlash(str) {
+    return str.endsWith('/') ?
+        str.slice(0, -1) :
+        str;
 }

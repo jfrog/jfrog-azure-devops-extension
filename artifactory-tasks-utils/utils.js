@@ -413,8 +413,8 @@ function isToolExists(toolName) {
     return !!tl.which(toolName, false);
 }
 
-const stripTrailingSlash = (str) => {
+function stripTrailingSlash(str) {
     return str.endsWith('/') ?
         str.slice(0, -1) :
         str;
-};
+}
