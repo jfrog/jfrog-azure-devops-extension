@@ -1,7 +1,4 @@
 "use strict";
-
-const utils = require('artifactory-tasks-utils');
-
 define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
     let sharedConfig = VSS.getConfiguration();
     let vsoContext = VSS.getWebContext();
@@ -68,7 +65,7 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
 
         buildInfoIcon.src = "images/artifactory-build-info.png";
         buildInfoUrlDiv.classList.add("build-info-url");
-        buildInfoUrlDiv.href = utils.stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        buildInfoUrlDiv.href = stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
         buildInfoUrlDiv.text = "Artifactory Build Info";
         buildInfoUrlDiv.target = "_blank";
         buildInfoDiv.append(buildInfoIcon);
@@ -107,5 +104,11 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
         noXrayScanDiv.classList.add("build-info-url");
         noXrayScanDiv.innerText = "Xray Scan for this build was not performed";
         return noXrayScanDiv;
+    }
+
+    function stripTrailingSlash(str) {
+        return str.endsWith('/') ?
+            str.slice(0, -1) :
+            str;
     }
 });
