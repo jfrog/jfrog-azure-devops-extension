@@ -10,8 +10,9 @@
         "Release"
     ],
     "version": {
-        "Minor": "7",
-        "Patch": "0"
+        "Major": "1",
+        "Minor": "6",
+        "Patch": "2"
     },
     "demands": [],
     "minimumAgentVersion": "1.89.0",
