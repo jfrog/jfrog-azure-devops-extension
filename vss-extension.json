@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "public": true,
     "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.7.0",
+    "version": "1.6.2",
     "name": "JFrog Artifactory",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "JFrog",
@@ -233,12 +233,12 @@
                     {
                         "target": "definition",
                         "dataSourceName": "BuildNames",
-                        "resultTemplate": "{ \"Value\" : \"{{{ #regex /?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex /?(.*$) uri}}}\" }"
+                        "resultTemplate": "{ \"Value\" : \"{{{ #regex \/?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex \/?(.*$) uri}}}\" }"
                     },
                     {
                         "target": "versions",
                         "dataSourceName": "BuildNumbers",
-                        "resultTemplate": "{ \"Value\" : \"{{{ #regex /?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex /?(.*$) uri}}}\" }"
+                        "resultTemplate": "{ \"Value\" : \"{{{ #regex \/?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex \/?(.*$) uri}}}\" }"
                     },
                     {
                         "target": "latestversion",
@@ -248,7 +248,7 @@
                     {
                         "target": "defaultVersionSpecific",
                         "dataSourceName": "BuildNumbers",
-                        "resultTemplate": "{ \"Value\" : \"{{{ #regex /?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex /?(.*$) uri}}}\" }"
+                        "resultTemplate": "{ \"Value\" : \"{{{ #regex \/?(.*$) uri}}}\", \"DisplayValue\" : \"{{{ #regex \/?(.*$) uri}}}\" }"
                     },
                     {
                         "target": "artifactDetails",
@@ -403,10 +403,10 @@
             "id": "artifactory-go",
             "type": "ms.vss-distributed-task.task",
             "targets": [
-                "ms.vss-distributed-task.tasks"
+              "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGo"
+              "name": "tasks/ArtifactoryGo"
             }
         }
     ],
