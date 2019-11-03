@@ -139,9 +139,9 @@ function createTestRepositories() {
     createRepo(module.exports.npmRemoteRepoKey, JSON.stringify({ rclass: "remote", packageType: "npm", url: "https://registry.npmjs.org" }));
     createRepo(module.exports.npmVirtualRepoKey, JSON.stringify({ rclass: "virtual", packageType: "npm", repositories: ["ado-npm-local-test", "ado-npm-remote-test"] }));
     createRepo(module.exports.repoConan, JSON.stringify({ rclass: "local", packageType: "conan" }));
-    createRepo(module.exports.localGo, JSON.stringify({ rclass: "local", packageType: "go" }));
-    createRepo(module.exports.remoteGo, JSON.stringify({ rclass: "remote", packageType: "go", url: "https://gocenter.io" }));
-    createRepo(module.exports.virtualGo, JSON.stringify({ rclass: "virtual", packageType: "go", repositories: ["ado-extension-test-go-local", "ado-extension-test-go-remote"] }));
+    createRepo(module.exports.localGo, JSON.stringify({ rclass: "local", packageType: "go", repoLayoutRef: "go-default" }));
+    createRepo(module.exports.remoteGo, JSON.stringify({ rclass: "remote", packageType: "go", repoLayoutRef: "go-default", url: "https://gocenter.io" }));
+    createRepo(module.exports.virtualGo, JSON.stringify({ rclass: "virtual", packageType: "go", repoLayoutRef: "go-default", repositories: ["ado-extension-test-go-local", "ado-extension-test-go-remote"] }));
 }
 
 function deleteTestRepositories() {
