@@ -70,6 +70,7 @@ function updateTasksVersion() {
 function updateTaskJsonWithNewVersion(taskJsonPath) {
     let taskJson = editJsonFile(taskJsonPath, editJsonFileOptions);
     taskJson.set('version', {
+        'Major': splitVersion[0],
         'Minor': splitVersion[1],
         'Patch': splitVersion[2]
     });
