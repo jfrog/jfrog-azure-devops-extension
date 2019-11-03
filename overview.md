@@ -8,8 +8,8 @@ In addition to managing efficient deployment of your artifacts to Artifactory,
 the extension lets you capture information about deployed artifacts, 
 and resolved dependencies Gain full traceability for your builds as the environment data associated with your build is automatically collected.
 
-The extension currently supports the following builds:
-Generic, Maven, npm, NuGet, Docker, Go and Conan builds. 
+The extension currently supports the following package managers:
+Maven, npm, NuGet, Docker, Go and Conan. It also allows downloading and uploading generic files from and to Artifactory.
 
 ## Documentation and Source Code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension).
