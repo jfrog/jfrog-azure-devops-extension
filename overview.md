@@ -8,7 +8,8 @@ In addition to managing efficient deployment of your artifacts to Artifactory,
 the extension lets you capture information about deployed artifacts, 
 and resolved dependencies Gain full traceability for your builds as the environment data associated with your build is automatically collected.
 
-The extension currently support generic, maven, npm and nuget builds. 
+The extension currently supports the following package managers:
+Maven, npm, NuGet, Docker, Go and Conan. It also allows downloading and uploading generic files from and to Artifactory.
 
 ## Documentation and Source Code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension).
@@ -31,36 +32,48 @@ The task can be also configured to capture build-info and stores the uploaded fi
 
 ![GenericUpload](images/marketplace/generic-upload.png)
 
-## Trigger maven builds
-The **Artifactory Maven** task allows triggering maven builds, while resolvong dependencies and deploying artifacts from and to Artifactory. 
+## Trigger Maven builds
+The **Artifactory Maven** task allows triggering Maven builds, while resolving dependencies and deploying artifacts from and to Artifactory. 
 The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![Maven](images/marketplace/maven.png)
 
 ## Trigger npm builds
-The **Artifactory Npm** task allows triggering npm builds, while resolvong npm dependencies and deploying npm packages from and to Artifactory. 
+The **Artifactory Npm** task allows triggering npm builds, while resolving npm dependencies and deploying npm packages from and to Artifactory. 
 The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![Npm](images/marketplace/npm.png)
 
-## Trigger nuget builds
-The **Artifactory Nuget** task allows triggering nuget restore while resolving nuget dependencies from Artifactory. 
-It also allows publishing nuget packages to Artifactory.
-The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+## Trigger NuGet builds
+The **Artifactory NuGet** task allows triggering NuGet restore while resolving NuGet dependencies from Artifactory. 
+It also allows publishing NuGet packages to Artifactory.
+The task can be also configured to capture build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![NuGet](images/marketplace/nuget.png)
 
-## Trigger conan builds
-The **Artifactory Conan** task allows triggering [conan](https://conan.io/) builds, while resolvong dependencies and deploying artifacts from and to Artifactory. 
+## Trigger Conan builds
+The **Artifactory Conan** task allows triggering [conan](https://conan.io/) builds, while resolving dependencies and deploying artifacts from and to Artifactory. 
 The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![Conan](images/marketplace/conan.png)
 
-## Push and Pull docker images
-The **Artifactory Docker** task allows pushing and pulling your docker images to and from Artifactory.
+## Trigger Go builds
+The **Artifactory Go** task allows triggering go builds while resolving go dependencies from Artifactory. 
+It also allows publishing go packages to Artifactory, by selecting the *publish* command.
+The task can be also configured to capture build-info. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+
+![Go](images/marketplace/go.png)
+
+## Push and Pull Docker images
+The **Artifactory Docker** task allows pushing and pulling your Docker images to and from Artifactory.
 The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![Docker](images/marketplace/docker.png)
+
+## Set / delete properties on files in Artifactory
+The **Artifactory Properties** task allows setting and deleting properties on both files in Artifactory.
+
+![Props](images/marketplace/props.png)
 
 ## Scan builds with Xray
 The JFrog Artifactory extension is integrated with JFrog Xray through JFrog Artifactory, allowing you to have build artifacts scanned for vulnerabilities and other issues using the **Artifactory Xray Scan** task.
