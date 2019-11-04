@@ -39,6 +39,8 @@ function assertVersion() {
     let vssExtension = fs.readFileSync('vss-extension.json', 'utf8');
     let vssExtensionJson = JSON.parse(vssExtension);
     assert.strictEqual(compareVersions(commandLineArgsOptions.version, vssExtensionJson.version), 1, 'Input version must be bigger than current version');
+    let oldVersionSplit = vssExtensionJson.version.split('.');
+    assert.strictEqual(oldVersionSplit[0], splitVersion[0], 'Upgrading Major version using this script is forbidden');
 }
 
 /**
@@ -69,8 +71,9 @@ function updateTasksVersion() {
 
 function updateTaskJsonWithNewVersion(taskJsonPath) {
     let taskJson = editJsonFile(taskJsonPath, editJsonFileOptions);
+    let curMajorVersion = taskJson.get('version.Major');
     taskJson.set('version', {
-        'Major': splitVersion[0],
+        'Major': curMajorVersion,
         'Minor': splitVersion[1],
         'Patch': splitVersion[2]
     });
