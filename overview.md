@@ -101,11 +101,13 @@ Builds are discarded according to the retention parameters configured in the tas
 
 ![Discard](images/marketplace/discard.png)
 
-## Access the Build-Info
+## Access the Build-Info and the Xray scan report
 You can access the build-info from the Build Results in Azure DevOps, if your build pipeline has published the build-info to Artifactory.
+You can also access the Xray scan report, if your build pipeline is configured to scan the build.
 
-![BuildInfo](images/marketplace/build-info.png)
-![BuildInfo](images/marketplace/build-info-in-artifactory.png)
+![BuildInfo](images/marketplace/build-results.png)
+![BuildInfo](images/marketplace/bi-in-artifactory.png)
+![BuildInfo](images/marketplace/xray-report-in-xray.png)
 
 ## Release Published Builds
 The **Artifactory Publish Build-Info** task allows publishing builds to Artifactory. By choosing Artifactory as an artifacts source in a Release, 
