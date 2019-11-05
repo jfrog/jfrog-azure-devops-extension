@@ -245,7 +245,7 @@ function addArtifactoryCredentials(cliCommand, artifactoryService) {
 
 function addStringParam(cliCommand, inputParam, cliParam) {
     let val = tl.getInput(inputParam, false);
-    if (val !== null) {
+    if (val) {
         cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val));
     }
     return cliCommand;
