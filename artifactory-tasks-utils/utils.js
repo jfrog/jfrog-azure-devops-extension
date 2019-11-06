@@ -133,12 +133,16 @@ function generateDownloadCliErrorMessage(downloadUrl) {
  */
 function executeCliCommand(cliCommand, runningDir, stdio) {
     if (!fs.existsSync(runningDir)) {
-        return "JFrog CLI execution path doesn't exist: " + runningDir;
+        throw "JFrog CLI execution path doesn't exist: " + runningDir;
+    }
+    if (!cliCommand) {
+        throw "Cannot execute empty Cli command.";
     }
     try {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
+        tl.debug("Executing cliCommand: " + cliCommand);
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
@@ -475,4 +479,5 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         let buildNumber = tl.getInput('buildNumber', true);
         return cliJoin(cliCommand, "--build-name=" + quote(buildName), "--build-number=" + quote(buildNumber));
     }
+    return cliCommand;
 }
