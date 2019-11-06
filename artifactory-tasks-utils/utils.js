@@ -474,5 +474,7 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
         return cliJoin(cliCommand, "--build-name=" + quote(buildName), "--build-number=" + quote(buildNumber));
+    } else {
+        return cliCommand;
     }
 }
