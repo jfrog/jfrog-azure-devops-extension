@@ -10,8 +10,6 @@ utils.executeCliTask(RunTaskCbk);
 
 function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
-
-    let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
