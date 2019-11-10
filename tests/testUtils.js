@@ -158,7 +158,7 @@ function createTestRepositories() {
  * Creates unique repositories keys, and writes them to file for later access by the tests.
  */
 function createUniqueReposKeys() {
-    let timestamp = getCurrentUnixTimestamp();
+    let timestamp = getCurrentTimestamp();
     Object.keys(repoKeys).forEach(repoVar => {
         repoKeys[repoVar] = [testReposPrefix, repoKeys[repoVar]].join("-");
         // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
@@ -169,7 +169,10 @@ function createUniqueReposKeys() {
     fs.outputFileSync(repoKeysPath, JSON.stringify(repoKeys));
 }
 
-function getCurrentUnixTimestamp() {
+/**
+ * Returns the current timestamp in seconds
+ */
+function getCurrentTimestamp() {
     return Math.floor(Date.now() / 1000);
 }
 
@@ -202,7 +205,7 @@ function cleanUpOldRepositories() {
         }
         let repoTimestamp = parseInt(regexGroups.pop(), 10);
         // Convert unix timestamp to time
-        let timeDifference = new Date(Math.floor(getCurrentUnixTimestamp()-repoTimestamp) * 1000);
+        let timeDifference = new Date(Math.floor(getCurrentTimestamp()-repoTimestamp) * 1000);
         // If more than 2 hours have passed, delete the repository.
         if (timeDifference.getHours() > 2) {
             deleteRepo(repoKey);
