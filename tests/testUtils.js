@@ -74,6 +74,7 @@ module.exports = {
 };
 
 function initTests() {
+    process.env.JFROG_CLI_REPORT_USAGE = false;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
     tl.setStdStream(devnull());
