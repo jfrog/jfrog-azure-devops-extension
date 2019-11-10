@@ -5,7 +5,7 @@ const TEST_NAME = testUtils.getTestName(__dirname);
 let inputs = {
     "fileSpec": JSON.stringify({
         files: [{
-            pattern: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME)
+            pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
         }]
     }),
     "specSource": "taskConfiguration",

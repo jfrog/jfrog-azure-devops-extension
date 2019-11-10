@@ -13,7 +13,7 @@ let inputs = {
     "buildName": BUILD_NAME,
     "buildNumber": BUILD_NUMBER,
     "artifactoryService": "mock-service",
-    "targetRepo": testUtils.localGo,
+    "targetRepo": testUtils.getRepoKeys().goLocalRepo,
     "version": "v0.4.2",
     "command": "publish",
     "workingDirectory": TEST_NAME,

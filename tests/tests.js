@@ -13,6 +13,7 @@ const conanutils = require("../tasks/ArtifactoryConan/conanUtils");
 
 describe("JFrog Artifactory Extension Tests", () => {
     let jfrogUtils;
+    let repoKeys;
     before(() => {
         // Validate environment variables exist for tests
         assert(testUtils.artifactoryUrl, "Tests are missing environment variable: ADO_ARTIFACTORY_URL");
@@ -21,6 +22,7 @@ describe("JFrog Artifactory Extension Tests", () => {
 
         testUtils.initTests();
         jfrogUtils = require("artifactory-tasks-utils");
+        repoKeys = testUtils.getRepoKeys();
     });
 
     beforeEach(() => {
@@ -38,7 +40,7 @@ describe("JFrog Artifactory Extension Tests", () => {
             process.env.ADO_ARTIFACTORY_PASSWORD = "SUPER_SECRET";
             let retVal;
             try {
-                jfrogUtils.executeCliCommand("jfrog rt del " + testUtils.repoKey1 + "/" + " --url=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
+                jfrogUtils.executeCliCommand("jfrog rt del " + repoKeys.repo1 + "/" + " --url=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_URL) + " --user=" + jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME) + " --password=" + jfrogUtils.quote("SUPER_SECRET"), testUtils.testDataDir, [""]);
             } catch (ex) {
                 retVal = ex.toString();
             }
@@ -345,8 +347,8 @@ describe("JFrog Artifactory Extension Tests", () => {
     describe("NuGet Tests", () => {
         runTest("NuGet restore", () => {
             let testDir = "nuget";
-            // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
-            assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+            // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
+            assert(testUtils.isRepoExists(repoKeys.nugetRemoteRepo), "Create nuget remote repository: " + repoKeys.nugetRemoteRepo + " manually in order to run nuget tests");
             mockTask(testDir, "restore");
             mockTask(testDir, "publish");
             getAndAssertBuild("NuGet", "3");
@@ -354,8 +356,8 @@ describe("JFrog Artifactory Extension Tests", () => {
         }, testUtils.isSkipTest("nuget"));
         runTest("NuGet push", () => {
             let testDir = "nuget";
-            // There is a bug in Artifactory when creating a remote nuget repository. Cannot be created via REST API. Need to create manually.
-            assert(testUtils.isRepoExists(testUtils.remoteNuGet), "Create nuget remote repository: " + testUtils.remoteNuGet + " in order to run nuget tests");
+            // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
+            assert(testUtils.isRepoExists(repoKeys.nugetRemoteRepo), "Create nuget remote repository: " + repoKeys.nugetRemoteRepo + " manually in order to run nuget tests");
             mockTask(testDir, "push");
             mockTask(testDir, "publish");
             mockTask(testDir, "download");

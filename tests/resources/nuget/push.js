@@ -6,7 +6,7 @@ let inputs = {
     "buildName": "NuGet",
     "buildNumber": "3",
     "command": "push",
-    "targetDeployRepo": testUtils.localNuGet,
+    "targetDeployRepo": testUtils.getRepoKeys().nugetLocalRepo,
     "pathToNupkg": path.join(testUtils.getLocalTestDir(TEST_NAME), "nugetTest*.nupkg"),
     "collectBuildInfo": true
 };

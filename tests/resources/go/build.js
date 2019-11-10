@@ -13,7 +13,7 @@ let inputs = {
     "buildName": BUILD_NAME,
     "buildNumber": BUILD_NUMBER,
     "artifactoryService": "mock-service",
-    "resolutionRepo": testUtils.virtualGo,
+    "resolutionRepo": testUtils.getRepoKeys().goVirtualRepo,
     "command": "build",
     "workingDirectory": TEST_NAME,
     "collectBuildInfo": true

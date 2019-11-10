@@ -6,7 +6,7 @@ let inputs = {
     "collectBuildInfo": true,
     "workingFolder": "npm",
     "command": "pack and publish",
-    "targetRepo": testUtils.npmLocalRepoKey,
+    "targetRepo": testUtils.getRepoKeys().npmLocalRepo,
     "arguments": ""
 };
 
