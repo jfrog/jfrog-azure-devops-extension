@@ -8,7 +8,7 @@ let inputs = {
     "collectBuildInfo": true,
     "workingFolder": "npm",
     "command": "ci",
-    "sourceRepo": testUtils.npmVirtualRepoKey,
+    "sourceRepo": testUtils.getRepoKeys().npmVirtualRepo,
     "arguments": "",
     "threads": "4"
 };

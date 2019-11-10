@@ -8,7 +8,7 @@ let inputs = {
     "fileSpec": JSON.stringify({
         files: [{
             pattern: testUtils.getTestLocalFilesDir(__dirname),
-            target: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME)
+            target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
         }]
     }),
     "failNoOp": true,

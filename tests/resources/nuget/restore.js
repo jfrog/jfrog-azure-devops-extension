@@ -7,7 +7,7 @@ let inputs = {
     "buildNumber": "3",
     "command": "restore",
     "solutionPath": path.join(testUtils.getLocalTestDir(TEST_NAME), "**", "*.sln"),
-    "targetResolveRepo": testUtils.virtualNuget,
+    "targetResolveRepo": testUtils.getRepoKeys().nugetVirtualRepo,
     "packagesDirectory": path.join(testUtils.getLocalTestDir(TEST_NAME), "packages"),
     "verbosityRestore": "Detailed",
     "collectBuildInfo": true

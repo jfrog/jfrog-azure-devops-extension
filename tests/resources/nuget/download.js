@@ -6,7 +6,7 @@ const TEST_NAME = path.basename(__dirname);
 let inputs = {
     "fileSpec": JSON.stringify({
         files: [{
-            pattern: testUtils.localNuGet,
+            pattern: testUtils.getRepoKeys().nugetLocalRepo,
             target: path.join(testUtils.getLocalTestDir(TEST_NAME), "files", "/"),
             build: "NuGet/3",
             flat: "true"

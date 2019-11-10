@@ -8,7 +8,7 @@ const specPath = path.join(testUtils.testDataDir, "downloadSpec.json");
 
 fs.writeFileSync(specPath, JSON.stringify({
     files: [{
-        pattern: testUtils.getRemoteTestDir(testUtils.repoKey1, TEST_NAME),
+        pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
         target: testUtils.getLocalTestDir(TEST_NAME),
         flat: "true"
     }]

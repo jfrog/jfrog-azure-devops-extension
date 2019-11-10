@@ -7,7 +7,7 @@ let inputs = {
     "buildNumber": "3",
     "fileSpec": JSON.stringify({
         files: [{
-            pattern: testUtils.getRemoteTestDir(testUtils.repoKey2, TEST_NAME),
+            pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo2, TEST_NAME),
             target: testUtils.getLocalTestDir(TEST_NAME),
             flat: "true"
         }]
