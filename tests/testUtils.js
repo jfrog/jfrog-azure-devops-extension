@@ -138,7 +138,7 @@ function cleanUpAllTests() {
 }
 
 function createTestRepositories() {
-    createRandomReposKeys();
+    createUniqueReposKeys();
     createRepo(repoKeys.repo1, JSON.stringify({ rclass: "local", packageType: "generic" }));
     createRepo(repoKeys.repo2, JSON.stringify({ rclass: "local", packageType: "generic" }));
     createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: "local", packageType: "maven" }));
@@ -155,10 +155,10 @@ function createTestRepositories() {
 }
 
 /**
- * Creates random repositories keys, and writes them to file for later access by the tests.
+ * Creates unique repositories keys, and writes them to file for later access by the tests.
  */
-function createRandomReposKeys() {
-    let timestamp = getCurrentTimestamp();
+function createUniqueReposKeys() {
+    let timestamp = getCurrentUnixTimestamp();
     Object.keys(repoKeys).forEach(repoVar => {
         repoKeys[repoVar] = [testReposPrefix, repoKeys[repoVar]].join("-");
         // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
@@ -169,7 +169,7 @@ function createRandomReposKeys() {
     fs.outputFileSync(repoKeysPath, JSON.stringify(repoKeys));
 }
 
-function getCurrentTimestamp() {
+function getCurrentUnixTimestamp() {
     return Math.floor(Date.now() / 1000);
 }
 
@@ -181,10 +181,9 @@ function getRepoKeys() {
 }
 
 function deleteTestRepositories() {
-    Object.values(repoKeys).forEach(repoKey => {
-        if (repoKey !== repoKeys.nugetRemoteRepo) {
-            deleteRepo(repoKey)
-        }});
+    Object.values(repoKeys)
+        .filter(repoKey => repoKey !== repoKeys.nugetRemoteRepo)
+        .forEach(deleteRepo);
 }
 
 /**
@@ -203,10 +202,10 @@ function cleanUpOldRepositories() {
         }
         let repoTimestamp = parseInt(regexGroups.pop(), 10);
         // Convert unix timestamp to time
-        let timeDifference = new Date(Math.floor(getCurrentTimestamp()-repoTimestamp) * 1000);
+        let timeDifference = new Date(Math.floor(getCurrentUnixTimestamp()-repoTimestamp) * 1000);
         // If more than 2 hours have passed, delete the repository.
         if (timeDifference.getHours() > 2) {
-            deleteRepo(repoKey)
+            deleteRepo(repoKey);
         }
     })
 }
@@ -217,13 +216,9 @@ function getRepoListFromArtifactory() {
             "Authorization": getAuthorizationHeaderValue()
         }
     });
-    assert(res.statusCode === 200 || res.statusCode === 201, "Failed getting repositories from Artifactory. Error: " + res.getBody('utf8'));
+    assert(res.statusCode === 200 || res.statusCode === 201, "Failed getting repositories from Artifactory. Status code: " + res.statusCode + ". Error: " + res.getBody('utf8'));
     let repoArray = JSON.parse(res.getBody('utf8'));
-    let repoKeysList = [];
-    repoArray.forEach(repo => {
-        repoKeysList.push(repo.key);
-    });
-    return repoKeysList;
+    return repoArray.map(repo => repo.key);
 }
 
 function createRepo(repoKey, body) {
@@ -234,7 +229,7 @@ function createRepo(repoKey, body) {
         },
         body: body
     });
-    assert(res.statusCode === 200 || res.statusCode === 201, "Failed creating repo: " + repoKey + ". Error: " + res.getBody('utf8'));
+    assert(res.statusCode === 200 || res.statusCode === 201, "Failed creating repo: " + repoKey + ". Status code: " + res.statusCode + ". Error: " + res.getBody('utf8'));
     return res;
 }
 
