@@ -243,7 +243,7 @@
                     {
                         "target": "latestversion",
                         "dataSourceName": "BuildNumbers",
-                        "resultTemplate": "{ Value : \"{{{uri}}}\", DisplayValue : \"{{{uri}}}\" }"
+                        "resultTemplate": "{ Value : \"{{{ #regex /?(.*$) uri}}}\", DisplayValue : \"{{{ #regex /?(.*$) uri}}}\" }"
                     },
                     {
                         "target": "defaultVersionSpecific",
