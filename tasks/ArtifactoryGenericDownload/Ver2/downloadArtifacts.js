@@ -26,7 +26,9 @@ function RunTaskCbk(cliPath) {
 }
 
 function performArtifactSourceDownload(cliPath, workDir, artifactoryService, artifactoryUrl) {
-    let buildNumber = tl.getInput("version", true);
+    // 'ARTIFACTORY_RELEASE_BUILD_NUMBER' is used to support providing 'LATEST' version by the user.
+    // When Azure DevOps Server supports Artifactory's LATEST version natively, this variable could be removed.
+    let buildNumber = tl.getVariable('ARTIFACTORY_RELEASE_BUILD_NUMBER') || tl.getInput("version", true);
     let buildName = tl.getInput("definition", true);
     // 'downloadPath' is provided by server when artifact-source is used.
     let downloadPath = tl.getInput("downloadPath", true);
@@ -34,10 +36,6 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
         downloadPath += "/";
     }
     downloadPath = utils.fixWindowsPaths(downloadPath);
-
-    // Remove '/' as Artifactory's api returns build name and number with this prefix.
-    buildName = buildName.replace(/^\//, '');
-    buildNumber = buildNumber.replace(/^\//, '');
 
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, utils.quote("*"), utils.quote(downloadPath), "--build=" + utils.quote(buildName + "/" + buildNumber), "--url=" + utils.quote(artifactoryUrl), "--flat=true");
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
