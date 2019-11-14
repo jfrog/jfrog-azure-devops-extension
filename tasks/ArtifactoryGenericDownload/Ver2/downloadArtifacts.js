@@ -27,7 +27,7 @@ function RunTaskCbk(cliPath) {
 
 function performArtifactSourceDownload(cliPath, workDir, artifactoryService, artifactoryUrl) {
     // 'ARTIFACTORY_RELEASE_BUILD_NUMBER' is used to support providing 'LATEST' version by the user.
-    // When Azure DevOps Server supports our LATEST version natively, this variable could be removed.
+    // When Azure DevOps Server supports Artifactory's LATEST version natively, this variable could be removed.
     let buildNumber = tl.getVariable('ARTIFACTORY_RELEASE_BUILD_NUMBER') || tl.getInput("version", true);
     let buildName = tl.getInput("definition", true);
     // 'downloadPath' is provided by server when artifact-source is used.
