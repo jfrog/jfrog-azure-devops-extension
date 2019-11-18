@@ -12,6 +12,8 @@ const toolName = "jfrog";
 const btPackage = "jfrog-cli-" + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
 const jfrogCliVersion = "1.30.3";
+const pluginVersion = "1.7.4";
+const buildAgent = "artifactory-azure-devops-extension";
 const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
 const buildToolsConfigVersion = 1;
@@ -49,7 +51,7 @@ module.exports = {
 function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
-    process.env.JFROG_CLI_REPORT_USAGE = false;
+    process.env.JFROG_CLI_USER_AGENT = buildAgent + "/" + pluginVersion;
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
         cliDownloadUrl = jfrogCliBintrayDownloadUrl;
