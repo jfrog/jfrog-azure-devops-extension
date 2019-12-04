@@ -37,6 +37,9 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
     }
     downloadPath = utils.fixWindowsPaths(downloadPath);
 
+    // Remove '/' as Artifactory's api returns build name and number with this prefix.
+    buildName = buildName.replace(/^\//, '');
+
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, utils.quote("*"), utils.quote(downloadPath), "--build=" + utils.quote(buildName + "/" + buildNumber), "--url=" + utils.quote(artifactoryUrl), "--flat=true");
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 
