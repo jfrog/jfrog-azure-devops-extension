@@ -3,18 +3,20 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    "buildName": "buildPromoteDryRun",
-    "buildNumber": "3",
-    "fileSpec": JSON.stringify({
-        files: [{
-            pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
-            target: testUtils.getLocalTestDir(TEST_NAME),
-            flat: "true"
-        }]
+    buildName: 'buildPromoteDryRun',
+    buildNumber: '3',
+    fileSpec: JSON.stringify({
+        files: [
+            {
+                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
+                target: testUtils.getLocalTestDir(TEST_NAME),
+                flat: 'true'
+            }
+        ]
     }),
-    "collectBuildInfo": true,
-    "failNoOp": true,
-    "specSource": "taskConfiguration"
+    collectBuildInfo: true,
+    failNoOp: true,
+    specSource: 'taskConfiguration'
 };
 
 testUtils.runTask(testUtils.download, {}, inputs);

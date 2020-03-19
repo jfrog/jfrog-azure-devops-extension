@@ -1,18 +1,20 @@
 const testUtils = require('../../../testUtils');
 const path = require('path');
 
-const TEST_NAME = "npm";
+const TEST_NAME = 'npm';
 
 let inputs = {
-    "fileSpec": JSON.stringify({
-        files: [{
-            pattern: testUtils.getRepoKeys().npmLocalRepo,
-            target: path.join(testUtils.getLocalTestDir(TEST_NAME), "2", "/"),
-            flat: "true"
-        }]
+    fileSpec: JSON.stringify({
+        files: [
+            {
+                pattern: testUtils.getRepoKeys().npmLocalRepo,
+                target: path.join(testUtils.getLocalTestDir(TEST_NAME), '2', '/'),
+                flat: 'true'
+            }
+        ]
     }),
-    "failNoOp": true,
-    "specSource": "taskConfiguration"
+    failNoOp: true,
+    specSource: 'taskConfiguration'
 };
 
 testUtils.runTask(testUtils.download, {}, inputs);

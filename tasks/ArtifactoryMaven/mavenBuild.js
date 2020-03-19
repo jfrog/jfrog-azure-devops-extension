@@ -1,7 +1,7 @@
 let tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 let utils = require('artifactory-tasks-utils');
-const cliMavenCommand = "rt mvn";
+const cliMavenCommand = 'rt mvn';
 let serverIdDeployer;
 let serverIdResolver;
 const execSync = require('child_process').execSync;
@@ -12,12 +12,12 @@ function RunTaskCbk(cliPath) {
     checkAndSetMavenHome();
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
-        tl.setResult(tl.TaskResult.Failed, "Failed getting default working directory.");
+        tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
 
     // Create Maven config file.
-    let configPath = path.join(workDir, "config");
+    let configPath = path.join(workDir, 'config');
     try {
         createMavenConfigFile(configPath, cliPath, workDir);
     } catch (ex) {
@@ -27,12 +27,12 @@ function RunTaskCbk(cliPath) {
     }
 
     // Running Maven command
-    let pomFile = tl.getInput("mavenPOMFile");
-    let goalsAndOptions = tl.getInput("goals");
-    goalsAndOptions = utils.cliJoin(goalsAndOptions, "-f", pomFile);
-    let options = tl.getInput("options");
+    let pomFile = tl.getInput('mavenPOMFile');
+    let goalsAndOptions = tl.getInput('goals');
+    goalsAndOptions = utils.cliJoin(goalsAndOptions, '-f', pomFile);
+    let options = tl.getInput('options');
     if (options) {
-        goalsAndOptions = utils.cliJoin(goalsAndOptions, options)
+        goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
     let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
@@ -45,52 +45,55 @@ function RunTaskCbk(cliPath) {
         cleanup(cliPath, workDir);
     }
     // Ignored if the build's result was previously set to 'Failed'.
-    tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.")
+    tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
 }
 
 function checkAndSetMavenHome() {
     let m2HomeEnvVar = tl.getVariable('M2_HOME');
     if (!m2HomeEnvVar) {
-        console.log("M2_HOME is not defined. Retrieving Maven home using mvn --version.");
+        console.log('M2_HOME is not defined. Retrieving Maven home using mvn --version.');
         // The M2_HOME environment variable is not defined.
         // Since Maven installation can be located in different locations,
         // depending on the installation type and the OS (for example: For Mac with brew install: /usr/local/Cellar/maven/{version}/libexec or Ubuntu with debian: /usr/share/maven),
         // we need to grab the location using the mvn --version command
-        let mvnCommand = "mvn --version";
+        let mvnCommand = 'mvn --version';
         let res = execSync(mvnCommand);
-        let mavenHomeLine = String.fromCharCode.apply(null, res).split('\n')[1].trim();
-        let mavenHome = mavenHomeLine.split(" ")[2];
-        console.log("The Maven home location: " + mavenHome);
-        process.env["M2_HOME"] = mavenHome;
+        let mavenHomeLine = String.fromCharCode
+            .apply(null, res)
+            .split('\n')[1]
+            .trim();
+        let mavenHome = mavenHomeLine.split(' ')[2];
+        console.log('The Maven home location: ' + mavenHome);
+        process.env['M2_HOME'] = mavenHome;
     }
 }
 
 function createMavenConfigFile(configPath, cliPath, buildDir) {
     // Configure resolver server, throws on failure.
-    let artifactoryResolver = tl.getInput("artifactoryResolverService");
+    let artifactoryResolver = tl.getInput('artifactoryResolverService');
     let resolverObj = {};
     if (artifactoryResolver != null) {
         serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
-        let targetResolveReleaseRepo = tl.getInput("targetResolveReleaseRepo");
-        let targetResolveSnapshotRepo = tl.getInput("targetResolveSnapshotRepo");
+        let targetResolveReleaseRepo = tl.getInput('targetResolveReleaseRepo');
+        let targetResolveSnapshotRepo = tl.getInput('targetResolveSnapshotRepo');
         resolverObj = getDeployerResolverObj(targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
     } else {
-        console.log("Resolution from Artifactory is not configured");
+        console.log('Resolution from Artifactory is not configured');
     }
 
     // Configure deployer server, throws on failure.
-    let artifactoryDeployer = tl.getInput("artifactoryDeployService");
+    let artifactoryDeployer = tl.getInput('artifactoryDeployService');
     serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
     utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
-    let targetDeployReleaseRepo = tl.getInput("targetDeployReleaseRepo");
-    let targetDeploySnapshotRepo = tl.getInput("targetDeploySnapshotRepo");
+    let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
+    let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
     let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
     utils.createBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
 }
 
 function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
-    return {snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverID: serverID};
+    return { snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverID: serverID };
 }
 
 /**
@@ -98,12 +101,12 @@ function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
  * @throws In CLI execution failure.
  */
 function removeExtractorDownloadVariables(cliPath, workDir) {
-    let serverId = tl.getVariable("JFROG_CLI_JCENTER_REMOTE_SERVER");
+    let serverId = tl.getVariable('JFROG_CLI_JCENTER_REMOTE_SERVER');
     if (!serverId) {
         return;
     }
-    tl.setVariable("JFROG_CLI_JCENTER_REMOTE_SERVER", "");
-    tl.setVariable("JFROG_CLI_JCENTER_REMOTE_REPO", "");
+    tl.setVariable('JFROG_CLI_JCENTER_REMOTE_SERVER', '');
+    tl.setVariable('JFROG_CLI_JCENTER_REMOTE_REPO', '');
     utils.deleteCliServers(cliPath, workDir, [serverId]);
 }
 

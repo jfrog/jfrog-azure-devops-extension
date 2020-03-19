@@ -3,17 +3,19 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    "buildName": "buildUrlBuildPipeline",
-    "buildNumber": "3",
-    "fileSpec": JSON.stringify({
-        files: [{
-            pattern: "*.nothing",
-            target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
-        }]
+    buildName: 'buildUrlBuildPipeline',
+    buildNumber: '3',
+    fileSpec: JSON.stringify({
+        files: [
+            {
+                pattern: '*.nothing',
+                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
+            }
+        ]
     }),
-    "collectBuildInfo": true,
-    "failNoOp": false,
-    "specSource": "taskConfiguration"
+    collectBuildInfo: true,
+    failNoOp: false,
+    specSource: 'taskConfiguration'
 };
 
 testUtils.runTask(testUtils.upload, {}, inputs);

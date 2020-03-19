@@ -60,6 +60,7 @@ We welcome pull requests from the community!
 * Before creating your first pull request, please join our contributors community by signing [JFrog's CLA](https://secure.echosign.com/public/hostedForm?formid=5IYKLZ2RXB543N).
 * Pull requests should be created on the *dev* branch.
 * Please make sure the code is covered by tests. 
+* Please run `npm run format` for formatting the code before submitting the pull request.
 
 # Release Notes
 See the release notes [here](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension#AzureDevOpsandTFSArtifactoryExtension-ReleaseNotes).

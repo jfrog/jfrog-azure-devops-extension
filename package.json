@@ -7,7 +7,11 @@
     "dependencies": {
         "tfx-cli": "^0.6.1"
     },
+    "devDependencies": {
+        "prettier": "1.19.1"
+    },
     "scripts": {
+        "format": "prettier --write \"**/{*.js,package.json}\"",
         "preinstall": "cd buildScripts && npm i",
         "install": "node buildScripts/build.js",
         "create": "npm i && tfx extension create",

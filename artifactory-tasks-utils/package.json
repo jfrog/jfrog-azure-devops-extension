@@ -1,18 +1,18 @@
 {
-  "name": "artifactory-tasks-utils",
-  "version": "1.0.0",
-  "author": "JFrog",
-  "license": "Apache-2.0",
-  "description": "Utilities for the JFrog Artifactory extension",
-  "main": "utils.js",
-  "dependencies": {
-    "azure-pipelines-task-lib": "^2.7.1",
-    "azure-pipelines-tool-lib": "^0.11.0",
-    "fs-extra": "^7.0.0",
-    "typed-rest-client": "1.0.9",
-    "js-yaml": "^3.13.1"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+    "name": "artifactory-tasks-utils",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "license": "Apache-2.0",
+    "description": "Utilities for the JFrog Artifactory extension",
+    "main": "utils.js",
+    "dependencies": {
+        "azure-pipelines-task-lib": "^2.7.1",
+        "azure-pipelines-tool-lib": "^0.11.0",
+        "fs-extra": "^7.0.0",
+        "typed-rest-client": "1.0.9",
+        "js-yaml": "^3.13.1"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }
 }

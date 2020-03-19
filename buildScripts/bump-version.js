@@ -5,10 +5,10 @@ const commandLineArgs = require('command-line-args');
 const commandLineUsage = require('command-line-usage');
 const editJsonFile = require('edit-json-file');
 const compareVersions = require('compare-versions');
-const editJsonFileOptions = {autosave: true, stringify_width: 4};
+const editJsonFileOptions = { autosave: true, stringify_width: 4 };
 const optionDefinitions = [
-    {name: 'help', alias: 'h', type: Boolean, description: 'Display this usage guide'},
-    {name: 'version', alias: 'v', type: String, description: 'Version to set. Must be bigger than the current version. Format: X.X.X'}
+    { name: 'help', alias: 'h', type: Boolean, description: 'Display this usage guide' },
+    { name: 'version', alias: 'v', type: String, description: 'Version to set. Must be bigger than the current version. Format: X.X.X' }
 ];
 const usage = commandLineUsage([
     {
@@ -20,7 +20,7 @@ const usage = commandLineUsage([
         optionList: optionDefinitions
     }
 ]);
-const commandLineArgsOptions = commandLineArgs(optionDefinitions, {camelCase: true});
+const commandLineArgsOptions = commandLineArgs(optionDefinitions, { camelCase: true });
 if (commandLineArgsOptions.help || !commandLineArgsOptions.version) {
     console.log(usage);
     process.exit(commandLineArgsOptions.help ? 0 : 1);
@@ -38,7 +38,11 @@ function assertVersion() {
     assert.strictEqual(splitVersion.length, 3, 'Version have a format of X.Y.Z');
     let vssExtension = fs.readFileSync('vss-extension.json', 'utf8');
     let vssExtensionJson = JSON.parse(vssExtension);
-    assert.strictEqual(compareVersions(commandLineArgsOptions.version, vssExtensionJson.version), 1, 'Input version must be bigger than current version');
+    assert.strictEqual(
+        compareVersions(commandLineArgsOptions.version, vssExtensionJson.version),
+        1,
+        'Input version must be bigger than current version'
+    );
     let oldVersionSplit = vssExtensionJson.version.split('.');
     assert.strictEqual(oldVersionSplit[0], splitVersion[0], 'Upgrading Major version using this script is forbidden');
 }
@@ -53,17 +57,19 @@ function updateTasksVersion() {
         let taskDir = path.join('tasks', taskName);
         let taskJsonPath = path.join(taskDir, 'task.json');
         if (fs.existsSync(taskJsonPath)) {
-            console.log('Updating version of task ' + taskName + ' to X.' + splitVersion[1] + "." + splitVersion[2]);
-            updateTaskJsonWithNewVersion(taskJsonPath)
+            console.log('Updating version of task ' + taskName + ' to X.' + splitVersion[1] + '.' + splitVersion[2]);
+            updateTaskJsonWithNewVersion(taskJsonPath);
         } else {
             fs.readdir(taskDir, (err, taskVersionDirs) => {
                 taskVersionDirs.forEach(versToBuild => {
                     let taskVersionDirJson = path.join(taskDir, versToBuild, 'task.json');
                     if (fs.existsSync(taskVersionDirJson)) {
-                        console.log('Updating version of task ' + taskName + ', version: ' + versToBuild + ' to X.' + splitVersion[1] + "." + splitVersion[2]);
+                        console.log(
+                            'Updating version of task ' + taskName + ', version: ' + versToBuild + ' to X.' + splitVersion[1] + '.' + splitVersion[2]
+                        );
                         updateTaskJsonWithNewVersion(taskVersionDirJson);
                     }
-                })
+                });
             });
         }
     });
@@ -73,9 +79,9 @@ function updateTaskJsonWithNewVersion(taskJsonPath) {
     let taskJson = editJsonFile(taskJsonPath, editJsonFileOptions);
     let curMajorVersion = taskJson.get('version.Major');
     taskJson.set('version', {
-        'Major': curMajorVersion,
-        'Minor': splitVersion[1],
-        'Patch': splitVersion[2]
+        Major: curMajorVersion,
+        Minor: splitVersion[1],
+        Patch: splitVersion[2]
     });
 }
 

@@ -4,10 +4,10 @@ const path = require('path');
 const fs = require('fs-extra');
 const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
-const testDataDir = path.join(__dirname, "testData");
-const repoKeysPath = path.join(testDataDir, "configuration", "repoKeys");
+const testDataDir = path.join(__dirname, 'testData');
+const repoKeysPath = path.join(testDataDir, 'configuration', 'repoKeys');
 const devnull = require('dev-null');
-const assert = require("assert");
+const assert = require('assert');
 let artifactoryUrl = process.env.ADO_ARTIFACTORY_URL;
 let artifactoryUsername = process.env.ADO_ARTIFACTORY_USERNAME;
 let artifactoryPassword = process.env.ADO_ARTIFACTORY_PASSWORD;
@@ -16,23 +16,23 @@ let artifactoryDockerDomain = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN;
 let artifactoryDockerRepo = process.env.ADO_ARTIFACTORY_DOCKER_REPO;
 let skipTests = process.env.ADO_ARTIFACTORY_SKIP_TESTS ? process.env.ADO_ARTIFACTORY_SKIP_TESTS.split(',') : [];
 
-const testReposPrefix = "ado-extension-test";
+const testReposPrefix = 'ado-extension-test';
 let repoKeys = {
-    repo0: "repo0",
-    repo1: "repo1",
-    repo2: "repo2",
-    mavenLocalRepo: "maven-local",
-    mavenRemoteRepo: "maven-remote",
-    nugetLocalRepo: "nuget-local",
-    nugetRemoteRepo: "nuget-remote",
-    nugetVirtualRepo: "nuget-virtual",
-    npmLocalRepo: "npm-local",
-    npmRemoteRepo: "npm-remote",
-    npmVirtualRepo: "npm-virtual",
-    conanLocalRepo: "conan-local",
-    goLocalRepo: "go-local",
-    goRemoteRepo: "go-remote",
-    goVirtualRepo: "go-virtual",
+    repo0: 'repo0',
+    repo1: 'repo1',
+    repo2: 'repo2',
+    mavenLocalRepo: 'maven-local',
+    mavenRemoteRepo: 'maven-remote',
+    nugetLocalRepo: 'nuget-local',
+    nugetRemoteRepo: 'nuget-remote',
+    nugetVirtualRepo: 'nuget-virtual',
+    npmLocalRepo: 'npm-local',
+    npmRemoteRepo: 'npm-remote',
+    npmVirtualRepo: 'npm-virtual',
+    conanLocalRepo: 'conan-local',
+    goLocalRepo: 'go-local',
+    goRemoteRepo: 'go-remote',
+    goVirtualRepo: 'go-virtual'
 };
 
 module.exports = {
@@ -44,18 +44,18 @@ module.exports = {
     artifactoryPassword: artifactoryPassword,
     artifactoryUsername: artifactoryUsername,
 
-    promote: path.join(__dirname, "..", "tasks", "ArtifactoryBuildPromotion", "buildPromotion.js"),
-    conan: path.join(__dirname, "..", "tasks", "ArtifactoryConan", "conanBuild.js"),
-    docker: path.join(__dirname, "..", "tasks", "ArtifactoryDocker", "dockerBuild.js"),
-    download: path.join(__dirname, "..", "tasks", "ArtifactoryGenericDownload", "Ver2", "downloadArtifacts.js"),
-    upload: path.join(__dirname, "..", "tasks", "ArtifactoryGenericUpload", "uploadArtifacts.js"),
-    maven: path.join(__dirname, "..", "tasks", "ArtifactoryMaven", "mavenBuild.js"),
-    npm: path.join(__dirname, "..", "tasks", "ArtifactoryNpm", "npmBuild.js"),
-    nuget: path.join(__dirname, "..", "tasks", "ArtifactoryNuget", "nugetBuild.js"),
-    publish: path.join(__dirname, "..", "tasks", "ArtifactoryPublishBuildInfo", "publishBuildInfo.js"),
-    discard: path.join(__dirname, "..", "tasks", "ArtifactoryDiscardBuilds", "discardBuilds.js"),
-    properties: path.join(__dirname, "..", "tasks", "ArtifactoryProperties", "properties.js"),
-    go: path.join(__dirname, "..", "tasks", "ArtifactoryGo", "goBuild.js"),
+    promote: path.join(__dirname, '..', 'tasks', 'ArtifactoryBuildPromotion', 'buildPromotion.js'),
+    conan: path.join(__dirname, '..', 'tasks', 'ArtifactoryConan', 'conanBuild.js'),
+    docker: path.join(__dirname, '..', 'tasks', 'ArtifactoryDocker', 'dockerBuild.js'),
+    download: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericDownload', 'Ver2', 'downloadArtifacts.js'),
+    upload: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericUpload', 'uploadArtifacts.js'),
+    maven: path.join(__dirname, '..', 'tasks', 'ArtifactoryMaven', 'mavenBuild.js'),
+    npm: path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'npmBuild.js'),
+    nuget: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'nugetBuild.js'),
+    publish: path.join(__dirname, '..', 'tasks', 'ArtifactoryPublishBuildInfo', 'publishBuildInfo.js'),
+    discard: path.join(__dirname, '..', 'tasks', 'ArtifactoryDiscardBuilds', 'discardBuilds.js'),
+    properties: path.join(__dirname, '..', 'tasks', 'ArtifactoryProperties', 'properties.js'),
+    go: path.join(__dirname, '..', 'tasks', 'ArtifactoryGo', 'goBuild.js'),
 
     initTests: initTests,
     runTask: runTask,
@@ -76,11 +76,11 @@ module.exports = {
 function initTests() {
     process.env.JFROG_CLI_REPORT_USAGE = false;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
-    process.env.JFROG_CLI_LOG_LEVEL = "ERROR";
+    process.env.JFROG_CLI_LOG_LEVEL = 'ERROR';
     tl.setStdStream(devnull());
-    tl.setVariable("Agent.WorkFolder", testDataDir);
-    tl.setVariable("Agent.TempDirectory", testDataDir);
-    tl.setVariable("Agent.ToolsDirectory", testDataDir);
+    tl.setVariable('Agent.WorkFolder', testDataDir);
+    tl.setVariable('Agent.TempDirectory', testDataDir);
+    tl.setVariable('Agent.ToolsDirectory', testDataDir);
 
     cleanUpOldRepositories();
     recreateTestDataDir();
@@ -88,10 +88,10 @@ function initTests() {
 }
 
 function runTask(testMain, variables, inputs) {
-    variables["Agent.WorkFolder"] = testDataDir;
-    variables["Agent.TempDirectory"] = testDataDir;
-    variables["Agent.ToolsDirectory"] = testDataDir;
-    variables["System.DefaultWorkingDirectory"] = testDataDir;
+    variables['Agent.WorkFolder'] = testDataDir;
+    variables['Agent.TempDirectory'] = testDataDir;
+    variables['Agent.ToolsDirectory'] = testDataDir;
+    variables['System.DefaultWorkingDirectory'] = testDataDir;
 
     let tmr = new tmrm.TaskMockRunner(testMain);
 
@@ -111,26 +111,26 @@ function recreateTestDataDir() {
 }
 
 function getBuild(buildName, buildNumber) {
-    return syncRequest('GET', stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "/" + buildNumber, {
+    return syncRequest('GET', stripTrailingSlash(artifactoryUrl) + '/api/build/' + buildName + '/' + buildNumber, {
         headers: {
-            "Authorization": getAuthorizationHeaderValue()
+            Authorization: getAuthorizationHeaderValue()
         }
     });
 }
 
 function deleteBuild(buildName) {
-    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + "/api/build/" + buildName + "?deleteAll=1", {
+    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + '/api/build/' + buildName + '?deleteAll=1', {
         headers: {
-            "Authorization": getAuthorizationHeaderValue()
+            Authorization: getAuthorizationHeaderValue()
         }
     });
 }
 
 function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
-        rimraf(testDataDir, (err) => {
+        rimraf(testDataDir, err => {
             if (err) {
-                console.warn("Tests cleanup issue: " + err)
+                console.warn('Tests cleanup issue: ' + err);
             }
         });
     }
@@ -139,19 +139,49 @@ function cleanUpAllTests() {
 
 function createTestRepositories() {
     createUniqueReposKeys();
-    createRepo(repoKeys.repo1, JSON.stringify({ rclass: "local", packageType: "generic" }));
-    createRepo(repoKeys.repo2, JSON.stringify({ rclass: "local", packageType: "generic" }));
-    createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: "local", packageType: "maven" }));
-    createRepo(repoKeys.mavenRemoteRepo, JSON.stringify({ rclass: "remote", packageType: "maven", url: "https://jcenter.bintray.com" }));
-    createRepo(repoKeys.nugetLocalRepo, JSON.stringify({ rclass: "local", packageType: "nuget", repoLayoutRef: "nuget-default" }));
-    createRepo(repoKeys.nugetVirtualRepo, JSON.stringify({ rclass: "virtual", packageType: "nuget", repoLayoutRef: "nuget-default", repositories: [repoKeys.nugetRemoteRepo, repoKeys.nugetLocalRepo] }));
-    createRepo(repoKeys.npmLocalRepo, JSON.stringify({ rclass: "local", packageType: "npm", repoLayoutRef: "npm-default" }));
-    createRepo(repoKeys.npmRemoteRepo, JSON.stringify({ rclass: "remote", packageType: "npm", repoLayoutRef: "npm-default", url: "https://registry.npmjs.org" }));
-    createRepo(repoKeys.npmVirtualRepo, JSON.stringify({ rclass: "virtual", packageType: "npm", repoLayoutRef: "npm-default", repositories: [repoKeys.npmLocalRepo, repoKeys.npmRemoteRepo] }));
-    createRepo(repoKeys.conanLocalRepo, JSON.stringify({ rclass: "local", packageType: "conan" }));
-    createRepo(repoKeys.goLocalRepo, JSON.stringify({ rclass: "local", packageType: "go", repoLayoutRef: "go-default" }));
-    createRepo(repoKeys.goRemoteRepo, JSON.stringify({ rclass: "remote", packageType: "go", repoLayoutRef: "go-default", url: "https://gocenter.io" }));
-    createRepo(repoKeys.goVirtualRepo, JSON.stringify({ rclass: "virtual", packageType: "go", repoLayoutRef: "go-default", repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo] }));
+    createRepo(repoKeys.repo1, JSON.stringify({ rclass: 'local', packageType: 'generic' }));
+    createRepo(repoKeys.repo2, JSON.stringify({ rclass: 'local', packageType: 'generic' }));
+    createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
+    createRepo(repoKeys.mavenRemoteRepo, JSON.stringify({ rclass: 'remote', packageType: 'maven', url: 'https://jcenter.bintray.com' }));
+    createRepo(repoKeys.nugetLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'nuget', repoLayoutRef: 'nuget-default' }));
+    createRepo(
+        repoKeys.nugetVirtualRepo,
+        JSON.stringify({
+            rclass: 'virtual',
+            packageType: 'nuget',
+            repoLayoutRef: 'nuget-default',
+            repositories: [repoKeys.nugetRemoteRepo, repoKeys.nugetLocalRepo]
+        })
+    );
+    createRepo(repoKeys.npmLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'npm', repoLayoutRef: 'npm-default' }));
+    createRepo(
+        repoKeys.npmRemoteRepo,
+        JSON.stringify({ rclass: 'remote', packageType: 'npm', repoLayoutRef: 'npm-default', url: 'https://registry.npmjs.org' })
+    );
+    createRepo(
+        repoKeys.npmVirtualRepo,
+        JSON.stringify({
+            rclass: 'virtual',
+            packageType: 'npm',
+            repoLayoutRef: 'npm-default',
+            repositories: [repoKeys.npmLocalRepo, repoKeys.npmRemoteRepo]
+        })
+    );
+    createRepo(repoKeys.conanLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'conan' }));
+    createRepo(repoKeys.goLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'go', repoLayoutRef: 'go-default' }));
+    createRepo(
+        repoKeys.goRemoteRepo,
+        JSON.stringify({ rclass: 'remote', packageType: 'go', repoLayoutRef: 'go-default', url: 'https://gocenter.io' })
+    );
+    createRepo(
+        repoKeys.goVirtualRepo,
+        JSON.stringify({
+            rclass: 'virtual',
+            packageType: 'go',
+            repoLayoutRef: 'go-default',
+            repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo]
+        })
+    );
 }
 
 /**
@@ -160,10 +190,10 @@ function createTestRepositories() {
 function createUniqueReposKeys() {
     let timestamp = getCurrentTimestamp();
     Object.keys(repoKeys).forEach(repoVar => {
-        repoKeys[repoVar] = [testReposPrefix, repoKeys[repoVar]].join("-");
+        repoKeys[repoVar] = [testReposPrefix, repoKeys[repoVar]].join('-');
         // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
         if (repoKeys[repoVar] !== repoKeys.nugetRemoteRepo) {
-            repoKeys[repoVar] = [repoKeys[repoVar], timestamp].join("-");
+            repoKeys[repoVar] = [repoKeys[repoVar], timestamp].join('-');
         }
     });
     fs.outputFileSync(repoKeysPath, JSON.stringify(repoKeys));
@@ -180,7 +210,7 @@ function getCurrentTimestamp() {
  * Reads the configured repositories keys from file.
  */
 function getRepoKeys() {
-    return JSON.parse(fs.readFileSync(repoKeysPath, "utf8"));
+    return JSON.parse(fs.readFileSync(repoKeysPath, 'utf8'));
 }
 
 function deleteTestRepositories() {
@@ -205,60 +235,66 @@ function cleanUpOldRepositories() {
         }
         let repoTimestamp = parseInt(regexGroups.pop(), 10);
         // Convert unix timestamp to time
-        let timeDifference = new Date(Math.floor(getCurrentTimestamp()-repoTimestamp) * 1000);
+        let timeDifference = new Date(Math.floor(getCurrentTimestamp() - repoTimestamp) * 1000);
         // If more than 2 hours have passed, delete the repository.
         if (timeDifference.getHours() > 2) {
             deleteRepo(repoKey);
         }
-    })
+    });
 }
 
 function getRepoListFromArtifactory() {
-    let res = syncRequest('GET', stripTrailingSlash(artifactoryUrl) + "/api/repositories/", {
+    let res = syncRequest('GET', stripTrailingSlash(artifactoryUrl) + '/api/repositories/', {
         headers: {
-            "Authorization": getAuthorizationHeaderValue()
+            Authorization: getAuthorizationHeaderValue()
         }
     });
-    assert(res.statusCode === 200 || res.statusCode === 201, "Failed getting repositories from Artifactory. Status code: " + res.statusCode + ". Error: " + res.getBody('utf8'));
+    assert(
+        res.statusCode === 200 || res.statusCode === 201,
+        'Failed getting repositories from Artifactory. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8')
+    );
     let repoArray = JSON.parse(res.getBody('utf8'));
     return repoArray.map(repo => repo.key);
 }
 
 function createRepo(repoKey, body) {
-    let res = syncRequest('PUT', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
+    let res = syncRequest('PUT', stripTrailingSlash(artifactoryUrl) + '/api/repositories/' + repoKey, {
         headers: {
-            "Authorization": getAuthorizationHeaderValue(),
-            "Content-Type": "application/json"
+            Authorization: getAuthorizationHeaderValue(),
+            'Content-Type': 'application/json'
         },
         body: body
     });
-    assert(res.statusCode === 200 || res.statusCode === 201, "Failed creating repo: " + repoKey + ". Status code: " + res.statusCode + ". Error: " + res.getBody('utf8'));
+    assert(
+        res.statusCode === 200 || res.statusCode === 201,
+        'Failed creating repo: ' + repoKey + '. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8')
+    );
     return res;
 }
 
 function isRepoExists(repoKey) {
-    let res = syncRequest('GET', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
+    let res = syncRequest('GET', stripTrailingSlash(artifactoryUrl) + '/api/repositories/' + repoKey, {
         headers: {
-            "Authorization": getAuthorizationHeaderValue()
+            Authorization: getAuthorizationHeaderValue()
         }
     });
     return res.statusCode === 200;
 }
 
 function deleteRepo(repoKey) {
-    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + "/api/repositories/" + repoKey, {
+    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + '/api/repositories/' + repoKey, {
         headers: {
-            "Authorization": getAuthorizationHeaderValue(),
-            "Content-Type": "application/json"
+            Authorization: getAuthorizationHeaderValue(),
+            'Content-Type': 'application/json'
         }
     });
 }
 
 function getAuthorizationHeaderValue() {
     if (artifactoryAccessToken) {
-        return "Bearer " + artifactoryAccessToken;
+        return 'Bearer ' + artifactoryAccessToken;
     } else {
-        return "Basic " + new Buffer.from(artifactoryUsername + ":" + artifactoryPassword).toString("base64");
+        return 'Basic ' + new Buffer.from(artifactoryUsername + ':' + artifactoryPassword).toString('base64');
     }
 }
 
@@ -267,13 +303,13 @@ function setArtifactoryCredentials() {
         return artifactoryUrl;
     };
     tl.getEndpointAuthorizationParameter = (id, key, optional) => {
-        if (key === "username") {
+        if (key === 'username') {
             return artifactoryUsername;
         }
-        if (key === "password") {
+        if (key === 'password') {
             return artifactoryPassword;
         }
-        if (key === "apitoken") {
+        if (key === 'apitoken') {
             return artifactoryAccessToken;
         }
     };
@@ -283,11 +319,11 @@ function setArtifactoryCredentials() {
  * Returns an array of files contained in folderToCopy
  */
 function getResourcesFiles(folderToCopy) {
-    let dir = path.join(__dirname, "resources", folderToCopy);
+    let dir = path.join(__dirname, 'resources', folderToCopy);
     let files = fs.readdirSync(dir);
     let fullFilesPath = [];
     for (let i = 0; i < files.length; i++) {
-        fullFilesPath.push(path.join(dir, files[i]))
+        fullFilesPath.push(path.join(dir, files[i]));
     }
     return fullFilesPath;
 }
@@ -331,19 +367,19 @@ function getTestName(testDir) {
 }
 
 function getLocalTestDir(testName) {
-    return path.join(testDataDir, testName, "/");
+    return path.join(testDataDir, testName, '/');
 }
 
 function getTestLocalFilesDir(testDir) {
-    return path.join(testDir, "files", "/")
+    return path.join(testDir, 'files', '/');
 }
 
 function getRemoteTestDir(repo, testName) {
-    return repo + "/" + testName + "/"
+    return repo + '/' + testName + '/';
 }
 
 function isWindows() {
-    return process.platform.startsWith("win");
+    return process.platform.startsWith('win');
 }
 
 function isSkipTest(skipValue) {
@@ -351,7 +387,5 @@ function isSkipTest(skipValue) {
 }
 
 function stripTrailingSlash(str) {
-    return str.endsWith('/') ?
-        str.slice(0, -1) :
-        str;
+    return str.endsWith('/') ? str.slice(0, -1) : str;
 }
