@@ -1,21 +1,30 @@
-"use strict";
-define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
+'use strict';
+define(['TFS/DistributedTask/TaskRestClient'], taskRestClient => {
     let sharedConfig = VSS.getConfiguration();
     let vsoContext = VSS.getWebContext();
     if (sharedConfig) {
         // Register your extension with host through callback.
-        sharedConfig.onBuildChanged((build) => {
+        sharedConfig.onBuildChanged(build => {
             let taskClient = taskRestClient.getClient();
 
             // Create build-info div.
             // Get 'artifactoryType' attachments from build agent.
-            taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "artifactoryType").then((taskAttachments) => {
-                let buildInfoParentDiv = $("#artifactory-build-info-parent");
+            taskClient.getPlanAttachments(vsoContext.project.id, 'build', build.orchestrationPlan.planId, 'artifactoryType').then(taskAttachments => {
+                let buildInfoParentDiv = $('#artifactory-build-info-parent');
                 if (taskAttachments.length > 0) {
                     let recId = taskAttachments[0].recordId;
                     let timelineId = taskAttachments[0].timelineId;
-                    taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId, timelineId, recId, "artifactoryType", "buildDetails")
-                        .then((attachmentContent) => {
+                    taskClient
+                        .getAttachmentContent(
+                            vsoContext.project.id,
+                            'build',
+                            build.orchestrationPlan.planId,
+                            timelineId,
+                            recId,
+                            'artifactoryType',
+                            'buildDetails'
+                        )
+                        .then(attachmentContent => {
                             let buildDetails = JSON.parse(bufferToString(attachmentContent));
                             let buildInfoDiv = createBuildInfoDiv(buildDetails);
                             buildInfoParentDiv.append(buildInfoDiv);
@@ -28,13 +37,22 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
 
             // Create xray-scan div.
             // Get 'xrayType' attachments from build agent.
-            taskClient.getPlanAttachments(vsoContext.project.id, "build", build.orchestrationPlan.planId, "xrayType").then((taskAttachments) => {
-                let xrayScanParentDiv = $("#artifactory-build-info-parent");
+            taskClient.getPlanAttachments(vsoContext.project.id, 'build', build.orchestrationPlan.planId, 'xrayType').then(taskAttachments => {
+                let xrayScanParentDiv = $('#artifactory-build-info-parent');
                 if (taskAttachments.length > 0) {
                     let recId = taskAttachments[0].recordId;
                     let timelineId = taskAttachments[0].timelineId;
-                    taskClient.getAttachmentContent(vsoContext.project.id, "build", build.orchestrationPlan.planId, timelineId, recId, "xrayType", "scanDetails")
-                        .then((attachmentContent) => {
+                    taskClient
+                        .getAttachmentContent(
+                            vsoContext.project.id,
+                            'build',
+                            build.orchestrationPlan.planId,
+                            timelineId,
+                            recId,
+                            'xrayType',
+                            'scanDetails'
+                        )
+                        .then(attachmentContent => {
                             let scanUrl = JSON.parse(bufferToString(attachmentContent));
                             let xrayScanDiv = createXrayScanDiv(scanUrl);
                             xrayScanParentDiv.append(xrayScanDiv);
@@ -63,11 +81,12 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
         let buildInfoIcon = document.createElement('img');
         let buildInfoUrlDiv = document.createElement('a');
 
-        buildInfoIcon.src = "images/artifactory-build-info.png";
-        buildInfoUrlDiv.classList.add("build-info-url");
-        buildInfoUrlDiv.href = stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
-        buildInfoUrlDiv.text = "Artifactory Build Info";
-        buildInfoUrlDiv.target = "_blank";
+        buildInfoIcon.src = 'images/artifactory-build-info.png';
+        buildInfoUrlDiv.classList.add('build-info-url');
+        buildInfoUrlDiv.href =
+            stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        buildInfoUrlDiv.text = 'Artifactory Build Info';
+        buildInfoUrlDiv.target = '_blank';
         buildInfoDiv.append(buildInfoIcon);
         buildInfoDiv.append(buildInfoUrlDiv);
         return buildInfoDiv;
@@ -75,8 +94,8 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
 
     function createNoBuildInfoDiv() {
         let noBuildInfoDiv = document.createElement('p');
-        noBuildInfoDiv.classList.add("build-info-url");
-        noBuildInfoDiv.innerText = "Build Info is not published to Artifactory";
+        noBuildInfoDiv.classList.add('build-info-url');
+        noBuildInfoDiv.innerText = 'Build Info is not published to Artifactory';
         return noBuildInfoDiv;
     }
 
@@ -89,11 +108,11 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
         let xrayScanIcon = document.createElement('img');
         let xrayScanUrlDiv = document.createElement('a');
 
-        xrayScanIcon.src = "images/artifactory-xray-scan.png";
-        xrayScanUrlDiv.classList.add("xray-scan-url");
+        xrayScanIcon.src = 'images/artifactory-xray-scan.png';
+        xrayScanUrlDiv.classList.add('xray-scan-url');
         xrayScanUrlDiv.href = scanUrl;
-        xrayScanUrlDiv.text = "Xray Build Scan Report";
-        xrayScanUrlDiv.target = "_blank";
+        xrayScanUrlDiv.text = 'Xray Build Scan Report';
+        xrayScanUrlDiv.target = '_blank';
         xrayScanDiv.append(xrayScanIcon);
         xrayScanDiv.append(xrayScanUrlDiv);
         return xrayScanDiv;
@@ -101,14 +120,12 @@ define(["TFS/DistributedTask/TaskRestClient"], (taskRestClient) => {
 
     function createNoXrayScanDiv() {
         let noXrayScanDiv = document.createElement('p');
-        noXrayScanDiv.classList.add("build-info-url");
-        noXrayScanDiv.innerText = "Xray Scan for this build was not performed";
+        noXrayScanDiv.classList.add('build-info-url');
+        noXrayScanDiv.innerText = 'Xray Scan for this build was not performed';
         return noXrayScanDiv;
     }
 
     function stripTrailingSlash(str) {
-        return str.endsWith('/') ?
-            str.slice(0, -1) :
-            str;
+        return str.endsWith('/') ? str.slice(0, -1) : str;
     }
 });

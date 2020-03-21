@@ -8,17 +8,18 @@ const localTools = require('./tools');
 const yaml = require('js-yaml');
 
 const fileName = getCliExecutableName();
-const toolName = "jfrog";
-const btPackage = "jfrog-cli-" + getArchitecture();
-const jfrogFolderPath = encodePath(path.join(tl.getVariable("Agent.WorkFolder"), "_jfrog"));
-const jfrogCliVersion = "1.31.2";
-const pluginVersion = "1.8.1";
-const buildAgent = "artifactory-azure-devops-extension";
-const customCliPath = encodePath(path.join(jfrogFolderPath, "current", fileName)); // Optional - Customized jfrog-cli path.
-const jfrogCliBintrayDownloadUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + "?bt_package=" + btPackage;
+const toolName = 'jfrog';
+const btPackage = 'jfrog-cli-' + getArchitecture();
+const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
+const jfrogCliVersion = '1.31.2';
+const pluginVersion = '1.8.1';
+const buildAgent = 'artifactory-azure-devops-extension';
+const customCliPath = encodePath(path.join(jfrogFolderPath, 'current', fileName)); // Optional - Customized jfrog-cli path.
+const jfrogCliBintrayDownloadUrl =
+    'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + '?bt_package=' + btPackage;
 const buildToolsConfigVersion = 1;
 
-let cliConfigCommand = "rt c";
+let cliConfigCommand = 'rt c';
 let runTaskCbk = null;
 
 module.exports = {
@@ -51,7 +52,7 @@ module.exports = {
 function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
-    process.env.JFROG_CLI_USER_AGENT = buildAgent + "/" + pluginVersion;
+    process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
         cliDownloadUrl = jfrogCliBintrayDownloadUrl;
@@ -59,33 +60,33 @@ function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     }
 
     runTaskCbk = runTaskFunc;
-    getCliPath(cliDownloadUrl, cliAuthHandlers).then((cliPath) => {
-        runCbk(cliPath);
-        collectEnvVarsIfNeeded(cliPath);
-    }).catch((error) => tl.setResult(tl.TaskResult.Failed, "Error occurred while executing task:\n" + error));
+    getCliPath(cliDownloadUrl, cliAuthHandlers)
+        .then(cliPath => {
+            runCbk(cliPath);
+            collectEnvVarsIfNeeded(cliPath);
+        })
+        .catch(error => tl.setResult(tl.TaskResult.Failed, 'Error occurred while executing task:\n' + error));
 }
 
 // Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
 function getCliPath(cliDownloadUrl, cliAuthHandlers) {
-    return new Promise(
-        function (resolve, reject) {
-            let cliDir = toolLib.findLocalTool(toolName, jfrogCliVersion);
-            if (fs.existsSync(customCliPath)) {
-                tl.debug("Using cli from custom cli path: " + customCliPath);
-                resolve(customCliPath);
-            } else if (cliDir) {
-                let cliPath = path.join(cliDir, fileName);
-                tl.debug("Using existing versioned cli path: " + cliPath);
-                resolve(cliPath);
-            } else {
-                const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl);
-                createCliDirs();
-                return downloadCli(cliDownloadUrl, cliAuthHandlers)
-                    .then((cliPath) => resolve(cliPath))
-                    .catch((error) => reject(errMsg + "\n" + error));
-            }
+    return new Promise(function(resolve, reject) {
+        let cliDir = toolLib.findLocalTool(toolName, jfrogCliVersion);
+        if (fs.existsSync(customCliPath)) {
+            tl.debug('Using cli from custom cli path: ' + customCliPath);
+            resolve(customCliPath);
+        } else if (cliDir) {
+            let cliPath = path.join(cliDir, fileName);
+            tl.debug('Using existing versioned cli path: ' + cliPath);
+            resolve(cliPath);
+        } else {
+            const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl);
+            createCliDirs();
+            return downloadCli(cliDownloadUrl, cliAuthHandlers)
+                .then(cliPath => resolve(cliPath))
+                .catch(error => reject(errMsg + '\n' + error));
         }
-    );
+    });
 }
 
 function buildCliArtifactoryDownloadUrl(rtUrl, repoName) {
@@ -96,17 +97,17 @@ function buildCliArtifactoryDownloadUrl(rtUrl, repoName) {
 }
 
 function createAuthHandlers(artifactoryService) {
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, 'username', true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, 'password', true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, 'apitoken', true);
 
     // Check if Artifactory should be accessed using access-token.
     if (artifactoryAccessToken) {
-        return [new clientHandlers.BearerCredentialHandler(artifactoryAccessToken)]
+        return [new clientHandlers.BearerCredentialHandler(artifactoryAccessToken)];
     }
 
     // Check if Artifactory should be accessed anonymously.
-    if (artifactoryUser === "") {
+    if (artifactoryUser === '') {
         return [];
     }
 
@@ -115,13 +116,17 @@ function createAuthHandlers(artifactoryService) {
 }
 
 function generateDownloadCliErrorMessage(downloadUrl) {
-    let errMsg = "Failed while attempting to download JFrog CLI from " + downloadUrl + ". ";
+    let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl + '. ';
     if (downloadUrl === jfrogCliBintrayDownloadUrl) {
-        errMsg += "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " + jfrogCliBintrayDownloadUrl + ". You ";
+        errMsg +=
+            "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
+            jfrogCliBintrayDownloadUrl +
+            '. You ';
     } else {
-        errMsg += "If the chosen Artifactory Service cannot access the internet, you ";
+        errMsg += 'If the chosen Artifactory Service cannot access the internet, you ';
     }
-    errMsg += "may also manually download version " + jfrogCliVersion + " of JFrog CLI and place it on the agent in the following path: " + customCliPath;
+    errMsg +=
+        'may also manually download version ' + jfrogCliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + customCliPath;
     return errMsg;
 }
 
@@ -138,18 +143,18 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         throw "JFrog CLI execution path doesn't exist: " + runningDir;
     }
     if (!cliCommand) {
-        throw "Cannot execute empty Cli command.";
+        throw 'Cannot execute empty Cli command.';
     }
     try {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        tl.debug("Executing cliCommand: " + cliCommand);
+        tl.debug('Executing cliCommand: ' + cliCommand);
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
-        let errorMsg = ex.toString().replace(/--password=".*"/g, "--password=***");
-        throw errorMsg.replace(/--access-token=".*"/g, "--access-token=***");
+        let errorMsg = ex.toString().replace(/--password=".*"/g, '--password=***');
+        throw errorMsg.replace(/--access-token=".*"/g, '--access-token=***');
     }
 }
 
@@ -160,16 +165,16 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  */
 function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     let artifactoryUrl = tl.getEndpointUrl(artifactory);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, "username", true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, "password", true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactory, "apitoken", true);
-    let cliCommand = cliJoin(cliPath, cliConfigCommand, quote(serverId), "--url=" + quote(artifactoryUrl), "--interactive=false");
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, 'username', true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, 'password', true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactory, 'apitoken', true);
+    let cliCommand = cliJoin(cliPath, cliConfigCommand, quote(serverId), '--url=' + quote(artifactoryUrl), '--interactive=false');
     if (artifactoryAccessToken) {
         // Add access-token if required.
-        cliCommand = cliJoin(cliCommand, "--access-token=" + quote(artifactoryAccessToken));
+        cliCommand = cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
     } else {
         // Add username and password.
-        cliCommand = cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
+        cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
     }
     executeCliCommand(cliCommand, buildDir);
 }
@@ -182,7 +187,7 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
     let deleteServerIDCommand;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
-        deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, "delete", quote(serverIdArray[i]), "--interactive=false");
+        deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
         // This operation throws an exception in case of failure.
         executeCliCommand(deleteServerIDCommand, buildDir);
     }
@@ -198,84 +203,87 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
  */
 function writeSpecContentToSpecPath(specSource, specPath) {
     let fileSpec;
-    if (specSource === "file") {
-        let specInputPath = tl.getPathInput("file", true, true);
-        console.log("Using file spec located at " + specInputPath);
-        fileSpec = fs.readFileSync(specInputPath, "utf8");
-    } else if (specSource === "taskConfiguration") {
-        fileSpec = tl.getInput("fileSpec", true);
+    if (specSource === 'file') {
+        let specInputPath = tl.getPathInput('file', true, true);
+        console.log('Using file spec located at ' + specInputPath);
+        fileSpec = fs.readFileSync(specInputPath, 'utf8');
+    } else if (specSource === 'taskConfiguration') {
+        fileSpec = tl.getInput('fileSpec', true);
     } else {
-        throw "Failed creating File-Spec, since the provided File-Spec source value is invalid."
+        throw 'Failed creating File-Spec, since the provided File-Spec source value is invalid.';
     }
     fileSpec = fixWindowsPaths(fileSpec);
     validateSpecWithoutRegex(fileSpec);
-    console.log("Using file spec:");
+    console.log('Using file spec:');
     console.log(fileSpec);
     // Write provided fileSpec to file
     tl.writeFile(specPath, fileSpec);
 }
 
 function cliJoin() {
-    let command = "";
+    let command = '';
     for (let i = 0; i < arguments.length; ++i) {
         let arg = arguments[i];
         if (arg.length > 0) {
-            command += (command === "") ? arg : (" " + arg);
+            command += command === '' ? arg : ' ' + arg;
         }
     }
     return command;
 }
 
 function quote(str) {
-    return "\"" + str + "\"";
+    return '"' + str + '"';
 }
 
 function addArtifactoryCredentials(cliCommand, artifactoryService) {
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, "username", true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, "password", true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, "apitoken", true);
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, 'username', true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, 'password', true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, 'apitoken', true);
 
     // Check if should use Access Token.
     if (artifactoryAccessToken) {
-        return cliJoin(cliCommand, "--access-token=" + quote(artifactoryAccessToken));
+        return cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
     }
 
     // Check if Artifactory should be accessed anonymously.
-    if (artifactoryUser === "") {
-        artifactoryUser = "anonymous";
-        return cliJoin(cliCommand, "--user=" + quote(artifactoryUser));
+    if (artifactoryUser === '') {
+        artifactoryUser = 'anonymous';
+        return cliJoin(cliCommand, '--user=' + quote(artifactoryUser));
     }
 
-    return cliJoin(cliCommand, "--user=" + quote(artifactoryUser), "--password=" + quote(artifactoryPassword));
+    return cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
 }
 
 function addStringParam(cliCommand, inputParam, cliParam) {
     let val = tl.getInput(inputParam, false);
     if (val) {
-        cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + quote(val));
+        cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + quote(val));
     }
     return cliCommand;
 }
 
 function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
-    cliCommand = cliJoin(cliCommand, "--" + cliParam + "=" + val);
+    cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
     return cliCommand;
 }
 
 function logCliVersion(cliPath) {
-    let cliCommand = cliJoin(cliPath, "--version");
+    let cliCommand = cliJoin(cliPath, '--version');
     try {
         let res = execSync(cliCommand);
-        let detectedVersion = String.fromCharCode.apply(null, res).split(' ')[2].trim();
-        console.log("JFrog CLI version: " + detectedVersion);
+        let detectedVersion = String.fromCharCode
+            .apply(null, res)
+            .split(' ')[2]
+            .trim();
+        console.log('JFrog CLI version: ' + detectedVersion);
     } catch (ex) {
-        console.error("Failed to get JFrog CLI version: " + ex);
+        console.error('Failed to get JFrog CLI version: ' + ex);
     }
 }
 
 function runCbk(cliPath) {
-    console.log("Running jfrog-cli from " + cliPath + ".");
+    console.log('Running jfrog-cli from ' + cliPath + '.');
     logCliVersion(cliPath);
     runTaskCbk(cliPath);
 }
@@ -294,39 +302,42 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers) {
         cliAuthHandlers = [];
     }
     return new Promise((resolve, reject) => {
-        localTools.downloadTool(cliDownloadUrl, null, cliAuthHandlers).then((downloadPath) => {
-            toolLib.cacheFile(downloadPath, fileName, toolName, jfrogCliVersion).then((cliDir) => {
-                let cliPath = path.join(cliDir, fileName);
-                if (!isWindows()) {
-                    fs.chmodSync(cliPath, 0o555);
-                }
-                tl.debug("Finished downloading JFrog cli.");
-                resolve(cliPath);
+        localTools
+            .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
+            .then(downloadPath => {
+                toolLib.cacheFile(downloadPath, fileName, toolName, jfrogCliVersion).then(cliDir => {
+                    let cliPath = path.join(cliDir, fileName);
+                    if (!isWindows()) {
+                        fs.chmodSync(cliPath, 0o555);
+                    }
+                    tl.debug('Finished downloading JFrog cli.');
+                    resolve(cliPath);
+                });
             })
-        }).catch((err) => {
-            reject(err);
-        });
+            .catch(err => {
+                reject(err);
+            });
     });
 }
 
 function getArchitecture() {
     let platform = process.platform;
-    if (platform.startsWith("win")) {
-        return "windows-amd64";
+    if (platform.startsWith('win')) {
+        return 'windows-amd64';
     }
-    if (platform.includes("darwin")) {
-        return "mac-386";
+    if (platform.includes('darwin')) {
+        return 'mac-386';
     }
-    if (process.arch.includes("64")) {
-        return "linux-amd64";
+    if (process.arch.includes('64')) {
+        return 'linux-amd64';
     }
-    return "linux-386";
+    return 'linux-386';
 }
 
 function getCliExecutableName() {
-    let executable = "jfrog";
+    let executable = 'jfrog';
     if (isWindows()) {
-        executable += ".exe";
+        executable += '.exe';
     }
     return executable;
 }
@@ -346,12 +357,12 @@ function validateSpecWithoutRegex(fileSpec) {
     if (!isWindows()) {
         return;
     }
-    let files = JSON.parse(fileSpec)["files"];
+    let files = JSON.parse(fileSpec)['files'];
     for (const file of Object.keys(files)) {
         let values = files[file];
-        let regexp = values["regexp"];
-        if (regexp && regexp.toLowerCase() === "true") {
-            throw ("The File Spec includes 'regexp: true' which is currently not supported.");
+        let regexp = values['regexp'];
+        if (regexp && regexp.toLowerCase() === 'true') {
+            throw "The File Spec includes 'regexp: true' which is currently not supported.";
         }
     }
 }
@@ -363,7 +374,7 @@ function validateSpecWithoutRegex(fileSpec) {
  * @returns {string} - The encoded path.
  */
 function encodePath(str) {
-    let encodedPath = "";
+    let encodedPath = '';
     let arr = str.split(path.sep);
     let count = 0;
     for (let section of arr) {
@@ -371,7 +382,7 @@ function encodePath(str) {
             continue;
         }
         count++;
-        if (section.indexOf(" ") > 0 && !section.startsWith("\"") && !section.endsWith("\"")) {
+        if (section.indexOf(' ') > 0 && !section.startsWith('"') && !section.endsWith('"')) {
             section = quote(section);
         }
         encodedPath += section + path.sep;
@@ -391,12 +402,11 @@ function encodePath(str) {
  * @param cliPath - (String) - The cli path.
  */
 function collectEnvVarsIfNeeded(cliPath) {
-    let includeEnvVars = tl.getBoolInput("includeEnvVars");
+    let includeEnvVars = tl.getBoolInput('includeEnvVars');
     if (includeEnvVars) {
         try {
             collectEnvVars(cliPath);
-        }
-        catch (ex) {
+        } catch (ex) {
             tl.setResult(tl.TaskResult.Failed, ex);
         }
     }
@@ -409,16 +419,16 @@ function collectEnvVarsIfNeeded(cliPath) {
  * @throws In CLI execution failure.
  */
 function collectEnvVars(cliPath) {
-    console.log("Collecting environment variables...");
+    console.log('Collecting environment variables...');
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
-    let cliEnvVarsCommand = cliJoin(cliPath, "rt bce", quote(buildName), quote(buildNumber));
+    let cliEnvVarsCommand = cliJoin(cliPath, 'rt bce', quote(buildName), quote(buildNumber));
     executeCliCommand(cliEnvVarsCommand, workDir);
 }
 
 function isWindows() {
-    return process.platform.startsWith("win");
+    return process.platform.startsWith('win');
 }
 
 function isToolExists(toolName) {
@@ -426,9 +436,7 @@ function isToolExists(toolName) {
 }
 
 function stripTrailingSlash(str) {
-    return str.endsWith('/') ?
-        str.slice(0, -1) :
-        str;
+    return str.endsWith('/') ? str.slice(0, -1) : str;
 }
 
 /**
@@ -468,18 +476,18 @@ function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deplo
 function assembleBuildToolServerId(buildToolType, serverType) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
-    return [buildName, buildNumber, buildToolType, serverType].join("-");
+    return [buildName, buildNumber, buildToolType, serverType].join('-');
 }
 
 /**
  * Appends build name and number to provided cli command if collectBuildInfo is selected.
  * */
 function appendBuildFlagsToCliCommand(cliCommand) {
-    if (tl.getBoolInput("collectBuildInfo")) {
+    if (tl.getBoolInput('collectBuildInfo')) {
         // Construct the build-info collection flags.
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
-        return cliJoin(cliCommand, "--build-name=" + quote(buildName), "--build-number=" + quote(buildNumber));
+        return cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
     }
     return cliCommand;
 }
