@@ -1,0 +1,166 @@
+{
+    "id": "07fc5c20-6772-11d2-cace-6501d1a00335",
+    "name": "ArtifactoryNpm",
+    "friendlyName": "Artifactory npm",
+    "description": "Install, pack and publish npm packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Npm+Registry)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "2",
+        "Minor": "8",
+        "Patch": "1"
+    },
+    "demands": [
+        "npm"
+    ],
+    "minimumAgentVersion": "1.91.0",
+    "instanceNameFormat": "Artifactory npm $(command)",
+    "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "install",
+            "helpMarkDown": "The npm command to run.",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "install": "install",
+                "pack and publish": "pack and publish",
+                "ci": "ci"
+            }
+        },
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The Artifactory service used by the task."
+        },
+        {
+            "name": "sourceRepo",
+            "type": "pickList",
+            "label": "Npm source repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command != pack and publish",
+            "helpMarkDown": "The source npm repository.\nCan be local, remote, or a virtual npm repository.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetRepo",
+            "type": "pickList",
+            "label": "Npm target repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = pack and publish",
+            "helpMarkDown": "The target npm repository\nCan be local, or a virtual npm repository containing local repositories.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "workingFolder",
+            "type": "filePath",
+            "label": "Working folder with package.json",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Path to the folder containing the target package.json and .npmrc files. Select the folder, not the file e.g. \"/packages/mypackage\"."
+        },
+        {
+            "name": "arguments",
+            "type": "string",
+            "label": "Npm arguments",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "command != ci",
+            "helpMarkDown": "A list of npm arguments and options in the form of \"--arg1=value1 --arg2=value2\"."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "threads",
+            "type": "pickList",
+            "label": "Build info threads",
+            "defaultValue": "1",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true && command != pack and publish",
+            "options": {
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7",
+                "8": "8",
+                "9": "9",
+                "10": "10"
+            },
+            "helpMarkDown": "Number of working threads for build-info collection.\nCalculating the build-info requires sending a series of requests to Artifactory.\nSince some build agents may have limited network resources, the default for 'Build info threads' is set to 1.\nIncreasing the threads amount should consume more resources, but can also improve performance."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "sourceRepo",
+            "resultSelector": "jsonpath:$[*].key"
+        },
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "npmBuild.js"
+        }
+    }
+}

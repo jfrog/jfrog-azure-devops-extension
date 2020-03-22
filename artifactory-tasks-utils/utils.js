@@ -31,6 +31,7 @@ module.exports = {
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
+    performConfigCommand: performConfigCommand,
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
@@ -491,4 +492,17 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         return cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
     }
     return cliCommand;
+}
+
+function performConfigCommand(cliPath, serverId, artifactoryUrl, artifactoryService, requiredWorkDir) {
+        // Build the cli command.
+        let cliCommand = cliJoin(cliPath, serverId, "--url=" + artifactoryUrl);
+        cliCommand = addArtifactoryCredentials(cliCommand, artifactoryService);
+
+        // Execute cli.
+        try {
+            utils.executeCliCommand(cliCommand, requiredWorkDir);
+        } catch (ex) {
+            tl.setResult(tl.TaskResult.Failed, ex);
+        }
 }
