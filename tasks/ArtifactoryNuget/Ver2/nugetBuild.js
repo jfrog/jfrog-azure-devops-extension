@@ -11,9 +11,8 @@ const NUGET_VERSION = '4.7.1';
 const path = require('path');
 const cliNuGetCommand = 'rt nuget';
 const cliUploadCommand = 'rt u';
-const serverId = "nugetServerIdDeployResolve";
-const nugetConfigCommand = "rt nugetc";
-
+const serverId = 'nugetServerIdDeployResolve';
+const nugetConfigCommand = 'rt nugetc';
 
 /**
  * Adds the nuget executable to the Path and execute the CLI.
@@ -30,7 +29,7 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
 /**
  * Download NuGet version, adds to the path and executes.
  */
-let downloadAndRunNuget = async(function (cliPath, nugetCommand) {
+let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
     console.log('NuGet not found in Path. Downloading...');
     let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
     toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
@@ -41,7 +40,7 @@ let downloadAndRunNuget = async(function (cliPath, nugetCommand) {
 // First we will check for NuGet in the Env Path. If exists, this one will be used.
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
-let RunTaskCbk = async(function (cliPath) {
+let RunTaskCbk = async(function(cliPath) {
     let nugetCommand = tl.getInput('command');
     let nugetExec = tl.which('nuget', false);
     if (!nugetExec && nugetCommand.localeCompare('restore') === 0) {
@@ -82,16 +81,9 @@ function exec(cliPath, nugetCommand) {
             }
             let targetResolveRepo = tl.getInput('targetResolveRepo');
             let nugetArguments = addNugetArgsToCommands();
-            nugetCommandCli = utils.cliJoin(
-                cliPath,
-                cliNuGetCommand,
-                nugetCommand,
-                nugetArguments
-            );
+            nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
             performNugerConfig(cliPath, solutionPath, targetResolveRepo);
             runNuGet(nugetCommandCli, solutionPath);
-
-
         });
     } else {
         // Perform push command.
@@ -135,8 +127,15 @@ function performNugerConfig(cliPath, requiredWorkDir, repo) {
     utils.configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
 
     // Build the cli config command.
-    let cliCommand = utils.cliJoin(cliPath, nugetConfigCommand, "--server-id-resolve=" + utils.quote(serverId), "--repo-resolve=" + utils.quote(repo), "--server-id-deploy=" + utils.quote(serverId), "--repo-deploy=" + utils.quote(repo));
-    console.log("performNugerConfig :"+cliCommand)
+    let cliCommand = utils.cliJoin(
+        cliPath,
+        nugetConfigCommand,
+        '--server-id-resolve=' + utils.quote(serverId),
+        '--repo-resolve=' + utils.quote(repo),
+        '--server-id-deploy=' + utils.quote(serverId),
+        '--repo-deploy=' + utils.quote(repo)
+    );
+    console.log('performNugerConfig :' + cliCommand);
 
     // Execute cli.
     try {
@@ -144,8 +143,7 @@ function performNugerConfig(cliPath, requiredWorkDir, repo) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }
-    console.log("performNugerConfig finish")
-
+    console.log('performNugerConfig finish');
 }
 
 // Creates the Nuget arguments
@@ -160,7 +158,7 @@ function addNugetArgsToCommands() {
     }
 
     // Robi fixed windows backslash problem :)
-    let packagesDirectory =utils.fixWindowsPaths(tl.getInput('packagesDirectory'));
+    let packagesDirectory = utils.fixWindowsPaths(tl.getInput('packagesDirectory'));
     if (packagesDirectory) {
         nugetArguments = utils.cliJoin(nugetArguments, '-PackagesDirectory', packagesDirectory);
     }

@@ -2,11 +2,11 @@ const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
 
-const npmInstallCommand = "rt npmi";
-const npmPublishCommand = "rt npmp";
-const npmCiCommand = "rt npmci";
-const npmConfigCommand = "rt npmc";
-const serverId = "npmServerIdDeployResolve";
+const npmInstallCommand = 'rt npmi';
+const npmPublishCommand = 'rt npmp';
+const npmCiCommand = 'rt npmci';
+const npmConfigCommand = 'rt npmc';
+const serverId = 'npmServerIdDeployResolve';
 
 function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -28,18 +28,18 @@ function RunTaskCbk(cliPath) {
     }
 
     // Determine npm command.
-    let inputCommand = tl.getInput("command", true);
+    let inputCommand = tl.getInput('command', true);
     switch (inputCommand) {
         case 'install':
-            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput("sourceRepo", true), requiredWorkDir)
+            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput('sourceRepo', true), requiredWorkDir);
             performNpmCommand(npmInstallCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'ci':
-            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput("sourceRepo", true), requiredWorkDir)
+            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput('sourceRepo', true), requiredWorkDir);
             performNpmCommand(npmCiCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'pack and publish':
-            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput("targetRepo", true), requiredWorkDir)
+            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput('targetRepo', true), requiredWorkDir);
             performNpmCommand(npmPublishCommand, false, cliPath, collectBuildInfo, requiredWorkDir);
             break;
     }
@@ -50,7 +50,7 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
     let cliCommand = utils.cliJoin(cliPath, cliNpmCommand);
 
     // Add npm args
-    let npmParam = tl.getInput("arguments", false)
+    let npmParam = tl.getInput('arguments', false);
     if (npmParam) {
         cliCommand = utils.cliJoin(cliCommand, npmParam);
     }
@@ -73,7 +73,14 @@ function performNpmConfigCommand(cliPath, artifactoryService, repo, requiredWork
     utils.configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
 
     // Build the cli config command.
-    let cliCommand = utils.cliJoin(cliPath, npmConfigCommand, "--server-id-resolve=" + utils.quote(serverId), "--repo-resolve=" + utils.quote(repo), "--server-id-deploy=" + utils.quote(serverId), "--repo-deploy=" + utils.quote(repo));
+    let cliCommand = utils.cliJoin(
+        cliPath,
+        npmConfigCommand,
+        '--server-id-resolve=' + utils.quote(serverId),
+        '--repo-resolve=' + utils.quote(repo),
+        '--server-id-deploy=' + utils.quote(serverId),
+        '--repo-deploy=' + utils.quote(repo)
+    );
 
     // Execute cli.
     try {

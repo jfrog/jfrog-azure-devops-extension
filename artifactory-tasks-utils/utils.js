@@ -495,14 +495,14 @@ function appendBuildFlagsToCliCommand(cliCommand) {
 }
 
 function performConfigCommand(cliPath, serverId, artifactoryUrl, artifactoryService, requiredWorkDir) {
-        // Build the cli command.
-        let cliCommand = cliJoin(cliPath, serverId, "--url=" + artifactoryUrl);
-        cliCommand = addArtifactoryCredentials(cliCommand, artifactoryService);
+    // Build the cli command.
+    let cliCommand = cliJoin(cliPath, serverId, '--url=' + artifactoryUrl);
+    cliCommand = addArtifactoryCredentials(cliCommand, artifactoryService);
 
-        // Execute cli.
-        try {
-            utils.executeCliCommand(cliCommand, requiredWorkDir);
-        } catch (ex) {
-            tl.setResult(tl.TaskResult.Failed, ex);
-        }
+    // Execute cli.
+    try {
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
 }
