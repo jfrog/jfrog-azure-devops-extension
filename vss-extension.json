@@ -310,6 +310,16 @@
             }
         },
         {
+            "id": "artifactory-gradle",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryGradle"
+            }
+        },
+        {
             "id": "artifactory-npm",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -438,6 +448,9 @@
         },
         {
             "path": "tasks/ArtifactoryMaven"
+        },
+        {
+            "path": "tasks/ArtifactoryGradle"
         },
         {
             "path": "tasks/ArtifactoryNpm"

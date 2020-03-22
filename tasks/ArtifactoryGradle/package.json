@@ -1,0 +1,17 @@
+{
+    "name": "artifactory-gradle",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "private": true,
+    "license": "Apache-2.0",
+    "description": "Build with Gradle, while resolving dependencies and deploying artifacts from and to Artifactory.",
+    "main": "gradleBuild.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "azure-pipelines-task-lib": "^2.7.1",
+        "fs-extra": "^7.0.0",
+        "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+    }
+}
