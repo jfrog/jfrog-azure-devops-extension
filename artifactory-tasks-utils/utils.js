@@ -10,11 +10,14 @@ const yaml = require('js-yaml');
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
 const btPackage = 'jfrog-cli-' + getArchitecture();
-const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
+const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory'), '_jfrog'));
+const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
 const jfrogCliVersion = '1.31.2';
 const pluginVersion = '1.8.1';
 const buildAgent = 'artifactory-azure-devops-extension';
-const customCliPath = encodePath(path.join(jfrogFolderPath, 'current', fileName)); // Optional - Customized jfrog-cli path.
+const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
+const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
+const customLegacyCliPath = encodePath(path.join(jfrogLegacyFolderPath, 'current', fileName));
 const jfrogCliBintrayDownloadUrl =
     'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + '?bt_package=' + btPackage;
 const buildToolsConfigVersion = 1;
@@ -74,6 +77,11 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers) {
         let cliDir = toolLib.findLocalTool(toolName, jfrogCliVersion);
         if (fs.existsSync(customCliPath)) {
             tl.debug('Using cli from custom cli path: ' + customCliPath);
+            resolve(customCliPath);
+        } else if (fs.existsSync(customLegacyCliPath)) {
+            tl.warning('Found JFrog CLI in deprecated custom path: ' + customLegacyCliPath + '. Moving JFrog CLI to new supported path: ' + customFolderPath);
+            tl.mkdirP(customFolderPath);
+            tl.mv(customLegacyCliPath, customFolderPath, '-f');
             resolve(customCliPath);
         } else if (cliDir) {
             let cliPath = path.join(cliDir, fileName);
