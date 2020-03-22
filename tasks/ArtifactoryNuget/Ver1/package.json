@@ -14,6 +14,6 @@
         "asyncawait": "^1.0.7",
         "azure-pipelines-tool-lib": "^0.11.0",
         "fs-extra": "^7.0.0",
-        "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+        "artifactory-tasks-utils": "file:../../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
     }
 }
