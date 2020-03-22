@@ -80,10 +80,10 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers) {
             resolve(customCliPath);
         } else if (fs.existsSync(customLegacyCliPath)) {
             tl.warning(
-                'Found JFrog CLI in deprecated custom path: ' + customLegacyCliPath + '. Moving JFrog CLI to new supported path: ' + customFolderPath
+                'Found JFrog CLI in deprecated custom path: ' + customLegacyCliPath + '. Copying JFrog CLI to new supported path: ' + customFolderPath
             );
             tl.mkdirP(customFolderPath);
-            tl.mv(customLegacyCliPath, customFolderPath, '-f');
+            tl.cp(customLegacyCliPath, customFolderPath, '-f');
             resolve(customCliPath);
         } else if (cliDir) {
             let cliPath = path.join(cliDir, fileName);
