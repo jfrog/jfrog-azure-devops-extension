@@ -1,0 +1,160 @@
+{
+    "id": "4fe54fab-ecf8-441e-989e-5d9cbd861743",
+    "name": "ArtifactoryGradle",
+    "friendlyName": "Artifactory Gradle",
+    "description": "Build with Gradle, while resolving dependencies and deploying artifacts from and to Artifactory and while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Working+with+Gradle)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "8",
+        "Patch": "1"
+    },
+    "demands": [
+        "gradle"
+    ],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "Artifactory Gradle",
+    "groups": [
+        {
+            "name": "resolve",
+            "displayName": "Resolve dependencies from Artifactory",
+            "isExpanded": true
+        },
+        {
+            "name": "deployer",
+            "displayName": "Deploy artifacts to Artifactory",
+            "isExpanded": true
+        }
+    ],
+    "inputs": [
+        {
+            "name": "buildFile",
+            "type": "filePath",
+            "label": "Gradle build file",
+            "defaultValue": "build.gradle",
+            "required": true,
+            "helpMarkDown": "Path to the build.gradle file."
+        },
+        {
+            "name": "tasks",
+            "type": "string",
+            "label": "Task(s)",
+            "defaultValue": "artifactoryPublish",
+            "required": true
+        },
+        {
+            "name": "options",
+            "type": "string",
+            "label": "Options",
+            "defaultValue": "",
+            "required": false
+        },
+        {
+            "name": "artifactoryResolverService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "groupName": "resolve",
+            "required": false,
+            "helpMarkDown": "Artifactory service for artifacts resolution."
+        },
+        {
+            "name": "sourceRepo",
+            "type": "pickList",
+            "label": "Resolution repository",
+            "groupName": "resolve",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the repository for resolution.",
+            "visibleRule": "artifactoryResolverService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "artifactoryDeployService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "groupName": "deployer",
+            "required": true,
+            "helpMarkDown": "Artifactory service for artifacts deployment."
+        },
+        {
+            "name": "targetRepo",
+            "type": "pickList",
+            "label": "Deployment repository",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Sets the repository for deploying artifacts.",
+            "visibleRule": "artifactoryDeployService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally. The collected build info can be published to Artifactory using the \"Artifactory Publish Build Info\" task."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo == true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryResolverService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "sourceRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryDeployService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "gradleBuild.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}
