@@ -156,13 +156,6 @@ function addNugetArgsToCommands() {
     if (noNuGetCache) {
         nugetArguments = utils.cliJoin(nugetArguments, '-NoCache');
     }
-
-    // Robi fixed windows backslash problem :)
-    let packagesDirectory = utils.fixWindowsPaths(tl.getInput('packagesDirectory'));
-    if (packagesDirectory) {
-        nugetArguments = utils.cliJoin(nugetArguments, '-PackagesDirectory', packagesDirectory);
-    }
-
     let verbosityRestore = tl.getInput('verbosityRestore');
     nugetArguments = utils.cliJoin(nugetArguments, '-Verbosity', verbosityRestore);
 
