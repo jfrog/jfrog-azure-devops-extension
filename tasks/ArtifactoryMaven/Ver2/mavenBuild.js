@@ -2,6 +2,8 @@ let tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 let utils = require('artifactory-tasks-utils');
 const cliMavenCommand = 'rt mvn';
+const mavenConfigCommand = 'rt mvnc';
+
 let serverIdDeployer;
 let serverIdResolver;
 const execSync = require('child_process').execSync;
@@ -17,9 +19,8 @@ function RunTaskCbk(cliPath) {
     }
 
     // Create Maven config file.
-    let configPath = path.join(workDir, 'config');
     try {
-        createMavenConfigFile(configPath, cliPath, workDir);
+        createMavenConfigFile(cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         cleanup(cliPath, workDir);
@@ -34,7 +35,7 @@ function RunTaskCbk(cliPath) {
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
-    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
+    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, goalsAndOptions);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
 
     try {
@@ -68,16 +69,16 @@ function checkAndSetMavenHome() {
     }
 }
 
-function createMavenConfigFile(configPath, cliPath, buildDir) {
+function createMavenConfigFile(cliPath, buildDir) {
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
-    let resolverObj = {};
+    let targetResolveReleaseRepo = '';
+    let targetResolveSnapshotRepo = '';
     if (artifactoryResolver != null) {
         serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
-        let targetResolveReleaseRepo = tl.getInput('targetResolveReleaseRepo');
-        let targetResolveSnapshotRepo = tl.getInput('targetResolveSnapshotRepo');
-        resolverObj = getDeployerResolverObj(targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
+        targetResolveReleaseRepo = tl.getInput('targetResolveReleaseRepo');
+        targetResolveSnapshotRepo = tl.getInput('targetResolveSnapshotRepo');
     } else {
         console.log('Resolution from Artifactory is not configured');
     }
@@ -88,8 +89,24 @@ function createMavenConfigFile(configPath, cliPath, buildDir) {
     utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
     let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
     let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
-    let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
-    utils.createBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
+    // Build the cli config command.
+    let cliCommand = utils.cliJoin(
+        cliPath,
+        mavenConfigCommand,
+        '--server-id-resolve=' + utils.quote(serverIdResolver),
+        '--repo-resolve-releases=' + utils.quote(targetResolveReleaseRepo),
+        '--repo-resolve-snapshots=' + utils.quote(targetResolveSnapshotRepo),
+        '--server-id-deploy=' + utils.quote(serverIdDeployer),
+        '--repo-deploy-releases=' + utils.quote(targetDeployReleaseRepo),
+        '--repo-deploy-snapshots=' + utils.quote(targetDeploySnapshotRepo)
+    );
+
+    // Execute cli.
+    try {
+        utils.executeCliCommand(cliCommand, buildDir);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
 }
 
 function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
