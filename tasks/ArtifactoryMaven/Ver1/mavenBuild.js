@@ -90,7 +90,7 @@ function createMavenConfigFile(configPath, cliPath, buildDir) {
     let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
     let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
     let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
-    utils.createBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
+    utils.deprecatedCreateBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
 }
 
 function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
