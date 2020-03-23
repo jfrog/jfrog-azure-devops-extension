@@ -31,7 +31,6 @@ module.exports = {
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
-    performConfigCommand: performConfigCommand,
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
@@ -48,7 +47,8 @@ module.exports = {
     determineCliWorkDir: determineCliWorkDir,
     createBuildToolConfigFile: createBuildToolConfigFile,
     assembleBuildToolServerId: assembleBuildToolServerId,
-    appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand
+    appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
+    deprecatedTaskMessage: deprecatedTaskMessage
 };
 
 // The cliDownloadUrl and cliAuthHandlers arguments are optional. They are provided to this function by the 'Artifactory Tools Installer' task.
@@ -462,12 +462,6 @@ function assembleBuildToolServerId(buildToolType, buildToolCmd) {
 }
 
 function createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, ConfigCommand) {
-    console.log('cliPath ' + cliPath);
-    console.log('artifactoryService ' + artifactoryService);
-    console.log('serverId ' + serverId);
-    console.log('repo ' + repo);
-    console.log('requiredWorkDir ' + requiredWorkDir);
-    console.log('ConfigCommand ' + ConfigCommand);
     configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
     // Build the cli config command.
     let cliCommand = cliJoin(
@@ -500,15 +494,14 @@ function appendBuildFlagsToCliCommand(cliCommand) {
     return cliCommand;
 }
 
-function performConfigCommand(cliPath, serverId, artifactoryUrl, artifactoryService, requiredWorkDir) {
-    // Build the cli command.
-    let cliCommand = cliJoin(cliPath, serverId, '--url=' + artifactoryUrl);
-    cliCommand = addArtifactoryCredentials(cliCommand, artifactoryService);
-
-    // Execute cli.
-    try {
-        executeCliCommand(cliCommand, requiredWorkDir);
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
-    }
+function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
+    console.log(`
+You are using an old version of this task.
+It is recommended to upgrade the task to the latest major version of this task.
+You do this by replacing the task name in the azure-pipelines.yml file from ${oldTaskVersion}1 to ${newTaskVersion}2,
+or (for older pipelines), change the task version from the task UI.
+Important:
+If you installed JFrog CLI manually on the build agent, and it is not downloaded automatically,
+please upgrade JFrog CLI to version ${jfrogCliVersion}.
+    `);
 }

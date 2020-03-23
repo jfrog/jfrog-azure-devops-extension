@@ -1,12 +1,12 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
-
 const npmInstallCommand = 'rt npmi';
 const npmPublishCommand = 'rt npmp';
 const npmCiCommand = 'rt npmci';
 
 function RunTaskCbk(cliPath) {
+    utils.deprecatedTaskMessage('ArtifactoryNpm@', 'ArtifactoryNpm@');
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');

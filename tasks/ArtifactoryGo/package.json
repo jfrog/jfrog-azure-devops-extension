@@ -11,6 +11,6 @@
     "dependencies": {
         "fs-extra": "^7.0.0",
         "azure-pipelines-task-lib": "^2.7.1",
-        "artifactory-tasks-utils": "file:../../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+        "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
     }
 }

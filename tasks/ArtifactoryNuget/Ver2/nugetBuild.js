@@ -124,7 +124,6 @@ function addArtifactoryServer(nugetCommandCli) {
 function performNugerConfig(cliPath, repo, requiredWorkDir) {
     const serverId = utils.assembleBuildToolServerId('nuget', tl.getInput('command', true));
     const artifactoryService = tl.getInput('artifactoryService', false);
-    console.log('serverId ' + serverId);
     utils.createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, nugetConfigCommand);
 }
 

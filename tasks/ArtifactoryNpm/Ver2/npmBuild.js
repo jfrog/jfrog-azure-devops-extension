@@ -70,7 +70,6 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
 function performNpmConfigCommand(cliPath, repo, requiredWorkDir) {
     const serverId = utils.assembleBuildToolServerId('npm', tl.getInput('command', true));
     const artifactoryService = tl.getInput('artifactoryService', false);
-    console.log('serverId ' + serverId);
     utils.createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, npmConfigCommand);
 }
 

@@ -27,7 +27,6 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
  * Download NuGet version, adds to the path and executes.
  */
 let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
-    console.log('NuGet not found in Path. Downloading...');
     let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
     toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
     addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
@@ -62,6 +61,7 @@ utils.executeCliTask(RunTaskCbk);
 
 // Executing JFrog CLI with NuGet
 function exec(cliPath, nugetCommand) {
+    utils.deprecatedTaskMessage('ArtifactoryNuGet@', 'ArtifactoryNuGet@');
     let buildDir = tl.getVariable('System.DefaultWorkingDirectory');
     // Get configured parameters
     let nugetCommandCli;

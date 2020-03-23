@@ -9,6 +9,7 @@ const execSync = require('child_process').execSync;
 utils.executeCliTask(RunTaskCbk);
 
 function RunTaskCbk(cliPath) {
+    utils.deprecatedTaskMessage('ArtifactoryMaven@', 'ArtifactoryMaven@');
     checkAndSetMavenHome();
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
