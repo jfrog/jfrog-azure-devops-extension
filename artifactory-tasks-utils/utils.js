@@ -158,13 +158,21 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        tl.debug('Executing cliCommand: ' + cliCommand);
+        tl.debug('Executing cliCommand: ' + maskSecrets(cliCommand));
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
-        let errorMsg = ex.toString().replace(/--password=".*"/g, '--password=***');
-        throw errorMsg.replace(/--access-token=".*"/g, '--access-token=***');
+        throw maskSecrets(ex.toString());
     }
+}
+
+/**
+ * Mask password and access token in a CLI command or exception.
+ * @param str - CLI command or exception
+ * @returns {string}
+ */
+function maskSecrets(str) {
+    return str.replace(/--password=".*"/g, '--password=***').replace(/--access-token=".*"/g, '--access-token=***');
 }
 
 /**
