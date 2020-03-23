@@ -2,7 +2,7 @@ const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
 
-const cliGoNativeCommand = 'rt go';
+const cliGoCommand = 'rt go';
 const cliGoPublishCommand = 'rt gp';
 const cliGoConfigCommand = 'rt go-config';
 let configuredServerId;
@@ -29,11 +29,11 @@ function RunTaskCbk(cliPath) {
         case 'build':
         case 'test':
         case 'get':
-            performGoNativeCommand(inputCommand, cliPath, requiredWorkDir);
+            performGoCommand(inputCommand, cliPath, requiredWorkDir);
             break;
         case 'custom':
             let customCommand = tl.getInput('customCommand', true);
-            performGoNativeCommand(customCommand, cliPath, requiredWorkDir);
+            performGoCommand(customCommand, cliPath, requiredWorkDir);
             break;
         case 'publish':
             performGoPublishCommand(cliPath, requiredWorkDir);
@@ -41,7 +41,7 @@ function RunTaskCbk(cliPath) {
     }
 }
 
-function performGoNativeCommand(goCommand, cliPath, requiredWorkDir) {
+function performGoCommand(goCommand, cliPath, requiredWorkDir) {
     // Create config file and configure cli server
     try {
         performGoConfig(cliPath, requiredWorkDir);
@@ -51,7 +51,7 @@ function performGoNativeCommand(goCommand, cliPath, requiredWorkDir) {
     }
 
     // Build go command with arguments and execute.
-    let cliCommand = utils.cliJoin(cliPath, cliGoNativeCommand, goCommand);
+    let cliCommand = utils.cliJoin(cliPath, cliGoCommand, goCommand);
     let goArguments = tl.getInput('goArguments', false);
     if (goArguments) {
         cliCommand = utils.cliJoin(cliCommand, goArguments);
@@ -63,7 +63,6 @@ function performGoConfig(cliPath, requiredWorkDir) {
     configuredServerId = utils.assembleBuildToolServerId('go', tl.getInput('command', true));
     const artifactoryService = tl.getInput('artifactoryService', false);
     let resolutionRepo = tl.getInput('resolutionRepo', true);
-    console.log('serverId ' + configuredServerId);
     utils.createBuildToolConfigFile(cliPath, artifactoryService, configuredServerId, resolutionRepo, requiredWorkDir, cliGoConfigCommand);
 }
 

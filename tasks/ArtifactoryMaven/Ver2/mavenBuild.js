@@ -1,5 +1,4 @@
 let tl = require('azure-pipelines-task-lib/task');
-const path = require('path');
 let utils = require('artifactory-tasks-utils');
 const cliMavenCommand = 'rt mvn';
 const mavenConfigCommand = 'rt mvnc';
@@ -107,10 +106,6 @@ function createMavenConfigFile(cliPath, buildDir) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }
-}
-
-function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
-    return { snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverID: serverID };
 }
 
 /**

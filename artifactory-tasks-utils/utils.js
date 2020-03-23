@@ -46,6 +46,7 @@ module.exports = {
     stripTrailingSlash: stripTrailingSlash,
     determineCliWorkDir: determineCliWorkDir,
     createBuildToolConfigFile: createBuildToolConfigFile,
+    deprecatedCreateBuildToolConfigFile: deprecatedCreateBuildToolConfigFile,
     assembleBuildToolServerId: assembleBuildToolServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     deprecatedTaskMessage: deprecatedTaskMessage
@@ -459,6 +460,26 @@ function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     return [buildName, buildNumber, buildToolType, buildToolCmd].join('-');
+}
+
+/**
+ * Creates a build tool config file at a desired absolute path.
+ * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example, for maven:
+ * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
+ */
+function deprecatedCreateBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
+    let yamlDocument = {};
+    yamlDocument.version = buildToolsConfigVersion;
+    yamlDocument.type = buildToolType;
+    if (resolverObj && Object.keys(resolverObj).length > 0) {
+        yamlDocument.resolver = resolverObj;
+    }
+    if (deployerObj && Object.keys(deployerObj).length > 0) {
+        yamlDocument.deployer = deployerObj;
+    }
+    let configInfo = yaml.safeDump(yamlDocument);
+    console.log(configInfo);
+    fs.outputFileSync(configPath, configInfo);
 }
 
 function createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, ConfigCommand) {
