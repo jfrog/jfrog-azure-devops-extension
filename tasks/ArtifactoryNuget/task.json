@@ -32,7 +32,7 @@
             "type": "pickList",
             "label": "Command",
             "defaultValue": "restore",
-            "helpMfarkDown": "The NuGet command to run. Select 'Custom' to add arguments or to use a different command.",
+            "helpMarkDown": "The NuGet command to run. Select 'Custom' to add arguments or to use a different command.",
             "required": "true",
             "properties": {
                 "EditableOptions": "False"
@@ -99,6 +99,15 @@
             "defaultValue": "*.nupkg",
             "helpMarkDown": "The path to nupkg file(s) to be uploaded. Accepts wildcards.",
             "required": "true",
+            "visibleRule": "command = push"
+        },
+        {
+            "name": "props",
+            "type": "string",
+            "label": "Properties to set on pushed package(s)",
+            "defaultValue": "",
+            "helpMarkDown": "A list of Artifactory properties specified as \"key=value\" pairs separated by a semi-colon ( ; ) to be attached to the uploaded files. If any key can take several values, then each value is separated by a comma ( , ). For example, \"key1=value1;key2=value21,value22;key3=value3\".",
+            "required": false,
             "visibleRule": "command = push"
         },
         {

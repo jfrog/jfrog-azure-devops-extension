@@ -93,6 +93,7 @@ function exec(cliPath, nugetCommand) {
         let targetDeployRepo = tl.getInput('targetDeployRepo');
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, pathToNupkg, targetDeployRepo);
+        nugetCommandCli = utils.addStringParam(nugetCommandCli, 'props', 'props');
         runNuGet(nugetCommandCli, cliPath, buildDir);
     }
 }
