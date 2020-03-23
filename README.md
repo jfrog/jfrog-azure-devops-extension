@@ -4,10 +4,10 @@
 |dev|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-vsts-extension/branch/dev)|
 
 # Overview
-JFrog Artifactory provides tight integration with Azure DevOps and TFS through the **JFrog Artifactory Extension**.
+JFrog Artifactory provides tight integration with Azure DevOps through the **JFrog Artifactory Extension**.
 Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about artifacts deployed, dependencies resolved, environment data associated with the build runs and more, 
 that effectively facilitates fully traceable builds.
-See the full extension documentation at the [Azure DevOps and TFS Artifactory Extension User Guide](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension).
+See the full extension documentation at the [Artifactory Azure DevOps Extension User Guide](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
 
 # Download and Installation [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version-short/JFrog.jfrog-artifactory-vsts-extension.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension)
 The extension is available for installation on your Azure DevOps organization in the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension).
