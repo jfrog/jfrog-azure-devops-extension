@@ -1,10 +1,10 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
-const path = require('path');
 
 const cliGoNativeCommand = 'rt go';
 const cliGoPublishCommand = 'rt gp';
+const cliGoConfigCommand = 'rt go-config';
 let configuredServerId;
 
 function RunTaskCbk(cliPath) {
@@ -43,9 +43,8 @@ function RunTaskCbk(cliPath) {
 
 function performGoNativeCommand(goCommand, cliPath, requiredWorkDir) {
     // Create config file and configure cli server
-    let configPath = path.join(requiredWorkDir, '.jfrog', 'projects', 'go.yaml');
     try {
-        createGoConfigFile(configPath, cliPath, requiredWorkDir);
+        performGoConfig(cliPath, requiredWorkDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;
@@ -60,11 +59,12 @@ function performGoNativeCommand(goCommand, cliPath, requiredWorkDir) {
     executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
 }
 
-function createGoConfigFile(configPath, cliPath, requiredWorkDir) {
-    configureGoCliServer(cliPath, requiredWorkDir, 'resolver');
+function performGoConfig(cliPath, requiredWorkDir) {
+    configuredServerId = utils.assembleBuildToolServerId('go', tl.getInput('command', true));
+    const artifactoryService = tl.getInput('artifactoryService', false);
     let resolutionRepo = tl.getInput('resolutionRepo', true);
-    let resolverObj = { serverId: configuredServerId, repo: resolutionRepo };
-    utils.createBuildToolConfigFile(configPath, 'go', resolverObj, {});
+    console.log('serverId ' + configuredServerId);
+    utils.createBuildToolConfigFile(cliPath, artifactoryService, configuredServerId, resolutionRepo, requiredWorkDir, cliGoConfigCommand);
 }
 
 function performGoPublishCommand(cliPath, requiredWorkDir) {

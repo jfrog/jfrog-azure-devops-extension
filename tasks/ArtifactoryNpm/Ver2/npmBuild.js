@@ -6,7 +6,6 @@ const npmInstallCommand = 'rt npmi';
 const npmPublishCommand = 'rt npmp';
 const npmCiCommand = 'rt npmci';
 const npmConfigCommand = 'rt npmc';
-const serverId = 'npmServerIdDeployResolve';
 
 function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -16,7 +15,6 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters.
-    let artifactoryService = tl.getInput('artifactoryService', false);
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
 
     // Determine working directory for the cli.
@@ -31,15 +29,15 @@ function RunTaskCbk(cliPath) {
     let inputCommand = tl.getInput('command', true);
     switch (inputCommand) {
         case 'install':
-            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput('sourceRepo', true), requiredWorkDir);
+            performNpmConfigCommand(cliPath, tl.getInput('sourceRepo', true), requiredWorkDir);
             performNpmCommand(npmInstallCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'ci':
-            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput('sourceRepo', true), requiredWorkDir);
+            performNpmConfigCommand(cliPath, tl.getInput('sourceRepo', true), requiredWorkDir);
             performNpmCommand(npmCiCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'pack and publish':
-            performNpmConfigCommand(cliPath, artifactoryService, tl.getInput('targetRepo', true), requiredWorkDir);
+            performNpmConfigCommand(cliPath, tl.getInput('targetRepo', true), requiredWorkDir);
             performNpmCommand(npmPublishCommand, false, cliPath, collectBuildInfo, requiredWorkDir);
             break;
     }
@@ -69,25 +67,11 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
     }
 }
 
-function performNpmConfigCommand(cliPath, artifactoryService, repo, requiredWorkDir) {
-    utils.configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
-
-    // Build the cli config command.
-    let cliCommand = utils.cliJoin(
-        cliPath,
-        npmConfigCommand,
-        '--server-id-resolve=' + utils.quote(serverId),
-        '--repo-resolve=' + utils.quote(repo),
-        '--server-id-deploy=' + utils.quote(serverId),
-        '--repo-deploy=' + utils.quote(repo)
-    );
-
-    // Execute cli.
-    try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir);
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
-    }
+function performNpmConfigCommand(cliPath, repo, requiredWorkDir) {
+    const serverId = utils.assembleBuildToolServerId('npm', tl.getInput('command', true));
+    const artifactoryService = tl.getInput('artifactoryService', false);
+    console.log('serverId ' + serverId);
+    utils.createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, npmConfigCommand);
 }
 
 function getCollectBuildInfoFlags(addThreads) {

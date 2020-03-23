@@ -455,30 +455,36 @@ function determineCliWorkDir(defaultPath, providedPath) {
     return defaultPath;
 }
 
-/**
- * Creates a build tool config file at a desired absolute path.
- * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example, for maven:
- * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
- */
-function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
-    let yamlDocument = {};
-    yamlDocument.version = buildToolsConfigVersion;
-    yamlDocument.type = buildToolType;
-    if (resolverObj && Object.keys(resolverObj).length > 0) {
-        yamlDocument.resolver = resolverObj;
-    }
-    if (deployerObj && Object.keys(deployerObj).length > 0) {
-        yamlDocument.deployer = deployerObj;
-    }
-    let configInfo = yaml.safeDump(yamlDocument);
-    console.log(configInfo);
-    fs.outputFileSync(configPath, configInfo);
-}
-
-function assembleBuildToolServerId(buildToolType, serverType) {
+function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
-    return [buildName, buildNumber, buildToolType, serverType].join('-');
+    return [buildName, buildNumber, buildToolType, buildToolCmd].join('-');
+}
+
+function createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, ConfigCommand) {
+    console.log('cliPath ' + cliPath);
+    console.log('artifactoryService ' + artifactoryService);
+    console.log('serverId ' + serverId);
+    console.log('repo ' + repo);
+    console.log('requiredWorkDir ' + requiredWorkDir);
+    console.log('ConfigCommand ' + ConfigCommand);
+    configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
+    // Build the cli config command.
+    let cliCommand = cliJoin(
+        cliPath,
+        ConfigCommand,
+        '--server-id-resolve=' + quote(serverId),
+        '--repo-resolve=' + quote(repo),
+        '--server-id-deploy=' + quote(serverId),
+        '--repo-deploy=' + quote(repo)
+    );
+
+    // Execute cli.
+    try {
+        executeCliCommand(cliCommand, requiredWorkDir);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
 }
 
 /**
@@ -501,7 +507,7 @@ function performConfigCommand(cliPath, serverId, artifactoryUrl, artifactoryServ
 
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir);
+        executeCliCommand(cliCommand, requiredWorkDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }

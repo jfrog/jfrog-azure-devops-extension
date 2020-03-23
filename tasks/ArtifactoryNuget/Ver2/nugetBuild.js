@@ -11,7 +11,6 @@ const NUGET_VERSION = '4.7.1';
 const path = require('path');
 const cliNuGetCommand = 'rt nuget';
 const cliUploadCommand = 'rt u';
-const serverId = 'nugetServerIdDeployResolve';
 const nugetConfigCommand = 'rt nugetc';
 
 /**
@@ -82,7 +81,7 @@ function exec(cliPath, nugetCommand) {
             let targetResolveRepo = tl.getInput('targetResolveRepo');
             let nugetArguments = addNugetArgsToCommands();
             nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
-            performNugerConfig(cliPath, solutionPath, targetResolveRepo);
+            performNugerConfig(cliPath, targetResolveRepo, solutionPath);
             runNuGet(nugetCommandCli, solutionPath);
         });
     } else {
@@ -122,28 +121,11 @@ function addArtifactoryServer(nugetCommandCli) {
 }
 
 // Create nuget config
-function performNugerConfig(cliPath, requiredWorkDir, repo) {
-    let artifactoryService = tl.getInput('artifactoryService', false);
-    utils.configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
-
-    // Build the cli config command.
-    let cliCommand = utils.cliJoin(
-        cliPath,
-        nugetConfigCommand,
-        '--server-id-resolve=' + utils.quote(serverId),
-        '--repo-resolve=' + utils.quote(repo),
-        '--server-id-deploy=' + utils.quote(serverId),
-        '--repo-deploy=' + utils.quote(repo)
-    );
-    console.log('performNugerConfig :' + cliCommand);
-
-    // Execute cli.
-    try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir);
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
-    }
-    console.log('performNugerConfig finish');
+function performNugerConfig(cliPath, repo, requiredWorkDir) {
+    const serverId = utils.assembleBuildToolServerId('nuget', tl.getInput('command', true));
+    const artifactoryService = tl.getInput('artifactoryService', false);
+    console.log('serverId ' + serverId);
+    utils.createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, nugetConfigCommand);
 }
 
 // Creates the Nuget arguments
