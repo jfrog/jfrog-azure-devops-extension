@@ -77,6 +77,7 @@ function initTests() {
     process.env.JFROG_CLI_REPORT_USAGE = false;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = 'ERROR';
+    process.env.USE_UNSUPPORTED_CONAN_WITH_PYTHON_2 = true;
     tl.setStdStream(devnull());
     tl.setVariable('Agent.WorkFolder', testDataDir);
     tl.setVariable('Agent.TempDirectory', testDataDir);
