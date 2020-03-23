@@ -220,7 +220,7 @@ function deleteTestRepositories() {
 }
 
 /**
- * Deletes repositories older than 2 hours that match the tests repository key pattern.
+ * Deletes repositories older than 24 hours that match the tests repository key pattern.
  */
 function cleanUpOldRepositories() {
     let repoKeysList = getRepoListFromArtifactory();
@@ -236,8 +236,8 @@ function cleanUpOldRepositories() {
         let repoTimestamp = parseInt(regexGroups.pop(), 10);
         // Convert unix timestamp to time
         let timeDifference = new Date(Math.floor(getCurrentTimestamp() - repoTimestamp) * 1000);
-        // If more than 2 hours have passed, delete the repository.
-        if (timeDifference.getHours() > 2) {
+        // If more than 24 hours have passed, delete the repository.
+        if (timeDifference.getHours() > 24) {
             deleteRepo(repoKey);
         }
     });

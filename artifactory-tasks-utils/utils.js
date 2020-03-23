@@ -13,7 +13,7 @@ const btPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory'), '_jfrog'));
 const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
 const jfrogCliVersion = '1.35.1';
-const pluginVersion = '1.8.1';
+const pluginVersion = '1.8.2';
 const buildAgent = 'artifactory-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
@@ -35,7 +35,6 @@ module.exports = {
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
-    validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
     isToolExists: isToolExists,
@@ -223,7 +222,6 @@ function writeSpecContentToSpecPath(specSource, specPath) {
         throw 'Failed creating File-Spec, since the provided File-Spec source value is invalid.';
     }
     fileSpec = fixWindowsPaths(fileSpec);
-    validateSpecWithoutRegex(fileSpec);
     console.log('Using file spec:');
     console.log(fileSpec);
     // Write provided fileSpec to file
@@ -360,20 +358,6 @@ function getCliExecutableName() {
  */
 function fixWindowsPaths(string) {
     return isWindows() ? string.replace(/([^\\])\\(?!\\)/g, '$1\\\\') : string;
-}
-
-function validateSpecWithoutRegex(fileSpec) {
-    if (!isWindows()) {
-        return;
-    }
-    let files = JSON.parse(fileSpec)['files'];
-    for (const file of Object.keys(files)) {
-        let values = files[file];
-        let regexp = values['regexp'];
-        if (regexp && regexp.toLowerCase() === 'true') {
-            throw "The File Spec includes 'regexp: true' which is currently not supported.";
-        }
-    }
 }
 
 /**
