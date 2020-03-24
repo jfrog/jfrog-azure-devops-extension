@@ -29,20 +29,25 @@
     ],
     "inputs": [
         {
-            "name": "workDir",
-            "type": "filePath",
-            "label": "Path to Gradle project",
-            "defaultValue": "$(System.DefaultWorkingDirectory)",
-            "required": false,
-            "helpMarkDown": "Path to directory of the Gradle project."
-        },
-        {
-            "name": "buildFile",
+            "name": "gradleBuildFile",
             "type": "filePath",
             "label": "Gradle build file",
             "defaultValue": "build.gradle",
             "required": true,
-            "helpMarkDown": "Path to the build.gradle file."
+            "helpMarkDown": "Relative path to build.gradle file."
+        },
+        {
+            "name": "workDir",
+            "type": "filePath",
+            "label": "Working directory",
+            "required": false,
+            "helpMarkDown": "Path to directory of the Gradle project. If not specified, the repository root directory is used. "
+        },
+        {
+            "name": "options",
+            "type": "string",
+            "label": "Options",
+            "required": false
         },
         {
             "name": "tasks",
@@ -52,17 +57,9 @@
             "required": true
         },
         {
-            "name": "options",
-            "type": "string",
-            "label": "Options",
-            "defaultValue": "",
-            "required": false
-        },
-        {
             "name": "artifactoryResolverService",
             "type": "connectedService:artifactoryService",
             "label": "Artifactory service",
-            "defaultValue": "",
             "groupName": "resolve",
             "required": false,
             "helpMarkDown": "Artifactory service for artifacts resolution."
@@ -72,7 +69,6 @@
             "type": "pickList",
             "label": "Resolution repository",
             "groupName": "resolve",
-            "defaultValue": "",
             "required": "true",
             "helpMarkDown": "Sets the repository for resolution.",
             "visibleRule": "artifactoryResolverService != \"\"",
@@ -81,7 +77,7 @@
             }
         },
         {
-            "name": "artifactoryDeployService",
+            "name": "artifactoryDeployerService",
             "type": "connectedService:artifactoryService",
             "label": "Artifactory service",
             "defaultValue": "",
@@ -97,7 +93,7 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Sets the repository for deploying artifacts.",
-            "visibleRule": "artifactoryDeployService != \"\"",
+            "visibleRule": "artifactoryDeployerService != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }

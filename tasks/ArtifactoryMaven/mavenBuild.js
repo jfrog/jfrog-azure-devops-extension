@@ -19,7 +19,7 @@ function RunTaskCbk(cliPath) {
     // Create Maven config file.
     let configPath = path.join(workDir, 'config');
     try {
-        createMavenConfigFile(configPath, cliPath, workDir);
+        createMavenConfigFile(configPath, cliPath, workDir, configPath);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         cleanup(cliPath, workDir);
@@ -34,7 +34,7 @@ function RunTaskCbk(cliPath) {
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
-    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
+    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions));
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
 
     try {
@@ -89,7 +89,7 @@ function createMavenConfigFile(configPath, cliPath, buildDir) {
     let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
     let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
     let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
-    utils.createBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj, {});
+    utils.createBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
 }
 
 function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {

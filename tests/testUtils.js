@@ -50,6 +50,7 @@ module.exports = {
     download: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericDownload', 'Ver2', 'downloadArtifacts.js'),
     upload: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericUpload', 'uploadArtifacts.js'),
     maven: path.join(__dirname, '..', 'tasks', 'ArtifactoryMaven', 'mavenBuild.js'),
+    gradle: path.join(__dirname, '..', 'tasks', 'ArtifactoryGradle', 'gradleBuild.js'),
     npm: path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'npmBuild.js'),
     nuget: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'nugetBuild.js'),
     publish: path.join(__dirname, '..', 'tasks', 'ArtifactoryPublishBuildInfo', 'publishBuildInfo.js'),
@@ -335,15 +336,11 @@ function getResourcesFiles(folderToCopy) {
  * @param folderToCopy - the folder to copy from the test
  */
 function copyTestFilesToTestWorkDir(testDirName, folderToCopy) {
-    let files = getResourcesFiles(path.join(testDirName, folderToCopy));
-
     if (!fs.existsSync(path.join(testDataDir, testDirName))) {
         fs.mkdirSync(path.join(testDataDir, testDirName));
     }
-
-    for (let i = 0; i < files.length; i++) {
-        fs.copyFileSync(files[i], path.join(getLocalTestDir(testDirName), path.basename(files[i])));
-    }
+    let err = fs.copySync(path.join(__dirname, 'resources', testDirName, folderToCopy), path.join(getLocalTestDir(testDirName)), { recursive: true });
+    assert(!err, err);
 }
 
 function setVariables(variables) {
