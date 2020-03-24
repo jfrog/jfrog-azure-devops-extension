@@ -5,7 +5,6 @@ const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const clientHandlers = require('typed-rest-client/Handlers');
 const localTools = require('./tools');
-const yaml = require('js-yaml');
 
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
@@ -20,7 +19,6 @@ const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Opti
 const customLegacyCliPath = encodePath(path.join(jfrogLegacyFolderPath, 'current', fileName));
 const jfrogCliBintrayDownloadUrl =
     'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + '?bt_package=' + btPackage;
-const buildToolsConfigVersion = 1;
 
 let cliConfigCommand = 'rt c';
 let runTaskCbk = null;
@@ -46,7 +44,6 @@ module.exports = {
     stripTrailingSlash: stripTrailingSlash,
     determineCliWorkDir: determineCliWorkDir,
     createBuildToolConfigFile: createBuildToolConfigFile,
-    deprecatedCreateBuildToolConfigFile: deprecatedCreateBuildToolConfigFile,
     assembleBuildToolServerId: assembleBuildToolServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     deprecatedTaskMessage: deprecatedTaskMessage
@@ -56,7 +53,7 @@ module.exports = {
 // jfrogCliBintrayDownloadUrl is used by default.
 function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
-    process.env.JFROG_CLI_OFFER_CONFIG = false;
+    process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
@@ -195,7 +192,7 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
         // Add username and password.
         cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
     }
-    executeCliCommand(cliCommand, buildDir);
+    return executeCliCommand(cliCommand, buildDir, null);
 }
 
 /**
@@ -208,7 +205,7 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
         deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
         // This operation throws an exception in case of failure.
-        executeCliCommand(deleteServerIDCommand, buildDir);
+        executeCliCommand(deleteServerIDCommand, buildDir, null);
     }
 }
 
@@ -427,7 +424,7 @@ function collectEnvVars(cliPath) {
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, 'rt bce', quote(buildName), quote(buildNumber));
-    executeCliCommand(cliEnvVarsCommand, workDir);
+    executeCliCommand(cliEnvVarsCommand, workDir, null);
 }
 
 function isWindows() {
@@ -462,26 +459,6 @@ function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     return [buildName, buildNumber, buildToolType, buildToolCmd].join('-');
 }
 
-/**
- * Creates a build tool config file at a desired absolute path.
- * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example, for maven:
- * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
- */
-function deprecatedCreateBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
-    let yamlDocument = {};
-    yamlDocument.version = buildToolsConfigVersion;
-    yamlDocument.type = buildToolType;
-    if (resolverObj && Object.keys(resolverObj).length > 0) {
-        yamlDocument.resolver = resolverObj;
-    }
-    if (deployerObj && Object.keys(deployerObj).length > 0) {
-        yamlDocument.deployer = deployerObj;
-    }
-    let configInfo = yaml.safeDump(yamlDocument);
-    console.log(configInfo);
-    fs.outputFileSync(configPath, configInfo);
-}
-
 function createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, ConfigCommand) {
     configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
     // Build the cli config command.
@@ -496,7 +473,7 @@ function createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, 
 
     // Execute cli.
     try {
-        executeCliCommand(cliCommand, requiredWorkDir);
+        executeCliCommand(cliCommand, requiredWorkDir, null);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }
@@ -517,9 +494,9 @@ function appendBuildFlagsToCliCommand(cliCommand) {
 
 function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
     console.log(`
-You are using an old version of this task.
+[Warn] You are using an old version of this task.
 It is recommended to upgrade the task to the latest major version of this task.
-You do this by replacing the task name in the azure-pipelines.yml file from ${oldTaskVersion}1 to ${newTaskVersion}2,
+You do this by replacing the task name in the azure-pipelines.yml file from ${oldTaskVersion} to ${newTaskVersion},
 or (for older pipelines), change the task version from the task UI.
 Important:
 If you installed JFrog CLI manually on the build agent, and it is not downloaded automatically,

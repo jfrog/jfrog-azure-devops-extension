@@ -60,7 +60,7 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
 
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir);
+        utils.executeCliCommand(cliCommand, requiredWorkDir, null);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -76,7 +76,7 @@ function performNpmConfigCommand(cliPath, repo, requiredWorkDir) {
 function getCollectBuildInfoFlags(addThreads) {
     // Construct the build-info collection flags.
     let buildName = tl.getInput('buildName', true);
-    let buildNumber = gtl.etInput('buildNumber', true);
+    let buildNumber = tl.getInput('buildNumber', true);
     let commandAddition = utils.cliJoin('--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
 
     // Check if need to add threads.

@@ -1,5 +1,6 @@
 let tl = require('azure-pipelines-task-lib/task');
 let utils = require('artifactory-tasks-utils');
+
 const cliMavenCommand = 'rt mvn';
 const mavenConfigCommand = 'rt mvnc';
 
@@ -36,9 +37,9 @@ function RunTaskCbk(cliPath) {
     }
     let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, goalsAndOptions);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
-
+    utils.executeCliCommand(utils.cliJoin(cliPath, 'rt c show'), workDir, null);
     try {
-        utils.executeCliCommand(mavenCommand, workDir);
+        utils.executeCliCommand(mavenCommand, workDir, null);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
@@ -102,7 +103,7 @@ function createMavenConfigFile(cliPath, buildDir) {
 
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, buildDir);
+        utils.executeCliCommand(cliCommand, buildDir, null);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }

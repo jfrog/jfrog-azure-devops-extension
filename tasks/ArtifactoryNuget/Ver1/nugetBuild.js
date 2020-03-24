@@ -26,17 +26,21 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
 /**
  * Download NuGet version, adds to the path and executes.
  */
-let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
-    let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
+let downloadAndRunNuget = async (cliPath, nugetCommand) => {
+    let downloadPath = await toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe');
     toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
     addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
-});
+};
 
 // This triggered after downloading the CLI.
 // First we will check for NuGet in the Env Path. If exists, this one will be used.
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
 let RunTaskCbk = async(function(cliPath) {
+    if (process.platform !== 'win32') {
+        tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
+        return;
+    }
     let nugetCommand = tl.getInput('command');
     let nugetExec = tl.which('nuget', false);
     if (!nugetExec && nugetCommand.localeCompare('restore') === 0) {
@@ -52,16 +56,11 @@ let RunTaskCbk = async(function(cliPath) {
     }
 });
 
-if (process.platform !== 'win32') {
-    tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
-    return;
-}
-
 utils.executeCliTask(RunTaskCbk);
 
 // Executing JFrog CLI with NuGet
 function exec(cliPath, nugetCommand) {
-    utils.deprecatedTaskMessage('ArtifactoryNuGet@', 'ArtifactoryNuGet@');
+    utils.deprecatedTaskMessage('ArtifactoryNuGet@1', 'ArtifactoryNuGet@2');
     let buildDir = tl.getVariable('System.DefaultWorkingDirectory');
     // Get configured parameters
     let nugetCommandCli;
@@ -109,7 +108,7 @@ function runNuGet(nugetCommandCli, cliPath, buildDir) {
 
     nugetCommandCli = addArtifactoryServer(nugetCommandCli);
     try {
-        utils.executeCliCommand(nugetCommandCli, buildDir);
+        utils.executeCliCommand(nugetCommandCli, buildDir, null);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);

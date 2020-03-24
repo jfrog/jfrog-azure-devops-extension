@@ -28,18 +28,22 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
 /**
  * Download NuGet version, adds to the path and executes.
  */
-let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
+let downloadAndRunNuget = async (cliPath, nugetCommand) => {
     console.log('NuGet not found in Path. Downloading...');
-    let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
+    let downloadPath = await toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe');
     toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
     addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
-});
+};
 
 // This triggered after downloading the CLI.
 // First we will check for NuGet in the Env Path. If exists, this one will be used.
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
 let RunTaskCbk = async(function(cliPath) {
+    if (process.platform !== 'win32') {
+        tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
+        return;
+    }
     let nugetCommand = tl.getInput('command');
     let nugetExec = tl.which('nuget', false);
     if (!nugetExec && nugetCommand.localeCompare('restore') === 0) {
@@ -54,11 +58,6 @@ let RunTaskCbk = async(function(cliPath) {
         exec(cliPath, nugetCommand);
     }
 });
-
-if (process.platform !== 'win32') {
-    tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
-    return;
-}
 
 utils.executeCliTask(RunTaskCbk);
 
@@ -103,7 +102,7 @@ function runNuGet(nugetCommandCli, buildDir) {
         nugetCommandCli = utils.cliJoin(nugetCommandCli, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
     }
     try {
-        utils.executeCliCommand(nugetCommandCli, buildDir);
+        utils.executeCliCommand(nugetCommandCli, buildDir, null);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);

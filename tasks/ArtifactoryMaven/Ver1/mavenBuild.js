@@ -1,6 +1,9 @@
 let tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 let utils = require('artifactory-tasks-utils');
+const fs = require('fs-extra');
+const yaml = require('js-yaml');
+const buildToolsConfigVersion = 1;
 const cliMavenCommand = 'rt mvn';
 let serverIdDeployer;
 let serverIdResolver;
@@ -9,7 +12,7 @@ const execSync = require('child_process').execSync;
 utils.executeCliTask(RunTaskCbk);
 
 function RunTaskCbk(cliPath) {
-    utils.deprecatedTaskMessage('ArtifactoryMaven@', 'ArtifactoryMaven@');
+    utils.deprecatedTaskMessage('ArtifactoryMaven@1', 'ArtifactoryMaven@2');
     checkAndSetMavenHome();
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
@@ -37,9 +40,9 @@ function RunTaskCbk(cliPath) {
     }
     let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
-
+    utils.executeCliCommand(utils.cliJoin(cliPath, 'rt c show'), workDir, null);
     try {
-        utils.executeCliCommand(mavenCommand, workDir);
+        utils.executeCliCommand(mavenCommand, workDir, null);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
@@ -90,11 +93,11 @@ function createMavenConfigFile(configPath, cliPath, buildDir) {
     let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
     let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
     let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
-    utils.deprecatedCreateBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
+    createBuildToolConfigFile(configPath, 'maven', resolverObj, deployerObj);
 }
 
 function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
-    return { snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverID: serverID };
+    return { snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverId: serverID };
 }
 
 /**
@@ -124,4 +127,24 @@ function cleanup(cliPath, workDir) {
     } catch (removeVariablesException) {
         tl.setResult(tl.TaskResult.Failed, removeVariablesException);
     }
+}
+
+/**
+ * Creates a build tool config file at a desired absolute path.
+ * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example, for maven:
+ * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
+ */
+function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
+    let yamlDocument = {};
+    yamlDocument.version = buildToolsConfigVersion;
+    yamlDocument.type = buildToolType;
+    if (resolverObj && Object.keys(resolverObj).length > 0) {
+        yamlDocument.resolver = resolverObj;
+    }
+    if (deployerObj && Object.keys(deployerObj).length > 0) {
+        yamlDocument.deployer = deployerObj;
+    }
+    let configInfo = yaml.safeDump(yamlDocument);
+    console.log(configInfo);
+    fs.outputFileSync(configPath, configInfo);
 }
