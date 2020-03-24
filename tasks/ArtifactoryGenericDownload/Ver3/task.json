@@ -251,7 +251,7 @@
       "required": false,
       "visibleRule": "splitCount!=0",
       "groupName": "advanced",
-      "helpMarkDown": "Files larger than the specified number will be split into equally sized \"split count\" segments.\nAny files smaller than the specified number will be downloaded in a single thread. If set to -1, files are not split."
+      "helpMarkDown": "Files larger than the specified number will be split into equally sized \"split count\" segments.\nAny files smaller than the specified number will be downloaded in a single thread. If set to -1, files are not split.\nThe default value is 5120"
     },
     {
       "name": "validateSymlinks",
@@ -274,7 +274,7 @@
     {
       "name": "syncDeletesPath",
       "type": "string",
-      "label": "Sync path",
+      "label": "Local sync path",
       "defaultValue": "",
       "required": false,
       "groupName": "advanced",

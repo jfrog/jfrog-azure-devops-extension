@@ -73,16 +73,36 @@ function performGenericDownload(cliPath, workDir, artifactoryService, artifactor
     // Build the cli command.
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, '--url=' + utils.quote(artifactoryUrl), '--spec=' + utils.quote(specPath));
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    let replaceSpecVars = tl.getBoolInput('replaceSpecVars');
+    if (replaceSpecVars) {
+        cliCommand = utils.addStringParam(cliCommand, 'specVars', 'spec-vars');
+    }
+    // Add boolean flags
     cliCommand = utils.addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
+    cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
+    cliCommand = utils.addBoolParam(cliCommand, 'validateSymlinks', 'validate-symlinks');
+    cliCommand = utils.addBoolParam(cliCommand, 'insecureTls', 'insecure-tls');
+
     // Add build info collection.
     if (collectBuildInfo) {
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
         cliCommand = utils.cliJoin(cliCommand, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+        cliCommand = utils.addStringParam(cliCommand, 'module', 'module');
+    }
+    // Add sync-deletes
+    let syncDeletes = tl.getBoolInput('syncDeletes');
+    if (syncDeletes) {
+        cliCommand = utils.addStringParam(cliCommand, 'syncDeletesPath', 'sync-deletes');
     }
 
-    // Execute the cli command.
     try {
+        // Add numeric flags, may throw exception for illegal value
+        cliCommand = utils.addIntParam(cliCommand, 'threads', 'threads');
+        cliCommand = utils.addIntParam(cliCommand, 'retries', 'retries');
+        cliCommand = utils.addIntParam(cliCommand, 'splitCount', 'split-count');
+        cliCommand = utils.addIntParam(cliCommand, 'minSplit', 'min-split');
+        // Execute the cli command.
         utils.executeCliCommand(cliCommand, workDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);

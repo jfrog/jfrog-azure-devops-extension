@@ -33,6 +33,7 @@ module.exports = {
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
+    addIntParam: addIntParam,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
@@ -56,6 +57,7 @@ function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
+    process.env.CI = true;
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
         cliDownloadUrl = jfrogCliBintrayDownloadUrl;
@@ -286,6 +288,17 @@ function addStringParam(cliCommand, inputParam, cliParam, require) {
 function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
     cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
+    return cliCommand;
+}
+
+function addIntParam(cliCommand, inputParam, cliParam) {
+    let val = tl.getInput(inputParam, false);
+    if (val) {
+        if (isNaN(val)) {
+            throw 'Illegal value "' + val + '" for ' + inputParam + ', should be numeric.';
+        }
+        cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
+    }
     return cliCommand;
 }
 
