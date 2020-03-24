@@ -458,7 +458,7 @@ function determineCliWorkDir(defaultPath, providedPath) {
  * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example, for maven:
  * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
  */
-function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
+function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj, extraArgs) {
     let yamlDocument = {};
     yamlDocument.version = buildToolsConfigVersion;
     yamlDocument.type = buildToolType;
@@ -467,6 +467,13 @@ function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deplo
     }
     if (deployerObj && Object.keys(deployerObj).length > 0) {
         yamlDocument.deployer = deployerObj;
+    }
+    if (extraArgs) {
+        for (var key in extraArgs) {
+            if (extraArgs[key]) {
+                yamlDocument[key] = extraArgs[key];
+            }
+        }
     }
     let configInfo = yaml.safeDump(yamlDocument);
     console.log(configInfo);
