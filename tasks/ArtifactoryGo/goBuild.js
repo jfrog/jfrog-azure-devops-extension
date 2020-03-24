@@ -64,7 +64,7 @@ function createGoConfigFile(configPath, cliPath, requiredWorkDir) {
     configureGoCliServer(cliPath, requiredWorkDir, 'resolver');
     let resolutionRepo = tl.getInput('resolutionRepo', true);
     let resolverObj = { serverId: configuredServerId, repo: resolutionRepo };
-    utils.createBuildToolConfigFile(configPath, 'go', resolverObj, {});
+    utils.createBuildToolConfigFile(configPath, 'go', resolverObj, {}, {});
 }
 
 function performGoPublishCommand(cliPath, requiredWorkDir) {

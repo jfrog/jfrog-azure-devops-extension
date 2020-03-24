@@ -6,18 +6,13 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Working+with+Gradle)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "8",
         "Patch": "1"
     },
-    "demands": [
-        "gradle"
-    ],
+    "demands": ["gradle"],
     "minimumAgentVersion": "1.89.0",
     "instanceNameFormat": "Artifactory Gradle",
     "groups": [
@@ -33,6 +28,14 @@
         }
     ],
     "inputs": [
+        {
+            "name": "workDir",
+            "type": "filePath",
+            "label": "Path to Gradle project",
+            "defaultValue": "$(System.DefaultWorkingDirectory)",
+            "required": false,
+            "helpMarkDown": "Path to directory of the Gradle project."
+        },
         {
             "name": "buildFile",
             "type": "filePath",
@@ -98,6 +101,56 @@
             "properties": {
                 "EditableOptions": "True"
             }
+        },
+        {
+            "name": "usesPlugin",
+            "type": "boolean",
+            "label": "Use Artifactory plugin",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select if the Gradle Artifactory Plugin is already applied in the build script."
+        },
+        {
+            "name": "useWrapper",
+            "type": "boolean",
+            "label": "Use Gradle wrapper",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select if you'd like to use the Gradle wrapper."
+        },
+        {
+            "name": "deployMavenDesc",
+            "type": "boolean",
+            "label": "Deploy Maven descriptors",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "When selected, Maven descriptors will be deployed."
+        },
+        {
+            "name": "deployIvyDesc",
+            "type": "boolean",
+            "label": "Deploy Ivy descriptors",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "When selected, Ivy descriptors will be deployed."
+        },
+        {
+            "name": "ivyDescPattern",
+            "type": "string",
+            "label": "Ivy descriptors pattern",
+            "defaultValue": "[organization]/[module]/ivy-[revision].xml",
+            "required": false,
+            "visibleRule": "deployIvyDesc=true",
+            "helpMarkDown": "Set the deployed Ivy descriptor pattern."
+        },
+        {
+            "name": "ivyArtifactsPattern",
+            "type": "string",
+            "label": "Ivy artifacts pattern",
+            "defaultValue": "[organization]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]",
+            "required": false,
+            "visibleRule": "deployIvyDesc=true",
+            "helpMarkDown": "Set the deployed Ivy artifacts pattern."
         },
         {
             "name": "collectBuildInfo",
