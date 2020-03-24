@@ -454,6 +454,24 @@ describe('JFrog Artifactory Extension Tests', () => {
         );
     });
 
+    describe('Collect Issues Tests', () => {
+        runTest('Collect Issues', () => {
+            let testDir = 'collectIssues';
+            mockTask(testDir, 'collect');
+            mockTask(testDir, 'publish');
+            assertIssuesCollection("Collect issues", "3");
+            deleteBuild('Collect issues');
+        });
+
+        runTest('Collect Issues from file', () => {
+            let testDir = 'collectIssues';
+            mockTask(testDir, 'collectFromFile');
+            mockTask(testDir, 'publish');
+            assertIssuesCollection("Collect issues from file", "4");
+            deleteBuild('Collect issues from file');
+        });
+    });
+
     describe('Conan Task Tests', () => {
         runTest(
             'Conan Custom Command',
@@ -727,4 +745,28 @@ function deleteBuild(buildName) {
 
 function assertPathExists(path) {
     assert(fs.existsSync(path), path + ' should exist!');
+}
+
+function assertIssuesCollection(buildName, buildNumber) {
+    // Get build from Artifactory.
+    let build = getAndAssertBuild(buildName, buildNumber);
+    let body = JSON.parse(build.getBody('utf8'));
+
+    // Check number of issues is correct.
+    let expectedIssues = 4;
+    let actualIssues = body['buildInfo']['issues']['affectedIssues'];
+    assert(actualIssues.length === expectedIssues, "Expected: '" + expectedIssues + "' issues, actual: '" + actualIssues + "'.\n" + tasksOutput);
+
+    // Check vcs url.
+    let expectedVcsUrl = 'https://github.com/jfrog/jfrog-cli-go.git';
+    let actualVcsUrl = body['buildInfo']['vcsUrl'];
+    assert(expectedVcsUrl === actualVcsUrl, "Expected vcs url: '" + expectedVcsUrl + "', actual: '" + actualVcsUrl + "'.\n" + tasksOutput);
+
+    // Check vcs revision.
+    let expectedVcsRevision = 'b033a0e508bdb52eee25654c9e12db33ff01b8ff';
+    let actualVcsRevision = body['buildInfo']['vcsRevision'];
+    assert(
+        expectedVcsRevision === actualVcsRevision,
+        "Expected vcs revision: '" + expectedVcsRevision + "', actual: '" + actualVcsRevision + "'.\n" + tasksOutput
+    );
 }

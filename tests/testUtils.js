@@ -2,6 +2,7 @@ const tmrm = require('azure-pipelines-task-lib/mock-run');
 const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const fs = require('fs-extra');
+const copyDir = require('copy-dir');
 const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, 'testData');
@@ -56,6 +57,7 @@ module.exports = {
     discard: path.join(__dirname, '..', 'tasks', 'ArtifactoryDiscardBuilds', 'discardBuilds.js'),
     properties: path.join(__dirname, '..', 'tasks', 'ArtifactoryProperties', 'properties.js'),
     go: path.join(__dirname, '..', 'tasks', 'ArtifactoryGo', 'goBuild.js'),
+    collectIssues: path.join(__dirname, '..', 'tasks', 'ArtifactoryCollectIssues', 'collectIssues.js'),
 
     initTests: initTests,
     runTask: runTask,
@@ -317,33 +319,19 @@ function setArtifactoryCredentials() {
 }
 
 /**
- * Returns an array of files contained in folderToCopy
- */
-function getResourcesFiles(folderToCopy) {
-    let dir = path.join(__dirname, 'resources', folderToCopy);
-    let files = fs.readdirSync(dir);
-    let fullFilesPath = [];
-    for (let i = 0; i < files.length; i++) {
-        fullFilesPath.push(path.join(dir, files[i]));
-    }
-    return fullFilesPath;
-}
-
-/**
- * Copies all files exists in "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>"
+ * Copies "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>".
+ * If newTargetDir is provided, the folder will be renamed to its value.
  * @param testDirName - test directory
- * @param folderToCopy - the folder to copy from the test
+ * @param dirToCopy - the folder to copy, located inside the test resources directory
+ * @param newTargetDir - optional new name for the copied directory.
  */
-function copyTestFilesToTestWorkDir(testDirName, folderToCopy) {
-    let files = getResourcesFiles(path.join(testDirName, folderToCopy));
-
-    if (!fs.existsSync(path.join(testDataDir, testDirName))) {
-        fs.mkdirSync(path.join(testDataDir, testDirName));
+function copyTestFilesToTestWorkDir(testDirName, dirToCopy, newTargetDir) {
+    let sourceDir = path.join(__dirname, 'resources', testDirName, dirToCopy);
+    let targetDir = path.join(testDataDir, testDirName);
+    if (newTargetDir) {
+        targetDir = path.join(testDataDir, newTargetDir);
     }
-
-    for (let i = 0; i < files.length; i++) {
-        fs.copyFileSync(files[i], path.join(getLocalTestDir(testDirName), path.basename(files[i])));
-    }
+    copyDir.sync(sourceDir, targetDir);
 }
 
 function setVariables(variables) {
