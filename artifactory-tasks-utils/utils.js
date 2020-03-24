@@ -10,11 +10,14 @@ const yaml = require('js-yaml');
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
 const btPackage = 'jfrog-cli-' + getArchitecture();
-const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
+const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory'), '_jfrog'));
+const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
 const jfrogCliVersion = '1.35.1';
-const pluginVersion = '1.8.1';
+const pluginVersion = '1.8.3';
 const buildAgent = 'artifactory-azure-devops-extension';
-const customCliPath = encodePath(path.join(jfrogFolderPath, 'current', fileName)); // Optional - Customized jfrog-cli path.
+const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
+const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
+const customLegacyCliPath = encodePath(path.join(jfrogLegacyFolderPath, 'current', fileName));
 const jfrogCliBintrayDownloadUrl =
     'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + '?bt_package=' + btPackage;
 const buildToolsConfigVersion = 1;
@@ -32,7 +35,6 @@ module.exports = {
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     fixWindowsPaths: fixWindowsPaths,
-    validateSpecWithoutRegex: validateSpecWithoutRegex,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
     isToolExists: isToolExists,
@@ -48,7 +50,8 @@ module.exports = {
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand
 };
 
-// Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
+// The cliDownloadUrl and cliAuthHandlers arguments are optional. They are provided to this function by the 'Artifactory Tools Installer' task.
+// jfrogCliBintrayDownloadUrl is used by default.
 function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
@@ -68,12 +71,18 @@ function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
         .catch(error => tl.setResult(tl.TaskResult.Failed, 'Error occurred while executing task:\n' + error));
 }
 
-// Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
 function getCliPath(cliDownloadUrl, cliAuthHandlers) {
     return new Promise(function(resolve, reject) {
         let cliDir = toolLib.findLocalTool(toolName, jfrogCliVersion);
         if (fs.existsSync(customCliPath)) {
             tl.debug('Using cli from custom cli path: ' + customCliPath);
+            resolve(customCliPath);
+        } else if (fs.existsSync(customLegacyCliPath)) {
+            tl.warning(
+                'Found JFrog CLI in deprecated custom path: ' + customLegacyCliPath + '. Copying JFrog CLI to new supported path: ' + customFolderPath
+            );
+            tl.mkdirP(customFolderPath);
+            tl.cp(customLegacyCliPath, customFolderPath, '-f');
             resolve(customCliPath);
         } else if (cliDir) {
             let cliPath = path.join(cliDir, fileName);
@@ -149,13 +158,21 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        tl.debug('Executing cliCommand: ' + cliCommand);
+        tl.debug('Executing cliCommand: ' + maskSecrets(cliCommand));
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
-        let errorMsg = ex.toString().replace(/--password=".*"/g, '--password=***');
-        throw errorMsg.replace(/--access-token=".*"/g, '--access-token=***');
+        throw maskSecrets(ex.toString());
     }
+}
+
+/**
+ * Mask password and access token in a CLI command or exception.
+ * @param str - CLI command or exception
+ * @returns {string}
+ */
+function maskSecrets(str) {
+    return str.replace(/--password=".*"/g, '--password=***').replace(/--access-token=".*"/g, '--access-token=***');
 }
 
 /**
@@ -213,7 +230,6 @@ function writeSpecContentToSpecPath(specSource, specPath) {
         throw 'Failed creating File-Spec, since the provided File-Spec source value is invalid.';
     }
     fileSpec = fixWindowsPaths(fileSpec);
-    validateSpecWithoutRegex(fileSpec);
     console.log('Using file spec:');
     console.log(fileSpec);
     // Write provided fileSpec to file
@@ -294,7 +310,6 @@ function createCliDirs() {
     }
 }
 
-// Url and AuthHandlers are optional. Using jfrogCliBintrayDownloadUrl by default.
 function downloadCli(cliDownloadUrl, cliAuthHandlers) {
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
@@ -351,20 +366,6 @@ function getCliExecutableName() {
  */
 function fixWindowsPaths(string) {
     return isWindows() ? string.replace(/([^\\])\\(?!\\)/g, '$1\\\\') : string;
-}
-
-function validateSpecWithoutRegex(fileSpec) {
-    if (!isWindows()) {
-        return;
-    }
-    let files = JSON.parse(fileSpec)['files'];
-    for (const file of Object.keys(files)) {
-        let values = files[file];
-        let regexp = values['regexp'];
-        if (regexp && regexp.toLowerCase() === 'true') {
-            throw "The File Spec includes 'regexp: true' which is currently not supported.";
-        }
-    }
 }
 
 /**
