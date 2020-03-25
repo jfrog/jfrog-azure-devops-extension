@@ -40,7 +40,6 @@ function RunTaskCbk(cliPath) {
     }
     let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
-    utils.executeCliCommand(utils.cliJoin(cliPath, 'rt c show'), workDir, null);
     try {
         utils.executeCliCommand(mavenCommand, workDir, null);
     } catch (ex) {
