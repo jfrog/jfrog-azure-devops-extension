@@ -19,7 +19,7 @@ function RunTaskCbk(cliPath) {
     let configSource = tl.getInput('configSource', false);
 
     // Create config yaml.
-    let configPath = path.join(defaultWorkDir, 'issuesConfig' + Date.now() + '.yaml');
+    let configPath = path.join(defaultWorkDir, 'issuesConfig_' + Date.now() + '.yaml');
     try {
         writeConfigFile(configSource, configPath);
     } catch (ex) {
