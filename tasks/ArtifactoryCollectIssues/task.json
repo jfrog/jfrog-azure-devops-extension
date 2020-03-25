@@ -24,7 +24,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service used for fetching VCS information."
+            "helpMarkDown": "Artifactory service used for fetching information collected in previous builds."
         },
         {
             "name": "configSource",
@@ -32,7 +32,7 @@
             "label": "Config source",
             "required": true,
             "defaultValue": "taskConfiguration",
-            "helpMarkDown": "To collect build issues, you need to provide a config file. \nTo read more about the issues-collection yaml schema click <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-CollectBuildIssues\" target=\"_blank\">here</a>.",
+            "helpMarkDown": "To collect build issues, you need to provide a config file. \nTo read more about the issues-collection yaml schema click <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension\" target=\"_blank\">here</a>.",
             "options": {
                 "taskConfiguration": "Task Configuration",
                 "file": "File"
@@ -41,7 +41,7 @@
         {
             "name": "taskConfig",
             "type": "multiLine",
-            "label": "Config Yaml",
+            "label": "Issues collection configuration",
             "visibleRule": "configSource=taskConfiguration",
             "defaultValue": "",
             "properties": {
@@ -49,14 +49,14 @@
                 "rows": "10",
                 "maxLength": "10000"
             },
-            "helpMarkDown": "Use config yaml from task configuration."
+            "helpMarkDown": "To specify the details required for the build issues collection, please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension\" target=\"_blank\">here."
         },
         {
             "name": "file",
             "type": "filePath",
             "label": "File path",
             "visibleRule": "configSource=file",
-            "helpMarkDown": "Use config yaml from a local file."
+            "helpMarkDown": "Path to a file, with the details required for the build issues collection. Please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension\" target=\"_blank\">here."
         },
         {
             "name": "buildName",
