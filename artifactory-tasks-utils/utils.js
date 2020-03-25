@@ -495,11 +495,8 @@ function appendBuildFlagsToCliCommand(cliCommand) {
 function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
     console.log(`
 [Warn] You are using an old version of this task.
-It is recommended to upgrade the task to the latest major version of this task.
-You do this by replacing the task name in the azure-pipelines.yml file from ${oldTaskVersion} to ${newTaskVersion},
-or (for older pipelines), change the task version from the task UI.
-Important:
-If you installed JFrog CLI manually on the build agent, and it is not downloaded automatically,
-please upgrade JFrog CLI to version ${jfrogCliVersion}.
-    `);
+       It is recommended to upgrade the task to its latest major version,
+       by replacing the task version in the azure-pipelines.yml file from ${oldTaskVersion} to ${newTaskVersion},
+       or changing the task version from the task UI.
+`);
 }

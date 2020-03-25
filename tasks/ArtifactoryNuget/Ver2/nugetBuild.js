@@ -28,12 +28,12 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
 /**
  * Download NuGet version, adds to the path and executes.
  */
-let downloadAndRunNuget = async (cliPath, nugetCommand) => {
+let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
     console.log('NuGet not found in Path. Downloading...');
-    let downloadPath = await toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe');
+    let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
     toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
     addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
-};
+});
 
 // This triggered after downloading the CLI.
 // First we will check for NuGet in the Env Path. If exists, this one will be used.

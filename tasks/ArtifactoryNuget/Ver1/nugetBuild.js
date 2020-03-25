@@ -26,11 +26,11 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
 /**
  * Download NuGet version, adds to the path and executes.
  */
-let downloadAndRunNuget = async (cliPath, nugetCommand) => {
-    let downloadPath = await toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe');
+let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
+    let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
     toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
     addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
-};
+});
 
 // This triggered after downloading the CLI.
 // First we will check for NuGet in the Env Path. If exists, this one will be used.
@@ -60,7 +60,7 @@ utils.executeCliTask(RunTaskCbk);
 
 // Executing JFrog CLI with NuGet
 function exec(cliPath, nugetCommand) {
-    utils.deprecatedTaskMessage('ArtifactoryNuGet@1', 'ArtifactoryNuGet@2');
+    utils.deprecatedTaskMessage('1', '2');
     let buildDir = tl.getVariable('System.DefaultWorkingDirectory');
     // Get configured parameters
     let nugetCommandCli;

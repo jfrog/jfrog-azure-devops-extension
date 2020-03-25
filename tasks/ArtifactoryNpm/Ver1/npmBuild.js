@@ -6,7 +6,7 @@ const npmPublishCommand = 'rt npmp';
 const npmCiCommand = 'rt npmci';
 
 function RunTaskCbk(cliPath) {
-    utils.deprecatedTaskMessage('ArtifactoryNpm@1', 'ArtifactoryNpm@2');
+    utils.deprecatedTaskMessage('1', '2');
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
