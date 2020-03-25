@@ -24,6 +24,9 @@ let inputs = {
         ]
     }),
     failNoOp: true,
+    dryRun: false,
+    insecureTls: false,
+    symlinks: false,
     includeEnvVars: true,
     collectBuildInfo: true,
     specSource: 'taskConfiguration'
