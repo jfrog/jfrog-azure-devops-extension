@@ -204,7 +204,7 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
     let deleteServerIDCommand;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
-        if(serverIdArray[i]) {
+        if (serverIdArray[i]) {
             deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
             // This operation throws an exception in case of failure.
             executeCliCommand(deleteServerIDCommand, buildDir, null);
@@ -272,7 +272,7 @@ function addArtifactoryCredentials(cliCommand, artifactoryService) {
     return cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
 }
 
-function addStringParam(cliCommand, inputParam, cliParam ,require) {
+function addStringParam(cliCommand, inputParam, cliParam, require) {
     let val = tl.getInput(inputParam, require);
     if (val) {
         cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + quote(val));
@@ -463,14 +463,14 @@ function assembleBuildToolServerId(buildToolType, buildToolCmd) {
 }
 
 function createBuildToolConfigFile(cliPath, artifactoryService, cmd, repo, requiredWorkDir, ConfigCommand) {
-    const artService = tl.getInput(artifactoryService)
+    const artService = tl.getInput(artifactoryService);
     const serverId = assembleBuildToolServerId(cmd, tl.getInput('command', true));
 
     configureCliServer(artService, serverId, cliPath, requiredWorkDir);
     // Build the cli config command.
-    let cliCommand = cliJoin(cliPath, ConfigCommand ,  '--server-id-resolve=' + quote(serverId), '--server-id-deploy=' + quote(serverId));
-    cliCommand = addStringParam(cliCommand, repo, 'repo-resolve',true);
-    cliCommand = addStringParam(cliCommand, repo, 'repo-deploy',true);
+    let cliCommand = cliJoin(cliPath, ConfigCommand, '--server-id-resolve=' + quote(serverId), '--server-id-deploy=' + quote(serverId));
+    cliCommand = addStringParam(cliCommand, repo, 'repo-resolve', true);
+    cliCommand = addStringParam(cliCommand, repo, 'repo-deploy', true);
     // Execute cli.
     try {
         executeCliCommand(cliCommand, requiredWorkDir, null);

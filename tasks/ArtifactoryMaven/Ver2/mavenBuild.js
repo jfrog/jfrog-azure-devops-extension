@@ -75,7 +75,7 @@ function createMavenConfigFile(cliPath, buildDir) {
     if (artifactoryResolver != null) {
         serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
-        cliCommand = utils.cliJoin(cliCommand,'--server-id-resolve='+utils.quote(serverIdResolver));
+        cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolver));
         cliCommand = utils.addStringParam(cliCommand, 'targetResolveReleaseRepo', 'repo-resolve-releases', true);
         cliCommand = utils.addStringParam(cliCommand, 'targetResolveSnapshotRepo', 'repo-resolve-snapshots', true);
     } else {
@@ -83,12 +83,12 @@ function createMavenConfigFile(cliPath, buildDir) {
     }
 
     // Configure deployer server, throws on failure.
-    let artifactoryDeployer = tl.getInput('artifactoryDeployService',true);
+    let artifactoryDeployer = tl.getInput('artifactoryDeployService', true);
     serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
     utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
-    cliCommand = utils.cliJoin(cliCommand,'--server-id-deploy='+utils.quote(serverIdDeployer));
-    cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases',true);
-    cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots',true);
+    cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
+    cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
+    cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
     // Execute cli.
     try {
         utils.executeCliCommand(cliCommand, buildDir, null);
