@@ -1,13 +1,11 @@
 const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let patternValue = testUtils.getTestLocalFilesDir(__dirname);
-
 let inputs = {
     fileSpec: JSON.stringify({
         files: [
             {
-                pattern: '${patternVar}',
+                pattern: testUtils.getTestLocalFilesDir(__dirname) + '${patternVar}',
                 target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
             }
         ]
@@ -18,7 +16,7 @@ let inputs = {
     symlinks: false,
     specSource: 'taskConfiguration',
     replaceSpecVars: true,
-    specVars: 'patternVar=' + patternValue
+    specVars: 'patternVar=a*.in'
 };
 
 testUtils.runTask(testUtils.upload, {}, inputs);
