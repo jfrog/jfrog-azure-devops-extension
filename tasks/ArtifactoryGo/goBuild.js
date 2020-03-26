@@ -60,7 +60,7 @@ function performGoCommand(goCommand, cliPath, requiredWorkDir) {
 }
 
 function performGoConfig(cliPath, requiredWorkDir) {
-    utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'go', 'resolutionRepo', requiredWorkDir, cliGoConfigCommand);
+    configuredServerId = utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'go', 'resolutionRepo', requiredWorkDir, cliGoConfigCommand);
 }
 
 function performGoPublishCommand(cliPath, requiredWorkDir) {

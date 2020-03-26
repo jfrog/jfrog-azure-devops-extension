@@ -12,6 +12,8 @@ const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const cliNuGetCommand = 'rt nuget';
 const cliUploadCommand = 'rt u';
 const nugetConfigCommand = 'rt nugetc';
+let configuredServerId;
+
 
 /**
  * Adds the nuget executable to the Path and execute the CLI.
@@ -88,11 +90,11 @@ function exec(cliPath, nugetCommand) {
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, pathToNupkg, targetDeployRepo);
         nugetCommandCli = addArtifactoryServer(nugetCommandCli);
-        runNuGet(nugetCommandCli, buildDir);
+        runNuGet(nugetCommandCli, buildDir, cliPath);
     }
 }
 
-function runNuGet(nugetCommandCli, buildDir) {
+function runNuGet(nugetCommandCli, buildDir, cliPath) {
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
 
     if (collectBuildInfo) {
@@ -105,6 +107,11 @@ function runNuGet(nugetCommandCli, buildDir) {
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
+    }
+    finally {
+        if(configuredServerId){
+            cleanup(cliPath, buildDir);
+        }
     }
 }
 
@@ -120,7 +127,7 @@ function addArtifactoryServer(nugetCommandCli) {
 
 // Create nuget config
 function performNugetConfig(cliPath, repo, requiredWorkDir) {
-    utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'nuget', repo, requiredWorkDir, nugetConfigCommand);
+    configuredServerId = utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'nuget', repo, requiredWorkDir, nugetConfigCommand);
 }
 
 // Creates the Nuget arguments
@@ -137,4 +144,13 @@ function addNugetArgsToCommands() {
     nugetArguments = utils.cliJoin(nugetArguments, '-Verbosity', verbosityRestore);
 
     return nugetArguments;
+}
+
+function cleanup(cliPath, workDir) {
+    // Delete servers.
+    try {
+        utils.deleteCliServers(cliPath, workDir, [configuredServerId]);
+    } catch (deleteServersException) {
+        tl.setResult(tl.TaskResult.Failed, deleteServersException);
+    }
 }

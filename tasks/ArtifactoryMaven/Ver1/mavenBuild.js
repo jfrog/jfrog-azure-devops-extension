@@ -116,7 +116,7 @@ function removeExtractorDownloadVariables(cliPath, workDir) {
 function cleanup(cliPath, workDir) {
     // Delete servers.
     try {
-        utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
+        utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver].filter(serverId => serverId));
     } catch (deleteServersException) {
         tl.setResult(tl.TaskResult.Failed, deleteServersException);
     }
