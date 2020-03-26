@@ -493,7 +493,7 @@ function appendBuildFlagsToCliCommand(cliCommand) {
 }
 
 function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
-    console.log(`
+    console.warn(`
 [Warn] You are using an old version of this task.
        It is recommended to upgrade the task to its latest major version,
        by replacing the task version in the azure-pipelines.yml file from ${oldTaskVersion} to ${newTaskVersion},
