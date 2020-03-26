@@ -1,6 +1,7 @@
 // This util will return a list of all files matching the pattern configured in the UI in the solution path.
 const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
+const utils = require('./utils');
 
 module.exports = {
     resolveFilterSpec: resolveFilterSpec
@@ -53,7 +54,7 @@ function resolveFilterSpec(filterSpec, basePath) {
 }
 
 function resolveWildcardPath(pattern) {
-    let isWindows = tl.osType() === 'Windows_NT';
+    let isWindows = utils.isWindows();
 
     // Resolve files for the specified value or pattern
     let filesList;

@@ -29,15 +29,15 @@ function RunTaskCbk(cliPath) {
     let inputCommand = tl.getInput('command', true);
     switch (inputCommand) {
         case 'install':
-            performNpmConfigCommand(cliPath, tl.getInput('sourceRepo', true), requiredWorkDir);
+            performNpmConfigCommand(cliPath, 'sourceRepo', requiredWorkDir);
             performNpmCommand(npmInstallCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'ci':
-            performNpmConfigCommand(cliPath, tl.getInput('sourceRepo', true), requiredWorkDir);
+            performNpmConfigCommand(cliPath, 'sourceRepo', requiredWorkDir);
             performNpmCommand(npmCiCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'pack and publish':
-            performNpmConfigCommand(cliPath, tl.getInput('targetRepo', true), requiredWorkDir);
+            performNpmConfigCommand(cliPath, 'targetRepo', requiredWorkDir);
             performNpmCommand(npmPublishCommand, false, cliPath, collectBuildInfo, requiredWorkDir);
             break;
     }
@@ -68,9 +68,7 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
 }
 
 function performNpmConfigCommand(cliPath, repo, requiredWorkDir) {
-    const serverId = utils.assembleBuildToolServerId('npm', tl.getInput('command', true));
-    const artifactoryService = tl.getInput('artifactoryService', false);
-    utils.createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, npmConfigCommand);
+    utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'npm', repo, requiredWorkDir, npmConfigCommand);
 }
 
 function getCollectBuildInfoFlags(addThreads) {

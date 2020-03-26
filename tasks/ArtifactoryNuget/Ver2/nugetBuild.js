@@ -6,9 +6,9 @@ const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
-const solutionPathUtil = require('./util/solutionPathUtil');
 const NUGET_VERSION = '4.7.1';
 const path = require('path');
+const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil')
 const cliNuGetCommand = 'rt nuget';
 const cliUploadCommand = 'rt u';
 const nugetConfigCommand = 'rt nugetc';
@@ -40,11 +40,11 @@ let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
 let RunTaskCbk = async(function(cliPath) {
-    if (process.platform !== 'win32') {
+    if (!utils.isWindows()) {
         tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
         return;
     }
-    let nugetCommand = tl.getInput('command');
+    let nugetCommand = tl.getInput('command', true);
     let nugetExec = tl.which('nuget', false);
     if (!nugetExec && nugetCommand.localeCompare('restore') === 0) {
         let localVersions = toolLib.findLocalToolVersions(NUGET_TOOL_NAME);
@@ -77,15 +77,14 @@ function exec(cliPath, nugetCommand) {
             } else {
                 solutionPath = solutionFile;
             }
-            let targetResolveRepo = tl.getInput('targetResolveRepo');
             let nugetArguments = addNugetArgsToCommands();
             nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
-            performNugerConfig(cliPath, targetResolveRepo, solutionPath);
+            performNugerConfig(cliPath, 'targetResolveRepo', solutionPath);
             runNuGet(nugetCommandCli, solutionPath);
         });
     } else {
         // Perform push command.
-        let targetDeployRepo = tl.getInput('targetDeployRepo');
+        let targetDeployRepo = tl.getInput('targetDeployRepo', true);
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, pathToNupkg, targetDeployRepo);
         nugetCommandCli = addArtifactoryServer(nugetCommandCli);
@@ -111,8 +110,8 @@ function runNuGet(nugetCommandCli, buildDir) {
 
 // Adds the Artifactory information to the command
 function addArtifactoryServer(nugetCommandCli) {
-    let artifactoryService = tl.getInput('artifactoryService', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    let artifactoryService = tl.getInput('artifactoryService', true);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, true);
 
     nugetCommandCli = utils.cliJoin(nugetCommandCli, '--url=' + utils.quote(artifactoryUrl));
     nugetCommandCli = utils.addArtifactoryCredentials(nugetCommandCli, artifactoryService);
@@ -121,9 +120,7 @@ function addArtifactoryServer(nugetCommandCli) {
 
 // Create nuget config
 function performNugerConfig(cliPath, repo, requiredWorkDir) {
-    const serverId = utils.assembleBuildToolServerId('nuget', tl.getInput('command', true));
-    const artifactoryService = tl.getInput('artifactoryService', false);
-    utils.createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, nugetConfigCommand);
+    utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'nuget', repo, requiredWorkDir, nugetConfigCommand);
 }
 
 // Creates the Nuget arguments

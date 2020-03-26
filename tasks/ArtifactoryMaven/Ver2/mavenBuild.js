@@ -71,35 +71,24 @@ function checkAndSetMavenHome() {
 function createMavenConfigFile(cliPath, buildDir) {
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
-    let targetResolveReleaseRepo = '';
-    let targetResolveSnapshotRepo = '';
+    let cliCommand = utils.cliJoin(cliPath, mavenConfigCommand);
     if (artifactoryResolver != null) {
         serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
-        targetResolveReleaseRepo = tl.getInput('targetResolveReleaseRepo');
-        targetResolveSnapshotRepo = tl.getInput('targetResolveSnapshotRepo');
+        cliCommand = utils.cliJoin(cliCommand,'--server-id-resolve='+utils.quote(serverIdResolver));
+        cliCommand = utils.addStringParam(cliCommand, 'targetResolveReleaseRepo', 'repo-resolve-releases', true);
+        cliCommand = utils.addStringParam(cliCommand, 'targetResolveSnapshotRepo', 'repo-resolve-snapshots', true);
     } else {
         console.log('Resolution from Artifactory is not configured');
     }
 
     // Configure deployer server, throws on failure.
-    let artifactoryDeployer = tl.getInput('artifactoryDeployService');
+    let artifactoryDeployer = tl.getInput('artifactoryDeployService',true);
     serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
     utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
-    let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
-    let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
-    // Build the cli config command.
-    let cliCommand = utils.cliJoin(
-        cliPath,
-        mavenConfigCommand,
-        '--server-id-resolve=' + utils.quote(serverIdResolver),
-        '--repo-resolve-releases=' + utils.quote(targetResolveReleaseRepo),
-        '--repo-resolve-snapshots=' + utils.quote(targetResolveSnapshotRepo),
-        '--server-id-deploy=' + utils.quote(serverIdDeployer),
-        '--repo-deploy-releases=' + utils.quote(targetDeployReleaseRepo),
-        '--repo-deploy-snapshots=' + utils.quote(targetDeploySnapshotRepo)
-    );
-
+    cliCommand = utils.cliJoin(cliCommand,'--server-id-deploy='+utils.quote(serverIdDeployer));
+    cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases',true);
+    cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots',true);
     // Execute cli.
     try {
         utils.executeCliCommand(cliCommand, buildDir, null);

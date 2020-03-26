@@ -2,11 +2,11 @@ const tl = require('azure-pipelines-task-lib/task');
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
+const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil')
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
-const solutionPathUtil = require('./util/solutionPathUtil');
 const NUGET_VERSION = '4.7.1';
 const path = require('path');
 const cliNuGetCommand = 'rt nuget';
@@ -27,6 +27,7 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
  * Download NuGet version, adds to the path and executes.
  */
 let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
+    console.log('NuGet not found in Path. Downloading...');
     let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
     toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
     addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
@@ -37,7 +38,7 @@ let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
 let RunTaskCbk = async(function(cliPath) {
-    if (process.platform !== 'win32') {
+    if (!utils.isWindows()) {
         tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
         return;
     }

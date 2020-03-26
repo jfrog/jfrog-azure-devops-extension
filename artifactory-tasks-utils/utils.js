@@ -29,6 +29,7 @@ module.exports = {
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
+    isWindows: isWindows,
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
@@ -203,9 +204,11 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
     let deleteServerIDCommand;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
-        deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
-        // This operation throws an exception in case of failure.
-        executeCliCommand(deleteServerIDCommand, buildDir, null);
+        if(serverIdArray[i]) {
+            deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
+            // This operation throws an exception in case of failure.
+            executeCliCommand(deleteServerIDCommand, buildDir, null);
+        }
     }
 }
 
@@ -269,8 +272,8 @@ function addArtifactoryCredentials(cliCommand, artifactoryService) {
     return cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
 }
 
-function addStringParam(cliCommand, inputParam, cliParam) {
-    let val = tl.getInput(inputParam, false);
+function addStringParam(cliCommand, inputParam, cliParam ,require) {
+    let val = tl.getInput(inputParam, require);
     if (val) {
         cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + quote(val));
     }
@@ -459,18 +462,15 @@ function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     return [buildName, buildNumber, buildToolType, buildToolCmd].join('_');
 }
 
-function createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, ConfigCommand) {
-    configureCliServer(artifactoryService, serverId, cliPath, requiredWorkDir);
-    // Build the cli config command.
-    let cliCommand = cliJoin(
-        cliPath,
-        ConfigCommand,
-        '--server-id-resolve=' + quote(serverId),
-        '--repo-resolve=' + quote(repo),
-        '--server-id-deploy=' + quote(serverId),
-        '--repo-deploy=' + quote(repo)
-    );
+function createBuildToolConfigFile(cliPath, artifactoryService, cmd, repo, requiredWorkDir, ConfigCommand) {
+    const artService = tl.getInput(artifactoryService)
+    const serverId = assembleBuildToolServerId(cmd, tl.getInput('command', true));
 
+    configureCliServer(artService, serverId, cliPath, requiredWorkDir);
+    // Build the cli config command.
+    let cliCommand = cliJoin(cliPath, ConfigCommand ,  '--server-id-resolve=' + quote(serverId), '--server-id-deploy=' + quote(serverId));
+    cliCommand = addStringParam(cliCommand, repo, 'repo-resolve',true);
+    cliCommand = addStringParam(cliCommand, repo, 'repo-deploy',true);
     // Execute cli.
     try {
         executeCliCommand(cliCommand, requiredWorkDir, null);
