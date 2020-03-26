@@ -3,25 +3,26 @@ const path = require('path');
 
 const TEST_NAME = path.basename(__dirname);
 
+let patternValue = testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME);
+let targetValue = testUtils.getLocalTestDir(TEST_NAME);
+
 let inputs = {
-    buildName: 'buildPublish',
-    buildNumber: '3',
-    module: 'myDownloadModule',
     fileSpec: JSON.stringify({
         files: [
             {
-                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
-                target: testUtils.getLocalTestDir(TEST_NAME),
+                pattern: '${patternVar}',
+                target: '${targetVar}',
                 flat: 'true'
             }
         ]
     }),
-    collectBuildInfo: true,
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     validateSymlinks: false,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
+    replaceSpecVars: true,
+    specVars: 'patternVar=' + patternValue + ';targetVar=' + targetValue
 };
 
 testUtils.runTask(testUtils.download, {}, inputs);
