@@ -329,7 +329,10 @@ function addCommonGenericParams(cliCommand, specPath) {
     // Add spec-vars
     let replaceSpecVars = tl.getBoolInput('replaceSpecVars');
     if (replaceSpecVars) {
-        cliCommand = addStringParam(cliCommand, 'specVars', 'spec-vars');
+        let specVars = tl.getInput('specVars', false);
+        if (specVars) {
+            cliCommand = cliJoin(cliCommand, '--spec-vars=' + quote(fixWindowsPaths(specVars)));
+        }
     }
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
     // Add build info collection
