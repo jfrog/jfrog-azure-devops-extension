@@ -253,7 +253,7 @@
     {
       "name": "syncDeletes",
       "type": "boolean",
-      "label": "Sync operation with a path in Artifactory",
+      "label": "Sync and delete files from a path in Artifactory",
       "defaultValue": "false",
       "required": false,
       "groupName": "advanced",

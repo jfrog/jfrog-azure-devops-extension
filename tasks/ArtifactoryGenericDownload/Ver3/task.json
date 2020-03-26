@@ -208,7 +208,7 @@
     {
       "name": "splitCount",
       "type": "pickList",
-      "label": "Split count",
+      "label": "# of splits",
       "defaultValue": "3",
       "required": false,
       "groupName": "advanced",
@@ -246,12 +246,12 @@
     {
       "name": "minSplit",
       "type": "string",
-      "label": "The minimum size permitted for splitting",
+      "label": "The minimum size in KB for splitting files",
       "defaultValue": "5120",
       "required": false,
       "visibleRule": "splitCount!=0",
       "groupName": "advanced",
-      "helpMarkDown": "Files larger than the specified number will be split into equally sized \"split count\" segments.\nAny files smaller than the specified number will be downloaded in a single thread. If set to -1, files are not split.\nThe default value is 5120"
+      "helpMarkDown": "Files larger than the specified number will be split into equally sized \"# of splits\" segments.\nAny files smaller than the specified number will be downloaded in a single thread. If set to -1, files are not split.\nThe default value is 5120"
     },
     {
       "name": "validateSymlinks",
@@ -265,7 +265,7 @@
     {
       "name": "syncDeletes",
       "type": "boolean",
-      "label": "Sync operation with a local file system path",
+      "label": "Sync and delete files from the local file system",
       "defaultValue": "false",
       "required": false,
       "groupName": "advanced",
