@@ -1,9 +1,10 @@
 const testUtils = require('../../testUtils');
+const tasksUtils = require('artifactory-tasks-utils');
 
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let patternValue = testUtils.getTestLocalFilesDir(__dirname);
-let targetValue = testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME);
+let patternValue = tasksUtils.fixWindowsPaths(testUtils.getTestLocalFilesDir(__dirname));
+let targetValue = tasksUtils.fixWindowsPaths(testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME));
 
 let inputs = {
     fileSpec: JSON.stringify({
