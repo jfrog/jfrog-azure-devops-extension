@@ -92,7 +92,7 @@ function createMavenConfigFile(configPath, cliPath, buildDir) {
     let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
     let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
     let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
-    createMavenConfigFile(configPath, 'maven', resolverObj, deployerObj);
+    createYamlFile(configPath, 'maven', resolverObj, deployerObj);
 }
 
 function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
@@ -133,7 +133,7 @@ function cleanup(cliPath, workDir) {
  * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example,:
  * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
  */
-function createMavenConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
+function createYamlFile(configPath, buildToolType, resolverObj, deployerObj) {
     let yamlDocument = {};
     yamlDocument.version = buildToolsConfigVersion;
     yamlDocument.type = buildToolType;
