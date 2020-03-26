@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
 
 let inputs = {
-    buildName: 'Go test',
+    buildName: 'Gotest',
     buildNumber: '3'
 };
 

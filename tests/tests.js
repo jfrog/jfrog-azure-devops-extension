@@ -420,8 +420,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'download');
                 mockTask(testDir, 'publishBuildInfo');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Go test', '3');
-                deleteBuild('Go build');
+                getAndAssertBuild('Gotest', '3');
+                deleteBuild('Gotest');
             },
             testUtils.isSkipTest('go')
         );
