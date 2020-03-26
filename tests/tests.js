@@ -459,15 +459,15 @@ describe('JFrog Artifactory Extension Tests', () => {
             let testDir = 'collectIssues';
             mockTask(testDir, 'collect');
             mockTask(testDir, 'publish');
-            assertIssuesCollection("Collect issues", "3");
+            assertIssuesCollection('Collect issues', '3');
             deleteBuild('Collect issues');
         });
 
         runTest('Collect Issues from file', () => {
             let testDir = 'collectIssues';
             mockTask(testDir, 'collectFromFile');
-            mockTask(testDir, 'publish');
-            assertIssuesCollection("Collect issues from file", "4");
+            mockTask(testDir, 'publishFromFile');
+            assertIssuesCollection('Collect issues from file', '4');
             deleteBuild('Collect issues from file');
         });
     });
