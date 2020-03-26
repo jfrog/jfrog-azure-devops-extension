@@ -1,12 +1,12 @@
 const testUtils = require('../../../testUtils');
 
-const TEST_NAME = 'npm';
+const TEST_NAME = 'npmVer1';
 
 let inputs = {
     buildName: 'npmTest',
     buildNumber: '2',
     collectBuildInfo: true,
-    workingFolder: 'npm',
+    workingFolder: 'npmVer1',
     command: 'ci',
     sourceRepo: testUtils.getRepoKeys().npmVirtualRepo,
     arguments: '',
@@ -14,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.runTask(testUtils.npm, {}, inputs);
+testUtils.runTask(testUtils.npmVer1, {}, inputs);

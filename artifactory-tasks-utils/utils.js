@@ -456,7 +456,7 @@ function determineCliWorkDir(defaultPath, providedPath) {
 function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
-    return [buildName, buildNumber, buildToolType, buildToolCmd].join('-');
+    return [buildName, buildNumber, buildToolType, buildToolCmd].join('_');
 }
 
 function createBuildToolConfigFile(cliPath, artifactoryService, serverId, repo, requiredWorkDir, ConfigCommand) {

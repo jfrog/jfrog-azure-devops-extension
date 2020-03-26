@@ -12,4 +12,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'push');
-testUtils.runTask(testUtils.nuget, {}, inputs);
+testUtils.runTask(testUtils.nugetVer2, {}, inputs);

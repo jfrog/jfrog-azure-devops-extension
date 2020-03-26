@@ -2,12 +2,12 @@ const testUtils = require('../../../testUtils');
 
 let inputs = {
     buildName: 'npmTest',
-    buildNumber: '2',
+    buildNumber: '1',
     collectBuildInfo: true,
-    workingFolder: 'npm',
+    workingFolder: 'npmVer1',
     command: 'pack and publish',
     targetRepo: testUtils.getRepoKeys().npmLocalRepo,
     arguments: ''
 };
 
-testUtils.runTask(testUtils.npm, {}, inputs);
+testUtils.runTask(testUtils.npmVer1, {}, inputs);

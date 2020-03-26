@@ -4,10 +4,10 @@ let inputs = {
     buildName: 'npmTest',
     buildNumber: '1',
     collectBuildInfo: true,
-    workingFolder: 'npm',
+    workingFolder: 'npmVer2',
     command: 'pack and publish',
     targetRepo: testUtils.getRepoKeys().npmLocalRepo,
     arguments: ''
 };
 
-testUtils.runTask(testUtils.npm, {}, inputs);
+testUtils.runTask(testUtils.npmVer2, {}, inputs);

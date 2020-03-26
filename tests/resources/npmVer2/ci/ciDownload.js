@@ -1,7 +1,7 @@
 const testUtils = require('../../../testUtils');
 const path = require('path');
 
-const TEST_NAME = 'npm';
+const TEST_NAME = 'npmVer2';
 
 let inputs = {
     fileSpec: JSON.stringify({

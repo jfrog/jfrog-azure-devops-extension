@@ -3,7 +3,7 @@ const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 let repoKeys = testUtils.getRepoKeys();
 
-let BUILD_NAME = 'Maven build';
+let BUILD_NAME = 'Mavenbuild';
 let BUILD_NUMBER = '3';
 
 let variables = {
@@ -25,4 +25,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.runTask(testUtils.maven, variables, inputs);
+testUtils.runTask(testUtils.mavenVer1, variables, inputs);

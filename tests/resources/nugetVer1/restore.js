@@ -14,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'restore');
-testUtils.runTask(testUtils.nuget, {}, inputs);
+testUtils.runTask(testUtils.nugetVer1, {}, inputs);
