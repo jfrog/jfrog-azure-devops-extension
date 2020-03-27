@@ -82,7 +82,7 @@ function exec(cliPath, nugetCommand) {
             let nugetArguments = addNugetArgsToCommands();
             nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
             performNugetConfig(cliPath, 'targetResolveRepo', solutionPath);
-            runNuGet(nugetCommandCli, solutionPath);
+            runNuGet(nugetCommandCli, solutionPath, cliPath);
         });
     } else {
         // Perform push command.
@@ -110,7 +110,7 @@ function runNuGet(nugetCommandCli, buildDir, cliPath) {
     }
     finally {
         if(configuredServerId){
-            cleanup(cliPath, buildDir);
+            utils.deleteCliServers(cliPath, buildDir,[configuredServerId]);
         }
     }
 }
@@ -144,13 +144,4 @@ function addNugetArgsToCommands() {
     nugetArguments = utils.cliJoin(nugetArguments, '-Verbosity', verbosityRestore);
 
     return nugetArguments;
-}
-
-function cleanup(cliPath, workDir) {
-    // Delete servers.
-    try {
-        utils.deleteCliServers(cliPath, workDir, [configuredServerId]);
-    } catch (deleteServersException) {
-        tl.setResult(tl.TaskResult.Failed, deleteServersException);
-    }
 }

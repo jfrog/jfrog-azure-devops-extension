@@ -204,9 +204,14 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
     let deleteServerIDCommand;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
+        try{
             deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
             // This operation throws an exception in case of failure.
             executeCliCommand(deleteServerIDCommand, buildDir, null);
+        } catch (deleteServersException) {
+            tl.setResult(tl.TaskResult.Failed, 'Cloud not delete server id ('+i+'/'+serverIdArray.length+')'+serverIdArray[i]+" error: "+deleteServersException);
+        }
+
     }
 }
 

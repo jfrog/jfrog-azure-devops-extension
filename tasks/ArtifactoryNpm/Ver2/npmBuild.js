@@ -67,7 +67,9 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
         tl.setResult(tl.TaskResult.Failed, ex);
     }
     finally {
-        cleanup(cliPath, requiredWorkDir);
+        if(configuredServerId){
+            utils.deleteCliServers(cliPath, requiredWorkDir,[configuredServerId]);
+        }
     }
 }
 
@@ -91,12 +93,3 @@ function getCollectBuildInfoFlags(addThreads) {
 }
 
 utils.executeCliTask(RunTaskCbk);
-
-function cleanup(cliPath, workDir) {
-    // Delete servers.
-    try {
-        utils.deleteCliServers(cliPath, workDir, [configuredServerId]);
-    } catch (deleteServersException) {
-        tl.setResult(tl.TaskResult.Failed, deleteServersException);
-    }
-}

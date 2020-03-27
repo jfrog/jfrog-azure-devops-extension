@@ -88,7 +88,9 @@ function executeGoCliCommand(cliCommand, cliPath, requiredWorkDir) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        cleanup(cliPath, requiredWorkDir);
+        if(configuredServerId){
+            utils.deleteCliServers(cliPath, requiredWorkDir,[configuredServerId]);
+        }
     }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
@@ -100,13 +102,5 @@ function configureGoCliServer(cliPath, buildDir, serverType) {
     utils.configureCliServer(artifactoryService, configuredServerId, cliPath, buildDir);
 }
 
-function cleanup(cliPath, workDir) {
-    // Delete servers.
-    try {
-        utils.deleteCliServers(cliPath, workDir, [configuredServerId]);
-    } catch (deleteServersException) {
-        tl.setResult(tl.TaskResult.Failed, deleteServersException);
-    }
-}
 
 utils.executeCliTask(RunTaskCbk);
