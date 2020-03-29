@@ -4,6 +4,20 @@ const path = require('path');
 
 const cliUploadCommand = 'rt u';
 
+function addDebParam(cliCommand) {
+    let setDebianProps = tl.getBoolInput('setDebianProps');
+    if (setDebianProps) {
+        let distribution = tl.getInput('debDistribution', true).replace(/\//g, "\\/");
+        let component = tl.getInput('debComponent', true).replace(/\//g, "\\/");
+        ;
+        let architecture = tl.getInput('debArchitecture', true).replace(/\//g, "\\/");
+        ;
+        let debValue = [distribution, component, architecture];
+        cliCommand = utils.cliJoin(cliCommand, '--deb=' + utils.quote(debValue.join('/')))
+    }
+    return cliCommand
+}
+
 function RunTaskCbk(cliPath) {
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
@@ -11,33 +25,15 @@ function RunTaskCbk(cliPath) {
         return;
     }
     let specPath = path.join(workDir, 'uploadSpec' + Date.now() + '.json');
-
-    // Get input parameters
     let artifactoryService = tl.getInput('artifactoryService', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    let specSource = tl.getInput('specSource', false);
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
-
-    // Create upload FileSpec.
+    let cliCommand = utils.cliJoin(cliPath, cliUploadCommand);
+    cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
     try {
-        utils.writeSpecContentToSpecPath(specSource, specPath);
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
-        return;
-    }
-
-    let cliCommand = utils.cliJoin(cliPath, cliUploadCommand, '--url=' + utils.quote(artifactoryUrl), '--spec=' + utils.quote(specPath));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
-    cliCommand = utils.addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
-
-    // Add build info collection
-    if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName', true);
-        let buildNumber = tl.getInput('buildNumber', true);
-        cliCommand = utils.cliJoin(cliCommand, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
-    }
-
-    try {
+        cliCommand = utils.addCommonGenericParams(cliCommand, specPath);
+        // Add unique download flags
+        cliCommand = utils.addBoolParam(cliCommand, 'symlinks', 'symlinks');
+        cliCommand = addDebParam(cliCommand)
+        // Execute the cli command.
         utils.executeCliCommand(cliCommand, workDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);

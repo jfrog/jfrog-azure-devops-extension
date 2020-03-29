@@ -164,11 +164,33 @@ describe('JFrog Artifactory Extension Tests', () => {
             assertFiles(path.join(testDir, 'files'), testDir);
         });
 
+        runTest('Upload and download with Spec Vars', () => {
+            let testDir = 'uploadAndDownloadWithSpecVars';
+            mockTask(testDir, 'upload');
+            mockTask(testDir, 'download');
+            assertFiles(path.join(testDir, 'files'), testDir);
+        });
+
         runTest('Upload and download from file', () => {
             let testDir = 'uploadAndDownloadFromFile';
             mockTask(testDir, 'upload');
             mockTask(testDir, 'download');
             assertFiles(path.join(testDir, 'files'), testDir);
+        });
+
+        runTest('Upload and dry-run download', () => {
+            let testDir = 'uploadAndDryRunDownload';
+            mockTask(testDir, 'upload');
+            mockTask(testDir, 'download');
+            assertFiles(path.join(testDir, 'emptyDir'), testDir);
+        });
+
+        runTest('Dry-run upload and download', () => {
+            let testDir = 'dryRunUploadAndDownload';
+            mockTask(testDir, 'uploadDryRun');
+            mockTask(testDir, 'upload');
+            mockTask(testDir, 'download');
+            assertFiles(path.join(testDir, 'expectedDir'), testDir);
         });
 
         runTest('Download artifact source', () => {
@@ -208,10 +230,12 @@ describe('JFrog Artifactory Extension Tests', () => {
         runTest('Publish build info', () => {
             let testDir = 'publishBuildInfo';
             mockTask(testDir, 'upload');
-            mockTask(testDir, 'publish');
             mockTask(testDir, 'download');
+            mockTask(testDir, 'publish');
             assertFiles(path.join(testDir, 'files'), testDir);
-            getAndAssertBuild('buildPublish', '3');
+            let build = getAndAssertBuild('buildPublish', '3');
+            assertBuildModule(build, 'myUploadModule');
+            assertBuildModule(build, 'myDownloadModule');
             deleteBuild('buildPublish');
         });
 
@@ -800,6 +824,24 @@ function assertBuildEnv(build, key, value) {
     let body = JSON.parse(build.getBody('utf8'));
     let actual = body['buildInfo']['properties'][key];
     assert.strictEqual(actual, value, "Expected: '" + key + ' = ' + value + "'. Actual: '" + key + ' = ' + actual + "'.\n" + tasksOutput);
+}
+
+/**
+ * Assert module in the build.
+ * @param build - (Object) - The build object returned from Artifactory
+ * @param moduleID - (String) - The module ID
+ */
+function assertBuildModule(build, moduleID) {
+    let body = JSON.parse(build.getBody('utf8'));
+    let modules = body['buildInfo']['modules'];
+    let found = false;
+    for (let i = 0; i < modules.length; i++) {
+        if (modules[i]['id'] == moduleID) {
+            found = true;
+            break;
+        }
+    }
+    assert.strictEqual(found, true, 'Module \"' + moduleID + '\" should be exist in buildInfo, but it does not');
 }
 
 function assertBuildUrl(build, url) {

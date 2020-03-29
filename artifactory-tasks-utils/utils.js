@@ -33,6 +33,9 @@ module.exports = {
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
+    addIntParam: addIntParam,
+    addCommonGenericParams: addCommonGenericParams,
+    addUrlAndCredentialsParams: addUrlAndCredentialsParams,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
@@ -56,6 +59,7 @@ function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
+    process.env.CI = true;
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
         cliDownloadUrl = jfrogCliBintrayDownloadUrl;
@@ -286,6 +290,70 @@ function addStringParam(cliCommand, inputParam, cliParam, require) {
 function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
     cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
+    return cliCommand;
+}
+
+function addIntParam(cliCommand, inputParam, cliParam) {
+    let val = tl.getInput(inputParam, false);
+    if (val) {
+        if (isNaN(val)) {
+            throw 'Illegal value "' + val + '" for ' + inputParam + ', should be numeric.';
+        }
+        cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
+    }
+    return cliCommand;
+}
+
+function addUrlAndCredentialsParams(cliCommand, artifactoryService) {
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    cliCommand = cliJoin(cliCommand, '--url=' + quote(artifactoryUrl));
+    cliCommand = addArtifactoryCredentials(cliCommand, artifactoryService);
+    return cliCommand;
+}
+
+function handleSpecFile(cliCommand, specPath) {
+    let specSource = tl.getInput('specSource', false);
+    // Create FileSpec.
+    try {
+        writeSpecContentToSpecPath(specSource, specPath);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+        return;
+    }
+    cliCommand = cliJoin(cliCommand, '--spec=' + quote(specPath));
+    return cliCommand;
+}
+
+function addCommonGenericParams(cliCommand, specPath) {
+    cliCommand = handleSpecFile(cliCommand, specPath);
+    // Add spec-vars
+    let replaceSpecVars = tl.getBoolInput('replaceSpecVars');
+    if (replaceSpecVars) {
+        let specVars = tl.getInput('specVars', false);
+        if (specVars) {
+            cliCommand = cliJoin(cliCommand, '--spec-vars=' + quote(fixWindowsPaths(specVars)));
+        }
+    }
+    let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
+    // Add build info collection
+    if (collectBuildInfo) {
+        let buildName = tl.getInput('buildName', true);
+        let buildNumber = tl.getInput('buildNumber', true);
+        cliCommand = cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
+        cliCommand = addStringParam(cliCommand, 'module', 'module');
+    }
+    // Add boolean flags
+    cliCommand = addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
+    cliCommand = addBoolParam(cliCommand, 'dryRun', 'dry-run');
+    cliCommand = addBoolParam(cliCommand, 'insecureTls', 'insecure-tls');
+    // Add sync-deletes
+    let syncDeletes = tl.getBoolInput('syncDeletes');
+    if (syncDeletes) {
+        cliCommand = addStringParam(cliCommand, 'syncDeletesPath', 'sync-deletes');
+    }
+    // Add numeric flags, may throw exception for illegal value
+    cliCommand = addIntParam(cliCommand, 'threads', 'threads');
+    cliCommand = addIntParam(cliCommand, 'retries', 'retries');
     return cliCommand;
 }
 
