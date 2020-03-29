@@ -65,11 +65,8 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
-    }
-    finally {
-        if(configuredServerId){
-            utils.deleteCliServers(cliPath, requiredWorkDir,[configuredServerId]);
-        }
+    } finally {
+        utils.deleteCliServers(cliPath, requiredWorkDir, [configuredServerId]);
     }
 }
 

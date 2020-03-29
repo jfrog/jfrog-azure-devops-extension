@@ -14,7 +14,6 @@ const cliUploadCommand = 'rt u';
 const nugetConfigCommand = 'rt nugetc';
 let configuredServerId;
 
-
 /**
  * Adds the nuget executable to the Path and execute the CLI.
  * @param cliPath - The path to JFrog CLI
@@ -107,11 +106,8 @@ function runNuGet(nugetCommandCli, buildDir, cliPath) {
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
-    }
-    finally {
-        if(configuredServerId){
-            utils.deleteCliServers(cliPath, buildDir,[configuredServerId]);
-        }
+    } finally {
+        utils.deleteCliServers(cliPath, buildDir, [configuredServerId]);
     }
 }
 

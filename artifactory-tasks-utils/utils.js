@@ -202,16 +202,16 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
  * @throws In CLI execution failure.
  */
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
-    let deleteServerIDCommand;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
-        try{
-            deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
-            // This operation throws an exception in case of failure.
-            executeCliCommand(deleteServerIDCommand, buildDir, null);
+        try {
+            if (serverIdArray[i]) {
+                let deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
+                // This operation throws an exception in case of failure.
+                executeCliCommand(deleteServerIDCommand, buildDir, null);
+            }
         } catch (deleteServersException) {
-            tl.setResult(tl.TaskResult.Failed, 'Cloud not delete server id ('+i+'/'+serverIdArray.length+')'+serverIdArray[i]+" error: "+deleteServersException);
+            tl.setResult(tl.TaskResult.Failed, `Could not delete server id ${serverIdArray[i]} error: ${deleteServersException}`);
         }
-
     }
 }
 
@@ -241,10 +241,10 @@ function writeSpecContentToSpecPath(specSource, specPath) {
     tl.writeFile(specPath, fileSpec);
 }
 
-function cliJoin() {
+function cliJoin(...args) {
     let command = '';
-    for (let i = 0; i < arguments.length; ++i) {
-        let arg = arguments[i];
+    for (let i = 0; i < args.length; ++i) {
+        let arg = args[i];
         if (arg.length > 0) {
             command += command === '' ? arg : ' ' + arg;
         }
