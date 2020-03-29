@@ -5,6 +5,7 @@ const path = require('path');
 const cliUploadCommand = 'rt u';
 
 function RunTaskCbk(cliPath) {
+    utils.deprecatedTaskMessage('1', '2');
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
