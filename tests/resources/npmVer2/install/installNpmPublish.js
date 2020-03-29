@@ -1,7 +1,7 @@
 const testUtils = require('../../../testUtils');
 
 let inputs = {
-    buildName: 'npmTest',
+    buildName: 'npm Test',
     buildNumber: '1',
     collectBuildInfo: true,
     workingFolder: 'npmVer2',

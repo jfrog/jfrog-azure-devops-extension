@@ -9,7 +9,7 @@ let inputs = {
             {
                 pattern: testUtils.getRepoKeys().mavenLocalRepo,
                 target: path.join(testUtils.getLocalTestDir(TEST_NAME), 'files', '/'),
-                build: 'Mavenbuild/3',
+                build: 'Maven Test/3',
                 flat: 'true'
             }
         ]
