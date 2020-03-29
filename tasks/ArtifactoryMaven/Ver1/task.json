@@ -65,7 +65,7 @@
             "defaultValue": "",
             "groupName": "resolve",
             "required": false,
-            "helpMarkDown": "Artifactory service for artifacts resolution."
+            "helpMarkDown": "Artifactory service for dependencies resolution."
         },
         {
             "name": "targetResolveReleaseRepo",
