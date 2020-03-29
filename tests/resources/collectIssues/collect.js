@@ -7,7 +7,7 @@ const configYaml = {
     version: 1,
     issues: {
         trackerName: 'JIRA',
-        regexp: '(.+-[0-9]+)\s-\s(.+)',
+        regexp: '(.+-[0-9]+)\\s-\\s(.+)',
         keyGroupIndex: '1',
         summaryGroupIndex: '2',
         trackerUrl: 'http://my-jira.com/issues',
