@@ -69,7 +69,7 @@
             "type": "pickList",
             "label": "Resolution repository",
             "groupName": "resolve",
-            "required": "true",
+            "required": true,
             "helpMarkDown": "Sets the repository for resolution.",
             "visibleRule": "artifactoryResolverService != \"\"",
             "properties": {
@@ -82,7 +82,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "groupName": "deployer",
-            "required": true,
+            "required": false,
             "helpMarkDown": "Artifactory service for artifacts deployment."
         },
         {
