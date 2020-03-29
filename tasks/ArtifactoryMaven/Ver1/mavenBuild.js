@@ -23,7 +23,7 @@ function RunTaskCbk(cliPath) {
     // Create Maven config file.
     let configPath = path.join(workDir, 'config');
     try {
-        createMavenConfigFile(configPath, cliPath, workDir, configPath);
+        createMavenConfigFile(configPath, cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         cleanup(cliPath, workDir);
@@ -38,7 +38,7 @@ function RunTaskCbk(cliPath) {
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
-    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions));
+    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
     try {
         utils.executeCliCommand(mavenCommand, workDir, null);
