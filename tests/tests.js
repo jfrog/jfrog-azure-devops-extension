@@ -324,9 +324,9 @@ describe('JFrog Artifactory Extension Tests', () => {
 
     describe('Npm Tests', () => {
         runTest(
-            'Npm install and publish',
+            'Npm install and publish Ver 1 ',
             () => {
-                let testDir = 'npm';
+                const testDir = 'npmVer1';
                 mockTask(testDir, path.join('install', 'npmInstall'));
                 mockTask(testDir, path.join('install', 'installNpmPublish'));
                 mockTask(testDir, path.join('install', 'installDownload'));
@@ -338,9 +338,37 @@ describe('JFrog Artifactory Extension Tests', () => {
             testUtils.isSkipTest('npm')
         );
         runTest(
-            'Npm ci and publish',
+            'Npm install and publish Ver 2',
             () => {
-                let testDir = 'npm';
+                const testDir = 'npmVer2';
+                mockTask(testDir, path.join('install', 'npmInstall'));
+                mockTask(testDir, path.join('install', 'installNpmPublish'));
+                mockTask(testDir, path.join('install', 'installDownload'));
+                mockTask(testDir, path.join('install', 'installPublish'));
+                assertFiles(path.join(testDir, 'files'), path.join(testDir, '1'));
+                getAndAssertBuild('npmTest', '1');
+                deleteBuild('npmTest');
+            },
+            testUtils.isSkipTest('npm')
+        );
+        runTest(
+            'Npm ci and publish Ver 1',
+            () => {
+                const testDir = 'npmVer1';
+                mockTask(testDir, path.join('ci', 'npmCi'));
+                mockTask(testDir, path.join('ci', 'ciNpmPublish'));
+                mockTask(testDir, path.join('ci', 'ciDownload'));
+                mockTask(testDir, path.join('ci', 'ciPublish'));
+                assertFiles(path.join(testDir, 'files'), path.join(testDir, '2'));
+                getAndAssertBuild('npmTest', '2');
+                deleteBuild('npmTest');
+            },
+            testUtils.isSkipTest('npm')
+        );
+        runTest(
+            'Npm ci and publish Ver 2',
+            () => {
+                const testDir = 'npmVer2';
                 mockTask(testDir, path.join('ci', 'npmCi'));
                 mockTask(testDir, path.join('ci', 'ciNpmPublish'));
                 mockTask(testDir, path.join('ci', 'ciDownload'));
@@ -355,15 +383,28 @@ describe('JFrog Artifactory Extension Tests', () => {
 
     describe('Maven Tests', () => {
         runTest(
-            'Maven',
+            'Maven Ver1',
             () => {
-                let testDir = 'maven';
+                let testDir = 'mavenVer1';
                 mockTask(testDir, 'build');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Maven build', '3');
-                deleteBuild('Maven build');
+                getAndAssertBuild('Mavenbuild', '3');
+                deleteBuild('Mavenbuild');
+            },
+            testUtils.isSkipTest('maven')
+        );
+        runTest(
+            'Maven Ver2',
+            () => {
+                let testDir = 'mavenVer2';
+                mockTask(testDir, 'build');
+                mockTask(testDir, 'publish');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                getAndAssertBuild('Mavenbuild', '3');
+                deleteBuild('Mavenbuild');
             },
             testUtils.isSkipTest('maven')
         );
@@ -379,8 +420,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'download');
                 mockTask(testDir, 'publishBuildInfo');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Go test', '3');
-                deleteBuild('Go build');
+                getAndAssertBuild('Gotest', '3');
+                deleteBuild('Gotest');
             },
             testUtils.isSkipTest('go')
         );
@@ -388,9 +429,9 @@ describe('JFrog Artifactory Extension Tests', () => {
 
     describe('NuGet Tests', () => {
         runTest(
-            'NuGet restore',
+            'NuGet restore Ver1',
             () => {
-                let testDir = 'nuget';
+                let testDir = 'nugetVer1';
                 // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
                 assert(
                     testUtils.isRepoExists(repoKeys.nugetRemoteRepo),
@@ -404,9 +445,43 @@ describe('JFrog Artifactory Extension Tests', () => {
             testUtils.isSkipTest('nuget')
         );
         runTest(
-            'NuGet push',
+            'NuGet restore Ver2',
             () => {
-                let testDir = 'nuget';
+                let testDir = 'nugetVer2';
+                // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
+                assert(
+                    testUtils.isRepoExists(repoKeys.nugetRemoteRepo),
+                    'Create nuget remote repository: ' + repoKeys.nugetRemoteRepo + ' manually in order to run nuget tests'
+                );
+                mockTask(testDir, 'restore');
+                mockTask(testDir, 'publish');
+                getAndAssertBuild('NuGet', '3');
+                deleteBuild('NuGet');
+            },
+            testUtils.isSkipTest('nuget')
+        );
+        runTest(
+            'NuGet push Ver1',
+            () => {
+                let testDir = 'nugetVer1';
+                // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
+                assert(
+                    testUtils.isRepoExists(repoKeys.nugetRemoteRepo),
+                    'Create nuget remote repository: ' + repoKeys.nugetRemoteRepo + ' manually in order to run nuget tests'
+                );
+                mockTask(testDir, 'push');
+                mockTask(testDir, 'publish');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                getAndAssertBuild('NuGet', '3');
+                deleteBuild('NuGet');
+            },
+            testUtils.isSkipTest('nuget')
+        );
+        runTest(
+            'NuGet push Ver2',
+            () => {
+                let testDir = 'nugetVer2';
                 // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
                 assert(
                     testUtils.isRepoExists(repoKeys.nugetRemoteRepo),
@@ -459,7 +534,7 @@ describe('JFrog Artifactory Extension Tests', () => {
             let testDir = 'collectIssues';
             mockTask(testDir, 'collect');
             mockTask(testDir, 'publish');
-            assertIssuesCollection("Collect issues", "3");
+            assertIssuesCollection('Collect issues', '3');
             deleteBuild('Collect issues');
         });
 
@@ -467,7 +542,7 @@ describe('JFrog Artifactory Extension Tests', () => {
             let testDir = 'collectIssues';
             mockTask(testDir, 'collectFromFile');
             mockTask(testDir, 'publish');
-            assertIssuesCollection("Collect issues from file", "4");
+            assertIssuesCollection('Collect issues from file', '4');
             deleteBuild('Collect issues from file');
         });
     });
