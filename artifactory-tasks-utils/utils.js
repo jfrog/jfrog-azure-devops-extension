@@ -3,7 +3,7 @@ const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
-const clientHandlers = require('typed-rest-client/Handlers');
+const credentialsHandler = require('./credentialsHandler');
 const localTools = require('./tools');
 const yaml = require('js-yaml');
 
@@ -112,7 +112,7 @@ function createAuthHandlers(artifactoryService) {
 
     // Check if Artifactory should be accessed using access-token.
     if (artifactoryAccessToken) {
-        return [new clientHandlers.BearerCredentialHandler(artifactoryAccessToken)];
+        return [credentialsHandler.accessTokenHandler(artifactoryAccessToken)];
     }
 
     // Check if Artifactory should be accessed anonymously.
@@ -121,7 +121,7 @@ function createAuthHandlers(artifactoryService) {
     }
 
     // Use basic authentication.
-    return [new clientHandlers.BasicCredentialHandler(artifactoryUser, artifactoryPassword)];
+    return [credentialsHandler.basicAuthHandler(artifactoryUser, artifactoryPassword)];
 }
 
 function generateDownloadCliErrorMessage(downloadUrl) {
