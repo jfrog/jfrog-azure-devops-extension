@@ -57,6 +57,7 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
 }
 
 function performGenericDownload(cliPath, workDir, artifactoryService, artifactoryUrl) {
+    utils.deprecatedTaskMessage('2', '3');
     let specPath = path.join(workDir, 'downloadSpec' + Date.now() + '.json');
 
     // Get input parameters.

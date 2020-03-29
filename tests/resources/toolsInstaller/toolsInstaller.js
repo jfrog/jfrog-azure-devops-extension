@@ -5,4 +5,4 @@ let inputs = {
     cliInstallationRepo: testUtils.getRepoKeys().cliRepo
 };
 
-testUtils.runTask(testUtils.toolsInstaller, variables, inputs);
+testUtils.runTask(testUtils.toolsInstaller, {}, inputs);

@@ -7,12 +7,12 @@ const configYaml = {
     version: 1,
     issues: {
         trackerName: 'JIRA',
-        regexp: '(.+-[0-9]+)\s-\s(.+)',
+        regexp: '(.+-[0-9]+)\\s-\\s(.+)',
         keyGroupIndex: '1',
         summaryGroupIndex: '2',
         trackerUrl: 'http://my-jira.com/issues',
         aggregate: 'true',
-        aggregationStatus: 'RELEASED',
+        aggregationStatus: 'RELEASED'
     }
 };
 const configString = yaml.safeDump(configYaml);
@@ -22,7 +22,7 @@ let inputs = {
     buildNumber: '3',
     artifactoryService: 'mock-service',
     configSource: 'taskConfiguration',
-    taskConfig: configString,
+    taskConfig: configString
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

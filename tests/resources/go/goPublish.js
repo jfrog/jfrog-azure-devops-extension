@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
-let BUILD_NAME = 'Go test';
+let BUILD_NAME = 'Gotest';
 let BUILD_NUMBER = '3';
 
 let variables = {

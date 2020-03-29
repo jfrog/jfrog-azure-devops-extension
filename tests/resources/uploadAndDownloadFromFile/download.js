@@ -23,7 +23,10 @@ fs.writeFileSync(
 let inputs = {
     specSource: 'file',
     file: specPath,
-    failNoOp: true
+    failNoOp: true,
+    dryRun: false,
+    insecureTls: false,
+    validateSymlinks: false
 };
 
 testUtils.runTask(testUtils.download, {}, inputs);

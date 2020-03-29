@@ -56,7 +56,7 @@ function RunTaskCbk(cliPath) {
     }
 
     try {
-        utils.executeCliCommand(cliCommand, defaultWorkDir);
+        utils.executeCliCommand(cliCommand, defaultWorkDir, null);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
