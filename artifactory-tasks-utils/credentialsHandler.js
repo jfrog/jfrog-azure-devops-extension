@@ -44,11 +44,11 @@ class CredentialHandler {
         // 1. First HTTP request - The first request is always to Artifactory
         // 2. Requests to Artifactory host as set in the first request of this handler
         if (!this.artifactoryHost || this.artifactoryHost === options.host) {
-            let accessToken = this.accessToken;
-            if (!accessToken) {
-                accessToken = new Buffer(this.username + ':' + this.password).toString('base64');
+            if (!this.accessToken) {
+                options.headers['Authorization'] = 'Basic ' + new Buffer(this.username + ':' + this.password).toString('base64');
+            } else {
+                options.headers['Authorization'] = 'Bearer ' + this.accessToken;
             }
-            options.headers['Authorization'] = 'Basic ' + accessToken;
             this.artifactoryHost = options.host;
         }
         // To be consisted with the BasicCredentialHandler: https://github.com/microsoft/typed-rest-client/blob/1.5.0/lib/handlers/basiccreds.ts#L19

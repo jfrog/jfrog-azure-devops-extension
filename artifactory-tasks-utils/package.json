@@ -9,7 +9,7 @@
         "azure-pipelines-task-lib": "^2.7.1",
         "azure-pipelines-tool-lib": "^0.11.0",
         "fs-extra": "^7.0.0",
-        "typed-rest-client": "1.0.9",
+        "typed-rest-client": "^1.7.2",
         "js-yaml": "^3.13.1"
     },
     "scripts": {
