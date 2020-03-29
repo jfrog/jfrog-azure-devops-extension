@@ -1,10 +1,10 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
-const path = require('path');
 
-const cliGoNativeCommand = 'rt go';
+const cliGoCommand = 'rt go';
 const cliGoPublishCommand = 'rt gp';
+const cliGoConfigCommand = 'rt go-config';
 let configuredServerId;
 
 function RunTaskCbk(cliPath) {
@@ -29,11 +29,11 @@ function RunTaskCbk(cliPath) {
         case 'build':
         case 'test':
         case 'get':
-            performGoNativeCommand(inputCommand, cliPath, requiredWorkDir);
+            performGoCommand(inputCommand, cliPath, requiredWorkDir);
             break;
         case 'custom':
             let customCommand = tl.getInput('customCommand', true);
-            performGoNativeCommand(customCommand, cliPath, requiredWorkDir);
+            performGoCommand(customCommand, cliPath, requiredWorkDir);
             break;
         case 'publish':
             performGoPublishCommand(cliPath, requiredWorkDir);
@@ -41,18 +41,17 @@ function RunTaskCbk(cliPath) {
     }
 }
 
-function performGoNativeCommand(goCommand, cliPath, requiredWorkDir) {
+function performGoCommand(goCommand, cliPath, requiredWorkDir) {
     // Create config file and configure cli server
-    let configPath = path.join(requiredWorkDir, '.jfrog', 'projects', 'go.yaml');
     try {
-        createGoConfigFile(configPath, cliPath, requiredWorkDir);
+        performGoConfig(cliPath, requiredWorkDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;
     }
 
     // Build go command with arguments and execute.
-    let cliCommand = utils.cliJoin(cliPath, cliGoNativeCommand, goCommand);
+    let cliCommand = utils.cliJoin(cliPath, cliGoCommand, goCommand);
     let goArguments = tl.getInput('goArguments', false);
     if (goArguments) {
         cliCommand = utils.cliJoin(cliCommand, goArguments);
@@ -60,11 +59,16 @@ function performGoNativeCommand(goCommand, cliPath, requiredWorkDir) {
     executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
 }
 
-function createGoConfigFile(configPath, cliPath, requiredWorkDir) {
-    configureGoCliServer(cliPath, requiredWorkDir, 'resolver');
-    let resolutionRepo = tl.getInput('resolutionRepo', true);
-    let resolverObj = { serverId: configuredServerId, repo: resolutionRepo };
-    utils.createBuildToolConfigFile(configPath, 'go', resolverObj, {});
+function performGoConfig(cliPath, requiredWorkDir) {
+    configuredServerId = utils.createBuildToolConfigFile(
+        cliPath,
+        'artifactoryService',
+        'go',
+        requiredWorkDir,
+        cliGoConfigCommand,
+        'resolutionRepo',
+        null
+    );
 }
 
 function performGoPublishCommand(cliPath, requiredWorkDir) {
@@ -92,25 +96,17 @@ function executeGoCliCommand(cliCommand, cliPath, requiredWorkDir) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        cleanup(cliPath, requiredWorkDir);
+        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerId);
     }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
 }
 
 function configureGoCliServer(cliPath, buildDir, serverType) {
-    configuredServerId = utils.assembleBuildToolServerId('go', serverType);
+    const serverId = utils.assembleBuildToolServerId('go', serverType);
     let artifactoryService = tl.getInput('artifactoryService', false);
-    utils.configureCliServer(artifactoryService, configuredServerId, cliPath, buildDir);
-}
-
-function cleanup(cliPath, workDir) {
-    // Delete servers.
-    try {
-        utils.deleteCliServers(cliPath, workDir, [configuredServerId]);
-    } catch (deleteServersException) {
-        tl.setResult(tl.TaskResult.Failed, deleteServersException);
-    }
+    utils.configureCliServer(artifactoryService, serverId, cliPath, buildDir);
+    configuredServerId = [serverId]
 }
 
 utils.executeCliTask(RunTaskCbk);

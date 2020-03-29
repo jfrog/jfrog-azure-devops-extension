@@ -5,7 +5,6 @@ const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const clientHandlers = require('typed-rest-client/Handlers');
 const localTools = require('./tools');
-const yaml = require('js-yaml');
 
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
@@ -20,7 +19,6 @@ const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Opti
 const customLegacyCliPath = encodePath(path.join(jfrogLegacyFolderPath, 'current', fileName));
 const jfrogCliBintrayDownloadUrl =
     'https://api.bintray.com/content/jfrog/jfrog-cli-go/' + jfrogCliVersion + '/' + btPackage + '/' + fileName + '?bt_package=' + btPackage;
-const buildToolsConfigVersion = 1;
 
 let cliConfigCommand = 'rt c';
 let runTaskCbk = null;
@@ -31,6 +29,7 @@ module.exports = {
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
+    isWindows: isWindows,
     addArtifactoryCredentials: addArtifactoryCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
@@ -47,14 +46,15 @@ module.exports = {
     determineCliWorkDir: determineCliWorkDir,
     createBuildToolConfigFile: createBuildToolConfigFile,
     assembleBuildToolServerId: assembleBuildToolServerId,
-    appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand
+    appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
+    deprecatedTaskMessage: deprecatedTaskMessage
 };
 
 // The cliDownloadUrl and cliAuthHandlers arguments are optional. They are provided to this function by the 'Artifactory Tools Installer' task.
 // jfrogCliBintrayDownloadUrl is used by default.
 function executeCliTask(runTaskFunc, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
-    process.env.JFROG_CLI_OFFER_CONFIG = false;
+    process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     // If unspecified, use the default cliDownloadUrl of Bintray.
     if (!cliDownloadUrl) {
@@ -193,7 +193,7 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
         // Add username and password.
         cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
     }
-    executeCliCommand(cliCommand, buildDir);
+    return executeCliCommand(cliCommand, buildDir, null);
 }
 
 /**
@@ -202,11 +202,16 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
  * @throws In CLI execution failure.
  */
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
-    let deleteServerIDCommand;
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
-        deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
-        // This operation throws an exception in case of failure.
-        executeCliCommand(deleteServerIDCommand, buildDir);
+        try {
+            if (serverIdArray[i]) {
+                let deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
+                // This operation throws an exception in case of failure.
+                executeCliCommand(deleteServerIDCommand, buildDir, null);
+            }
+        } catch (deleteServersException) {
+            tl.setResult(tl.TaskResult.Failed, `Could not delete server id ${serverIdArray[i]} error: ${deleteServersException}`);
+        }
     }
 }
 
@@ -236,10 +241,10 @@ function writeSpecContentToSpecPath(specSource, specPath) {
     tl.writeFile(specPath, fileSpec);
 }
 
-function cliJoin() {
+function cliJoin(...args) {
     let command = '';
-    for (let i = 0; i < arguments.length; ++i) {
-        let arg = arguments[i];
+    for (let i = 0; i < args.length; ++i) {
+        let arg = args[i];
         if (arg.length > 0) {
             command += command === '' ? arg : ' ' + arg;
         }
@@ -270,8 +275,8 @@ function addArtifactoryCredentials(cliCommand, artifactoryService) {
     return cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
 }
 
-function addStringParam(cliCommand, inputParam, cliParam) {
-    let val = tl.getInput(inputParam, false);
+function addStringParam(cliCommand, inputParam, cliParam, require) {
+    let val = tl.getInput(inputParam, require);
     if (val) {
         cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + quote(val));
     }
@@ -425,7 +430,7 @@ function collectEnvVars(cliPath) {
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, 'rt bce', quote(buildName), quote(buildNumber));
-    executeCliCommand(cliEnvVarsCommand, workDir);
+    executeCliCommand(cliEnvVarsCommand, workDir, null);
 }
 
 function isWindows() {
@@ -454,30 +459,40 @@ function determineCliWorkDir(defaultPath, providedPath) {
     return defaultPath;
 }
 
-/**
- * Creates a build tool config file at a desired absolute path.
- * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example, for maven:
- * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
- */
-function createBuildToolConfigFile(configPath, buildToolType, resolverObj, deployerObj) {
-    let yamlDocument = {};
-    yamlDocument.version = buildToolsConfigVersion;
-    yamlDocument.type = buildToolType;
-    if (resolverObj && Object.keys(resolverObj).length > 0) {
-        yamlDocument.resolver = resolverObj;
-    }
-    if (deployerObj && Object.keys(deployerObj).length > 0) {
-        yamlDocument.deployer = deployerObj;
-    }
-    let configInfo = yaml.safeDump(yamlDocument);
-    console.log(configInfo);
-    fs.outputFileSync(configPath, configInfo);
-}
-
-function assembleBuildToolServerId(buildToolType, serverType) {
+function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
-    return [buildName, buildNumber, buildToolType, serverType].join('-');
+    return [buildName, buildNumber, buildToolType, buildToolCmd].join('_');
+}
+
+function createBuildToolConfigFile(cliPath, artifactoryService, cmd, requiredWorkDir, ConfigCommand, repoResolver, repoDeploy) {
+    const artService = tl.getInput(artifactoryService);
+    let cliCommand = cliJoin(cliPath, ConfigCommand);
+    let serverIdResolve;
+    let serverIdDeploy;
+    if (repoResolver) {
+        // Create serverId
+        serverIdResolve = assembleBuildToolServerId(cmd, tl.getInput('command', true) + 'Resolve');
+        configureCliServer(artService, serverIdResolve, cliPath, requiredWorkDir);
+        // Add serverId and repo to config command
+        cliCommand = cliJoin(cliCommand, '--server-id-resolve=' + quote(serverIdResolve));
+        cliCommand = addStringParam(cliCommand, repoResolver, 'repo-resolve', true);
+    }
+    if (repoDeploy) {
+        // Create serverId
+        serverIdDeploy = assembleBuildToolServerId(cmd, tl.getInput('command', true) + 'Deploy');
+        configureCliServer(artService, serverIdDeploy, cliPath, requiredWorkDir);
+        // Add serverId and repo to config command
+        cliCommand = cliJoin(cliCommand, '--server-id-deploy=' + quote(serverIdDeploy));
+        cliCommand = addStringParam(cliCommand, repoDeploy, 'repo-deploy', true);
+    }
+    // Execute cli.
+    try {
+        executeCliCommand(cliCommand, requiredWorkDir, null);
+        return [serverIdResolve, serverIdDeploy];
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
 }
 
 /**
@@ -491,4 +506,13 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         return cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
     }
     return cliCommand;
+}
+
+function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
+    console.warn(`
+[Warn] You are using an old version of this task.
+       It is recommended to upgrade the task to its latest major version,
+       by replacing the task version in the azure-pipelines.yml file from ${oldTaskVersion} to ${newTaskVersion},
+       or changing the task version from the task UI.
+`);
 }

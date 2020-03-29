@@ -37,11 +37,8 @@ function RunTaskCbk(cliPath) {
         utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
-        try {
-            utils.deleteCliServers(cliPath, workDir, [serverId]);
-        } catch (deleteServersException) {
-            tl.setResult(tl.TaskResult.Failed, deleteServersException);
-        }
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
+
         return;
     }
 
