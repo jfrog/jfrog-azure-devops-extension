@@ -80,7 +80,7 @@ function exec(cliPath, nugetCommand) {
             }
             let nugetArguments = addNugetArgsToCommands();
             nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
-            performNugetConfig(cliPath, 'targetResolveRepo', solutionPath);
+            performNugetConfig(cliPath, solutionPath, 'targetResolveRepo', null);
             runNuGet(nugetCommandCli, solutionPath, cliPath);
         });
     } else {
@@ -107,7 +107,7 @@ function runNuGet(nugetCommandCli, buildDir, cliPath) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, buildDir, [configuredServerId]);
+        utils.deleteCliServers(cliPath, buildDir, configuredServerId);
     }
 }
 
@@ -122,8 +122,16 @@ function addArtifactoryServer(nugetCommandCli) {
 }
 
 // Create nuget config
-function performNugetConfig(cliPath, repo, requiredWorkDir) {
-    configuredServerId = utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'nuget', repo, requiredWorkDir, nugetConfigCommand);
+function performNugetConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
+    configuredServerId = utils.createBuildToolConfigFile(
+        cliPath,
+        'artifactoryService',
+        'nuget',
+        requiredWorkDir,
+        nugetConfigCommand,
+        repoResolve,
+        repoDeploy
+    );
 }
 
 // Creates the Nuget arguments

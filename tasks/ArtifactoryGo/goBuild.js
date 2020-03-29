@@ -60,7 +60,15 @@ function performGoCommand(goCommand, cliPath, requiredWorkDir) {
 }
 
 function performGoConfig(cliPath, requiredWorkDir) {
-    configuredServerId = utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'go', 'resolutionRepo', requiredWorkDir, cliGoConfigCommand);
+    configuredServerId = utils.createBuildToolConfigFile(
+        cliPath,
+        'artifactoryService',
+        'go',
+        requiredWorkDir,
+        cliGoConfigCommand,
+        'resolutionRepo',
+        null
+    );
 }
 
 function performGoPublishCommand(cliPath, requiredWorkDir) {
@@ -88,16 +96,17 @@ function executeGoCliCommand(cliCommand, cliPath, requiredWorkDir) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, requiredWorkDir, [configuredServerId]);
+        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerId);
     }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
 }
 
 function configureGoCliServer(cliPath, buildDir, serverType) {
-    configuredServerId = utils.assembleBuildToolServerId('go', serverType);
+    const serverId = utils.assembleBuildToolServerId('go', serverType);
     let artifactoryService = tl.getInput('artifactoryService', false);
-    utils.configureCliServer(artifactoryService, configuredServerId, cliPath, buildDir);
+    utils.configureCliServer(artifactoryService, serverId, cliPath, buildDir);
+    configuredServerId = [serverId]
 }
 
 utils.executeCliTask(RunTaskCbk);

@@ -465,19 +465,31 @@ function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     return [buildName, buildNumber, buildToolType, buildToolCmd].join('_');
 }
 
-function createBuildToolConfigFile(cliPath, artifactoryService, cmd, repo, requiredWorkDir, ConfigCommand) {
+function createBuildToolConfigFile(cliPath, artifactoryService, cmd, requiredWorkDir, ConfigCommand, repoResolver, repoDeploy) {
     const artService = tl.getInput(artifactoryService);
-    const serverId = assembleBuildToolServerId(cmd, tl.getInput('command', true));
-
-    configureCliServer(artService, serverId, cliPath, requiredWorkDir);
-    // Build the cli config command.
-    let cliCommand = cliJoin(cliPath, ConfigCommand, '--server-id-resolve=' + quote(serverId), '--server-id-deploy=' + quote(serverId));
-    cliCommand = addStringParam(cliCommand, repo, 'repo-resolve', true);
-    cliCommand = addStringParam(cliCommand, repo, 'repo-deploy', true);
+    let cliCommand = cliJoin(cliPath, ConfigCommand);
+    let serverIdResolve;
+    let serverIdDeploy;
+    if (repoResolver) {
+        // Create serverId
+        serverIdResolve = assembleBuildToolServerId(cmd, tl.getInput('command', true) + 'Resolve');
+        configureCliServer(artService, serverIdResolve, cliPath, requiredWorkDir);
+        // Add serverId and repo to config command
+        cliCommand = cliJoin(cliCommand, '--server-id-resolve=' + quote(serverIdResolve));
+        cliCommand = addStringParam(cliCommand, repoResolver, 'repo-resolve', true);
+    }
+    if (repoDeploy) {
+        // Create serverId
+        serverIdDeploy = assembleBuildToolServerId(cmd, tl.getInput('command', true) + 'Deploy');
+        configureCliServer(artService, serverIdDeploy, cliPath, requiredWorkDir);
+        // Add serverId and repo to config command
+        cliCommand = cliJoin(cliCommand, '--server-id-deploy=' + quote(serverIdDeploy));
+        cliCommand = addStringParam(cliCommand, repoDeploy, 'repo-deploy', true);
+    }
     // Execute cli.
     try {
         executeCliCommand(cliCommand, requiredWorkDir, null);
-        return serverId;
+        return [serverIdResolve, serverIdDeploy];
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }
