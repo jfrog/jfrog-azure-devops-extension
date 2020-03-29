@@ -430,7 +430,7 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Maven test', '3');
+                getAndAssertBuild('Maven Test', '3');
                 deleteBuild('Maven Test');
             },
             testUtils.isSkipTest('maven')
