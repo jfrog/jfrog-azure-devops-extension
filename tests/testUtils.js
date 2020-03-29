@@ -57,6 +57,7 @@ module.exports = {
     discard: path.join(__dirname, '..', 'tasks', 'ArtifactoryDiscardBuilds', 'discardBuilds.js'),
     properties: path.join(__dirname, '..', 'tasks', 'ArtifactoryProperties', 'properties.js'),
     go: path.join(__dirname, '..', 'tasks', 'ArtifactoryGo', 'goBuild.js'),
+    collectIssues: path.join(__dirname, '..', 'tasks', 'ArtifactoryCollectIssues', 'collectIssues.js'),
 
     initTests: initTests,
     runTask: runTask,
@@ -318,28 +319,19 @@ function setArtifactoryCredentials() {
 }
 
 /**
- * Returns an array of files contained in folderToCopy
- */
-function getResourcesFiles(folderToCopy) {
-    let dir = path.join(__dirname, 'resources', folderToCopy);
-    let files = fs.readdirSync(dir);
-    let fullFilesPath = [];
-    for (let i = 0; i < files.length; i++) {
-        fullFilesPath.push(path.join(dir, files[i]));
-    }
-    return fullFilesPath;
-}
-
-/**
- * Copies all files exists in "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>"
+ * Copies "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>".
+ * If newTargetDir is provided, the folder will be renamed to its value.
  * @param testDirName - test directory
- * @param folderToCopy - the folder to copy from the test
+ * @param dirToCopy - the folder to copy, located inside the test resources directory
+ * @param newTargetDir - optional new name for the copied directory.
  */
-function copyTestFilesToTestWorkDir(testDirName, folderToCopy) {
-    if (!fs.existsSync(path.join(testDataDir, testDirName))) {
-        fs.mkdirSync(path.join(testDataDir, testDirName));
+function copyTestFilesToTestWorkDir(testDirName, dirToCopy, newTargetDir) {
+    let sourceDir = path.join(__dirname, 'resources', testDirName, dirToCopy);
+    let targetDir = path.join(testDataDir, testDirName);
+    if (newTargetDir) {
+        targetDir = path.join(testDataDir, newTargetDir);
     }
-    let err = fs.copySync(path.join(__dirname, 'resources', testDirName, folderToCopy), path.join(getLocalTestDir(testDirName)), { recursive: true });
+    let err = fs.copySync(sourceDir, targetDir);
     assert(!err, err);
 }
 

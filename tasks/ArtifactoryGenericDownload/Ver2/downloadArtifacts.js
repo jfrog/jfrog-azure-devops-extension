@@ -43,7 +43,8 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
         utils.quote(downloadPath),
         '--build=' + utils.quote(buildName + '/' + buildNumber),
         '--url=' + utils.quote(artifactoryUrl),
-        '--flat=true'
+        '--flat',
+        '--fail-no-op'
     );
     cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
 

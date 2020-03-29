@@ -1,0 +1,84 @@
+{
+    "id": "07a15c20-6352-1d11-abde-ab31c4c12f1d",
+    "name": "ArtifactoryCollectIssues",
+    "friendlyName": "Artifactory Collect Build Issues",
+    "description": "Collect build issues from the git commit messages of the project and add them to the build-info.",
+    "author": "JFrog",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "8",
+        "Patch": "3"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "Artifactory Collect Build Issues",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used for fetching information collected in previous builds."
+        },
+        {
+            "name": "configSource",
+            "type": "radio",
+            "label": "Config source",
+            "required": true,
+            "defaultValue": "taskConfiguration",
+            "helpMarkDown": "To collect build issues, you need to provide a config file. \nTo read more about the issues-collection yaml schema click <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension\" target=\"_blank\">here</a>.",
+            "options": {
+                "taskConfiguration": "Task Configuration",
+                "file": "File"
+            }
+        },
+        {
+            "name": "taskConfig",
+            "type": "multiLine",
+            "label": "Issues collection configuration",
+            "visibleRule": "configSource=taskConfiguration",
+            "defaultValue": "",
+            "properties": {
+                "resizable": "true",
+                "rows": "10",
+                "maxLength": "10000"
+            },
+            "helpMarkDown": "To specify the details required for the build issues collection, please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension\" target=\"_blank\">here."
+        },
+        {
+            "name": "file",
+            "type": "filePath",
+            "label": "File path",
+            "visibleRule": "configSource=file",
+            "helpMarkDown": "Path to a file, with the details required for the build issues collection. Please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension\" target=\"_blank\">here."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "collectIssues.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}
