@@ -3,7 +3,7 @@ const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    buildName: 'NuGet Test',
+    buildName: 'NuGet Restore Ver2 Test',
     buildNumber: '3',
     command: 'restore',
     solutionPath: path.join(testUtils.getLocalTestDir(TEST_NAME), '**', '*.sln'),

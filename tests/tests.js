@@ -508,8 +508,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 );
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
+                getAndAssertBuild('NuGet Restore Ver2 Test', '3');
+                deleteBuild('NuGet Restore Ver2 Test');
             },
             testUtils.isSkipTest('nuget')
         );
@@ -542,8 +542,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
+                getAndAssertBuild('NuGet Restore Ver2 Test', '3');
+                deleteBuild('NuGet Restore Ver2 Test');
             },
             testUtils.isSkipTest('nuget')
         );
