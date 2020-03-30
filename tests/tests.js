@@ -372,8 +372,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, path.join('install', 'installDownload'));
                 mockTask(testDir, path.join('install', 'installPublish'));
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, '1'));
-                getAndAssertBuild('npmTest', '1');
-                deleteBuild('npmTest');
+                getAndAssertBuild('npm Test', '1');
+                deleteBuild('npm Test');
             },
             testUtils.isSkipTest('npm')
         );
@@ -386,8 +386,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, path.join('install', 'installDownload'));
                 mockTask(testDir, path.join('install', 'installPublish'));
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, '1'));
-                getAndAssertBuild('npmTest', '1');
-                deleteBuild('npmTest');
+                getAndAssertBuild('npm Test', '1');
+                deleteBuild('npm Test');
             },
             testUtils.isSkipTest('npm')
         );
@@ -400,8 +400,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, path.join('ci', 'ciDownload'));
                 mockTask(testDir, path.join('ci', 'ciPublish'));
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, '2'));
-                getAndAssertBuild('npmTest', '2');
-                deleteBuild('npmTest');
+                getAndAssertBuild('npm Test', '2');
+                deleteBuild('npm Test');
             },
             testUtils.isSkipTest('npm')
         );
@@ -414,8 +414,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, path.join('ci', 'ciDownload'));
                 mockTask(testDir, path.join('ci', 'ciPublish'));
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, '2'));
-                getAndAssertBuild('npmTest', '2');
-                deleteBuild('npmTest');
+                getAndAssertBuild('npm Test', '2');
+                deleteBuild('npm Test');
             },
             testUtils.isSkipTest('npm')
         );
@@ -430,8 +430,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Mavenbuild', '3');
-                deleteBuild('Mavenbuild');
+                getAndAssertBuild('Maven Test', '3');
+                deleteBuild('Maven Test');
             },
             testUtils.isSkipTest('maven')
         );
@@ -443,8 +443,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Mavenbuild', '3');
-                deleteBuild('Mavenbuild');
+                getAndAssertBuild('Maven Test', '3');
+                deleteBuild('Maven Test');
             },
             testUtils.isSkipTest('maven')
         );
@@ -459,8 +459,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, path.join('gradle-example', 'publish'));
                 mockTask(testDir, path.join('gradle-example', 'download'));
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files', 'gradle-example'));
-                getAndAssertBuild('GradleTest', '3');
-                deleteBuild('GradleTest');
+                getAndAssertBuild('Gradle Test', '3');
+                deleteBuild('Gradle Test');
             },
             testUtils.isSkipTest('gradle')
         );
@@ -472,8 +472,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, path.join('gradle-example-ci', 'publish'));
                 mockTask(testDir, path.join('gradle-example-ci', 'download'));
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files', 'gradle-example-ci'));
-                getAndAssertBuild('GradleCITest', '3');
-                deleteBuild('GradleCITest');
+                getAndAssertBuild('Gradle CI Test', '3');
+                deleteBuild('Gradle CI Test');
             },
             testUtils.isSkipTest('gradle')
         );
@@ -489,8 +489,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'download');
                 mockTask(testDir, 'publishBuildInfo');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Gotest', '3');
-                deleteBuild('Gotest');
+                getAndAssertBuild('Go Test', '3');
+                deleteBuild('Go Test');
             },
             testUtils.isSkipTest('go')
         );
@@ -508,8 +508,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 );
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
-                getAndAssertBuild('NuGet', '3');
-                deleteBuild('NuGet');
+                getAndAssertBuild('NuGet Test', '3');
+                deleteBuild('NuGet Test');
             },
             testUtils.isSkipTest('nuget')
         );
@@ -524,8 +524,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 );
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
-                getAndAssertBuild('NuGet', '3');
-                deleteBuild('NuGet');
+                getAndAssertBuild('NuGet Test', '3');
+                deleteBuild('NuGet Test');
             },
             testUtils.isSkipTest('nuget')
         );
@@ -542,8 +542,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('NuGet', '3');
-                deleteBuild('NuGet');
+                getAndAssertBuild('NuGet Test', '3');
+                deleteBuild('NuGet Test');
             },
             testUtils.isSkipTest('nuget')
         );
@@ -560,8 +560,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('NuGet', '3');
-                deleteBuild('NuGet');
+                getAndAssertBuild('NuGet Test', '3');
+                deleteBuild('NuGet Test');
             },
             testUtils.isSkipTest('nuget')
         );

@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
 
 let inputs = {
-    buildName: 'Mavenbuild',
+    buildName: 'Maven Test',
     buildNumber: '3'
 };
 

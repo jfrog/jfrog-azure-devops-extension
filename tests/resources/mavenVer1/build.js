@@ -3,7 +3,7 @@ const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 let repoKeys = testUtils.getRepoKeys();
 
-let BUILD_NAME = 'Mavenbuild';
+let BUILD_NAME = 'Maven Test';
 let BUILD_NUMBER = '3';
 
 let variables = {

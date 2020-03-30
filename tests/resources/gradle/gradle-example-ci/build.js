@@ -3,7 +3,7 @@ const path = require('path');
 const TEST_NAME = 'gradle';
 let repoKeys = testUtils.getRepoKeys();
 
-let BUILD_NAME = 'GradleCITest';
+let BUILD_NAME = 'Gradle CI Test';
 let BUILD_NUMBER = '3';
 
 let variables = {

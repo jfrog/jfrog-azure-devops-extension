@@ -8,7 +8,7 @@ let inputs = {
             {
                 pattern: testUtils.getRepoKeys().mavenLocalRepo,
                 target: path.join(TEST_NAME, 'files', 'gradle-example-ci', '/'),
-                build: 'GradleCITest/3',
+                build: 'Gradle CI Test/3',
                 flat: 'true'
             }
         ]

@@ -1,7 +1,7 @@
 const testUtils = require('../../../testUtils');
 
 let inputs = {
-    buildName: 'GradleTest',
+    buildName: 'Gradle Test',
     buildNumber: '3'
 };
 
