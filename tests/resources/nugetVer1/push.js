@@ -3,7 +3,7 @@ const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    buildName: 'NuGet Test',
+    buildName: 'NuGet Test Ver1',
     buildNumber: '3',
     command: 'push',
     targetDeployRepo: testUtils.getRepoKeys().nugetLocalRepo,

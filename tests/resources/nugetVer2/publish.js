@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
 
 let inputs = {
-    buildName: 'NuGet Restore Ver2 Test',
+    buildName: 'NuGet Test Ver2',
     buildNumber: '3'
 };
 

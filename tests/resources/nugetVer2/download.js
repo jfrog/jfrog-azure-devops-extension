@@ -9,7 +9,7 @@ let inputs = {
             {
                 pattern: testUtils.getRepoKeys().nugetLocalRepo,
                 target: path.join(testUtils.getLocalTestDir(TEST_NAME), 'files', '/'),
-                build: 'NuGet Restore Ver2 Test/3',
+                build: 'NuGet Test Ver2/3',
                 flat: 'true'
             }
         ]

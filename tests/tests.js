@@ -508,8 +508,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 );
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
-                getAndAssertBuild('NuGet Restore Ver2 Test', '3');
-                deleteBuild('NuGet Restore Ver2 Test');
+                getAndAssertBuild('NuGet Test Ver1', '3');
+                deleteBuild('NuGet Test Ver1');
             },
             testUtils.isSkipTest('nuget')
         );
@@ -524,8 +524,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 );
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
+                getAndAssertBuild('NuGet Test Ver2', '3');
+                deleteBuild('NuGet Test Ver2');
             },
             testUtils.isSkipTest('nuget')
         );
@@ -542,8 +542,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('NuGet Restore Ver2 Test', '3');
-                deleteBuild('NuGet Restore Ver2 Test');
+                getAndAssertBuild('NuGet Test Ver1', '3');
+                deleteBuild('NuGet Test Ver1');
             },
             testUtils.isSkipTest('nuget')
         );
@@ -560,8 +560,8 @@ describe('JFrog Artifactory Extension Tests', () => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
+                getAndAssertBuild('NuGet Test Ver2', '3');
+                deleteBuild('NuGet Test Ver2');
             },
             testUtils.isSkipTest('nuget')
         );
