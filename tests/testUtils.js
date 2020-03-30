@@ -22,6 +22,7 @@ let repoKeys = {
     repo0: 'repo0',
     repo1: 'repo1',
     repo2: 'repo2',
+    cliRepo: 'jfrog-cli',
     mavenLocalRepo: 'maven-local',
     mavenRemoteRepo: 'maven-remote',
     nugetLocalRepo: 'nuget-local',
@@ -61,6 +62,7 @@ module.exports = {
     properties: path.join(__dirname, '..', 'tasks', 'ArtifactoryProperties', 'properties.js'),
     go: path.join(__dirname, '..', 'tasks', 'ArtifactoryGo', 'goBuild.js'),
     collectIssues: path.join(__dirname, '..', 'tasks', 'ArtifactoryCollectIssues', 'collectIssues.js'),
+    toolsInstaller: path.join(__dirname, '..', 'tasks', 'ArtifactoryToolsInstaller', 'toolsInstaller.js'),
 
     initTests: initTests,
     runTask: runTask,
@@ -73,6 +75,7 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
+    cleanToolCache: cleanToolCache,
     cleanUpAllTests: cleanUpAllTests,
     isSkipTest: isSkipTest,
     getRepoKeys: getRepoKeys
@@ -132,6 +135,13 @@ function deleteBuild(buildName) {
     });
 }
 
+function cleanToolCache() {
+    let jfrogToolDirectory = path.join(testDataDir, 'jfrog');
+    if (fs.pathExistsSync(jfrogToolDirectory)) {
+        fs.removeSync(jfrogToolDirectory);
+    }
+}
+
 function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
         rimraf(testDataDir, err => {
@@ -147,6 +157,7 @@ function createTestRepositories() {
     createUniqueReposKeys();
     createRepo(repoKeys.repo1, JSON.stringify({ rclass: 'local', packageType: 'generic' }));
     createRepo(repoKeys.repo2, JSON.stringify({ rclass: 'local', packageType: 'generic' }));
+    createRepo(repoKeys.cliRepo, JSON.stringify({ rclass: 'remote', packageType: 'generic', url: 'https://jfrog.bintray.com/jfrog-cli-go/' }));
     createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
     createRepo(repoKeys.mavenRemoteRepo, JSON.stringify({ rclass: 'remote', packageType: 'maven', url: 'https://jcenter.bintray.com' }));
     createRepo(repoKeys.nugetLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'nuget', repoLayoutRef: 'nuget-default' }));

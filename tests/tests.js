@@ -10,6 +10,7 @@ const execSync = require('child_process').execSync;
 const createProxyServer = require('http-tunneling-proxy');
 let tasksOutput;
 const conanutils = require('../tasks/ArtifactoryConan/conanUtils');
+const toolLib = require('azure-pipelines-tool-lib/tool');
 
 describe('JFrog Artifactory Extension Tests', () => {
     let jfrogUtils;
@@ -153,6 +154,21 @@ describe('JFrog Artifactory Extension Tests', () => {
                     '/Users/myUser/myAgent/_work/1/myFolder/123'
                 );
             }
+        });
+    });
+
+    describe('Tools Installer Tests', () => {
+        runTest('Download CLI', () => {
+            let testDir = 'toolsInstaller';
+            // Clean tool cache
+            testUtils.cleanToolCache();
+            assert(toolLib.findLocalToolVersions('jfrog').length === 0);
+            // Run tools installer to download CLI from a fresh repository
+            mockTask(testDir, 'toolsInstaller');
+            assert(toolLib.findLocalToolVersions('jfrog').length === 1);
+            // Run tools installer again to make sure the JFrog CLI downloaded from Artifactory remote cache
+            mockTask(testDir, 'toolsInstaller');
+            assert(toolLib.findLocalToolVersions('jfrog').length === 1);
         });
     });
 
@@ -836,12 +852,12 @@ function assertBuildModule(build, moduleID) {
     let modules = body['buildInfo']['modules'];
     let found = false;
     for (let i = 0; i < modules.length; i++) {
-        if (modules[i]['id'] == moduleID) {
+        if (modules[i]['id'] === moduleID) {
             found = true;
             break;
         }
     }
-    assert.strictEqual(found, true, 'Module \"' + moduleID + '\" should be exist in buildInfo, but it does not');
+    assert.strictEqual(found, true, 'Module "' + moduleID + '" should be exist in buildInfo, but it does not');
 }
 
 function assertBuildUrl(build, url) {
