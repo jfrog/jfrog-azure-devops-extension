@@ -1,7 +1,7 @@
 const testUtils = require('../../../testUtils');
 
 let inputs = {
-    buildName: 'GradleCITest',
+    buildName: 'Gradle CI Test',
     buildNumber: '3'
 };
 
