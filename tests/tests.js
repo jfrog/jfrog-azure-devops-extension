@@ -159,8 +159,14 @@ describe('JFrog Artifactory Extension Tests', () => {
 
     describe('Tools Installer Tests', () => {
         runTest('Download CLI', () => {
-            assert(toolLib.findLocalToolVersions('jfrog').length === 0);
             let testDir = 'toolsInstaller';
+            // Clean tool cache
+            testUtils.cleanToolCache();
+            assert(toolLib.findLocalToolVersions('jfrog').length === 0);
+            // Run tools installer to download CLI from a fresh repository
+            mockTask(testDir, 'toolsInstaller');
+            assert(toolLib.findLocalToolVersions('jfrog').length === 1);
+            // Run tools installer again to make sure the JFrog CLI downloaded from Artifactory remote cache
             mockTask(testDir, 'toolsInstaller');
             assert(toolLib.findLocalToolVersions('jfrog').length === 1);
         });

@@ -75,6 +75,7 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
+    cleanToolCache: cleanToolCache,
     cleanUpAllTests: cleanUpAllTests,
     isSkipTest: isSkipTest,
     getRepoKeys: getRepoKeys
@@ -132,6 +133,13 @@ function deleteBuild(buildName) {
             Authorization: getAuthorizationHeaderValue()
         }
     });
+}
+
+function cleanToolCache() {
+    let jfrogToolDirectory = path.join(testDataDir, 'jfrog');
+    if (fs.pathExistsSync(jfrogToolDirectory)) {
+        fs.removeSync(jfrogToolDirectory);
+    }
 }
 
 function cleanUpAllTests() {
