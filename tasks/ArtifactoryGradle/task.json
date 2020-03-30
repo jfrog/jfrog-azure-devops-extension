@@ -1,25 +1,20 @@
 {
-    "id": "07fc5c20-6772-11e5-abde-6901d3d00476",
-    "name": "ArtifactoryMaven",
-    "friendlyName": "Artifactory Maven",
-    "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory and while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "id": "4fe54fab-ecf8-441e-989e-5d9cbd861743",
+    "name": "ArtifactoryGradle",
+    "friendlyName": "Artifactory Gradle",
+    "description": "Build with Gradle, while resolving dependencies and deploying artifacts from and to Artifactory and while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Maven+Repository)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Working+with+Gradle)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "8",
-        "Patch": "3"
+        "Patch": "1"
     },
-    "demands": [
-        "maven"
-    ],
+    "demands": ["gradle"],
     "minimumAgentVersion": "1.89.0",
-    "instanceNameFormat": "Artifactory Maven",
+    "instanceNameFormat": "Artifactory Gradle",
     "groups": [
         {
             "name": "resolve",
@@ -34,99 +29,124 @@
     ],
     "inputs": [
         {
-            "name": "mavenPOMFile",
-            "aliases": [
-                "mavenPomFile"
-            ],
+            "name": "gradleBuildFile",
             "type": "filePath",
-            "label": "Maven POM file",
-            "defaultValue": "pom.xml",
+            "label": "Gradle build file",
+            "defaultValue": "build.gradle",
             "required": true,
-            "helpMarkDown": "Path to the Maven POM file."
+            "helpMarkDown": "Relative path to build.gradle file."
         },
         {
-            "name": "goals",
-            "type": "string",
-            "label": "Goal(s)",
-            "defaultValue": "install",
-            "required": true
+            "name": "workDir",
+            "type": "filePath",
+            "label": "Working directory",
+            "required": false,
+            "helpMarkDown": "Path to directory of the Gradle project. If not specified, the repository root directory is used. "
         },
         {
             "name": "options",
             "type": "string",
             "label": "Options",
-            "defaultValue": "",
             "required": false
+        },
+        {
+            "name": "tasks",
+            "type": "string",
+            "label": "Task(s)",
+            "defaultValue": "artifactoryPublish",
+            "required": true
         },
         {
             "name": "artifactoryResolverService",
             "type": "connectedService:artifactoryService",
             "label": "Artifactory service",
-            "defaultValue": "",
             "groupName": "resolve",
             "required": false,
             "helpMarkDown": "Artifactory service for dependencies resolution."
         },
         {
-            "name": "targetResolveReleaseRepo",
+            "name": "sourceRepo",
             "type": "pickList",
-            "label": "Resolution repository for releases",
+            "label": "Resolution repository",
             "groupName": "resolve",
-            "defaultValue": "",
-            "required": "true",
-            "helpMarkDown": "Sets the target release repository for resolution.",
+            "required": true,
+            "helpMarkDown": "Sets the repository for resolution.",
             "visibleRule": "artifactoryResolverService != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }
         },
         {
-            "name": "targetResolveSnapshotRepo",
-            "type": "pickList",
-            "label": "Resolution repository for snapshots",
-            "groupName": "resolve",
-            "defaultValue": "",
-            "required": "true",
-            "helpMarkDown": "Sets the target snapshot repository for resolution.",
-            "visibleRule": "artifactoryResolverService != \"\"",
-            "properties": {
-                "EditableOptions": "True"
-            }
-        },
-        {
-            "name": "artifactoryDeployService",
+            "name": "artifactoryDeployerService",
             "type": "connectedService:artifactoryService",
             "label": "Artifactory service",
             "defaultValue": "",
             "groupName": "deployer",
-            "required": true,
+            "required": false,
             "helpMarkDown": "Artifactory service for artifacts deployment."
         },
         {
-            "name": "targetDeployReleaseRepo",
+            "name": "targetRepo",
             "type": "pickList",
-            "label": "Deployment repository for releases",
+            "label": "Deployment repository",
             "groupName": "deployer",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Sets the target release repository for deploying release artifacts.",
-            "visibleRule": "artifactoryDeployService != \"\"",
+            "helpMarkDown": "Sets the repository for deploying artifacts.",
+            "visibleRule": "artifactoryDeployerService != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }
         },
         {
-            "name": "targetDeploySnapshotRepo",
-            "type": "pickList",
-            "label": "Deployment repository for snapshots",
-            "groupName": "deployer",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "Sets the target snapshot repository for deploying snapshot artifacts.",
-            "visibleRule": "artifactoryDeployService != \"\"",
-            "properties": {
-                "EditableOptions": "True"
-            }
+            "name": "usesPlugin",
+            "type": "boolean",
+            "label": "Use Artifactory plugin",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select if the Gradle Artifactory Plugin is already applied in the build script."
+        },
+        {
+            "name": "useWrapper",
+            "type": "boolean",
+            "label": "Use Gradle wrapper",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select if you'd like to use the Gradle wrapper."
+        },
+        {
+            "name": "deployMavenDesc",
+            "type": "boolean",
+            "label": "Deploy Maven descriptors",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "When selected, Maven descriptors will be deployed."
+        },
+        {
+            "name": "deployIvyDesc",
+            "type": "boolean",
+            "label": "Deploy Ivy descriptors",
+            "defaultValue": "true",
+            "required": false,
+            "helpMarkDown": "When selected, Ivy descriptors will be deployed."
+        },
+        {
+            "name": "ivyDescPattern",
+            "type": "string",
+            "label": "Ivy descriptors pattern",
+            "defaultValue": "[organization]/[module]/ivy-[revision].xml",
+            "required": false,
+            "visibleRule": "deployIvyDesc=true",
+            "helpMarkDown": "Set the deployed Ivy descriptor pattern."
+        },
+        {
+            "name": "ivyArtifactsPattern",
+            "type": "string",
+            "label": "Ivy artifacts pattern",
+            "defaultValue": "[organization]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]",
+            "required": false,
+            "visibleRule": "deployIvyDesc=true",
+            "helpMarkDown": "Set the deployed Ivy artifacts pattern."
         },
         {
             "name": "collectBuildInfo",
@@ -168,35 +188,21 @@
         {
             "endpointId": "$(artifactoryResolverService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
-            "target": "targetResolveReleaseRepo",
+            "target": "sourceRepo",
             "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         },
         {
             "endpointId": "$(artifactoryDeployService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
-            "target": "targetDeployReleaseRepo",
-            "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
-            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-        },
-        {
-            "endpointId": "$(artifactoryResolverService)",
-            "endpointURL": "{{endpoint.url}}/api/repositories",
-            "target": "targetResolveSnapshotRepo",
-            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
-            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
-        },
-        {
-            "endpointId": "$(artifactoryDeployService)",
-            "endpointURL": "{{endpoint.url}}/api/repositories",
-            "target": "targetDeploySnapshotRepo",
+            "target": "targetRepo",
             "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         }
     ],
     "execution": {
         "Node": {
-            "target": "mavenBuild.js",
+            "target": "gradleBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }
     }

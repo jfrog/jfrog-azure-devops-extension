@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+allprojects {
+    group = 'org.jfrog.test.gradle.publish'
+    version = '1.0'
+    status = 'Integration'
+}
+
+configure(['shared']) {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+
+    dependencies {
+        testImplementation 'junit:junit:4.7'
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+}
+
+artifactoryPublish.skip = true

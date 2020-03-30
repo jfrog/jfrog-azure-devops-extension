@@ -14,12 +14,12 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
 }
 
 function RunTaskCbk(cliPath) {
-    let installMavenExtractor = tl.getBoolInput('installMavenExtractor');
-    if (!installMavenExtractor) {
+    let installExtractors = tl.getBoolInput('installExtractors');
+    if (!installExtractors) {
         tl.setResult(tl.TaskResult.Succeeded, 'Tools installed successfully.');
         return;
     }
-    console.log('Installing Maven Extractor...');
+    console.log('Installing Maven and Gradle Extractors...');
 
     // Get inputs and variables
     let artifactoryService = tl.getInput('artifactoryService');
@@ -31,8 +31,8 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    // Config a temporary serverId for maven extractor download:
-    let serverId = buildName + '-' + buildNumber + '-forextractordownload';
+    // Config a temporary serverId for maven and Gradle extractors download:
+    let serverId = buildName + '-' + buildNumber + '-forextractorsdownload';
     try {
         utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
     } catch (ex) {
@@ -43,8 +43,8 @@ function RunTaskCbk(cliPath) {
     }
 
     // Set the environment variables needed for the cli to download the extractor from artifactory
-    // The extractor download will occur during the execution of the Artifactory Maven task, then the config and environment variables will be removed
+    // The extractor download will occur during the execution of the Artifactory Maven and Gradle tasks, then the config and environment variables will be removed
     tl.setVariable('JFROG_CLI_JCENTER_REMOTE_SERVER', serverId);
-    tl.setVariable('JFROG_CLI_JCENTER_REMOTE_REPO', tl.getInput('mavenInstallationRepo'));
+    tl.setVariable('JFROG_CLI_JCENTER_REMOTE_REPO', tl.getInput('extractorsInstallationRepo'));
     tl.setResult(tl.TaskResult.Succeeded, 'Tools installed successfully.');
 }

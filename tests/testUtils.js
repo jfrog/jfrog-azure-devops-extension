@@ -2,7 +2,6 @@ const tmrm = require('azure-pipelines-task-lib/mock-run');
 const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const fs = require('fs-extra');
-const copyDir = require('copy-dir');
 const rimraf = require('rimraf');
 const syncRequest = require('sync-request');
 const testDataDir = path.join(__dirname, 'testData');
@@ -57,6 +56,7 @@ module.exports = {
     npmVer2: path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'Ver2', 'npmBuild.js'),
     nugetVer1: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'Ver1', 'nugetBuild.js'),
     nugetVer2: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'Ver2', 'nugetBuild.js'),
+    gradle: path.join(__dirname, '..', 'tasks', 'ArtifactoryGradle', 'gradleBuild.js'),
     publish: path.join(__dirname, '..', 'tasks', 'ArtifactoryPublishBuildInfo', 'publishBuildInfo.js'),
     discard: path.join(__dirname, '..', 'tasks', 'ArtifactoryDiscardBuilds', 'discardBuilds.js'),
     properties: path.join(__dirname, '..', 'tasks', 'ArtifactoryProperties', 'properties.js'),
@@ -345,7 +345,8 @@ function copyTestFilesToTestWorkDir(testDirName, dirToCopy, newTargetDir) {
     if (newTargetDir) {
         targetDir = path.join(testDataDir, newTargetDir);
     }
-    copyDir.sync(sourceDir, targetDir);
+    let err = fs.copySync(sourceDir, targetDir);
+    assert(!err, err);
 }
 
 function setVariables(variables) {
