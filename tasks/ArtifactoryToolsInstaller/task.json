@@ -5,11 +5,14 @@
     "description": "Installs tools necessary for all Artifactory integration tasks.",
     "author": "JFrog",
     "category": "Tool",
-    "visibility": ["Build", "Release"],
+    "visibility": [
+        "Build",
+        "Release"
+    ],
     "version": {
         "Major": "1",
-        "Minor": "8",
-        "Patch": "3"
+        "Minor": "9",
+        "Patch": "0"
     },
     "demands": [],
     "minimumAgentVersion": "1.89.0",
@@ -37,7 +40,10 @@
         },
         {
             "name": "installExtractors",
-            "aliases": ["installExtractors", "installMavenExtractor"],
+            "aliases": [
+                "installExtractors",
+                "installMavenExtractor"
+            ],
             "type": "boolean",
             "label": "Install Maven and Gradle Extractors",
             "defaultValue": "false",
@@ -46,7 +52,10 @@
         },
         {
             "name": "extractorsInstallationRepo",
-            "aliases": ["extractorsInstallationRepo", "mavenInstallationRepo"],
+            "aliases": [
+                "extractorsInstallationRepo",
+                "mavenInstallationRepo"
+            ],
             "type": "pickList",
             "label": "From:",
             "defaultValue": "",

@@ -6,13 +6,18 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Working+with+Gradle)",
     "category": "Utility",
-    "visibility": ["Build", "Release"],
+    "visibility": [
+        "Build",
+        "Release"
+    ],
     "version": {
         "Major": "1",
-        "Minor": "8",
-        "Patch": "1"
+        "Minor": "9",
+        "Patch": "0"
     },
-    "demands": ["gradle"],
+    "demands": [
+        "gradle"
+    ],
     "minimumAgentVersion": "1.89.0",
     "instanceNameFormat": "Artifactory Gradle",
     "groups": [
