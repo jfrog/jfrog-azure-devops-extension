@@ -14,7 +14,7 @@ Maven, npm, NuGet, Docker, Go and Conan. It also allows downloading and uploadin
 ## Documentation and Source Code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension).
 <br>
-See the source code is on [GitHub](https://github.com/jfrog/artifactory-vsts-extension).
+See the source code is on [GitHub](https://github.com/jfrog/artifactory-azure-devops-extension).
 
 ## Download generic build dependencies from Artifactory
 The **Artifactory Generic Download** task supports downloading your build dependencies from Artifactory to the build agent. 

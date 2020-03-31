@@ -48,7 +48,7 @@
             "uri": "https://www.jfrog.com/support"
         },
         "repository": {
-            "uri": "https://github.com/jfrog/artifactory-vsts-extension"
+            "uri": "https://github.com/jfrog/artifactory-azure-devops-extension"
         }
     },
     "branding": {
