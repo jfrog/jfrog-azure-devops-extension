@@ -14,8 +14,8 @@
         "rmdir-recursive": "^0.0.1",
         "sync-request": "^6.0.0",
         "azure-pipelines-task-lib": "2.8.0",
-        "fs-extra": "^7.0.0",
-        "dev-null": "^0.1.1"
+        "dev-null": "^0.1.1",
+        "js-yaml": "^3.13.1"
     },
     "scripts": {
         "test": "npm i && mocha tests.js -t 600000"

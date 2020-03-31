@@ -5,6 +5,7 @@ const TEST_NAME = testUtils.getTestName(__dirname);
 let inputs = {
     buildName: 'buildPublish',
     buildNumber: '3',
+    module: 'myUploadModule',
     fileSpec: JSON.stringify({
         files: [
             {
@@ -15,6 +16,9 @@ let inputs = {
     }),
     collectBuildInfo: true,
     failNoOp: true,
+    dryRun: false,
+    insecureTls: false,
+    symlinks: false,
     specSource: 'taskConfiguration'
 };
 

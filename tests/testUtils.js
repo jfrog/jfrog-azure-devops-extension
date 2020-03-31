@@ -21,6 +21,7 @@ let repoKeys = {
     repo0: 'repo0',
     repo1: 'repo1',
     repo2: 'repo2',
+    cliRepo: 'jfrog-cli',
     mavenLocalRepo: 'maven-local',
     mavenRemoteRepo: 'maven-remote',
     nugetLocalRepo: 'nuget-local',
@@ -47,15 +48,21 @@ module.exports = {
     promote: path.join(__dirname, '..', 'tasks', 'ArtifactoryBuildPromotion', 'buildPromotion.js'),
     conan: path.join(__dirname, '..', 'tasks', 'ArtifactoryConan', 'conanBuild.js'),
     docker: path.join(__dirname, '..', 'tasks', 'ArtifactoryDocker', 'dockerBuild.js'),
-    download: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericDownload', 'Ver2', 'downloadArtifacts.js'),
-    upload: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericUpload', 'uploadArtifacts.js'),
-    maven: path.join(__dirname, '..', 'tasks', 'ArtifactoryMaven', 'mavenBuild.js'),
-    npm: path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'npmBuild.js'),
-    nuget: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'nugetBuild.js'),
+    download: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericDownload', 'Ver3', 'downloadArtifacts.js'),
+    upload: path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericUpload', 'Ver2', 'uploadArtifacts.js'),
+    mavenVer1: path.join(__dirname, '..', 'tasks', 'ArtifactoryMaven', 'Ver1', 'mavenBuild.js'),
+    mavenVer2: path.join(__dirname, '..', 'tasks', 'ArtifactoryMaven', 'Ver2', 'mavenBuild.js'),
+    npmVer1: path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'Ver1', 'npmBuild.js'),
+    npmVer2: path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'Ver2', 'npmBuild.js'),
+    nugetVer1: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'Ver1', 'nugetBuild.js'),
+    nugetVer2: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'Ver2', 'nugetBuild.js'),
+    gradle: path.join(__dirname, '..', 'tasks', 'ArtifactoryGradle', 'gradleBuild.js'),
     publish: path.join(__dirname, '..', 'tasks', 'ArtifactoryPublishBuildInfo', 'publishBuildInfo.js'),
     discard: path.join(__dirname, '..', 'tasks', 'ArtifactoryDiscardBuilds', 'discardBuilds.js'),
     properties: path.join(__dirname, '..', 'tasks', 'ArtifactoryProperties', 'properties.js'),
     go: path.join(__dirname, '..', 'tasks', 'ArtifactoryGo', 'goBuild.js'),
+    collectIssues: path.join(__dirname, '..', 'tasks', 'ArtifactoryCollectIssues', 'collectIssues.js'),
+    toolsInstaller: path.join(__dirname, '..', 'tasks', 'ArtifactoryToolsInstaller', 'toolsInstaller.js'),
 
     initTests: initTests,
     runTask: runTask,
@@ -68,6 +75,7 @@ module.exports = {
     deleteBuild: deleteBuild,
     copyTestFilesToTestWorkDir: copyTestFilesToTestWorkDir,
     isWindows: isWindows,
+    cleanToolCache: cleanToolCache,
     cleanUpAllTests: cleanUpAllTests,
     isSkipTest: isSkipTest,
     getRepoKeys: getRepoKeys
@@ -77,6 +85,7 @@ function initTests() {
     process.env.JFROG_CLI_REPORT_USAGE = false;
     process.env.JFROG_CLI_OFFER_CONFIG = false;
     process.env.JFROG_CLI_LOG_LEVEL = 'ERROR';
+    process.env.USE_UNSUPPORTED_CONAN_WITH_PYTHON_2 = true;
     tl.setStdStream(devnull());
     tl.setVariable('Agent.WorkFolder', testDataDir);
     tl.setVariable('Agent.TempDirectory', testDataDir);
@@ -126,6 +135,13 @@ function deleteBuild(buildName) {
     });
 }
 
+function cleanToolCache() {
+    let jfrogToolDirectory = path.join(testDataDir, 'jfrog');
+    if (fs.pathExistsSync(jfrogToolDirectory)) {
+        fs.removeSync(jfrogToolDirectory);
+    }
+}
+
 function cleanUpAllTests() {
     if (fs.existsSync(testDataDir)) {
         rimraf(testDataDir, err => {
@@ -141,6 +157,7 @@ function createTestRepositories() {
     createUniqueReposKeys();
     createRepo(repoKeys.repo1, JSON.stringify({ rclass: 'local', packageType: 'generic' }));
     createRepo(repoKeys.repo2, JSON.stringify({ rclass: 'local', packageType: 'generic' }));
+    createRepo(repoKeys.cliRepo, JSON.stringify({ rclass: 'remote', packageType: 'generic', url: 'https://jfrog.bintray.com/jfrog-cli-go/' }));
     createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
     createRepo(repoKeys.mavenRemoteRepo, JSON.stringify({ rclass: 'remote', packageType: 'maven', url: 'https://jcenter.bintray.com' }));
     createRepo(repoKeys.nugetLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'nuget', repoLayoutRef: 'nuget-default' }));
@@ -316,33 +333,20 @@ function setArtifactoryCredentials() {
 }
 
 /**
- * Returns an array of files contained in folderToCopy
- */
-function getResourcesFiles(folderToCopy) {
-    let dir = path.join(__dirname, 'resources', folderToCopy);
-    let files = fs.readdirSync(dir);
-    let fullFilesPath = [];
-    for (let i = 0; i < files.length; i++) {
-        fullFilesPath.push(path.join(dir, files[i]));
-    }
-    return fullFilesPath;
-}
-
-/**
- * Copies all files exists in "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>"
+ * Copies "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>".
+ * If newTargetDir is provided, the folder will be renamed to its value.
  * @param testDirName - test directory
- * @param folderToCopy - the folder to copy from the test
+ * @param dirToCopy - the folder to copy, located inside the test resources directory
+ * @param newTargetDir - optional new name for the copied directory.
  */
-function copyTestFilesToTestWorkDir(testDirName, folderToCopy) {
-    let files = getResourcesFiles(path.join(testDirName, folderToCopy));
-
-    if (!fs.existsSync(path.join(testDataDir, testDirName))) {
-        fs.mkdirSync(path.join(testDataDir, testDirName));
+function copyTestFilesToTestWorkDir(testDirName, dirToCopy, newTargetDir) {
+    let sourceDir = path.join(__dirname, 'resources', testDirName, dirToCopy);
+    let targetDir = path.join(testDataDir, testDirName);
+    if (newTargetDir) {
+        targetDir = path.join(testDataDir, newTargetDir);
     }
-
-    for (let i = 0; i < files.length; i++) {
-        fs.copyFileSync(files[i], path.join(getLocalTestDir(testDirName), path.basename(files[i])));
-    }
+    let err = fs.copySync(sourceDir, targetDir);
+    assert(!err, err);
 }
 
 function setVariables(variables) {

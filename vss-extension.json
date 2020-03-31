@@ -310,6 +310,16 @@
             }
         },
         {
+            "id": "artifactory-gradle",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryGradle"
+            }
+        },
+        {
             "id": "artifactory-npm",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -408,6 +418,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryGo"
             }
+        },
+        {
+            "id": "artifactory-collect-issues",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryCollectIssues"
+            }
         }
     ],
     "files": [
@@ -440,6 +460,9 @@
             "path": "tasks/ArtifactoryMaven"
         },
         {
+            "path": "tasks/ArtifactoryGradle"
+        },
+        {
             "path": "tasks/ArtifactoryNpm"
         },
         {
@@ -468,6 +491,9 @@
         },
         {
             "path": "tasks/ArtifactoryGo"
+        },
+        {
+            "path": "tasks/ArtifactoryCollectIssues"
         }
     ]
 }

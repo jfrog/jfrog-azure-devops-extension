@@ -11,8 +11,6 @@
     "dependencies": {
         "asyncawait": "^1.0.7",
         "uuid": "^3.3.2",
-        "fs-extra": "^7.0.0",
-        "azure-pipelines-task-lib": "^2.7.1",
         "request-promise-lite": "^0.13.1",
         "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
     }

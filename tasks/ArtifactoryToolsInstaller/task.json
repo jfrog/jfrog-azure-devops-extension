@@ -5,10 +5,7 @@
     "description": "Installs tools necessary for all Artifactory integration tasks.",
     "author": "JFrog",
     "category": "Tool",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "8",
@@ -39,21 +36,23 @@
             }
         },
         {
-            "name": "installMavenExtractor",
+            "name": "installExtractors",
+            "aliases": ["installExtractors", "installMavenExtractor"],
             "type": "boolean",
-            "label": "Install Maven Extractor",
+            "label": "Install Maven and Gradle Extractors",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Select to make the JFrog Cli install the Maven Extractor from Artifactory.\nThe Maven Extractor is used by the 'Artifactory Maven' task."
+            "helpMarkDown": "Select to make the JFrog Cli install the Maven and Gradle Extractors from Artifactory.\nThe Maven and Gradle Extractors are used by the 'Artifactory Maven' and 'Artifactory Gradle' tasks."
         },
         {
-            "name": "mavenInstallationRepo",
+            "name": "extractorsInstallationRepo",
+            "aliases": ["extractorsInstallationRepo", "mavenInstallationRepo"],
             "type": "pickList",
             "label": "From:",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Sets the repository from which the Maven Extractor should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jcenter.bintray.com\".",
-            "visibleRule": "installMavenExtractor == true && artifactoryService != \"\"",
+            "helpMarkDown": "Sets the repository from which the Maven and Gradle Extractors should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jcenter.bintray.com\".",
+            "visibleRule": "installExtractors == true && artifactoryService != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }
@@ -70,7 +69,7 @@
         {
             "endpointId": "$(artifactoryService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
-            "target": "mavenInstallationRepo",
+            "target": "extractorsInstallationRepo",
             "resultSelector": "jsonpath:$[?(@.type=='REMOTE' || @.type=='VIRTUAL')]",
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         }
