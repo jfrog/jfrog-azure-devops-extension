@@ -54,6 +54,9 @@ If issues or vulnerabilities are found, you may choose to fail a build.
 
 ![Xray](images/marketplace/xray.png)
 
+## Recording tracked issues
+Being able to look at the build which was published to Artifactory, and see all the tracked issues (from JIRA for example) associated with it, is one of the most powerful capabilities of Artifactory when it comes to managing metadata about builds. The **Artifactory Collect Issues** tasks can automatically identify the issues handled in the current build, and record them as part of the build-info. Read more about this unique capability [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-CollectingBuildIssues).
+
 ## Publishing build-info
 Build-info captured in preceding tasks can be published to Artifactory using the **Artifactory Publish Build-Info** task.
 The configured build name & number should match the ones specified when the build-info was captured.
