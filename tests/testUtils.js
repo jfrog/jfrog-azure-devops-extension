@@ -251,10 +251,10 @@ function cleanUpOldRepositories() {
             return;
         }
         let repoTimestamp = parseInt(regexGroups.pop(), 10);
-        // Convert unix timestamp to time
-        let timeDifference = new Date(Math.floor(getCurrentTimestamp() - repoTimestamp) * 1000);
+        // Subtract and convert seconds to hours
+        let timeDifference = (getCurrentTimestamp() - repoTimestamp) / 3600;
         // If more than 24 hours have passed, delete the repository.
-        if (timeDifference.getHours() > 24) {
+        if (timeDifference > 24) {
             deleteRepo(repoKey);
         }
     });
