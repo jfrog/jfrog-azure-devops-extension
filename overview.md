@@ -35,7 +35,7 @@ The task can be also configured to capture build-info and stores the uploaded fi
 ## Triggering nuget, maven, gradle, npm, go and conan builds
 The extension adds the the following tasks: **Artifactory Nuget**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
-![Maven](images/marketplace/package-managers.png)
+![PackageManagers](images/marketplace/package-managers.png)
 
 ## Pushing and pulling docker images
 The **Artifactory Docker** task allows pushing and pulling docker images to and from Artifactory.
