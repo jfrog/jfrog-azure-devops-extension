@@ -35,21 +35,31 @@
     "content": {
         "details": {
             "path": "overview.md"
+        },
+        "license": {
+            "path": "LICENSE.md"
         }
     },
     "links": {
         "getstarted": {
-            "uri": "https://www.jfrog.com"
+            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Artifactory"
         },
         "learn": {
-            "uri": "https://www.jfrog.com/confluence/display/RTF/Welcome+to+Artifactory"
+            "uri": "https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension"
         },
         "support": {
             "uri": "https://www.jfrog.com/support"
         },
         "repository": {
             "uri": "https://github.com/jfrog/artifactory-azure-devops-extension"
+        },
+        "privacypolicy": {
+            "uri": "https://jfrog.com/privacy-policy"
         }
+    },
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/jfrog/artifactory-azure-devops-extension"
     },
     "branding": {
         "color": "ffffff",
