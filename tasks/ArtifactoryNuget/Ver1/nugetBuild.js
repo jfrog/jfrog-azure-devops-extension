@@ -5,8 +5,6 @@ const utils = require('artifactory-tasks-utils');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
-const async = require('asyncawait/async');
-const await = require('asyncawait/await');
 const NUGET_VERSION = '4.7.1';
 const path = require('path');
 const cliNuGetCommand = 'rt nuget';
@@ -26,18 +24,19 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
 /**
  * Download NuGet version, adds to the path and executes.
  */
-let downloadAndRunNuget = async(function(cliPath, nugetCommand) {
+function downloadAndRunNuget(cliPath, nugetCommand) {
     console.log('NuGet not found in Path. Downloading...');
-    let downloadPath = await(toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe'));
-    toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
-    addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
-});
+    toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe').then(downloadPath => {
+        toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
+        addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
+    });
+}
 
 // This triggered after downloading the CLI.
 // First we will check for NuGet in the Env Path. If exists, this one will be used.
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
-let RunTaskCbk = async(function(cliPath) {
+function RunTaskCbk(cliPath) {
     if (!utils.isWindows()) {
         tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
         return;
@@ -47,7 +46,7 @@ let RunTaskCbk = async(function(cliPath) {
     if (!nugetExec && nugetCommand.localeCompare('restore') === 0) {
         let localVersions = toolLib.findLocalToolVersions(NUGET_TOOL_NAME);
         if (localVersions === undefined || localVersions.length === 0) {
-            await(downloadAndRunNuget(cliPath, nugetCommand));
+            downloadAndRunNuget(cliPath, nugetCommand);
         } else {
             console.log('The following version/s ' + localVersions + ' were found on the build agent');
             addToPathAndExec(cliPath, nugetCommand, localVersions[localVersions.length - 1]);
@@ -55,7 +54,7 @@ let RunTaskCbk = async(function(cliPath) {
     } else {
         exec(cliPath, nugetCommand);
     }
-});
+}
 
 utils.executeCliTask(RunTaskCbk);
 
