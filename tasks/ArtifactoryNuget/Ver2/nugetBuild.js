@@ -105,7 +105,7 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerId) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        if (!!configuredServerId) {
+        if (configuredServerId) {
             utils.deleteCliServers(cliPath, buildDir, configuredServerId);
         }
     }
