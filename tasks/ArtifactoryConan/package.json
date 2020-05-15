@@ -11,7 +11,6 @@
     "dependencies": {
         "asyncawait": "^1.0.7",
         "uuid": "^3.3.2",
-        "request-promise-lite": "^0.13.1",
         "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
     }
 }
