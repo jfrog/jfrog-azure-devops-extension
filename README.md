@@ -19,6 +19,7 @@ To build and run the extension sources, please follow these steps:
 1. Clone the code from git.
 2. To Build and create the JFrog Artifactory extension vsix file, run the following command.
     ```
+    npm i
     npm run create
     ```
 After the build process is completed, you'll find the vsix file in the project directory.

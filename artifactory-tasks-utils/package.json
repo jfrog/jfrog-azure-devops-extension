@@ -2,6 +2,7 @@
     "name": "artifactory-tasks-utils",
     "version": "1.0.0",
     "author": "JFrog",
+    "private": true,
     "license": "Apache-2.0",
     "description": "Utilities for the JFrog Artifactory extension",
     "main": "utils.js",
