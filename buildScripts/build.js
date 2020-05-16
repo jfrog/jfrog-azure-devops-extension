@@ -29,10 +29,12 @@ function installTasks() {
             let taskDir = path.join(TASKS_DIR, taskName);
             // If a package.json is missing, npm will exec the install command on the parent folder. This will cause an endless install loop.
             if (fs.existsSync(path.join(taskDir, 'package.json'))) {
+                // tasks/<task-name>/package.json
                 clean(taskDir);
                 copyTaskUtilsModules(taskDir);
                 execNpm('i', taskDir);
             } else {
+                // tasks/<task-name>/<task-version>/package.json
                 fs.readdir(taskDir, (err, taskVersionDirs) => {
                     taskVersionDirs.forEach(versToBuild => {
                         let taskVersionDir = path.join(taskDir, versToBuild);
