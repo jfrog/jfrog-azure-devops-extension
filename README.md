@@ -64,4 +64,4 @@ We welcome pull requests from the community!
 * Please run `npm run format` for formatting the code before submitting the pull request.
 
 # Release Notes
-See the release notes [here](https://www.jfrog.com/confluence/display/RTF/Azure+DevOps+and+TFS+Artifactory+Extension#AzureDevOpsandTFSArtifactoryExtension-ReleaseNotes).
+See the release notes [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ReleaseNotes).
