@@ -12,10 +12,10 @@
     },
     "scripts": {
         "format": "prettier --write \"**/{*.js,package.json}\"",
-        "preinstall": "cd buildScripts && npm i",
+        "preinstall": "cd buildScripts && npm i --no-fund",
         "install": "node buildScripts/build.js",
-        "create": "npm i && tfx extension create",
-        "test": "npm i && npm t --prefix=tests",
-        "publish-private": "npm i && bash buildScripts/publish-private.sh"
+        "create": "tfx extension create",
+        "test": "npm i --no-fund && npm t --prefix=tests",
+        "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh"
     }
 }

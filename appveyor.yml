@@ -23,7 +23,6 @@ environment:
 
 install:
 - npm i -gq jfrog-cli-go
-- npm i -gq tfx-cli
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
@@ -34,5 +33,5 @@ services:
 test_script:
 - node --version
 - npm --version
-- npm run create # Make sure that that the extension can be created
 - npm t
+- npm run create # Make sure that that the extension can be created
