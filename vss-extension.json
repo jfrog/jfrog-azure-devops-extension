@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "public": true,
     "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.9.2",
+    "version": "1.9.3",
     "name": "JFrog Artifactory",
     "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
     "publisher": "JFrog",
