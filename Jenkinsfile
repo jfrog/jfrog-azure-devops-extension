@@ -32,10 +32,8 @@ node {
             stage('Create extension') {
                 sh '''#!/bin/bash
                     set -euxo pipefail
-                    npm i --prefix=buildScripts
-                    node buildScripts/build.js
-                    npm install -g tfx-cli@0.6.4
-                    tfx extension create
+                    npm i
+                    npm run create
                 '''
             }
 
