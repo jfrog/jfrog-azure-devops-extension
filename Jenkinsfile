@@ -65,7 +65,7 @@ node {
                 wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: '$ADO_PUBLISHER_API_KEY', var: 'SECRET']]]) {
                     sh '''#!/bin/bash
                         set -euxo pipefail
-                        tfx extension publish -t ${ADO_PUBLISHER_API_KEY}
+                        ./node_modules/tfx-cli/_build/tfx-cli.js extension publish -t ${ADO_PUBLISHER_API_KEY}
                     '''
                 }
             }
