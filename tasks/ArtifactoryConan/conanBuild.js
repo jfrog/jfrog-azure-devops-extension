@@ -1,7 +1,5 @@
 const conanutils = require('./conanUtils');
 const tl = require('azure-pipelines-task-lib/task');
-const async = require('asyncawait/async');
-const await = require('asyncawait/await');
 const utils = require('artifactory-tasks-utils');
 
 function run() {
@@ -35,7 +33,7 @@ function run() {
 /**
  * Handle Conan Config Install Command
  */
-let handleConfigInstallCommand = async(function() {
+function handleConfigInstallCommand() {
     let configSourceType = tl.getInput('configSourceType', true);
     let extraArguments = tl.getInput('extraArguments', false);
 
@@ -52,19 +50,21 @@ let handleConfigInstallCommand = async(function() {
         conanArguments.push(configInstallGit);
     }
 
-    try {
-        await(conanutils.executeConanTask(conanArguments));
-        setTaskResult(true);
-    } catch (err) {
-        console.error('Failed to execute Conan Task: ' + err.message);
-        setTaskResult(false);
-    }
-});
+    conanutils
+        .executeConanTask(conanArguments)
+        .then(() => {
+            setTaskResult(true);
+        })
+        .catch(err => {
+            console.error('Failed to execute Conan Task: ' + err.message);
+            setTaskResult(false);
+        });
+}
 
 /**
  * Handle Conan Add Remote Command
  */
-let handleAddRemoteCommand = async(function() {
+function handleAddRemoteCommand() {
     let remoteName = tl.getInput('remoteName', true);
     let artifactoryService = tl.getInput('artifactoryService', true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
@@ -89,7 +89,7 @@ let handleAddRemoteCommand = async(function() {
     // Purge existing
     if (purgeExistingRemotes) {
         try {
-            await(conanutils.purgeConanRemotes());
+            conanutils.purgeConanRemotes();
         } catch (err) {
             console.error('Failed to purge Conan Remotes: ' + err.message);
             setTaskResult(false);
@@ -98,30 +98,25 @@ let handleAddRemoteCommand = async(function() {
     }
 
     // Add remote repo configuration
-    try {
-        await(conanutils.executeConanTask(conanArguments));
-    } catch (err) {
-        console.error('Failed to execute Conan Task: ' + err.message);
-        setTaskResult(false);
-        return;
-    }
-
-    // Add user credentials
-    conanArguments = ['user', artifactoryUser, '-r', remoteName, '-p', artifactoryPassword];
-
-    try {
-        await(conanutils.executeConanTask(conanArguments));
-        setTaskResult(true);
-    } catch (err) {
-        console.error('Failed to execute Conan Task: ' + err.message);
-        setTaskResult(false);
-    }
-});
+    conanutils
+        .executeConanTask(conanArguments)
+        .then(() => {
+            // Add user credentials
+            conanArguments = ['user', artifactoryUser, '-r', remoteName, '-p', artifactoryPassword];
+            conanutils.executeConanTask(conanArguments).then(() => {
+                setTaskResult(true);
+            });
+        })
+        .catch(err => {
+            console.error('Failed to execute Conan Task: ' + err.message);
+            setTaskResult(false);
+        });
+}
 
 /**
  * Handle Conan Create Command
  */
-let handleCreateCommand = async(function() {
+function handleCreateCommand() {
     let createPath = tl.getPathInput('createPath', true, true);
     let createReference = tl.getInput('createReference', true);
     let extraArguments = tl.getInput('extraArguments', false);
@@ -131,19 +126,21 @@ let handleCreateCommand = async(function() {
     conanArguments.push(createPath);
     conanArguments.push(createReference);
 
-    try {
-        await(conanutils.executeConanTask(conanArguments));
-        setTaskResult(true);
-    } catch (err) {
-        console.error('Failed to execute Conan Task: ' + err.message);
-        setTaskResult(false);
-    }
-});
+    conanutils
+        .executeConanTask(conanArguments)
+        .then(() => {
+            setTaskResult(true);
+        })
+        .catch(err => {
+            console.error('Failed to execute Conan Task: ' + err.message);
+            setTaskResult(false);
+        });
+}
 
 /**
  * Handle Conan Install Command
  */
-let handleInstallCommand = async(function() {
+function handleInstallCommand() {
     let pathOrReference = tl.getInput('pathOrReference', true);
     let extraArguments = tl.getInput('extraArguments', false);
 
@@ -151,19 +148,21 @@ let handleInstallCommand = async(function() {
     conanArguments = addExtraArguments(conanArguments, extraArguments);
     conanArguments.push(pathOrReference);
 
-    try {
-        await(conanutils.executeConanTask(conanArguments));
-        setTaskResult(true);
-    } catch (err) {
-        console.error('Failed to execute Conan Task: ' + err.message);
-        setTaskResult(false);
-    }
-});
+    conanutils
+        .executeConanTask(conanArguments)
+        .then(() => {
+            setTaskResult(true);
+        })
+        .catch(err => {
+            console.error('Failed to execute Conan Task: ' + err.message);
+            setTaskResult(false);
+        });
+}
 
 /**
  * Handle Conan Upload Command
  */
-let handleUploadCommand = async(function() {
+function handleUploadCommand() {
     let patternOrReference = tl.getInput('patternOrReference', true);
     let extraArguments = tl.getInput('extraArguments', false);
 
@@ -173,30 +172,34 @@ let handleUploadCommand = async(function() {
     enforceArgumentOrOption(conanArguments, '-c', '--confirm');
     conanArguments.push(patternOrReference);
 
-    try {
-        await(conanutils.executeConanTask(conanArguments));
-        setTaskResult(true);
-    } catch (err) {
-        console.error('Failed to execute Conan Task: ' + err.message);
-        setTaskResult(false);
-    }
-});
+    conanutils
+        .executeConanTask(conanArguments)
+        .then(() => {
+            setTaskResult(true);
+        })
+        .catch(err => {
+            console.error('Failed to execute Conan Task: ' + err.message);
+            setTaskResult(false);
+        });
+}
 
 /**
  * Handle Conan Custom Command
  */
-let handleCustomCommand = async(function() {
+function handleCustomCommand() {
     let customArguments = tl.getInput('customArguments', true);
     let conanArguments = customArguments.split(' ');
 
-    try {
-        await(conanutils.executeConanTask(conanArguments));
-        setTaskResult(true);
-    } catch (err) {
-        console.error('Failed to execute Conan Task: ' + err.message);
-        setTaskResult(false);
-    }
-});
+    conanutils
+        .executeConanTask(conanArguments)
+        .then(() => {
+            setTaskResult(true);
+        })
+        .catch(err => {
+            console.error('Failed to execute Conan Task: ' + err.message);
+            setTaskResult(false);
+        });
+}
 
 /**
  * Add extra arguments to list of options and arguments
