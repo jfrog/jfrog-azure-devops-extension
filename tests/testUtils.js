@@ -56,6 +56,7 @@ module.exports = {
     npmVer2: path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'Ver2', 'npmBuild.js'),
     nugetVer1: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'Ver1', 'nugetBuild.js'),
     nugetVer2: path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'Ver2', 'nugetBuild.js'),
+    dotnet: path.join(__dirname, '..', 'tasks', 'ArtifactoryDotnet', 'dotnetBuild.js'),
     gradle: path.join(__dirname, '..', 'tasks', 'ArtifactoryGradle', 'gradleBuild.js'),
     publish: path.join(__dirname, '..', 'tasks', 'ArtifactoryPublishBuildInfo', 'publishBuildInfo.js'),
     discard: path.join(__dirname, '..', 'tasks', 'ArtifactoryDiscardBuilds', 'discardBuilds.js'),
