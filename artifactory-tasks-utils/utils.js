@@ -50,7 +50,8 @@ module.exports = {
     createBuildToolConfigFile: createBuildToolConfigFile,
     assembleBuildToolServerId: assembleBuildToolServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
-    deprecatedTaskMessage: deprecatedTaskMessage
+    deprecatedTaskMessage: deprecatedTaskMessage,
+    jfrogCliVersion: jfrogCliVersion
 };
 
 // The cliDownloadUrl and cliAuthHandlers arguments are optional. They are provided to this function by the 'Artifactory Tools Installer' task.
@@ -102,11 +103,11 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers) {
     });
 }
 
-function buildCliArtifactoryDownloadUrl(rtUrl, repoName) {
+function buildCliArtifactoryDownloadUrl(rtUrl, repoName, version = jfrogCliVersion) {
     if (rtUrl.slice(-1) !== '/') {
         rtUrl += '/';
     }
-    return rtUrl + repoName + '/' + jfrogCliVersion + '/' + btPackage + '/' + fileName;
+    return rtUrl + repoName + '/' + version + '/' + btPackage + '/' + fileName;
 }
 
 function createAuthHandlers(artifactoryService) {
