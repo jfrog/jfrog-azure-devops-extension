@@ -53,7 +53,7 @@
             "defaultValue": "$(jfrogCliVersion)",
             "required": true,
             "visibleRule": "useCustomVersion = true",
-            "helpMarkDown": "Specify the version of JFrog CLI to download, in form of X.Y.Z"
+            "helpMarkDown": "Specify the version of JFrog CLI to download, in form of X.Y.Z\nYou can set the $(jfrogCliVersion) environment variable to use a specific version along the pipeline for different tasks."
         },
         {
             "name": "installExtractors",
