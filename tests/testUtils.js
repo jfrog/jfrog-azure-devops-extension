@@ -63,6 +63,7 @@ module.exports = {
     go: path.join(__dirname, '..', 'tasks', 'ArtifactoryGo', 'goBuild.js'),
     collectIssues: path.join(__dirname, '..', 'tasks', 'ArtifactoryCollectIssues', 'collectIssues.js'),
     toolsInstaller: path.join(__dirname, '..', 'tasks', 'ArtifactoryToolsInstaller', 'toolsInstaller.js'),
+    genericCli: path.join(__dirname, '..', 'tasks', 'JfrogCliGeneric', 'jfrogCliGeneric.js'),
 
     initTests: initTests,
     runTask: runTask,

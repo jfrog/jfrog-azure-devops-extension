@@ -157,6 +157,21 @@ describe('JFrog Artifactory Extension Tests', () => {
         });
     });
 
+    describe('CLI Generic Tests', () => {
+        runTest('CLI Generic Test', () => {
+            let testDir = 'genericCliTask';
+            // Upload a.in. b.in and c.in
+            mockTask(testDir, 'upload');
+            // Delete a.in
+            mockTask(testDir, 'delete');
+            // Rename b.in to d.in
+            mockTask(testDir, 'move');
+            // Download all files
+            mockTask(testDir, 'download');
+            assertFiles(path.join(testDir, 'expectedFiles'), testDir);
+        });
+    });
+
     describe('Tools Installer Tests', () => {
         runTest('Download CLI', () => {
             let testDir = 'toolsInstaller';
@@ -168,6 +183,16 @@ describe('JFrog Artifactory Extension Tests', () => {
             assert(toolLib.findLocalToolVersions('jfrog').length === 1);
             // Run tools installer again to make sure the JFrog CLI downloaded from Artifactory remote cache
             mockTask(testDir, 'toolsInstaller');
+            assert(toolLib.findLocalToolVersions('jfrog').length === 1);
+        });
+
+        runTest('Download Custom CLI', () => {
+            let testDir = 'toolsInstaller';
+            // Clean tool cache
+            testUtils.cleanToolCache();
+            assert(toolLib.findLocalToolVersions('jfrog').length === 0);
+            // Run tools installer to download CLI from a fresh repository
+            mockTask(testDir, 'toolsInstallerCustomVersion');
             assert(toolLib.findLocalToolVersions('jfrog').length === 1);
         });
     });
