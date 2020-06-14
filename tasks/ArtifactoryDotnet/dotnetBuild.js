@@ -34,7 +34,7 @@ function performDotnetRestore(cliPath) {
         let configuredServerId = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo', null);
         let dotnetArguments = buildDotnetCliArgs();
         let dotnetCommand = utils.cliJoin(cliPath, cliDotnetCoreRestoreCommand, dotnetArguments);
-        runDotnet(dotnetCommand, sourcePath, cliPath, configuredServerId);
+        executeCliCommand(dotnetCommand, sourcePath, cliPath, configuredServerId);
     });
 }
 
@@ -45,18 +45,18 @@ function performDotnetNugetPush(cliPath) {
     let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), targetRepo);
     let artifactoryService = tl.getInput('artifactoryService', true);
     uploadCommand = utils.addUrlAndCredentialsParams(uploadCommand, artifactoryService);
-    runDotnet(uploadCommand, buildDir, cliPath);
+    executeCliCommand(uploadCommand, buildDir, cliPath);
 }
 
-function runDotnet(nugetCommandCli, buildDir, cliPath, configuredServerId) {
+function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerId) {
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
     if (collectBuildInfo) {
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
-        nugetCommandCli = utils.cliJoin(nugetCommandCli, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+        cliCmd = utils.cliJoin(cliCmd, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
     }
     try {
-        utils.executeCliCommand(nugetCommandCli, buildDir, null);
+        utils.executeCliCommand(cliCmd, buildDir, null);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -105,7 +105,6 @@ function buildDotnetCliArgs() {
     let additionalArguments = tl.getInput('arguments');
     if (additionalArguments) {
         nugetArguments = utils.cliJoin(nugetArguments, additionalArguments);
-        ;
     }
     return nugetArguments;
 }
