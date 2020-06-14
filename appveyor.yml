@@ -7,7 +7,6 @@ environment:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
         ADO_ARTIFACTORY_SKIP_TESTS: docker
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-        ADO_ARTIFACTORY_SKIP_TESTS: nuget
 
   nodejs_version: "8"
   ADO_ARTIFACTORY_URL:
