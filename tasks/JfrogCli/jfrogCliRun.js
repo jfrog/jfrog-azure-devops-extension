@@ -4,16 +4,13 @@ const utils = require('artifactory-tasks-utils');
 const cliExecName = 'jfrog';
 const cliCommandPrefix = cliExecName + ' rt ';
 
-PerformJfrogCliComand(RunTaskCbk);
+RunJfrogCliCommand(RunTaskCbk);
 
-function PerformJfrogCliComand(RunTaskCbk) {
-    let cliVersion = '';
+function RunJfrogCliCommand(RunTaskCbk) {
+    let cliVersion = utils.defaultJfrogCliVersion;
     // If a custom version was requested and provided (by a variable or a specific value) we will try to use it
     if (tl.getBoolInput('useCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
         cliVersion = tl.getInput('cliVersion', true);
-    } else {
-        // Otherwise, we will use the the default extension's version
-        cliVersion = utils.defaultJfrogCliVersion;
     }
     utils.executeCliTask(RunTaskCbk, cliVersion);
 }
@@ -27,11 +24,11 @@ function RunTaskCbk(cliPath) {
     let artifactoryService = tl.getInput('artifactoryService', false);
     let cliCommand = tl.getInput('command', true);
     if (!cliCommand.startsWith(cliCommandPrefix)) {
-        tl.setResult(tl.TaskResult.Failed, 'Illegal command input: ', cliPath);
+        tl.setResult(tl.TaskResult.Failed, 'Unexpected JFrog CLI command prefix. Expecting the command to start with \'jfrog rt\'. The command received is: ', cliCommand);
         return;
     }
     try {
-        // remove 'jfrog' and space from the begining of the command string, so we can use the CLI's path
+        // Remove 'jfrog' and space from the begining of the command string, so we can use the CLI's path
         cliCommand = cliCommand.slice(cliExecName.length + 1);
         cliCommand = utils.cliJoin(cliPath, cliCommand);
         cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);

@@ -446,7 +446,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/JfrogCliGeneric"
+                "name": "tasks/JfrogCli"
             }
         }
     ],
@@ -516,7 +516,7 @@
             "path": "tasks/ArtifactoryCollectIssues"
         },
         {
-            "path": "tasks/JfrogCliGeneric"
+            "path": "tasks/JfrogCli"
         }
     ]
 }

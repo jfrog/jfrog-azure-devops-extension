@@ -157,8 +157,8 @@ describe('JFrog Artifactory Extension Tests', () => {
         });
     });
 
-    describe('CLI Generic Tests', () => {
-        runTest('CLI Generic Test', () => {
+    describe('JFrog CLI Task Tests', () => {
+        runTest('JFrog CLI Task Test', () => {
             let testDir = 'genericCliTask';
             // Upload a.in. b.in and c.in
             mockTask(testDir, 'upload');
@@ -186,7 +186,7 @@ describe('JFrog Artifactory Extension Tests', () => {
             assert(toolLib.findLocalToolVersions('jfrog').length === 1);
         });
 
-        runTest('Download Custom CLI', () => {
+        runTest('Download Custom CLI version', () => {
             let testDir = 'toolsInstaller';
             // Clean tool cache
             testUtils.cleanToolCache();

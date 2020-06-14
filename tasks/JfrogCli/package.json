@@ -1,0 +1,15 @@
+{
+  "name": "jfrog-cli",
+  "version": "1.0.0",
+  "author": "JFrog",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "This task runs a JFrog CLI command.",
+  "main": "jfrogCliRun.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+  }
+}

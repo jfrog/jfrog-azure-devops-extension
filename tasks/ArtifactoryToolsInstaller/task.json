@@ -39,12 +39,12 @@
             }
         },
         {
-            "name": "useCustomVersion",
+            "name": "installCustomVersion",
             "type": "boolean",
-            "label": "Download custom version",
+            "label": "Install custom version",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Select to determine a specific JFrog CLI version to be downloaded."
+            "helpMarkDown": "Select to install a specific version of JFrog CLI."
         },
         {
             "name": "cliVersion",
@@ -52,8 +52,8 @@
             "label": "Version",
             "defaultValue": "$(jfrogCliVersion)",
             "required": true,
-            "visibleRule": "useCustomVersion = true",
-            "helpMarkDown": "Specify the version of JFrog CLI to download, in form of X.Y.Z\nYou can set the $(jfrogCliVersion) environment variable to use a specific version along the pipeline for different tasks."
+            "visibleRule": "installCustomVersion = true",
+            "helpMarkDown": "Specify the version of JFrog CLI to install.\nYou can also use $(jfrogCliVersion) as the value."
         },
         {
             "name": "installExtractors",

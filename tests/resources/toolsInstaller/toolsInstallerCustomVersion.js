@@ -4,7 +4,7 @@ const jfrogUtils = require('artifactory-tasks-utils');
 let inputs = {
     artifactoryResolverService: 'mock-service',
     cliInstallationRepo: testUtils.getRepoKeys().cliRepo,
-    useCustomVersion: true,
+    installCustomVersion: true,
     cliVersion: jfrogUtils.defaultJfrogCliVersion
 };
 

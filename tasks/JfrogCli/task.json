@@ -5,7 +5,7 @@
   "description": "Run your own JFrog CLI command.",
   "author": "JFrog",
   "category": "Tool",
-  "helpMarkDown": "[Learn more about JFrog CLI capabilities](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory)",
+  "helpMarkDown": "[Learn more about JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI)",
   "visibility": [
     "Build",
     "Release"
@@ -30,10 +30,10 @@
     {
       "name": "useCustomVersion",
       "type": "boolean",
-      "label": "Run custom version",
+      "label": "Use custom JFrog CLI version",
       "defaultValue": "false",
       "required": false,
-      "helpMarkDown": "Select to determine a specific JFrog CLI version to be used."
+      "helpMarkDown": "Select to use a specific JFrog CLI version."
     },
     {
       "name": "cliVersion",
@@ -42,7 +42,7 @@
       "defaultValue": "$(jfrogCliVersion)",
       "required": true,
       "visibleRule": "useCustomVersion = true",
-      "helpMarkDown": "Specify the version of JFrog CLI to run, in form of X.Y.Z\nYou can set the $(jfrogCliVersion) environment variable to use a specific version along the pipeline for different tasks."
+      "helpMarkDown": "Specify the version of JFrog CLI to use.\nYou can also set $(jfrogCliVersion)."
     },
     {
       "name": "command",
@@ -50,7 +50,7 @@
       "label": "Command to run",
       "defaultValue": "jfrog rt <COMMAND>",
       "required": true,
-      "helpMarkDown": "Enter your command command after 'jfrog rt '. There is no need to provide the url and credentials options.",
+      "helpMarkDown": "Set your JFrog CLI command after 'jfrog rt '. There is no need to provide the URL and credentials options.",
       "validation": {
         "expression": "isMatch(value, '^jfrog rt ', 'IgnoreCase')",
         "message": "The command must start with `jfrog rt `."

@@ -7,13 +7,10 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     let artifactoryService = tl.getInput('artifactoryService', true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, true);
     let cliInstallationRepo = tl.getInput('cliInstallationRepo', true);
-    let cliVersion = '';
+    let cliVersion = utils.defaultJfrogCliVersion;
     // If a custom version was requested and provided (by a variable or a specific value) we will use it
-    if (tl.getBoolInput('useCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
+    if (tl.getBoolInput('installCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
         cliVersion = tl.getInput('cliVersion', true);
-    } else {
-        // Otherwise, we will use the the default extension's version
-        cliVersion = utils.defaultJfrogCliVersion;
     }
 
     let downloadUrl = utils.buildCliArtifactoryDownloadUrl(artifactoryUrl, cliInstallationRepo, cliVersion);
