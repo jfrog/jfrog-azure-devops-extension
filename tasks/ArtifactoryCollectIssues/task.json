@@ -43,7 +43,7 @@
             "type": "multiLine",
             "label": "Issues collection configuration",
             "visibleRule": "configSource=taskConfiguration",
-            "defaultValue": "",
+            "defaultValue": "version: 1\nissues:\n    trackerName: JIRA\n    regexp: (.+-[0-9]+)\\s-\\s(.+) \n    keyGroupIndex: 1\n    summaryGroupIndex: 2\n    trackerUrl: <REPLACE ME>\n    aggregate: true\n    aggregationStatus: RELEASED",
             "properties": {
                 "resizable": "true",
                 "rows": "10",
