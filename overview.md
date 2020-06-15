@@ -77,6 +77,9 @@ Builds are discarded according to the retention parameters configured in the tas
 
 ![Discard](images/marketplace/discard.png)
 
+## Executing JFrog CLI commands
+The **JFrog CLI** task allows executing [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) commands, while using the pre-configured connection details of JFrog Artifactory, stored in Azure DevOps.
+
 ## Accessing the Build-Info and the Xray scan report
 You can access the build-info from the Build Results in Azure DevOps, if your build pipeline has published the build-info to Artifactory.
 You can also access the Xray scan report, if your build pipeline is configured to scan the build.
@@ -90,8 +93,3 @@ The **Artifactory Publish Build-Info** task allows publishing builds to Artifact
 you can select a published build, to make its artifacts available for the release.
 
 ![ArtifactsSource](images/marketplace/artifacts-source.png)
-
-## Executing JFrog CLI commands
-The **JFrog CLI** task allows executing [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) commands, while using the pre-configured connection details of JFrog Artifactory, stored in Azure DevOps.
-
-![JFrogCLI](images/marketplace/jfrog-cli.png)
