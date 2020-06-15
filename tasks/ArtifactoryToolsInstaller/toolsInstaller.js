@@ -11,6 +11,10 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     // If a custom version was requested and provided (by a variable or a specific value) we will use it
     if (tl.getBoolInput('installCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
         cliVersion = tl.getInput('cliVersion', true);
+        if (utils.comparVersionToDefault(cliVersion) < 0) {
+            tl.setResult(tl.TaskResult.Succeeded, 'Custom JFrog CLI Version must be at least the default version ' + utils.defaultJfrogCliVersion);
+            return;
+        }
     }
 
     let downloadUrl = utils.buildCliArtifactoryDownloadUrl(artifactoryUrl, cliInstallationRepo, cliVersion);

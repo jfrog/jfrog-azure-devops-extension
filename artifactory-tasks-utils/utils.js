@@ -50,6 +50,7 @@ module.exports = {
     assembleBuildToolServerId: assembleBuildToolServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     deprecatedTaskMessage: deprecatedTaskMessage,
+    comparVersionToDefault: comparVersionToDefault,
     defaultJfrogCliVersion: defaultJfrogCliVersion
 };
 
@@ -409,6 +410,45 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
                 reject(err);
             });
     });
+}
+
+// We compare the custom CLI version provided to the default CLI version.
+// we will return 0 if the versions are equal, 1 if the custom version is bigger than the default and -1 otherwise.
+function comparVersionToDefault(cliVersion) {
+    let defaultVersionTokens = defaultJfrogCliVersion.split('.', 3);
+    let customVersionTokens = cliVersion.split('.', 3);
+    let maxIndex = defaultVersionTokens.length;
+    if (customVersionTokens.length > maxIndex) {
+        maxIndex = customVersionTokens.length;
+    }
+    for (let i = 0, len = maxIndex; i < len; i++) {
+        let defaultVersionToken = '0';
+        if (defaultVersionTokens.length >= i + 1) {
+            defaultVersionToken = defaultVersionTokens[i];
+        }
+        let customVersionToken = '0';
+        if (customVersionTokens.length >= i + 1) {
+            customVersionToken = customVersionTokens[i];
+        }
+        let compare = compareVersionTokens(customVersionToken, defaultVersionToken);
+        if (compare !== 0) {
+            return compare;
+        }
+    }
+    return 0;
+}
+
+function compareVersionTokens(customVersionToken, defaultVersionToken) {
+    let customVersionTokenInt = parseInt(customVersionToken);
+    let defaultVersionTokenInt = parseInt(defaultVersionToken);
+
+    if (customVersionTokenInt > defaultVersionTokenInt) {
+        return 1;
+    }
+    if (customVersionTokenInt < defaultVersionTokenInt) {
+        return -1;
+    }
+    return 0;
 }
 
 function getArchitecture() {

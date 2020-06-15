@@ -155,6 +155,15 @@ describe('JFrog Artifactory Extension Tests', () => {
                 );
             }
         });
+
+        runTest('CLI version compare', () => {
+            assert.strictEqual(jfrogUtils.comparVersionToDefault(jfrogUtils.defaultJfrogCliVersion), 0);
+            assert.strictEqual(jfrogUtils.comparVersionToDefault('0.8'), -1);
+            assert.strictEqual(jfrogUtils.comparVersionToDefault('1'), -1);
+            assert.strictEqual(jfrogUtils.comparVersionToDefault('1.500.0'), 1);
+            assert.strictEqual(jfrogUtils.comparVersionToDefault('2'), 1);
+            assert.strictEqual(jfrogUtils.comparVersionToDefault('2.37.1'), 1);
+        });
     });
 
     describe('JFrog CLI Task Tests', () => {
