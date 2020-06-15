@@ -27,6 +27,10 @@ function installTasks() {
     fs.readdir(TASKS_DIR, (err, files) => {
         files.forEach(taskName => {
             let taskDir = path.join(TASKS_DIR, taskName);
+            // We want to ignore files like .DS_Store may exists in TASKS_DIR
+            if (!fs.lstatSync(taskDir).isDirectory()) {
+                return;
+            }
             // If a package.json is missing, npm will exec the install command on the parent folder. This will cause an endless install loop.
             if (fs.existsSync(path.join(taskDir, 'package.json'))) {
                 // tasks/<task-name>/package.json

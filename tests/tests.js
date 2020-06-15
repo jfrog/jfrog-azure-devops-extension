@@ -155,6 +155,32 @@ describe('JFrog Artifactory Extension Tests', () => {
                 );
             }
         });
+
+        runTest('CLI version compare', () => {
+            assert.strictEqual(jfrogUtils.comparVersions('1.37.1', '1.37.1'), 0);
+            assert.strictEqual(jfrogUtils.comparVersions('0.8', '1.37.1'), -1);
+            assert.strictEqual(jfrogUtils.comparVersions('1', '1.37.1'), -1);
+            assert.strictEqual(jfrogUtils.comparVersions('1.37.0', '1.37.1'), -1);
+            assert.strictEqual(jfrogUtils.comparVersions('1.500.0', '1.37.1'), 1);
+            assert.strictEqual(jfrogUtils.comparVersions('2', '1.37.1'), 1);
+            assert.strictEqual(jfrogUtils.comparVersions('1.37.3', '1.37.1'), 1);
+            assert.strictEqual(jfrogUtils.comparVersions('2.37.1', '1.37.1'), 1);
+        });
+    });
+
+    describe('JFrog CLI Task Tests', () => {
+        runTest('JFrog CLI Task Test', () => {
+            let testDir = 'genericCliTask';
+            // Upload a.in. b.in and c.in
+            mockTask(testDir, 'upload');
+            // Delete a.in
+            mockTask(testDir, 'delete');
+            // Rename b.in to d.in
+            mockTask(testDir, 'move');
+            // Download all files
+            mockTask(testDir, 'download');
+            assertFiles(path.join(testDir, 'expectedFiles'), testDir);
+        });
     });
 
     describe('Tools Installer Tests', () => {
@@ -168,6 +194,16 @@ describe('JFrog Artifactory Extension Tests', () => {
             assert(toolLib.findLocalToolVersions('jfrog').length === 1);
             // Run tools installer again to make sure the JFrog CLI downloaded from Artifactory remote cache
             mockTask(testDir, 'toolsInstaller');
+            assert(toolLib.findLocalToolVersions('jfrog').length === 1);
+        });
+
+        runTest('Download Custom CLI version', () => {
+            let testDir = 'toolsInstaller';
+            // Clean tool cache
+            testUtils.cleanToolCache();
+            assert(toolLib.findLocalToolVersions('jfrog').length === 0);
+            // Run tools installer to download CLI from a fresh repository
+            mockTask(testDir, 'toolsInstallerCustomVersion');
             assert(toolLib.findLocalToolVersions('jfrog').length === 1);
         });
     });

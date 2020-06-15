@@ -39,6 +39,23 @@
             }
         },
         {
+            "name": "installCustomVersion",
+            "type": "boolean",
+            "label": "Install custom version",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to install a specific version of JFrog CLI."
+        },
+        {
+            "name": "cliVersion",
+            "type": "string",
+            "label": "Version",
+            "defaultValue": "$(jfrogCliVersion)",
+            "required": true,
+            "visibleRule": "installCustomVersion = true",
+            "helpMarkDown": "Specify the version of JFrog CLI to install.\nYou can also use $(jfrogCliVersion) as the value."
+        },
+        {
             "name": "installExtractors",
             "aliases": [
                 "installExtractors",

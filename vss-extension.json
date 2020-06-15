@@ -448,6 +448,16 @@
             "properties": {
                 "name": "tasks/ArtifactoryCollectIssues"
             }
+        },
+        {
+            "id": "jfrog-cli-generic",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/JfrogCli"
+            }
         }
     ],
     "files": [
@@ -516,7 +526,10 @@
             "path": "tasks/ArtifactoryCollectIssues"
         },
         {
-            "path": "tasks/ArtifactoryDotnet"
+            "path": "tasks/ArtifactoryDotnet"   
+        },
+        {
+            "path": "tasks/JfrogCli"
         }
     ]
 }
