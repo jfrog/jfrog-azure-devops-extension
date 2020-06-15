@@ -1,66 +1,66 @@
 {
-  "id": "696edde6-8d8b-4531-b93b-531030fa7199",
-  "name": "JfrogCli",
-  "friendlyName": "JFrog CLI",
-  "description": "Run your own JFrog CLI command.",
-  "author": "JFrog",
-  "category": "Tool",
-  "helpMarkDown": "[Learn more about JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI)",
-  "visibility": [
-    "Build",
-    "Release"
-  ],
-  "version": {
-    "Major": "1",
-    "Minor": "9",
-    "Patch": "4"
-  },
-  "demands": [],
-  "minimumAgentVersion": "1.89.0",
-  "instanceNameFormat": "JFrog CLI",
-  "inputs": [
-    {
-      "name": "artifactoryService",
-      "type": "connectedService:artifactoryService",
-      "label": "Artifactory service",
-      "defaultValue": "",
-      "required": true,
-      "helpMarkDown": "Artifactory service to run the command against."
+    "id": "696edde6-8d8b-4531-b93b-531030fa7199",
+    "name": "JfrogCli",
+    "friendlyName": "JFrog CLI",
+    "description": "Run your own JFrog CLI command.",
+    "author": "JFrog",
+    "category": "Tool",
+    "helpMarkDown": "[Learn more about JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI)",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "10",
+        "Patch": "0"
     },
-    {
-      "name": "useCustomVersion",
-      "type": "boolean",
-      "label": "Use custom JFrog CLI version",
-      "defaultValue": "false",
-      "required": false,
-      "helpMarkDown": "Select to use a specific JFrog CLI version."
-    },
-    {
-      "name": "cliVersion",
-      "type": "string",
-      "label": "Version",
-      "defaultValue": "$(jfrogCliVersion)",
-      "required": true,
-      "visibleRule": "useCustomVersion = true",
-      "helpMarkDown": "Specify the version of JFrog CLI to use.\nYou can also set $(jfrogCliVersion)."
-    },
-    {
-      "name": "command",
-      "type": "multiLine",
-      "label": "Command to run",
-      "defaultValue": "jfrog rt <COMMAND>",
-      "required": true,
-      "helpMarkDown": "Set your JFrog CLI command after 'jfrog rt '. There is no need to provide the URL and credentials options.",
-      "validation": {
-        "expression": "isMatch(value, '^jfrog rt ', 'IgnoreCase')",
-        "message": "The command must start with `jfrog rt `."
-      }
+    "demands": [],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "JFrog CLI",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to run the command against."
+        },
+        {
+            "name": "useCustomVersion",
+            "type": "boolean",
+            "label": "Use custom JFrog CLI version",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to use a specific JFrog CLI version."
+        },
+        {
+            "name": "cliVersion",
+            "type": "string",
+            "label": "Version",
+            "defaultValue": "$(jfrogCliVersion)",
+            "required": true,
+            "visibleRule": "useCustomVersion = true",
+            "helpMarkDown": "Specify the version of JFrog CLI to use.\nYou can also set $(jfrogCliVersion)."
+        },
+        {
+            "name": "command",
+            "type": "multiLine",
+            "label": "Command to run",
+            "defaultValue": "jfrog rt <COMMAND>",
+            "required": true,
+            "helpMarkDown": "Set your JFrog CLI command after 'jfrog rt '. There is no need to provide the URL and credentials options.",
+            "validation": {
+                "expression": "isMatch(value, '^jfrog rt ', 'IgnoreCase')",
+                "message": "The command must start with `jfrog rt `."
+            }
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "jfrogCliRun.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
     }
-  ],
-  "execution": {
-    "Node": {
-      "target": "jfrogCliRun.js",
-      "workingDirectory": "$(currentDirectory)"
-    }
-  }
 }
