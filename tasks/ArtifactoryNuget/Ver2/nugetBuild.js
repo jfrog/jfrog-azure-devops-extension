@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const utils = require('artifactory-tasks-utils');
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
-const NUGET_VERSION = '4.7.1';
+const NUGET_VERSION = '5.4.0';
 const path = require('path');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const cliNuGetCommand = 'rt nuget';
@@ -29,6 +29,7 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
 function downloadAndRunNuget(cliPath, nugetCommand) {
     console.log('NuGet not found in Path. Downloading...');
     toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe').then(downloadPath => {
+        fs.chmodSync(downloadPath, 0o555);
         toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
         addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
     });
@@ -39,10 +40,6 @@ function downloadAndRunNuget(cliPath, nugetCommand) {
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
 function RunTaskCbk(cliPath) {
-    if (!utils.isWindows()) {
-        tl.setResult(tl.TaskResult.Failed, 'This task currently supports Windows agents only.');
-        return;
-    }
     let nugetCommand = tl.getInput('command', true);
     let nugetExec = tl.which('nuget', false);
     if (!nugetExec && nugetCommand.localeCompare('restore') === 0) {
@@ -140,12 +137,15 @@ function addNugetArgsToCommands() {
     if (!nugetArguments) {
         nugetArguments = '';
     }
-    let noNuGetCache = tl.getInput('noNuGetCache');
+    let noNuGetCache = tl.getBoolInput('noNuGetCache');
     if (noNuGetCache) {
         nugetArguments = utils.cliJoin(nugetArguments, '-NoCache');
     }
+    let packagesDirectory = utils.fixWindowsPaths(tl.getInput('packagesDirectory'));
+    if (packagesDirectory) {
+        nugetArguments = utils.cliJoin(nugetArguments, '-PackagesDirectory', packagesDirectory);
+    }
     let verbosityRestore = tl.getInput('verbosityRestore');
     nugetArguments = utils.cliJoin(nugetArguments, '-Verbosity', verbosityRestore);
-
     return nugetArguments;
 }

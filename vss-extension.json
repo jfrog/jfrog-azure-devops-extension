@@ -350,6 +350,16 @@
             }
         },
         {
+            "id": "artifactory-dotnet",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryDotnet"
+            }
+        },
+        {
             "id": "artifactory-publish-build-info",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -516,6 +526,9 @@
             "path": "tasks/ArtifactoryCollectIssues"
         },
         {
+            "path": "tasks/ArtifactoryDotnet"   
+        },
+        }
             "path": "tasks/JfrogCli"
         }
     ]
