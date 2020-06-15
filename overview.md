@@ -32,8 +32,8 @@ The task can be also configured to capture build-info and stores the uploaded fi
 
 ![GenericUpload](images/marketplace/generic-upload.png)
 
-## Triggering Nuget, Maven, Gradle, npm, Go and Conan builds
-The extension adds the the following tasks: **Artifactory Nuget**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+## Triggering Nuget, .NET Core CLI, Maven, Gradle, npm, Go and Conan builds
+The extension adds the the following tasks: **Artifactory Nuget**, **Artifactory .NET Core**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![PackageManagers](images/marketplace/package-managers.png)
 
@@ -77,6 +77,9 @@ Builds are discarded according to the retention parameters configured in the tas
 
 ![Discard](images/marketplace/discard.png)
 
+## Executing JFrog CLI commands
+The **JFrog CLI** task allows executing [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) commands, while using the pre-configured connection details of JFrog Artifactory, stored in Azure DevOps.
+
 ## Accessing the Build-Info and the Xray scan report
 You can access the build-info from the Build Results in Azure DevOps, if your build pipeline has published the build-info to Artifactory.
 You can also access the Xray scan report, if your build pipeline is configured to scan the build.
@@ -85,7 +88,7 @@ You can also access the Xray scan report, if your build pipeline is configured t
 ![BuildInfo](images/marketplace/bi-in-artifactory.png)
 ![BuildInfo](images/marketplace/xray-report-in-xray.png)
 
-## Releasing published Builds
+## Releasing published builds
 The **Artifactory Publish Build-Info** task allows publishing builds to Artifactory. By choosing Artifactory as an artifacts source in a Release, 
 you can select a published build, to make its artifacts available for the release.
 
