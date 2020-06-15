@@ -567,6 +567,43 @@ describe('JFrog Artifactory Extension Tests', () => {
         );
     });
 
+    describe('Dotnet Tests', () => {
+        runTest(
+            'Dotnet restore',
+            () => {
+                let testDir = 'dotnet';
+                // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
+                assert(
+                    testUtils.isRepoExists(repoKeys.nugetRemoteRepo),
+                    'Create nuget remote repository: ' + repoKeys.nugetRemoteRepo + ' manually in order to run nuget tests'
+                );
+                mockTask(testDir, 'restore');
+                mockTask(testDir, 'publish');
+                getAndAssertBuild('DotNET Test', '7');
+                deleteBuild('DotNET Test');
+            },
+            testUtils.isSkipTest('dotnet')
+        );
+        runTest(
+            'Dotnet push',
+            () => {
+                let testDir = 'dotnet';
+                // There is a bug in Artifactory when creating a remote nuget repository [RTFACT-10628]. Cannot be created via REST API. Need to create manually.
+                assert(
+                    testUtils.isRepoExists(repoKeys.nugetRemoteRepo),
+                    'Create nuget remote repository: ' + repoKeys.nugetRemoteRepo + ' manually in order to run nuget tests'
+                );
+                mockTask(testDir, 'push');
+                mockTask(testDir, 'publish');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                getAndAssertBuild('DotNET Test', '7');
+                deleteBuild('DotNET Test');
+            },
+            testUtils.isSkipTest('dotnet')
+        );
+    });
+
     describe('Docker Tests', () => {
         runTest(
             'Docker push and pull',
