@@ -85,8 +85,13 @@ You can also access the Xray scan report, if your build pipeline is configured t
 ![BuildInfo](images/marketplace/bi-in-artifactory.png)
 ![BuildInfo](images/marketplace/xray-report-in-xray.png)
 
-## Releasing published Builds
+## Releasing published builds
 The **Artifactory Publish Build-Info** task allows publishing builds to Artifactory. By choosing Artifactory as an artifacts source in a Release, 
 you can select a published build, to make its artifacts available for the release.
 
 ![ArtifactsSource](images/marketplace/artifacts-source.png)
+
+## Executing JFrog CLI commands
+The **JFrog CLI** task allows executing [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) commands, while using the pre-configured connection details of JFrog Artifactory, stored in Azure DevOps.
+
+![JFrogCLI](images/marketplace/jfrog-cli.png)
