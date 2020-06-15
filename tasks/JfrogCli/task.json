@@ -1,6 +1,6 @@
 {
   "id": "696edde6-8d8b-4531-b93b-531030fa7199",
-  "name": "JfrogCliGeneric",
+  "name": "JfrogCli",
   "friendlyName": "JFrog CLI",
   "description": "Run your own JFrog CLI command.",
   "author": "JFrog",
@@ -59,7 +59,7 @@
   ],
   "execution": {
     "Node": {
-      "target": "jfrogCliGeneric.js",
+      "target": "jfrogCliRun.js",
       "workingDirectory": "$(currentDirectory)"
     }
   }
