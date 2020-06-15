@@ -528,7 +528,7 @@
         {
             "path": "tasks/ArtifactoryDotnet"   
         },
-        }
+        {
             "path": "tasks/JfrogCli"
         }
     ]
