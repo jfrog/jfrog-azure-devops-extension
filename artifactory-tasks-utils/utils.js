@@ -11,7 +11,8 @@ const toolName = 'jfrog';
 const btPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory'), '_jfrog'));
 const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
-const defaultJfrogCliVersion = '1.37.0';
+const defaultJfrogCliVersion = '1.37.1';
+const minCustomCliVersion = '1.37.1';
 const pluginVersion = '1.9.3';
 const buildAgent = 'artifactory-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
@@ -50,7 +51,8 @@ module.exports = {
     assembleBuildToolServerId: assembleBuildToolServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     deprecatedTaskMessage: deprecatedTaskMessage,
-    comparVersionToDefault: comparVersionToDefault,
+    comparVersions: comparVersions,
+    minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion
 };
 
@@ -412,25 +414,25 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
     });
 }
 
-// We compare the custom CLI version provided to the default CLI version.
-// we will return 0 if the versions are equal, 1 if the custom version is bigger than the default and -1 otherwise.
-function comparVersionToDefault(cliVersion) {
-    let defaultVersionTokens = defaultJfrogCliVersion.split('.', 3);
-    let customVersionTokens = cliVersion.split('.', 3);
-    let maxIndex = defaultVersionTokens.length;
-    if (customVersionTokens.length > maxIndex) {
-        maxIndex = customVersionTokens.length;
+// Compares two versions.
+// Returns 0 if the versions are equal, 1 if version1 is higher and -1 otherwise.
+function comparVersions(version1, version2) {
+    let version1Tokens = version1.split('.', 3);
+    let version2Tokens = version2.split('.', 3);
+    let maxIndex = version1Tokens.length;
+    if (version2Tokens.length > maxIndex) {
+        maxIndex = version2Tokens.length;
     }
     for (let i = 0, len = maxIndex; i < len; i++) {
-        let defaultVersionToken = '0';
-        if (defaultVersionTokens.length >= i + 1) {
-            defaultVersionToken = defaultVersionTokens[i];
+        let version1Token = '0';
+        if (version1Tokens.length >= i + 1) {
+            version1Token = version1Tokens[i];
         }
-        let customVersionToken = '0';
-        if (customVersionTokens.length >= i + 1) {
-            customVersionToken = customVersionTokens[i];
+        let version2Token = '0';
+        if (version2Tokens.length >= i + 1) {
+            version2Token = version2Tokens[i];
         }
-        let compare = compareVersionTokens(customVersionToken, defaultVersionToken);
+        let compare = compareVersionTokens(version1Token, version2Token);
         if (compare !== 0) {
             return compare;
         }
@@ -438,14 +440,14 @@ function comparVersionToDefault(cliVersion) {
     return 0;
 }
 
-function compareVersionTokens(customVersionToken, defaultVersionToken) {
-    let customVersionTokenInt = parseInt(customVersionToken);
-    let defaultVersionTokenInt = parseInt(defaultVersionToken);
+function compareVersionTokens(version1Token, version2Token) {
+    let version1TokenInt = parseInt(version1Token);
+    let version2TokenInt = parseInt(version2Token);
 
-    if (customVersionTokenInt > defaultVersionTokenInt) {
+    if (version1TokenInt > version2TokenInt) {
         return 1;
     }
-    if (customVersionTokenInt < defaultVersionTokenInt) {
+    if (version1TokenInt < version2TokenInt) {
         return -1;
     }
     return 0;

@@ -11,8 +11,8 @@ function RunJfrogCliCommand(RunTaskCbk) {
     // If a custom version was requested and provided (by a variable or a specific value) we will try to use it
     if (tl.getBoolInput('useCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
         cliVersion = tl.getInput('cliVersion', true);
-        if (utils.comparVersionToDefault(cliVersion) < 0) {
-            tl.setResult(tl.TaskResult.Succeeded, 'Custom JFrog CLI Version must be at least the default version ' + utils.defaultJfrogCliVersion);
+        if (utils.comparVersions(cliVersion, utils.minCustomCliVersion) > 0) {
+            tl.setResult(tl.TaskResult.Failed, 'Custom JFrog CLI Version must be at least ' + utils.minCustomCliVersion);
             return;
         }
     }
