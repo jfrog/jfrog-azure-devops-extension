@@ -511,7 +511,7 @@ describe('JFrog Artifactory Extension Tests', () => {
                 getAndAssertBuild('NuGet Test', '3');
                 deleteBuild('NuGet Test');
             },
-            testUtils.isSkipTest('nuget')
+            !testUtils.isWindows() || testUtils.isSkipTest('nuget')
         );
         runTest(
             'NuGet restore Ver2',
@@ -545,7 +545,7 @@ describe('JFrog Artifactory Extension Tests', () => {
                 getAndAssertBuild('NuGet Test', '3');
                 deleteBuild('NuGet Test');
             },
-            testUtils.isSkipTest('nuget')
+            !testUtils.isWindows() || testUtils.isSkipTest('nuget')
         );
         runTest(
             'NuGet push Ver2',
