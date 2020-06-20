@@ -1,5 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
-const fs = require('fs-extra');
+const fs = require('fs');
 const utils = require('artifactory-tasks-utils');
 const npmInstallCommand = 'rt npmi';
 const npmPublishCommand = 'rt npmp';
