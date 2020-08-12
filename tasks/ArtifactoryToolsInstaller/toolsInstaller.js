@@ -11,7 +11,8 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     // If a custom version was requested and provided (by a variable or a specific value) we will use it
     if (tl.getBoolInput('installCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
         cliVersion = tl.getInput('cliVersion', true);
-        if (utils.comparVersions(cliVersion, utils.minCustomCliVersion) > 0) {
+        // If the min version allowed is higher than the requested version we will fail the task.
+        if (utils.comparVersions(utils.minCustomCliVersion, cliVersion) > 0) {
             tl.setResult(tl.TaskResult.Failed, 'Custom JFrog CLI Version must be at least ' + utils.minCustomCliVersion);
             return;
         }
