@@ -32,7 +32,7 @@
             "type": "pickList",
             "label": "Command",
             "defaultValue": "restore",
-            "helpMfarkDown": "The NuGet command to run. Select 'Custom' to add arguments or to use a different command.",
+            "helpMarkDown": "The NuGet command to run. Select 'Custom' to add arguments or to use a different command.",
             "required": "true",
             "properties": {
                 "EditableOptions": "False"

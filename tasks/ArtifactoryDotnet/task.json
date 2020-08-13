@@ -183,7 +183,7 @@
             "endpointId": "$(artifactoryService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "targetDeployRepo",
-            "resultSelector": "jsonpath:$[?(@.packageType=='NuGet' && (@.type=='LOCAL' || @.type=='VIRTUAL'))]",
+            "resultSelector": "jsonpath:$[?(@.packageType=='NuGet' && @.type!='REMOTE')]",
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         }
     ],
