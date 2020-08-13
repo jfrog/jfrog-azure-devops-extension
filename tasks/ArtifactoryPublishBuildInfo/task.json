@@ -13,7 +13,7 @@
     "version": {
         "Major": "1",
         "Minor": "10",
-        "Patch": "1"
+        "Patch": "2"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "Artifactory Publish Build Info",
