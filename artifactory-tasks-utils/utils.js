@@ -252,14 +252,7 @@ function writeSpecContentToSpecPath(specSource, specPath) {
 }
 
 function cliJoin(...args) {
-    let command = '';
-    for (let i = 0; i < args.length; ++i) {
-        let arg = args[i];
-        if (arg.length > 0) {
-            command += command === '' ? arg : ' ' + arg;
-        }
-    }
-    return command;
+    return args.filter(x => x.length > 0).join(' ');
 }
 
 function quote(str) {
