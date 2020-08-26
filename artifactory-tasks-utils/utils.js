@@ -312,7 +312,7 @@ function addIntParam(cliCommand, inputParam, cliParam) {
 
 function addUrlAndCredentialsParams(cliCommand, artifactoryService) {
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    cliCommand = cliJoin(cliCommand, '--url=' + quote(artifactoryUrl));
+    cliCommand = cliJoin(cliCommand, '--url', quote(artifactoryUrl));
     cliCommand = addArtifactoryCredentials(cliCommand, artifactoryService);
     return cliCommand;
 }
