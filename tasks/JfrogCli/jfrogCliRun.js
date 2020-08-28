@@ -36,7 +36,9 @@ function RunTaskCbk(cliPath) {
         // Remove 'jfrog' and space from the begining of the command string, so we can use the CLI's path
         cliCommand = cliCommand.slice(cliExecName.length + 1);
         cliCommand = utils.cliJoin(cliPath, cliCommand);
-        cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
+        if (tl.getBoolInput('addUrlAndCredentials')) {
+            cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
+        }
         // Execute the cli command.
         utils.executeCliCommand(cliCommand, workDir);
     } catch (executionException) {

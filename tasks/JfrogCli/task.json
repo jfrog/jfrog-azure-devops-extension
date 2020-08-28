@@ -55,6 +55,14 @@
                 "expression": "isMatch(value, '^jfrog rt ', 'IgnoreCase')",
                 "message": "The command must start with `jfrog rt `."
             }
+        },
+        {
+            "name": "addUrlAndCredentials",
+            "type": "boolean",
+            "label": "Add --url, --user, --password arguments to the command",
+            "defaultValue": "true",
+            "required": true,
+            "helpMarkDown": "Deselect it, if provided JFrog CLI command does not support --url, --user, --password arguments."
         }
     ],
     "execution": {
