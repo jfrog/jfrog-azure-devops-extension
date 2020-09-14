@@ -72,7 +72,7 @@ function createMavenConfigFile(cliPath, buildDir) {
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
     let cliCommand = utils.cliJoin(cliPath, mavenConfigCommand);
-    if (artifactoryResolver != null) {
+    if (!!artifactoryResolver) {
         serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolver));
