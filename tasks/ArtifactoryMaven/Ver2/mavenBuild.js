@@ -82,13 +82,17 @@ function createMavenConfigFile(cliPath, buildDir) {
         console.log('Resolution from Artifactory is not configured');
     }
 
-    // Configure deployer server, throws on failure.
-    let artifactoryDeployer = tl.getInput('artifactoryDeployService', true);
-    serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
-    utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
-    cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
-    cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
-    cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
+    // Configure deployer server, skip if missing. This allows user to resolve dependencies from artifactory without deployment.
+    let artifactoryDeployer = tl.getInput('artifactoryDeployService');
+    if (artifactoryDeployer != null) {
+        serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
+        utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
+        cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
+        cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
+        cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
+    } else {
+        console.info('Deployment skipped since artifactoryDeployService was not set.')
+    }
     // Execute cli.
     try {
         utils.executeCliCommand(cliCommand, buildDir, null);
