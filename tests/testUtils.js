@@ -130,7 +130,7 @@ function getBuild(buildName, buildNumber) {
 }
 
 function deleteBuild(buildName) {
-    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + '/api/build/' + buildName + '?deleteAll=1', {
+    syncRequest('DELETE', stripTrailingSlash(artifactoryUrl) + '/api/build/' + buildName + '?deleteAll=1&artifacts=1', {
         headers: {
             Authorization: getAuthorizationHeaderValue()
         }

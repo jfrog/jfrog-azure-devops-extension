@@ -50,7 +50,7 @@ function executeGradleConfig(cliPath, workDir) {
 
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
-    if (!!artifactoryResolver) {
+    if (artifactoryResolver) {
         serverIdResolver = utils.assembleBuildToolServerId('gradle', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, workDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolver));
@@ -60,7 +60,7 @@ function executeGradleConfig(cliPath, workDir) {
 
     // Configure deployer server, throws on failure.
     let artifactoryDeployer = tl.getInput('artifactoryDeployerService');
-    if (!!artifactoryDeployer) {
+    if (artifactoryDeployer) {
         serverIdDeployer = utils.assembleBuildToolServerId('gradle', 'deployer');
         utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, workDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));

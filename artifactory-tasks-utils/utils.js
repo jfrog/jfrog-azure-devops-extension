@@ -565,6 +565,7 @@ function determineCliWorkDir(defaultPath, providedPath) {
     return defaultPath;
 }
 
+// Creates a server Id from build and build tool parameters.
 function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
