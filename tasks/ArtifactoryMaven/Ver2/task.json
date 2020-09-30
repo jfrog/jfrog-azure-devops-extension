@@ -99,7 +99,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "groupName": "deployer",
-            "required": true,
+            "required": false,
             "helpMarkDown": "Artifactory service for artifacts deployment."
         },
         {
@@ -108,7 +108,7 @@
             "label": "Deployment repository for releases",
             "groupName": "deployer",
             "defaultValue": "",
-            "required": true,
+            "required": false,
             "helpMarkDown": "Sets the target release repository for deploying release artifacts.",
             "visibleRule": "artifactoryDeployService != \"\"",
             "properties": {
@@ -121,7 +121,7 @@
             "label": "Deployment repository for snapshots",
             "groupName": "deployer",
             "defaultValue": "",
-            "required": true,
+            "required": false,
             "helpMarkDown": "Sets the target snapshot repository for deploying snapshot artifacts.",
             "visibleRule": "artifactoryDeployService != \"\"",
             "properties": {
