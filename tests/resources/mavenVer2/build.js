@@ -15,6 +15,7 @@ let inputs = {
     buildName: BUILD_NAME,
     buildNumber: BUILD_NUMBER,
     artifactoryResolverService: 'mock-service',
+    artifactoryDeployService: 'mock-service',
     targetResolveSnapshotRepo: repoKeys.mavenRemoteRepo,
     targetResolveReleaseRepo: repoKeys.mavenRemoteRepo,
     targetDeployReleaseRepo: repoKeys.mavenLocalRepo,
