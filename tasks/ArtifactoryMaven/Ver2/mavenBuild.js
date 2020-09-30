@@ -69,10 +69,11 @@ function checkAndSetMavenHome() {
 }
 
 function createMavenConfigFile(cliPath, buildDir) {
+    let cliCommand = utils.cliJoin(cliPath, mavenConfigCommand);
+
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
-    let cliCommand = utils.cliJoin(cliPath, mavenConfigCommand);
-    if (!!artifactoryResolver) {
+    if (artifactoryResolver) {
         serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolver));
@@ -84,7 +85,7 @@ function createMavenConfigFile(cliPath, buildDir) {
 
     // Configure deployer server, skip if missing. This allows user to resolve dependencies from artifactory without deployment.
     let artifactoryDeployer = tl.getInput('artifactoryDeployService');
-    if (!!artifactoryDeployer) {
+    if (artifactoryDeployer) {
         serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
         utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
