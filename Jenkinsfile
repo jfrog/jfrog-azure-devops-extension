@@ -1,8 +1,16 @@
-node {
+node("docker") {
     cleanWs()
 
     stage('Clone') {
         sh 'git clone https://github.com/jfrog/artifactory-azure-devops-extension.git'
+    }
+
+    stage('Install Prerequisites') {
+        sh '''#!/bin/bash
+            apt update
+            apt install wget -y
+            apt install file
+        '''
     }
 
     stage('Downloading npm') {
@@ -34,6 +42,13 @@ node {
                     set -euxo pipefail
                     npm i
                     npm run create
+                '''
+            }
+
+            stage('Git config') {
+                sh '''#!/bin/bash
+                    git config user.name "jfrog-ecosystem"
+                    git config user.email "eco-system@jfrog.com"
                 '''
             }
 
