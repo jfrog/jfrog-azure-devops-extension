@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const toolLib = require('azure-pipelines-tool-lib/tool');
-const fs = require('fs-extra');
+const fs = require('fs');
 const utils = require('artifactory-tasks-utils');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const NUGET_TOOL_NAME = 'NuGet';

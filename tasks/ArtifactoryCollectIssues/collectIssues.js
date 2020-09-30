@@ -1,7 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils');
 const path = require('path');
-const fs = require('fs-extra');
+const fs = require('fs');
 
 const cliCollectIssuesCommand = 'rt bag';
 

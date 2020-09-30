@@ -53,16 +53,16 @@ node {
 
                 stage('Merge to dev') {
                     sh '''#!/bin/bash
-                        set -euxo pipefail
-                        git checkout dev
-                        git merge master
-                        git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git
+                    set -euxo pipefail
+                    git checkout dev
+                    git merge master
+                    git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git
                     '''
                 }
             }
 
             stage('Publish extension') {
-                wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: '$ADO_PUBLISHER_API_KEY', var: 'SECRET']]]) {
+                withCredentials([string(credentialsId: 'azure-devops-publisher', variable: 'ADO_PUBLISHER_API_KEY')]) {
                     sh '''#!/bin/bash
                         set -euxo pipefail
                         ./node_modules/tfx-cli/_build/tfx-cli.js extension publish -t ${ADO_PUBLISHER_API_KEY}
