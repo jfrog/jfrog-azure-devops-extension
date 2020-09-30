@@ -5,7 +5,7 @@
 
 Artifactory provides tight integration Azure DevOps through the **JFrog Artifactory Extension.** 
 In addition to managing efficient deployment of your artifacts to Artifactory, 
-the extension lets you capture information about your build's resolved depedencies and deployed artifacts. 
+the extension lets you capture information about your build's resolved dependencies and deployed artifacts. 
 Gain full traceability for your builds as the environment data associated with your build is automatically collected.
 
 The extension currently supports the following package managers:
@@ -33,7 +33,7 @@ The task can be also configured to capture build-info and stores the uploaded fi
 ![GenericUpload](images/marketplace/generic-upload.png)
 
 ## Triggering Nuget, .NET Core CLI, Maven, Gradle, npm, Go and Conan builds
-The extension adds the the following tasks: **Artifactory Nuget**, **Artifactory .NET Core**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+The extension adds the following tasks: **Artifactory Nuget**, **Artifactory .NET Core**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![PackageManagers](images/marketplace/package-managers.png)
 
@@ -49,7 +49,7 @@ The **Artifactory Properties** task allows setting and deleting properties on bo
 ![Props](images/marketplace/props.png)
 
 ## Scanning builds with JFrog Xray
-The JFrog Artifactory extension is integrated with JFrog Xray through JFrog Artifactory, allowing you to have build artifacts scanned for vulnerabilities and other issues using the **Artifactory Xray Scan** task.
+The JFrog Artifactory extension integrates with JFrog Xray through JFrog Artifactory, allowing you to have build artifacts scanned for vulnerabilities and other issues using the **Artifactory Xray Scan** task.
 If issues or vulnerabilities are found, you may choose to fail a build.
 
 ![Xray](images/marketplace/xray.png)
