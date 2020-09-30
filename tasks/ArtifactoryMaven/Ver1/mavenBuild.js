@@ -1,7 +1,7 @@
 let tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 let utils = require('artifactory-tasks-utils');
-const fs = require('fs-extra');
+const fs = require('fs');
 const yaml = require('js-yaml');
 const buildToolsConfigVersion = 1;
 const cliMavenCommand = 'rt mvn';
@@ -141,5 +141,5 @@ function createYamlFile(configPath, buildToolType, resolverObj, deployerObj) {
     }
     let configInfo = yaml.safeDump(yamlDocument);
     console.log(configInfo);
-    fs.outputFileSync(configPath, configInfo);
+    fs.writeFileSync(configPath, configInfo);
 }

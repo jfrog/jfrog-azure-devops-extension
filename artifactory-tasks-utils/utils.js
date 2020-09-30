@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
