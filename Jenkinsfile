@@ -40,8 +40,10 @@ node("docker") {
             stage('Create extension') {
                 sh '''#!/bin/bash
                     set -euxo pipefail
-                    npm i
+                    npm i --unsafe-perm
                     npm run create
+                    # Verify vsix file is larger than 15M
+                    find . -iname "JFrog.jfrog-artifactory-vsts-extension*" -size +15M | grep .
                 '''
             }
 
