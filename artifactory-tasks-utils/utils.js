@@ -110,11 +110,11 @@ function buildCliArtifactoryDownloadUrl(rtUrl, repoName, cliVersion = defaultJfr
     return addTrailingSlashIfNeeded(rtUrl) + repoName + '/' + cliVersion + '/' + btPackage + '/' + fileName;
 }
 
-function addTrailingSlashIfNeeded(input) {
-    if (input.slice(-1) !== '/') {
-        input += '/';
+function addTrailingSlashIfNeeded(str) {
+    if (str.slice(-1) !== '/') {
+        str += '/';
     }
-    return input;
+    return str;
 }
 
 function buildBintrayDownloadUrl(cliVersion = defaultJfrogCliVersion) {
