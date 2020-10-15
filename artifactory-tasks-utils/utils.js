@@ -52,6 +52,7 @@ module.exports = {
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     deprecatedTaskMessage: deprecatedTaskMessage,
     comparVersions: comparVersions,
+    addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion
 };
@@ -106,10 +107,14 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
 }
 
 function buildCliArtifactoryDownloadUrl(rtUrl, repoName, cliVersion = defaultJfrogCliVersion) {
-    if (rtUrl.slice(-1) !== '/') {
-        rtUrl += '/';
+    return addTrailingSlashIfNeeded(rtUrl) + repoName + '/' + cliVersion + '/' + btPackage + '/' + fileName;
+}
+
+function addTrailingSlashIfNeeded(input) {
+    if (input.slice(-1) !== '/') {
+        input += '/';
     }
-    return rtUrl + repoName + '/' + cliVersion + '/' + btPackage + '/' + fileName;
+    return input;
 }
 
 function buildBintrayDownloadUrl(cliVersion = defaultJfrogCliVersion) {

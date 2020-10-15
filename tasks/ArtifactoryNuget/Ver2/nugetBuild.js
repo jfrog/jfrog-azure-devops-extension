@@ -80,9 +80,13 @@ function exec(cliPath, nugetCommand) {
         });
     } else {
         // Perform push command.
-        let targetDeployRepo = tl.getInput('targetDeployRepo', true);
+        let targetPath = tl.getInput('targetDeployRepo', true);
+        let relativeTargetPath = tl.getInput('targetDeployPath');
+        if (relativeTargetPath) {
+            targetPath = utils.addTrailingSlashIfNeeded(targetPath) + utils.addTrailingSlashIfNeeded(relativeTargetPath);
+        }
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
-        nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, pathToNupkg, targetDeployRepo);
+        nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, pathToNupkg, targetPath);
         nugetCommandCli = addArtifactoryServer(nugetCommandCli);
         runNuGet(nugetCommandCli, buildDir, cliPath);
     }

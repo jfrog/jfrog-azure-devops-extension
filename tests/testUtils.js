@@ -80,7 +80,8 @@ module.exports = {
     cleanToolCache: cleanToolCache,
     cleanUpAllTests: cleanUpAllTests,
     isSkipTest: isSkipTest,
-    getRepoKeys: getRepoKeys
+    getRepoKeys: getRepoKeys,
+    stripTrailingSlash: stripTrailingSlash
 };
 
 function initTests() {
