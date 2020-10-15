@@ -139,7 +139,7 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
     let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl + '. ';
     if (downloadUrl === buildBintrayDownloadUrl(cliVersion)) {
         errMsg +=
-            'If this build agent cannot access the internet, you may use the \'Artifactory Tools Installer\' task, to download JFrog CLI through an Artifactory repository, which proxies ' +
+            "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
             buildBintrayDownloadUrl(cliVersion) +
             '. You ';
     } else {

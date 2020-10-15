@@ -7,15 +7,13 @@ const cliUploadCommand = 'rt u';
 function addDebParam(cliCommand) {
     let setDebianProps = tl.getBoolInput('setDebianProps');
     if (setDebianProps) {
-        let distribution = tl.getInput('debDistribution', true).replace(/\//g, "\\/");
-        let component = tl.getInput('debComponent', true).replace(/\//g, "\\/");
-        ;
-        let architecture = tl.getInput('debArchitecture', true).replace(/\//g, "\\/");
-        ;
+        let distribution = tl.getInput('debDistribution', true).replace(/\//g, '\\/');
+        let component = tl.getInput('debComponent', true).replace(/\//g, '\\/');
+        let architecture = tl.getInput('debArchitecture', true).replace(/\//g, '\\/');
         let debValue = [distribution, component, architecture];
-        cliCommand = utils.cliJoin(cliCommand, '--deb=' + utils.quote(debValue.join('/')))
+        cliCommand = utils.cliJoin(cliCommand, '--deb=' + utils.quote(debValue.join('/')));
     }
-    return cliCommand
+    return cliCommand;
 }
 
 function RunTaskCbk(cliPath) {
@@ -32,7 +30,7 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.addCommonGenericParams(cliCommand, specPath);
         // Add unique download flags
         cliCommand = utils.addBoolParam(cliCommand, 'symlinks', 'symlinks');
-        cliCommand = addDebParam(cliCommand)
+        cliCommand = addDebParam(cliCommand);
         // Execute the cli command.
         utils.executeCliCommand(cliCommand, workDir);
     } catch (executionException) {

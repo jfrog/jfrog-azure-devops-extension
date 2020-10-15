@@ -106,7 +106,7 @@ function configureGoCliServer(cliPath, buildDir, serverType) {
     const serverId = utils.assembleBuildToolServerId('go', serverType);
     let artifactoryService = tl.getInput('artifactoryService', false);
     utils.configureCliServer(artifactoryService, serverId, cliPath, buildDir);
-    configuredServerId = [serverId]
+    configuredServerId = [serverId];
 }
 
 utils.executeCliTask(RunTaskCbk);

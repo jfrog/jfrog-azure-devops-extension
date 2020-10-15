@@ -29,7 +29,11 @@ function RunTaskCbk(cliPath) {
     let artifactoryService = tl.getInput('artifactoryService', false);
     let cliCommand = tl.getInput('command', true);
     if (!cliCommand.startsWith(cliCommandPrefix)) {
-        tl.setResult(tl.TaskResult.Failed, 'Unexpected JFrog CLI command prefix. Expecting the command to start with \'jfrog rt\'. The command received is: ', cliCommand);
+        tl.setResult(
+            tl.TaskResult.Failed,
+            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jfrog rt'. The command received is: ",
+            cliCommand
+        );
         return;
     }
     try {

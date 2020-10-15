@@ -92,7 +92,7 @@ function createMavenConfigFile(cliPath, buildDir) {
         cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
         cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
     } else {
-        console.info('Deployment skipped since artifactoryDeployService was not set.')
+        console.info('Deployment skipped since artifactoryDeployService was not set.');
     }
     // Execute cli.
     try {
