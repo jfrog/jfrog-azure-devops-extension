@@ -86,7 +86,7 @@ function exec(cliPath, nugetCommand) {
             targetPath = utils.addTrailingSlashIfNeeded(targetPath) + utils.addTrailingSlashIfNeeded(relativeTargetPath);
         }
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
-        nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, pathToNupkg, targetPath);
+        nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(pathToNupkg), utils.quote(targetPath));
         nugetCommandCli = addArtifactoryServer(nugetCommandCli);
         runNuGet(nugetCommandCli, buildDir, cliPath);
     }
