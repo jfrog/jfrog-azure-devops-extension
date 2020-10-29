@@ -52,6 +52,7 @@ module.exports = {
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     deprecatedTaskMessage: deprecatedTaskMessage,
     comparVersions: comparVersions,
+    useCliServer: useCliServer,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion
 };
@@ -203,6 +204,16 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
         // Add username and password.
         cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
     }
+    return executeCliCommand(cliCommand, buildDir, null);
+}
+
+/**
+ *  Use given serverId as defualt
+ * @returns {Buffer|string}
+ * @throws In CLI execution failure.
+ */
+function useCliServer(serverId, cliPath, buildDir) {
+    let cliCommand = cliJoin(cliPath, 'rt use', quote(serverId));
     return executeCliCommand(cliCommand, buildDir, null);
 }
 
