@@ -53,6 +53,7 @@ module.exports = {
     comparVersions: comparVersions,
     addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
     useCliServer: useCliServer,
+    getCurrentTimestamp: getCurrentTimestamp,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion
 };
@@ -637,4 +638,11 @@ function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
        by replacing the task version in the azure-pipelines.yml file from ${oldTaskVersion} to ${newTaskVersion},
        or changing the task version from the task UI.
 `);
+}
+
+/**
+ * Returns the current timestamp in seconds
+ */
+function getCurrentTimestamp() {
+    return Math.floor(Date.now() / 1000);
 }
