@@ -1,0 +1,15 @@
+{
+    "name": "artifactory-python",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "private": true,
+    "license": "Apache-2.0",
+    "main": "pythonBuild.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "compile": "tsc -p ./"
+    },
+    "dependencies": {
+        "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+    }
+}

@@ -440,6 +440,16 @@
             }
         },
         {
+            "id": "artifactory-python",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/ArtifactoryPython"
+            }
+        },
+        {
             "id": "artifactory-collect-issues",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -521,6 +531,9 @@
         },
         {
             "path": "tasks/ArtifactoryGo"
+        },
+        {
+            "path": "tasks/ArtifactoryPython"
         },
         {
             "path": "tasks/ArtifactoryCollectIssues"

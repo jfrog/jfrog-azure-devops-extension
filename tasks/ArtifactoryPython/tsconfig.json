@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2018",
+        "sourceMap": true,
+        "declaration": true,
+        "outDir": "../dist",
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "strict": true,
+        "allowJs": true,
+        "rootDirs": ["src", "model", "bin"]
+    },
+    "files": [
+        "tests.ts",
+        "testUtils.ts"
+    ],
+    "exclude": [
+        "node_modules", "dist", "test"
+    ]
+}

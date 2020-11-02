@@ -1,0 +1,105 @@
+{
+    "id": "9605c9d9-b8a7-45b1-9887-89c330f138c9",
+    "name": "ArtifactoryPython",
+    "friendlyName": "Artifactory Python",
+    "description": "Build and publish Python packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/PyPI+Repositories)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "10",
+        "Patch": "6"
+    },
+    "demands": [],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "Artifactory Python",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to run the command against."
+        },
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "install",
+            "helpMarkDown": "The pip command",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "install": "pip-install"
+
+            }
+        },
+        {
+            "name": "arguments",
+            "type": "string",
+            "label": "Arguments",
+            "defaultValue": "",
+            "helpMarkDown": "The arguments which will be passed to pip for execution.",
+            "required": false,
+            "visibleRule": "command = install"
+        },
+        {
+            "name": "targetResolveRepo",
+            "type": "string",
+            "label": "Resolution repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = install",
+            "helpMarkDown": "Sets the resolution repository.",
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo = true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo = true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo = true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "pythonBuild.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

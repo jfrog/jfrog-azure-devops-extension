@@ -8,7 +8,10 @@
         "tfx-cli": "0.6.4"
     },
     "devDependencies": {
-        "prettier": "1.19.1"
+        "prettier": "1.19.1",
+        "tslint": "^6.1.2",
+        "tslint-config-prettier": "^1.18.0",
+        "typescript": "^3.8.3"
     },
     "scripts": {
         "format": "prettier --write \"**/{*.js,package.json}\"",
@@ -16,6 +19,7 @@
         "install": "node buildScripts/build.js",
         "create": "tfx extension create",
         "test": "npm i --no-fund && npm t --prefix=tests",
-        "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh"
+        "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",
+        "compile": "tsc -p ./"
     }
 }
