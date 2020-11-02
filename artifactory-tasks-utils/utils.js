@@ -4,7 +4,6 @@ const path = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('./credentialsHandler');
-const localTools = require('./tools');
 
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
@@ -389,7 +388,7 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
         cliAuthHandlers = [];
     }
     return new Promise((resolve, reject) => {
-        localTools
+        toolLib
             .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
             .then(downloadPath => {
                 toolLib.cacheFile(downloadPath, fileName, toolName, cliVersion).then(cliDir => {
