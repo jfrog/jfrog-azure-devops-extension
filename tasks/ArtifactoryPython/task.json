@@ -18,6 +18,14 @@
     "demands": [],
     "minimumAgentVersion": "1.89.0",
     "instanceNameFormat": "Artifactory Python",
+    "groups": [
+        {
+            "name": "advancedInstall",
+            "displayName": "Advanced",
+            "isExpanded": false,
+            "visibleRule": "command = install"
+        }
+    ],
     "inputs": [
         {
             "name": "artifactoryService",
@@ -53,7 +61,7 @@
         },
         {
             "name": "targetResolveRepo",
-            "type": "string",
+            "type": "pickList",
             "label": "Resolution repository",
             "defaultValue": "",
             "required": true,
@@ -94,6 +102,24 @@
             "required": false,
             "visibleRule": "collectBuildInfo = true",
             "helpMarkDown": "Select to include environment variables in the published build info."
+        },
+        {
+            "name": "noPipCache",
+            "type": "boolean",
+            "label": "Disable local pip cache",
+            "defaultValue": "false",
+            "helpMarkDown": "Prevents pip from using cached packages.",
+            "required": "false",
+            "groupName": "advancedInstall"
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetResolveRepo",
+            "resultSelector": "jsonpath:$[?(@.packageType=='Pypi')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         }
     ],
     "execution": {

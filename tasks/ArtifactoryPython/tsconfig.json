@@ -4,7 +4,7 @@
         "target": "es2018",
         "sourceMap": true,
         "declaration": true,
-        "outDir": "../dist",
+        "outDir": "./",
         "experimentalDecorators": true,
         "esModuleInterop": true,
         "strict": true,
@@ -12,8 +12,7 @@
         "rootDirs": ["src", "model", "bin"]
     },
     "files": [
-        "tests.ts",
-        "testUtils.ts"
+        "pythonBuild.ts"
     ],
     "exclude": [
         "node_modules", "dist", "test"
