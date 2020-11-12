@@ -20,7 +20,9 @@ function RunTaskCbk(cliPath:string):void {
 }
 
 function performPipInstall(cliPath:string) {
-    let sourcePath = tl.getVariable("System.DefaultWorkingDirectory") || process.cwd();
+    let inputWorkingDirectory = tl.getInput('workingDirectory', false);
+    let defaultWorkDir = tl.getVariable("System.DefaultWorkingDirectory") || process.cwd();
+    let sourcePath = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
     let configuredServerId = performPipConfig(cliPath, sourcePath);
     let pipArguments = buildPipCliArgs();
     let pipCommand = utils.cliJoin(cliPath, cliPipInstallCommand, pipArguments);

@@ -111,6 +111,15 @@
             "helpMarkDown": "Prevents pip from using cached packages.",
             "required": "false",
             "groupName": "advancedInstall"
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory.",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advancedInstall",
+            "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
         }
     ],
     "dataSourceBindings": [
