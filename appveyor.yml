@@ -34,6 +34,6 @@ services:
 test_script:
 - node --version
 - npm --version
-- cmd: C:\\Python37-x64\\python -m venv pip-venv && npm t
+- cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%  && npm t
 - sh: npm t
 - npm run create # Make sure that that the extension can be created
