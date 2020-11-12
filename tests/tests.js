@@ -827,6 +827,21 @@ describe('JFrog Artifactory Extension Tests', () => {
     function runBuildCommand(command, buildName, buildNumber) {
         jfrogUtils.executeCliCommand('jfrog rt ' + command + ' "' + buildName + '" ' + buildNumber, testUtils.testDataDir);
     }
+
+    describe('Python Tests', () => {
+        runTest(
+            'Python',
+            () => {
+                let testDir = 'python';
+                mockTask(testDir, 'install');
+                mockTask(testDir, 'publishBuildInfo');
+                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                getAndAssertBuild('Python Test', '17');
+                deleteBuild('Python Test');
+            },
+            testUtils.isSkipTest('python')
+        );
+    });
 });
 
 /**
