@@ -3,7 +3,7 @@ stack: node 8, python 3.8.2
 skip_tags: true
 environment:
   matrix:
-      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
         ADO_ARTIFACTORY_SKIP_TESTS: docker
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
 
@@ -27,7 +27,6 @@ install:
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
-- cmd: C:\\Python37-x64\\python -m venv pip-venv
 
 services:
 - docker
@@ -35,5 +34,6 @@ services:
 test_script:
 - node --version
 - npm --version
-- npm t
+- cmd: C:\\Python37-x64\\python -m venv pip-venv && npm t
+- sh: npm t
 - npm run create # Make sure that that the extension can be created
