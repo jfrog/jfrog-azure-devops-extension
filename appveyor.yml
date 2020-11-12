@@ -3,7 +3,7 @@ stack: node 8, python 3.8.2
 skip_tags: true
 environment:
   matrix:
-      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
         ADO_ARTIFACTORY_SKIP_TESTS: docker
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
 
@@ -27,6 +27,7 @@ install:
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
+- cmd: C:\\Python37-x64\\python -m venv pip-venv
 
 services:
 - docker
