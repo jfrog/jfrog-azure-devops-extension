@@ -25,6 +25,7 @@ install:
 - npm install @types/node
 - npm i -gq jfrog-cli-go
 - npm run compile
+- alias pip=/usr/local/bin/pip3
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
