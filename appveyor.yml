@@ -22,8 +22,8 @@ environment:
 
 install:
 - npm install -g typescript
-- npm run compile
 - npm i -gq jfrog-cli-go
+- npm run compile
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
