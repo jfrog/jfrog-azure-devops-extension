@@ -6,11 +6,12 @@ let inputs = {
     buildName: 'Python Test',
     buildNumber: '17',
     command: 'install',
-    arguments: '-r requirements.txt',
-    rootPath: path.join(testUtils.getLocalTestDir(TEST_NAME)),
+    arguments: '-r requirements.txt --module=jfrog-python-example',
+    workingDirectory: path.join(testUtils.getLocalTestDir(TEST_NAME)),
     targetResolveRepo: testUtils.getRepoKeys().pythonVirtualRepo,
-    workingDirectory: TEST_NAME,
-    collectBuildInfo: true
+    collectBuildInfo: true,
+    noPipCache: true
+
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'install');

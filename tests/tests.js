@@ -834,8 +834,7 @@ describe('JFrog Artifactory Extension Tests', () => {
             () => {
                 let testDir = 'python';
                 mockTask(testDir, 'install');
-                mockTask(testDir, 'publishBuildInfo');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                mockTask(testDir, 'publish');
                 getAndAssertBuild('Python Test', '17');
                 deleteBuild('Python Test');
             },
