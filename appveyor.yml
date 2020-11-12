@@ -1,10 +1,9 @@
-
 build: off
 stack: node 8, python 3.8.2
 skip_tags: true
 environment:
   matrix:
-      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
         ADO_ARTIFACTORY_SKIP_TESTS: docker
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
 
@@ -25,7 +24,6 @@ install:
 - npm install @types/node
 - npm i -gq jfrog-cli-go
 - npm run compile
-- alias pip=/usr/local/bin/pip3
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
