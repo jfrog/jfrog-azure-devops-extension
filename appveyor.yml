@@ -21,6 +21,7 @@ environment:
     secure: UjixvF6E1Bp1p8zgPRLCVA==
 
 install:
+- npm run compile
 - npm i -gq jfrog-cli-go
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
