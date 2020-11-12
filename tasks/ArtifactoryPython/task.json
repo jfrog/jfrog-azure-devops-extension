@@ -46,7 +46,7 @@
                 "EditableOptions": "False"
             },
             "options": {
-                "install": "pip-install"
+                "install": "install"
 
             }
         },
