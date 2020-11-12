@@ -21,7 +21,7 @@ environment:
     secure: UjixvF6E1Bp1p8zgPRLCVA==
 
 install:
-- npm run tsc-version
+- npm install -g typescript
 - npm run compile
 - npm i -gq jfrog-cli-go
 - sh: sudo pip install conan -q
