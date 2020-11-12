@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES6",
+        "lib": ["ES6", "dom"],
+        "sourceMap": true,
+        "declaration": true,
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "allowJs": true,
+        "moduleResolution": "node",
+        "types": ["node"],
+        "resolveJsonModule": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true
+    },
+    "exclude": [
+        "**/node_modules", "dist", "resources"
+    ],
+    "include": [
+        "**/*.ts"
+    ]
+}
