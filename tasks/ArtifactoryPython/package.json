@@ -7,7 +7,7 @@
     "main": "pythonBuild.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "compile": "tsc -p ./"
+        "compile": "npx tsc -p ./"
     },
     "dependencies": {
         "@types/q": "^1.5.4",
