@@ -5,10 +5,13 @@
     "private": true,
     "license": "Apache-2.0",
     "dependencies": {
-        "tfx-cli": "0.6.4"
+        "tfx-cli": "0.6.4",
+        "typescript": "^3.8.3",
+        "@types/node": "^14.14.6"
     },
     "devDependencies": {
-        "@types/node": "^14.14.6",
+        "tslint": "^6.1.2",
+        "tslint-config-prettier": "^1.18.0",
         "prettier": "1.19.1"
     },
     "scripts": {
