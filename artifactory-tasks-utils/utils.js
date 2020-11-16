@@ -213,7 +213,7 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
 }
 
 /**
- *  Use given serverId as defualt
+ * Use given serverId as default
  * @returns {Buffer|string}
  * @throws In CLI execution failure.
  */
