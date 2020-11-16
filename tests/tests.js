@@ -840,18 +840,6 @@ describe('JFrog Artifactory Extension Tests', () => {
             },
             testUtils.isSkipTest('python')
         );
-        runTest(
-            // In order to test the virtualEnvActivation option, we supply a simple shell command that creates a file
-            // And checks if the file was created as expected.
-            'Pip pre-shell command',
-            () => {
-                let testDir = 'python';
-                mockTask(testDir, 'pre-install');
-                assertFiles(path.join(testDir, 'files'), testDir);
-
-            },
-            testUtils.isSkipTest('python')
-        );
     });
 });
 
