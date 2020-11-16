@@ -33,7 +33,10 @@ let repoKeys = {
     conanLocalRepo: 'conan-local',
     goLocalRepo: 'go-local',
     goRemoteRepo: 'go-remote',
-    goVirtualRepo: 'go-virtual'
+    goVirtualRepo: 'go-virtual',
+    pipLocalRepo: 'pip-local',
+    pipRemoteRepo: 'pip-remote',
+    pipVirtualRepo: 'pip-virtual'
 };
 
 module.exports = {
@@ -65,6 +68,7 @@ module.exports = {
     collectIssues: path.join(__dirname, '..', 'tasks', 'ArtifactoryCollectIssues', 'collectIssues.js'),
     toolsInstaller: path.join(__dirname, '..', 'tasks', 'ArtifactoryToolsInstaller', 'toolsInstaller.js'),
     genericCli: path.join(__dirname, '..', 'tasks', 'JfrogCli', 'jfrogCliRun.js'),
+    pip: path.join(__dirname, '..', 'tasks', 'ArtifactoryPip', 'pipBuild.js'),
 
     initTests: initTests,
     runTask: runTask,
@@ -200,6 +204,20 @@ function createTestRepositories() {
             packageType: 'go',
             repoLayoutRef: 'go-default',
             repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo]
+        })
+    );
+    createRepo(repoKeys.pipLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'pypi', repoLayoutRef: 'simple-default' }));
+    createRepo(
+        repoKeys.pipRemoteRepo,
+        JSON.stringify({ rclass: 'remote', packageType: 'pypi', repoLayoutRef: 'simple-default', url: 'https://files.pythonhosted.org' })
+    );
+    createRepo(
+        repoKeys.pipVirtualRepo,
+        JSON.stringify({
+            rclass: 'virtual',
+            packageType: 'pypi',
+            repoLayoutRef: 'simple-default',
+            repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo]
         })
     );
 }

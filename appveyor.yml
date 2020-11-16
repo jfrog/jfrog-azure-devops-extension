@@ -1,4 +1,3 @@
-
 build: off
 stack: node 8, python 3.8.2
 skip_tags: true
@@ -25,6 +24,7 @@ install:
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
+- cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%
 
 services:
 - docker
