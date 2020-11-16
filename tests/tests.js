@@ -828,17 +828,17 @@ describe('JFrog Artifactory Extension Tests', () => {
         jfrogUtils.executeCliCommand('jfrog rt ' + command + ' "' + buildName + '" ' + buildNumber, testUtils.testDataDir);
     }
 
-    describe('Python Tests', () => {
+    describe('Pip Tests', () => {
         runTest(
             'Pip Install',
             () => {
-                let testDir = 'python';
+                let testDir = 'pip';
                 mockTask(testDir, 'install');
                 mockTask(testDir, 'publish');
-                getAndAssertBuild('Python Test', '17');
-                deleteBuild('Python Test');
+                getAndAssertBuild('Pip Test', '17');
+                deleteBuild('Pip Test');
             },
-            testUtils.isSkipTest('python')
+            testUtils.isSkipTest('pip')
         );
     });
 });

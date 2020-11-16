@@ -5,19 +5,20 @@
     "private": true,
     "license": "Apache-2.0",
     "dependencies": {
-        "tfx-cli": "0.6.4",
-        "typescript": "^3.8.3",
-        "@types/node": "^14.14.6"
+        "tfx-cli": "0.6.4"
     },
     "devDependencies": {
         "tslint": "^6.1.2",
         "tslint-config-prettier": "^1.18.0",
-        "prettier": "1.19.1"
+        "prettier": "1.19.1",
+        "typescript": "^3.8.3",
+        "@types/node": "^14.14.6"
     },
     "scripts": {
         "format": "prettier --write \"**/{*.js,package.json}\"",
         "preinstall": "cd buildScripts && npm i --no-fund",
         "install": "node buildScripts/build.js",
+        "postinstall": "npm run compile",
         "create": "tfx extension create",
         "test": "npm i --no-fund && npm t --prefix=tests",
         "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",

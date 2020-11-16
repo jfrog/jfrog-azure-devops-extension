@@ -1,8 +1,8 @@
 {
     "id": "9605c9d9-b8a7-45b1-9887-89c330f138c9",
-    "name": "ArtifactoryPython",
-    "friendlyName": "Artifactory Python",
-    "description": "Build and publish Python packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
+    "name": "ArtifactoryPip",
+    "friendlyName": "Artifactory Pip",
+    "description": "Run 'pip install' while resolving the Python dependencies from Artifactory. This task also allows collecting build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/PyPI+Repositories)",
     "category": "Utility",
@@ -17,7 +17,7 @@
     },
     "demands": [],
     "minimumAgentVersion": "1.89.0",
-    "instanceNameFormat": "Artifactory Python",
+    "instanceNameFormat": "Artifactory Pip",
     "groups": [
         {
             "name": "advancedInstall",
@@ -47,7 +47,6 @@
             },
             "options": {
                 "install": "install"
-
             }
         },
         {
@@ -66,7 +65,7 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "command = install",
-            "helpMarkDown": "Sets the resolution repository.",
+            "helpMarkDown": "Sets the resolution repository."
         },
         {
             "name": "collectBuildInfo",
@@ -142,7 +141,7 @@
     ],
     "execution": {
         "Node": {
-            "target": "pythonBuild.js",
+            "target": "pipBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }
     }

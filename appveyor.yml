@@ -20,13 +20,11 @@ environment:
     secure: UjixvF6E1Bp1p8zgPRLCVA==
 
 install:
-- npm install -g typescript
-- npm install @types/node
 - npm i -gq jfrog-cli-go
-- npm run compile
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q
 - cmd: nuget update -self
+- cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%
 
 services:
 - docker
@@ -34,6 +32,5 @@ services:
 test_script:
 - node --version
 - npm --version
-- cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%  && npm t
-- sh: npm t
+- npm t
 - npm run create # Make sure that that the extension can be created

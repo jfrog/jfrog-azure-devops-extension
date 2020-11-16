@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
 
 let inputs = {
-    buildName: 'Python Test',
+    buildName: 'Pip Test',
     buildNumber: '17'
 };
 

@@ -3,12 +3,9 @@ import * as utils from "artifactory-tasks-utils";
 // @ts-ignore
 import * as tl from "azure-pipelines-task-lib/task";
 
-
 const cliPipInstallCommand:string = "rt pip-install";
 const pipConfigCommand:string = "rt pip-config";
 const disablePipCacheFlags:string = "--no-cache-dir --force-reinstall";
-
-
 
 function RunTaskCbk(cliPath:string):void {
     let pipCommand = tl.getInput("command", true);
@@ -23,18 +20,17 @@ function performPipInstall(cliPath:string) {
     let inputWorkingDirectory = tl.getInput("workingDirectory", false);
     let defaultWorkDir = tl.getVariable("System.DefaultWorkingDirectory") || process.cwd();
     let sourcePath = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
-    let configuredServerId = performPipConfig(cliPath, sourcePath);
     let pipArguments = buildPipCliArgs();
     let pipCommand = utils.cliJoin(cliPath, cliPipInstallCommand, pipArguments);
     let virtualEnvActivation = tl.getInput("virtualEnvActivation", false);
     if(virtualEnvActivation){
         pipCommand = utils.cliJoin(virtualEnvActivation, "&&", pipCommand)
     }
-    executeCliCommand(pipCommand, sourcePath, cliPath, configuredServerId);
-
+    executeCliCommand(pipCommand, sourcePath, cliPath);
 }
 
-function executeCliCommand(cliCmd:string, buildDir:string, cliPath:string, configuredServerId:string) {
+function executeCliCommand(cliCmd:string, buildDir:string, cliPath:string) {
+    let configuredServerId = performPipConfig(cliPath, buildDir);
     let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
     if (collectBuildInfo) {
         let buildName = tl.getInput("buildName", true);
@@ -53,7 +49,7 @@ function executeCliCommand(cliCmd:string, buildDir:string, cliPath:string, confi
     }
 }
 
-// Create Python pip configuration
+// Creates Python pip configuration and returns the configured resolver server ID
 function performPipConfig(cliPath:string, requiredWorkDir:string) : string {
     return utils.createBuildToolConfigFile(
         cliPath,

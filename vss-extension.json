@@ -440,13 +440,13 @@
             }
         },
         {
-            "id": "artifactory-python",
+            "id": "artifactory-pip",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryPython"
+                "name": "tasks/ArtifactoryPip"
             }
         },
         {
@@ -533,7 +533,7 @@
             "path": "tasks/ArtifactoryGo"
         },
         {
-            "path": "tasks/ArtifactoryPython"
+            "path": "tasks/ArtifactoryPip"
         },
         {
             "path": "tasks/ArtifactoryCollectIssues"
