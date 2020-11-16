@@ -48,7 +48,7 @@ To run the tests, use the following commands:
 
 ### Skipping Tests
 In order to skip tests, set the ADO_ARTIFACTORY_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
-The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan** and **docker**.
+The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip** and **docker**.
 
 For example, for setting the nuget and docker tests:  
 ```
