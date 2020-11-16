@@ -52,6 +52,8 @@ module.exports = {
     deprecatedTaskMessage: deprecatedTaskMessage,
     comparVersions: comparVersions,
     addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
+    useCliServer: useCliServer,
+    getCurrentTimestamp: getCurrentTimestamp,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion
 };
@@ -207,6 +209,16 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
         // Add username and password.
         cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
     }
+    return executeCliCommand(cliCommand, buildDir, null);
+}
+
+/**
+ * Use given serverId as default
+ * @returns {Buffer|string}
+ * @throws In CLI execution failure.
+ */
+function useCliServer(serverId, cliPath, buildDir) {
+    let cliCommand = cliJoin(cliPath, 'rt use', quote(serverId));
     return executeCliCommand(cliCommand, buildDir, null);
 }
 
@@ -626,4 +638,11 @@ function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
        by replacing the task version in the azure-pipelines.yml file from ${oldTaskVersion} to ${newTaskVersion},
        or changing the task version from the task UI.
 `);
+}
+
+/**
+ * Returns the current timestamp in seconds
+ */
+function getCurrentTimestamp() {
+    return Math.floor(Date.now() / 1000);
 }

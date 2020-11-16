@@ -37,12 +37,18 @@ function RunTaskCbk(cliPath) {
         return;
     }
     try {
-        // Remove 'jfrog' and space from the begining of the command string, so we can use the CLI's path
+        let serverId = 'rt-server-' + utils.getCurrentTimestamp();
+        // Execute the cli config command.
+        utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
+        // Use the server we just created
+        utils.useCliServer(serverId, cliPath, workDir);
+        // Remove 'jfrog' and space from the beginning of the command string, so we can use the CLI's path
         cliCommand = cliCommand.slice(cliExecName.length + 1);
         cliCommand = utils.cliJoin(cliPath, cliCommand);
-        cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
         // Execute the cli command.
         utils.executeCliCommand(cliCommand, workDir);
+        // delete the server we configured
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     }

@@ -50,7 +50,7 @@
             "label": "Command to run",
             "defaultValue": "jfrog rt <COMMAND>",
             "required": true,
-            "helpMarkDown": "Set your JFrog CLI command after 'jfrog rt '. There is no need to provide the URL and credentials options.",
+            "helpMarkDown": "Set your JFrog CLI command after 'jfrog rt '. There is no need to provide the URL, the credentials or the server ID options.",
             "validation": {
                 "expression": "isMatch(value, '^jfrog rt ', 'IgnoreCase')",
                 "message": "The command must start with `jfrog rt `."
