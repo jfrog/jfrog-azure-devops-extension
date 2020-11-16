@@ -7,7 +7,7 @@ let inputs = {
     fileSpec: JSON.stringify({
         files: [
             {
-                pattern: testUtils.getRepoKeys().nugetLocalRepo,
+                pattern: testUtils.stripTrailingSlash(testUtils.getRepoKeys().nugetLocalRepo) + '/custom/path/',
                 target: path.join(testUtils.getLocalTestDir(TEST_NAME), 'files', '/'),
                 build: 'DotNET Test/7',
                 flat: 'true'
