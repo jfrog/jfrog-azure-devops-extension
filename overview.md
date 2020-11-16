@@ -9,7 +9,7 @@ the extension lets you capture information about your build's resolved dependenc
 Gain full traceability for your builds as the environment data associated with your build is automatically collected.
 
 The extension currently supports the following package managers:
-Maven, Gradle, npm, NuGet, Docker, Go and Conan. It also allows downloading and uploading generic files from and to Artifactory.
+Maven, Gradle, npm, NuGet, Docker, Go, Pip and Conan. It also allows downloading and uploading generic files from and to Artifactory.
 
 ## Documentation and source code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
@@ -32,8 +32,8 @@ The task can be also configured to capture build-info and stores the uploaded fi
 
 ![GenericUpload](images/marketplace/generic-upload.png)
 
-## Triggering Nuget, .NET Core CLI, Maven, Gradle, npm, Go and Conan builds
-The extension adds the following tasks: **Artifactory Nuget**, **Artifactory .NET Core**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
+## Triggering NuGet, .NET Core CLI, Maven, Gradle, npm, Go, Pip and Conan builds
+The extension adds the following tasks: **Artifactory NuGet**, **Artifactory .NET Core**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![PackageManagers](images/marketplace/package-managers.png)
 
