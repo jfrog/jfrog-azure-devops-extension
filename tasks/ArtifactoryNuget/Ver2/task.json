@@ -84,6 +84,15 @@
             }
         },
         {
+            "name": "targetDeployPath",
+            "type": "string",
+            "label": "Relative deployment path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "command = push",
+            "helpMarkDown": "Sets the relative deployment path in the chosen repository."
+        },
+        {
             "name": "solutionPath",
             "type": "filePath",
             "label": "Path to the root directory of the solution or to a file inside the root directory.",

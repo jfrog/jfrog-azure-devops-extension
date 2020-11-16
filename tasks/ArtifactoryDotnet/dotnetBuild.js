@@ -40,9 +40,14 @@ function performDotnetRestore(cliPath) {
 
 function performDotnetNugetPush(cliPath) {
     let buildDir = tl.getVariable('System.DefaultWorkingDirectory');
-    let targetRepo = tl.getInput('targetDeployRepo', true);
+    let targetPath = tl.getInput('targetDeployRepo', true);
+    let relativeTargetPath = tl.getInput('targetDeployPath');
+    if (relativeTargetPath) {
+        targetPath = utils.addTrailingSlashIfNeeded(targetPath) + utils.addTrailingSlashIfNeeded(relativeTargetPath);
+    }
+
     let nupkgPath = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
-    let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), targetRepo);
+    let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), utils.quote(targetPath));
     let artifactoryService = tl.getInput('artifactoryService', true);
     uploadCommand = utils.addUrlAndCredentialsParams(uploadCommand, artifactoryService);
     executeCliCommand(uploadCommand, buildDir, cliPath);
