@@ -20,12 +20,16 @@ function RunTaskCbk(cliPath:string):void {
 }
 
 function performPipInstall(cliPath:string) {
-    let inputWorkingDirectory = tl.getInput('workingDirectory', false);
+    let inputWorkingDirectory = tl.getInput("workingDirectory", false);
     let defaultWorkDir = tl.getVariable("System.DefaultWorkingDirectory") || process.cwd();
     let sourcePath = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
     let configuredServerId = performPipConfig(cliPath, sourcePath);
     let pipArguments = buildPipCliArgs();
     let pipCommand = utils.cliJoin(cliPath, cliPipInstallCommand, pipArguments);
+    let virtualEnvActivation = tl.getInput("virtualEnvActivation", false);
+    if(virtualEnvActivation){
+        pipCommand = utils.cliJoin(virtualEnvActivation, "&&", pipCommand)
+    }
     executeCliCommand(pipCommand, sourcePath, cliPath, configuredServerId);
 
 }

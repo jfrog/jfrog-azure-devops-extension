@@ -113,6 +113,15 @@
             "groupName": "advancedInstall"
         },
         {
+            "name": "virtualEnvActivation",
+            "type": "string",
+            "label": "Virtual environment setup command",
+            "defaultValue": "",
+            "helpMarkDown": "It is mostly recommended to run pip commands inside a virtual environment, to achieve isolation for the pip build. To follow this recommendation, provide a shell command which sets up a virtual environment.",
+            "required": "false",
+            "groupName": "advancedInstall"
+        },
+        {
             "name": "workingDirectory",
             "type": "filePath",
             "label": "Working Directory.",
