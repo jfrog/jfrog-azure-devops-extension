@@ -1,5 +1,5 @@
 build: off
-stack: node 8, python 3.8.2
+stack: node 8, python 3.9
 skip_tags: true
 environment:
   matrix:
