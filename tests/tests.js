@@ -1008,12 +1008,12 @@ function assertIssuesCollection(buildName, buildNumber) {
 
     // Check vcs url.
     let expectedVcsUrl = 'https://github.com/jfrog/jfrog-cli-go.git';
-    let actualVcsUrl = body['buildInfo']['vcsUrl'];
+    let actualVcsUrl = body['buildInfo']['vcs'][0]['url'];
     assert(expectedVcsUrl === actualVcsUrl, "Expected vcs url: '" + expectedVcsUrl + "', actual: '" + actualVcsUrl + "'.\n" + tasksOutput);
 
     // Check vcs revision.
     let expectedVcsRevision = 'b033a0e508bdb52eee25654c9e12db33ff01b8ff';
-    let actualVcsRevision = body['buildInfo']['vcsRevision'];
+    let actualVcsRevision = body['buildInfo']['vcs'][0]['revision'];
     assert(
         expectedVcsRevision === actualVcsRevision,
         "Expected vcs revision: '" + expectedVcsRevision + "', actual: '" + actualVcsRevision + "'.\n" + tasksOutput
