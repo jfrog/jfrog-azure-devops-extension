@@ -66,6 +66,7 @@ We welcome pull requests from the community!
 * Pull requests should be created on the *dev* branch.
 * Please make sure the code is covered by tests. 
 * Please run `npm run format` for formatting the code before submitting the pull request.
+* Please run `npm run lint` and make sure no new tslint warnings were introduced.
 
 # Release Notes
 See the release notes [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ReleaseNotes).
