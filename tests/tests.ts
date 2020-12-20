@@ -79,11 +79,14 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     next();
                 });
 
-                jfrogUtils.downloadCli().then((): void => {
-                    tunnel.close();
-                    process.env.HTTP_PROXY = '';
-                    done(cliDownloadedWithProxy ? '' : new Error('CLI downloaded without using the proxy server'));
-                });
+                jfrogUtils
+                    .downloadCli()
+                    .then((): void => {
+                        tunnel.close();
+                        process.env.HTTP_PROXY = '';
+                        done(cliDownloadedWithProxy ? '' : new Error('CLI downloaded without using the proxy server'));
+                    })
+                    .catch((): string => 'download with proxy failed');
             },
             TestUtils.isSkipTest('proxy')
         );

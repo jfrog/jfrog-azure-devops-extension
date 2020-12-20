@@ -25,6 +25,7 @@
         "create": "tfx extension create",
         "test": "npm i --no-fund && npm t --prefix=tests",
         "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",
-        "compile": "npx tsc -p ./"
+        "compile": "npx tsc -p ./",
+        "lint": "tslint -p tsconfig.json"
     }
 }
