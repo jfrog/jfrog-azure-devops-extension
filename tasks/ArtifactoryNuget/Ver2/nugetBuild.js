@@ -147,9 +147,9 @@ function addNugetArgsToCommands() {
     }
     let packagesDirectory = utils.fixWindowsPaths(tl.getInput('packagesDirectory'));
     if (packagesDirectory) {
-        nugetArguments = utils.cliJoin(nugetArguments, '-PackagesDirectory', packagesDirectory);
+        nugetArguments = utils.cliJoin(nugetArguments, '-PackagesDirectory', utils.quote(packagesDirectory));
     }
     let verbosityRestore = tl.getInput('verbosityRestore');
-    nugetArguments = utils.cliJoin(nugetArguments, '-Verbosity', verbosityRestore);
+    nugetArguments = utils.cliJoin(nugetArguments, '-Verbosity', utils.quote(verbosityRestore));
     return nugetArguments;
 }
