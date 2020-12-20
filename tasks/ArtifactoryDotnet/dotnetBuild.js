@@ -99,12 +99,12 @@ function buildDotnetCliArgs() {
         packagesDirectory = null;
     }
     if (packagesDirectory) {
-        nugetArguments = utils.cliJoin(nugetArguments, '--packages', packagesDirectory);
+        nugetArguments = utils.cliJoin(nugetArguments, '--packages', utils.quote(packagesDirectory));
     }
 
     let verbosity = tl.getInput('verbosityRestore');
     if (verbosity && verbosity !== 'None') {
-        nugetArguments = utils.cliJoin(nugetArguments, '--verbosity', verbosity);
+        nugetArguments = utils.cliJoin(nugetArguments, '--verbosity', utils.quote(verbosity));
     }
 
     let additionalArguments = tl.getInput('arguments');

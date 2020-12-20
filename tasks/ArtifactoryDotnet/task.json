@@ -47,7 +47,7 @@
             "type": "string",
             "label": "Arguments",
             "defaultValue": "",
-            "helpMarkDown": "The arguments which will be passed to .NET Core CLI for execution.",
+            "helpMarkDown": "The arguments which will be passed to .NET Core CLI for execution. Arguments should be quoted, and space separated.",
             "required": false,
             "visibleRule": "command = restore"
         },

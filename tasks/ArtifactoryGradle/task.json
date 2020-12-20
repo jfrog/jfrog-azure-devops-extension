@@ -198,7 +198,7 @@
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         },
         {
-            "endpointId": "$(artifactoryDeployService)",
+            "endpointId": "$(artifactoryDeployerService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "targetRepo",
             "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
