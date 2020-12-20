@@ -1,5 +1,5 @@
 build: off
-stack: node 10, python 3.8.6, jdk 8
+stack: node 10, python 3.9, jdk 8
 skip_tags: true
 environment:
   matrix:
