@@ -988,12 +988,12 @@ function assertIssuesCollection(buildName: string, buildNumber: string): void {
 
     // Check vcs url.
     const expectedVcsUrl: string = 'https://github.com/jfrog/jfrog-cli-go.git';
-    const actualVcsUrl: string = body.buildInfo.vcsUrl;
+    const actualVcsUrl: string = body.buildInfo.vcs[0].url;
     assert.ok(expectedVcsUrl === actualVcsUrl, "Expected vcs url: '" + expectedVcsUrl + "', actual: '" + actualVcsUrl + "'.\n" + tasksOutput);
 
     // Check vcs revision.
     const expectedVcsRevision: string = 'b033a0e508bdb52eee25654c9e12db33ff01b8ff';
-    const actualVcsRevision: string = body.buildInfo.vcsRevision;
+    const actualVcsRevision: string = body.buildInfo.vcs[0].revision;
     assert.ok(
         expectedVcsRevision === actualVcsRevision,
         "Expected vcs revision: '" + expectedVcsRevision + "', actual: '" + actualVcsRevision + "'.\n" + tasksOutput
