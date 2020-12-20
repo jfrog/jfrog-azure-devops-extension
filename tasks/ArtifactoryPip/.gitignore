@@ -1,0 +1,4 @@
+# Ignore ts outputs
+pipBuild.js.map
+pipBuild.d.ts
+pipBuild.js

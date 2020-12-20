@@ -8,8 +8,8 @@ const credentialsHandler = require('./credentialsHandler');
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
 const btPackage = 'jfrog-cli-' + getArchitecture();
-const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory'), '_jfrog'));
-const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder'), '_jfrog'));
+const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jfrog'));
+const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder') || '', '_jfrog'));
 const defaultJfrogCliVersion = '1.42.2';
 const minCustomCliVersion = '1.37.1';
 const pluginVersion = '1.11.1';
@@ -588,9 +588,9 @@ function assembleBuildToolServerId(buildToolType, buildToolCmd) {
     return [buildName, buildNumber, buildToolType, buildToolCmd].join('_');
 }
 
-function createBuildToolConfigFile(cliPath, artifactoryService, cmd, requiredWorkDir, ConfigCommand, repoResolver, repoDeploy) {
+function createBuildToolConfigFile(cliPath, artifactoryService, cmd, requiredWorkDir, configCommand, repoResolver, repoDeploy) {
     const artService = tl.getInput(artifactoryService);
-    let cliCommand = cliJoin(cliPath, ConfigCommand);
+    let cliCommand = cliJoin(cliPath, configCommand);
     let serverIdResolve;
     let serverIdDeploy;
     if (repoResolver) {

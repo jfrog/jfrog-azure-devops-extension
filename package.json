@@ -8,20 +8,24 @@
         "tfx-cli": "0.6.4"
     },
     "devDependencies": {
+        "@types/mocha": "^8.0.4",
+        "@types/node": "^14.14.7",
+        "@types/q": "^1.5.4",
+        "prettier": "1.19.1",
         "tslint": "^6.1.2",
         "tslint-config-prettier": "^1.18.0",
-        "prettier": "1.19.1",
-        "typescript": "^3.8.3",
-        "@types/node": "^14.14.6"
+        "typescript": "^4.0.5",
+        "ts-node": "^9.0.0"
     },
     "scripts": {
-        "format": "prettier --write \"**/{*.js,package.json}\"",
+        "format": "prettier --write \"**/{*.ts,*.js,package.json}\"",
         "preinstall": "cd buildScripts && npm i --no-fund",
         "install": "node buildScripts/build.js",
         "postinstall": "npm run compile",
         "create": "tfx extension create",
         "test": "npm i --no-fund && npm t --prefix=tests",
         "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",
-        "compile": "npx tsc -p ./"
+        "compile": "npx tsc -p ./",
+        "lint": "tslint -p tsconfig.json"
     }
 }

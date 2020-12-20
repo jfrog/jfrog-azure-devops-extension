@@ -2,7 +2,7 @@
     "extends": ["tslint:recommended", "tslint-config-prettier"],
     "rules": {
         "variable-name": [true, "allow-snake-case", "allow-leading-underscore"],
-        "max-line-length": [true, { "limit": 120, "ignore-pattern": "`.*?`|'.*?'|\".*?\"" }],
+        "max-line-length": [true, { "limit": 150, "ignore-pattern": "`.*?`|'.*?'|\".*?\"" }],
         "max-classes-per-file": false,
         "no-floating-promises": true,
         "no-console": false,

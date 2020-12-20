@@ -26,7 +26,9 @@ After the build process is completed, you'll find the vsix file in the project d
 The vsix file can be loaded into Azure DevOps and TFS.
 
 ## Testing
-To run the tests, use the following commands:
+To run the tests, please make sure you are using node 10 or above.
+
+Use the following commands to run from terminal:
 1. Set the ADO_ARTIFACTORY_URL, ADO_ARTIFACTORY_USERNAME and ADO_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password:
     ```
     export ADO_ARTIFACTORY_URL='http://localhost:8081/artifactory'
@@ -46,9 +48,11 @@ To run the tests, use the following commands:
     npm t
     ```
 
+Note: If you are running tests via your IDE, make sure you are registering tests with ts-node: `mocha -r ts-node/register tests.ts -t 600000`. 
+
 ### Skipping Tests
 In order to skip tests, set the ADO_ARTIFACTORY_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
-The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip** and **docker**.
+The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy** and **docker**.
 
 For example, for setting the nuget and docker tests:  
 ```
@@ -62,6 +66,7 @@ We welcome pull requests from the community!
 * Pull requests should be created on the *dev* branch.
 * Please make sure the code is covered by tests. 
 * Please run `npm run format` for formatting the code before submitting the pull request.
+* Please run `npm run lint` and make sure no new tslint warnings were introduced.
 
 # Release Notes
 See the release notes [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ReleaseNotes).

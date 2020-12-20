@@ -1,5 +1,5 @@
 build: off
-stack: node 8, python 3.8.2
+stack: node 10, python 3.9, jdk 8
 skip_tags: true
 environment:
   matrix:
@@ -7,7 +7,7 @@ environment:
         ADO_ARTIFACTORY_SKIP_TESTS: docker
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
 
-  nodejs_version: "8"
+  nodejs_version: "10"
   ADO_ARTIFACTORY_URL:
     secure: RIh0gGFDn2JAnLUEEqLsQnZ5H3XFWg1s+Qq8Z4i+Xu+FtQf6Tsu2AnfY4/6AaXJ8
   ADO_ARTIFACTORY_USERNAME:
@@ -20,6 +20,7 @@ environment:
     secure: UjixvF6E1Bp1p8zgPRLCVA==
 
 install:
+- cmd: powershell Install-Product node $env:nodejs_version
 - npm i -gq jfrog-cli-go
 - sh: sudo pip install conan -q
 - cmd: pip install conan -q

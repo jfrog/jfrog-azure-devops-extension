@@ -1,71 +1,61 @@
-// @ts-ignore
-import * as utils from "artifactory-tasks-utils";
-// @ts-ignore
-import * as tl from "azure-pipelines-task-lib/task";
+import * as utils from 'artifactory-tasks-utils';
+import * as tl from 'azure-pipelines-task-lib/task';
 
-const cliPipInstallCommand:string = "rt pip-install";
-const pipConfigCommand:string = "rt pip-config";
-const disablePipCacheFlags:string = "--no-cache-dir --force-reinstall";
+const cliPipInstallCommand: string = 'rt pip-install';
+const pipConfigCommand: string = 'rt pip-config';
+const disablePipCacheFlags: string = '--no-cache-dir --force-reinstall';
 
-function RunTaskCbk(cliPath:string):void {
-    let pipCommand = tl.getInput("command", true);
+function RunTaskCbk(cliPath: string): void {
+    const pipCommand: string = tl.getInput('command', true) || '';
     switch (pipCommand) {
-        case "install":
+        case 'install':
             performPipInstall(cliPath);
             break;
     }
 }
 
-function performPipInstall(cliPath:string) {
-    let inputWorkingDirectory = tl.getInput("workingDirectory", false);
-    let defaultWorkDir = tl.getVariable("System.DefaultWorkingDirectory") || process.cwd();
-    let sourcePath = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
-    let pipArguments = buildPipCliArgs();
-    let pipCommand = utils.cliJoin(cliPath, cliPipInstallCommand, pipArguments);
-    let virtualEnvActivation = tl.getInput("virtualEnvActivation", false);
-    if(virtualEnvActivation){
-        pipCommand = utils.cliJoin(virtualEnvActivation, "&&", pipCommand)
+function performPipInstall(cliPath: string): void {
+    const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) || '';
+    const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || process.cwd();
+    const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
+    const pipArguments: string = buildPipCliArgs();
+    let pipCommand: string = utils.cliJoin(cliPath, cliPipInstallCommand, pipArguments);
+    const virtualEnvActivation: string | undefined = tl.getInput('virtualEnvActivation', false);
+    if (virtualEnvActivation) {
+        pipCommand = utils.cliJoin(virtualEnvActivation, '&&', pipCommand);
     }
     executeCliCommand(pipCommand, sourcePath, cliPath);
 }
 
-function executeCliCommand(cliCmd:string, buildDir:string, cliPath:string) {
-    let configuredServerId = performPipConfig(cliPath, buildDir);
-    let collectBuildInfo = tl.getBoolInput("collectBuildInfo");
+function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): void {
+    const configuredServerIds: string[] = performPipConfig(cliPath, buildDir);
+    const collectBuildInfo: boolean = tl.getBoolInput('collectBuildInfo');
     if (collectBuildInfo) {
-        let buildName = tl.getInput("buildName", true);
-        let buildNumber = tl.getInput("buildNumber", true);
-        cliCmd = utils.cliJoin(cliCmd, "--build-name=" + utils.quote(buildName), "--build-number=" + utils.quote(buildNumber));
+        const buildName: string = tl.getInput('buildName', true) || '';
+        const buildNumber: string = tl.getInput('buildNumber', true) || '';
+        cliCmd = utils.cliJoin(cliCmd, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
     }
     try {
-        utils.executeCliCommand(cliCmd, buildDir, null);
-        tl.setResult(tl.TaskResult.Succeeded, "Build Succeeded.");
+        utils.executeCliCommand(cliCmd, buildDir);
+        tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        if (configuredServerId) {
-            utils.deleteCliServers(cliPath, buildDir, configuredServerId);
+        if (configuredServerIds) {
+            utils.deleteCliServers(cliPath, buildDir, configuredServerIds);
         }
     }
 }
 
 // Creates Python pip configuration and returns the configured resolver server ID
-function performPipConfig(cliPath:string, requiredWorkDir:string) : string {
-    return utils.createBuildToolConfigFile(
-        cliPath,
-        "artifactoryService",
-        "pip",
-        requiredWorkDir,
-        pipConfigCommand,
-        "targetResolveRepo",
-        null
-    );
+function performPipConfig(cliPath: string, requiredWorkDir: string): string[] {
+    return utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'pip', requiredWorkDir, pipConfigCommand, 'targetResolveRepo', '');
 }
 
 // Creates the Python CLI arguments
 function buildPipCliArgs(): string {
-    let pipArguments = tl.getInput("arguments") || "";
-    let noCache = tl.getBoolInput("noPipCache");
+    let pipArguments: string = tl.getInput('arguments') || '';
+    const noCache: boolean = tl.getBoolInput('noPipCache');
     if (noCache) {
         pipArguments = utils.cliJoin(pipArguments, disablePipCacheFlags);
     }

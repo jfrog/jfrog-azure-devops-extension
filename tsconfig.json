@@ -4,19 +4,19 @@
         "target": "ES6",
         "lib": ["ES6", "dom"],
         "sourceMap": true,
+        "strict": true,
+        "esModuleInterop": true,
         "declaration": true,
         "experimentalDecorators": true,
-        "esModuleInterop": true,
-        "allowJs": true,
         "moduleResolution": "node",
         "types": ["node"],
         "resolveJsonModule": true,
-        "strict": true,
         "noImplicitReturns": true,
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "skipLibCheck": true
     },
     "exclude": [
-        "**/node_modules", "dist", "resources"
+        "**/node_modules", "**/resources"
     ],
     "include": [
         "**/*.ts"

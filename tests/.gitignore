@@ -1,0 +1,7 @@
+# Ignore ts outputs
+tests.js.map
+tests.d.ts
+tests.js
+testUtils.js.map
+testUtils.d.ts
+testUtils.js
