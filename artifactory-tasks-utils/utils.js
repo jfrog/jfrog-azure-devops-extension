@@ -12,12 +12,12 @@ const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirector
 const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder') || '', '_jfrog'));
 const defaultJfrogCliVersion = '1.42.3';
 const minCustomCliVersion = '1.37.1';
-const pluginVersion = '1.11.2';
+const pluginVersion = '1.11.3';
 const buildAgent = 'artifactory-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
 const customLegacyCliPath = encodePath(path.join(jfrogLegacyFolderPath, 'current', fileName));
-const jfrogCliBintrayUrl = 'https://api.bintray.com/content/jfrog/jfrog-cli-go/';
+const jfrogCliBintrayUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v1/';
 
 let cliConfigCommand = 'rt c';
 let runTaskCbk = null;
