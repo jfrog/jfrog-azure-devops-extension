@@ -13,7 +13,7 @@
     "version": {
         "Major": "3",
         "Minor": "11",
-        "Patch": "2"
+        "Patch": "3"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "Artifactory Generic Download",
