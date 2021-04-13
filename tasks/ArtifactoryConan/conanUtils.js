@@ -396,7 +396,7 @@ function initCliPartialsBuildDir(buildName, buildNumber) {
 }
 
 function getCliPartialsBuildDir(buildName, buildNumber) {
-    return path.join(os.tmpdir(), BUILD_TEMP_PATH, Buffer.from(buildName + '_' + buildNumber).toString('base64'));
+    return path.join(os.tmpdir(), BUILD_TEMP_PATH, Buffer.from(buildName + '_' + buildNumber + '-').toString('base64'));
 }
 
 module.exports = {
