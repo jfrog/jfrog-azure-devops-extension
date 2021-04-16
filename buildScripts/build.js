@@ -16,7 +16,7 @@ installTests();
  */
 function installArtifactoryTaskUtils() {
     clean(TASKS_UTILS_DIR, true);
-    execNpm('i', TASKS_UTILS_DIR);
+    installAndShrink(TASKS_UTILS_DIR);
     execNpm('pack', TASKS_UTILS_DIR);
 }
 
@@ -36,7 +36,7 @@ function installTasks() {
                 // tasks/<task-name>/package.json
                 clean(taskDir);
                 copyTaskUtilsModules(taskDir);
-                execNpm('i', taskDir);
+                installAndShrink(taskDir);
             } else {
                 // tasks/<task-name>/<task-version>/package.json
                 fs.readdir(taskDir, (err, taskVersionDirs) => {
@@ -45,7 +45,7 @@ function installTasks() {
                         if (fs.existsSync(path.join(taskVersionDir, 'package.json'))) {
                             clean(taskVersionDir);
                             copyTaskUtilsModules(taskVersionDir);
-                            execNpm('i', taskVersionDir);
+                            installAndShrink(taskVersionDir);
                         }
                     });
                 });
@@ -91,4 +91,13 @@ function clean(cwd, cleanPackage) {
  */
 function execNpm(command, cwd) {
     exec('npm ' + command + ' -q --no-fund', { cwd: cwd, stdio: [0, 1, 2] });
+}
+
+/**
+ * Run 'npm install' and run clean-modules on the node_modules created.
+ * @param cwd - (String) - Current working directory.
+ */
+function installAndShrink(cwd) {
+    execNpm('i', cwd);
+    exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" ' + cwd, { stdio: [0, 1, 2] });
 }
