@@ -99,5 +99,5 @@ function execNpm(command, cwd) {
  */
 function installAndShrink(cwd) {
     execNpm('i', cwd);
-    exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" ' + cwd, { stdio: [0, 1, 2] });
+    exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" ' + path.join(cwd, 'node_modules'), { stdio: [0, 1, 2] });
 }
