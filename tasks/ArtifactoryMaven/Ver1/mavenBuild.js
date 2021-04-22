@@ -1,13 +1,14 @@
-let tl = require('azure-pipelines-task-lib/task');
+const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
-let utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils/utils.js');
 const fs = require('fs');
 const yaml = require('js-yaml');
 const buildToolsConfigVersion = 1;
 const cliMavenCommand = 'rt mvn';
+const execSync = require('child_process').execSync;
+
 let serverIdDeployer;
 let serverIdResolver;
-const execSync = require('child_process').execSync;
 
 utils.executeCliTask(RunTaskCbk);
 
@@ -99,26 +100,12 @@ function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
     return { snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverId: serverID };
 }
 
-/**
- * Removes the cli server config and env variables set in ToolsInstaller task.
- * @throws In CLI execution failure.
- */
-function removeExtractorDownloadVariables(cliPath, workDir) {
-    let serverId = tl.getVariable('JFROG_CLI_JCENTER_REMOTE_SERVER');
-    if (!serverId) {
-        return;
-    }
-    tl.setVariable('JFROG_CLI_JCENTER_REMOTE_SERVER', '');
-    tl.setVariable('JFROG_CLI_JCENTER_REMOTE_REPO', '');
-    utils.deleteCliServers(cliPath, workDir, [serverId]);
-}
-
 function cleanup(cliPath, workDir) {
     // Delete servers.
     utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
     // Remove extractor variables.
     try {
-        removeExtractorDownloadVariables(cliPath, workDir);
+        utils.removeExtractorsDownloadVariables(cliPath, workDir);
     } catch (removeVariablesException) {
         tl.setResult(tl.TaskResult.Failed, removeVariablesException);
     }

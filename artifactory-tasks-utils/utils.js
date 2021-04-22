@@ -7,19 +7,36 @@ const credentialsHandler = require('./credentialsHandler');
 
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
-const btPackage = 'jfrog-cli-' + getArchitecture();
+const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jfrog'));
 const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder') || '', '_jfrog'));
-const defaultJfrogCliVersion = '1.46.3';
+const defaultJfrogCliVersion = '1.46.4';
 const minCustomCliVersion = '1.37.1';
 const pluginVersion = '1.11.8';
 const buildAgent = 'artifactory-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
 const customLegacyCliPath = encodePath(path.join(jfrogLegacyFolderPath, 'current', fileName));
-const jfrogCliBintrayUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v1/';
+const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v1';
 
-let cliConfigCommand = 'rt c';
+// Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
+// or a specific version was requested in a task. If not set, use the default CLI version.
+const pipelineRequestedCliVersionEnv = 'JFROG_CLI_PIPELINE_REQUESTED_VERSION_AZURE';
+// The actual JFrog CLI version used in a task.
+const taskSelectedCliVersionEnv = 'JFROG_CLI_TASK_SELECTED_VERSION_AZURE';
+
+// Extractors Env:
+const extractorsRemoteEnv = 'JFROG_CLI_EXTRACTORS_REMOTE';
+const jcenterRemoteServerEnv = 'JFROG_CLI_JCENTER_REMOTE_SERVER';
+const jcenterRemoteRepoEnv = 'JFROG_CLI_JCENTER_REMOTE_REPO';
+
+// Config commands:
+const jfrogCliLegacyConfigCommand = 'rt c';
+const jfrogCliConfigAddCommand = 'c add';
+const jfrogCliConfigRmCommand = 'c remove';
+const jfrogCliConfigUseCommand = 'c use';
+const newConfigCommandMinVersion = '1.46.1';
+
 let runTaskCbk = null;
 
 module.exports = {
@@ -50,24 +67,40 @@ module.exports = {
     assembleBuildToolServerId: assembleBuildToolServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     deprecatedTaskMessage: deprecatedTaskMessage,
-    comparVersions: comparVersions,
+    compareVersions: compareVersions,
     addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
     useCliServer: useCliServer,
     getCurrentTimestamp: getCurrentTimestamp,
+    removeExtractorsDownloadVariables: removeExtractorsDownloadVariables,
     minCustomCliVersion: minCustomCliVersion,
-    defaultJfrogCliVersion: defaultJfrogCliVersion
+    defaultJfrogCliVersion: defaultJfrogCliVersion,
+    pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
+    taskSelectedCliVersionEnv: taskSelectedCliVersionEnv,
+    extractorsRemoteEnv: extractorsRemoteEnv,
+    jcenterRemoteServerEnv: jcenterRemoteServerEnv,
+    jcenterRemoteRepoEnv: jcenterRemoteRepoEnv
 };
 
-// The cliDownloadUrl and cliAuthHandlers arguments are optional. They are provided to this function by the 'Artifactory Tools Installer' task.
-// jfrogCliBintrayDownloadUrl is used by default.
-function executeCliTask(runTaskFunc, cliVersion = defaultJfrogCliVersion, cliDownloadUrl, cliAuthHandlers) {
+/**
+ * Executes a CLI task, downloads the CLI if necessary.
+ * @param runTaskFunc - Task to run.
+ * @param cliVersion - Specific CLI version to use in the current task execution.
+ * @param cliDownloadUrl [Optional, Default - releases.jfrog.io] - URL to download the required CLI executable from.
+ * @param cliAuthHandlers [Optional, Default - Anonymous] - Authentication handlers to download CLI with.
+ */
+function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     process.env.CI = true;
-    // If unspecified, use the default cliDownloadUrl of Bintray.
+
+    if (!cliVersion) {
+        // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
+        cliVersion = tl.getVariable(pipelineRequestedCliVersionEnv) || defaultJfrogCliVersion;
+    }
+    // If unspecified, download from 'releases.jfrog.io' by default.
     if (!cliDownloadUrl) {
-        cliDownloadUrl = buildBintrayDownloadUrl(cliVersion);
+        cliDownloadUrl = buildReleasesDownloadUrl(cliVersion);
         cliAuthHandlers = [];
     }
 
@@ -108,7 +141,7 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
 }
 
 function buildCliArtifactoryDownloadUrl(rtUrl, repoName, cliVersion = defaultJfrogCliVersion) {
-    return addTrailingSlashIfNeeded(rtUrl) + repoName + '/' + cliVersion + '/' + btPackage + '/' + fileName;
+    return addTrailingSlashIfNeeded(rtUrl) + repoName + '/' + getCliExePathInArtifactory(cliVersion);
 }
 
 function addTrailingSlashIfNeeded(str) {
@@ -118,8 +151,12 @@ function addTrailingSlashIfNeeded(str) {
     return str;
 }
 
-function buildBintrayDownloadUrl(cliVersion = defaultJfrogCliVersion) {
-    return jfrogCliBintrayUrl + cliVersion + '/' + btPackage + '/' + fileName + '?bt_package=' + btPackage;
+function buildReleasesDownloadUrl(cliVersion = defaultJfrogCliVersion) {
+    return jfrogCliReleasesUrl + '/' + getCliExePathInArtifactory(cliVersion);
+}
+
+function getCliExePathInArtifactory(cliVersion) {
+    return cliVersion + '/' + cliPackage + '/' + fileName;
 }
 
 function createAuthHandlers(artifactoryService) {
@@ -143,10 +180,10 @@ function createAuthHandlers(artifactoryService) {
 
 function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
     let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl + '. ';
-    if (downloadUrl === buildBintrayDownloadUrl(cliVersion)) {
+    if (downloadUrl === buildReleasesDownloadUrl(cliVersion)) {
         errMsg +=
             "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
-            buildBintrayDownloadUrl(cliVersion) +
+            buildReleasesDownloadUrl(cliVersion) +
             '. You ';
     } else {
         errMsg += 'If the chosen Artifactory Service cannot access the internet, you ';
@@ -197,11 +234,16 @@ function maskSecrets(str) {
  * @throws In CLI execution failure.
  */
 function configureCliServer(artifactory, serverId, cliPath, buildDir) {
-    let artifactoryUrl = tl.getEndpointUrl(artifactory);
+    let artifactoryUrl = tl.getEndpointUrl(artifactory, false);
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, 'username', true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, 'password', true);
     let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactory, 'apitoken', true);
-    let cliCommand = cliJoin(cliPath, cliConfigCommand, quote(serverId), '--url=' + quote(artifactoryUrl), '--interactive=false');
+    let cliCommand;
+    if (shouldUseNewConfigCmd()) {
+        cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), '--artifactory-url=' + quote(artifactoryUrl), '--interactive=false');
+    } else {
+        cliCommand = cliJoin(cliPath, jfrogCliLegacyConfigCommand, quote(serverId), '--url=' + quote(artifactoryUrl), '--interactive=false');
+    }
     if (artifactoryAccessToken) {
         // Add access-token if required.
         cliCommand = cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
@@ -212,6 +254,11 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     return executeCliCommand(cliCommand, buildDir, null);
 }
 
+function shouldUseNewConfigCmd() {
+    let cliVersion = tl.getVariable(taskSelectedCliVersionEnv);
+    return compareVersions(cliVersion, newConfigCommandMinVersion) >= 0;
+}
+
 /**
  * Use given serverId as default
  * @returns {Buffer|string}
@@ -219,6 +266,9 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
  */
 function useCliServer(serverId, cliPath, buildDir) {
     let cliCommand = cliJoin(cliPath, 'rt use', quote(serverId));
+    if (shouldUseNewConfigCmd()) {
+        cliCommand = cliJoin(cliPath, jfrogCliConfigUseCommand, quote(serverId));
+    }
     return executeCliCommand(cliCommand, buildDir, null);
 }
 
@@ -231,7 +281,12 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
         try {
             if (serverIdArray[i]) {
-                let deleteServerIDCommand = cliJoin(cliPath, cliConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
+                let deleteServerIDCommand;
+                if (shouldUseNewConfigCmd()) {
+                    deleteServerIDCommand = cliJoin(cliPath, jfrogCliConfigRmCommand, quote(serverIdArray[i]), '--quiet');
+                } else {
+                    deleteServerIDCommand = cliJoin(cliPath, jfrogCliLegacyConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
+                }
                 // This operation throws an exception in case of failure.
                 executeCliCommand(deleteServerIDCommand, buildDir, null);
             }
@@ -372,23 +427,28 @@ function addCommonGenericParams(cliCommand, specPath) {
     return cliCommand;
 }
 
-function logCliVersion(cliPath) {
-    let cliCommand = cliJoin(cliPath, '--version');
+function logCliVersionAndSetSelected(cliPath) {
     try {
-        let res = execSync(cliCommand);
-        let detectedVersion = String.fromCharCode
-            .apply(null, res)
-            .split(' ')[2]
-            .trim();
+        let detectedVersion = getCliVersion(cliPath);
         console.log('JFrog CLI version: ' + detectedVersion);
+        tl.setVariable(taskSelectedCliVersionEnv, detectedVersion);
     } catch (ex) {
         console.error('Failed to get JFrog CLI version: ' + ex);
     }
 }
 
+function getCliVersion(cliPath) {
+    let cliCommand = cliJoin(cliPath, '--version');
+    let res = execSync(cliCommand);
+    return String.fromCharCode
+        .apply(null, res)
+        .split(' ')[2]
+        .trim();
+}
+
 function runCbk(cliPath) {
     console.log('Running jfrog-cli from ' + cliPath + '.');
-    logCliVersion(cliPath);
+    logCliVersionAndSetSelected(cliPath);
     runTaskCbk(cliPath);
 }
 
@@ -399,9 +459,9 @@ function createCliDirs() {
 }
 
 function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogCliVersion) {
-    // If unspecified, use the default cliDownloadUrl of Bintray.
+    // If unspecified, download from 'releases.jfrog.io' by default.
     if (!cliDownloadUrl) {
-        cliDownloadUrl = buildBintrayDownloadUrl(cliVersion);
+        cliDownloadUrl = buildReleasesDownloadUrl(cliVersion);
         cliAuthHandlers = [];
     }
     return new Promise((resolve, reject) => {
@@ -425,7 +485,7 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
 
 // Compares two versions.
 // Returns 0 if the versions are equal, 1 if version1 is higher and -1 otherwise.
-function comparVersions(version1, version2) {
+function compareVersions(version1, version2) {
     let version1Tokens = version1.split('.', 3);
     let version2Tokens = version2.split('.', 3);
     let maxIndex = version1Tokens.length;
@@ -470,8 +530,15 @@ function getArchitecture() {
     if (platform.includes('darwin')) {
         return 'mac-386';
     }
-    if (process.arch.includes('64')) {
-        return 'linux-amd64';
+    switch (process.arch) {
+        case 'amd64':
+            return 'linux-amd64';
+        case 'arm64':
+            return 'linux-arm64';
+        case 'arm':
+            return 'linux-arm';
+        case 's390x':
+            return 'linux-s390x';
     }
     return 'linux-386';
 }
@@ -645,4 +712,27 @@ function deprecatedTaskMessage(oldTaskVersion, newTaskVersion) {
  */
 function getCurrentTimestamp() {
     return Math.floor(Date.now() / 1000);
+}
+
+/**
+ * Removes the cli server config and env variables set in ToolsInstaller task.
+ * @throws In CLI execution failure.
+ */
+function removeExtractorsDownloadVariables(cliPath, workDir) {
+    let serverId = tl.getVariable(jcenterRemoteServerEnv);
+    if (!serverId) {
+        let extractorsEnv = tl.getVariable(extractorsRemoteEnv);
+        if (!extractorsEnv) {
+            return;
+        }
+        let ind = extractorsEnv.lastIndexOf('/');
+        if (ind === -1) {
+            console.warn('Unexpected value for the "' + extractorsRemoteEnv + '" environment variable:' + 'expected to contain at least one "/"');
+        }
+        serverId = extractorsEnv.substring(0, ind);
+    }
+    tl.setVariable(extractorsRemoteEnv, '');
+    tl.setVariable(jcenterRemoteServerEnv, '');
+    tl.setVariable(jcenterRemoteRepoEnv, '');
+    deleteCliServers(cliPath, workDir, [serverId]);
 }

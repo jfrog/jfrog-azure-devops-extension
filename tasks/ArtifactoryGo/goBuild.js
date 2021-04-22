@@ -1,10 +1,13 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
-const utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils/utils.js');
 
 const cliGoCommand = 'rt go';
 const cliGoPublishCommand = 'rt gp';
 const cliGoConfigCommand = 'rt go-config';
+const newGpCommandMinVersion = '1.46.1';
+const resolutionRepoInputName = 'resolutionRepo';
+const deploymentRepoInputName = 'targetRepo';
 let configuredServerId;
 
 function RunTaskCbk(cliPath) {
@@ -44,7 +47,7 @@ function RunTaskCbk(cliPath) {
 function performGoCommand(goCommand, cliPath, requiredWorkDir) {
     // Create config file and configure cli server
     try {
-        performGoConfig(cliPath, requiredWorkDir);
+        performGoConfig(cliPath, requiredWorkDir, resolutionRepoInputName, null);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;
@@ -59,19 +62,26 @@ function performGoCommand(goCommand, cliPath, requiredWorkDir) {
     executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
 }
 
-function performGoConfig(cliPath, requiredWorkDir) {
+/**
+ * Creates go config file.
+ * @param cliPath - JFrog CLI path.
+ * @param requiredWorkDir - Working Directory to run in.
+ * @param repoResolve - Resolution repo input name, null if not needed.
+ * @param repoDeploy - Deployment repo input name, null if not needed.
+ */
+function performGoConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
     configuredServerId = utils.createBuildToolConfigFile(
         cliPath,
         'artifactoryService',
         'go',
         requiredWorkDir,
         cliGoConfigCommand,
-        'resolutionRepo',
-        null
+        repoResolve,
+        repoDeploy
     );
 }
 
-function performGoPublishCommand(cliPath, requiredWorkDir) {
+function performLegacyGoPublishCommand(cliPath, requiredWorkDir, version) {
     try {
         configureGoCliServer(cliPath, requiredWorkDir, 'deployer');
     } catch (ex) {
@@ -81,8 +91,27 @@ function performGoPublishCommand(cliPath, requiredWorkDir) {
 
     // Build go publish command and execute
     let targetRepo = tl.getInput('targetRepo', true);
-    let version = tl.getInput('version', false);
     let cliCommand = utils.cliJoin(cliPath, cliGoPublishCommand, targetRepo, version);
+    executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
+}
+
+function performGoPublishCommand(cliPath, requiredWorkDir) {
+    let version = tl.getInput('version', false);
+
+    if (shouldUseLegacyGpCmd()) {
+        performLegacyGoPublishCommand(cliPath, requiredWorkDir, version);
+        return;
+    }
+
+    try {
+        performGoConfig(cliPath, requiredWorkDir, null, deploymentRepoInputName);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+        return;
+    }
+
+    // Build go publish command and execute
+    let cliCommand = utils.cliJoin(cliPath, cliGoPublishCommand, version);
     executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
 }
 
@@ -107,6 +136,11 @@ function configureGoCliServer(cliPath, buildDir, serverType) {
     let artifactoryService = tl.getInput('artifactoryService', false);
     utils.configureCliServer(artifactoryService, serverId, cliPath, buildDir);
     configuredServerId = [serverId];
+}
+
+function shouldUseLegacyGpCmd() {
+    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
+    return utils.compareVersions(cliVersion, newGpCommandMinVersion) < 0;
 }
 
 utils.executeCliTask(RunTaskCbk);

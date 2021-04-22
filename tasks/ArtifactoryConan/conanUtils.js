@@ -3,6 +3,7 @@ const uuid = require('uuid/v1');
 const os = require('os');
 const fs = require('fs-extra');
 const path = require('path');
+const utils = require('artifactory-tasks-utils/utils.js');
 
 // Helper Constants
 const CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME = 'artifact_property_build.name';
@@ -13,6 +14,7 @@ const BUILD_INFO_BUILD_NUMBER = 'number';
 const BUILD_INFO_BUILD_STARTED = 'started';
 const BUILD_INFO_FILE_NAME = 'generatedBuildInfo';
 const BUILD_TEMP_PATH = 'jfrog/builds';
+const projectsSupportMinVer = '1.45.0';
 
 /**
  * Execute Artifactory Conan Task
@@ -396,7 +398,17 @@ function initCliPartialsBuildDir(buildName, buildNumber) {
 }
 
 function getCliPartialsBuildDir(buildName, buildNumber) {
-    return path.join(os.tmpdir(), BUILD_TEMP_PATH, Buffer.from(buildName + '_' + buildNumber + '-').toString('base64'));
+    let buildId = buildName + '_' + buildNumber;
+    if (isProjectSupported()) {
+        // Add project name.
+        buildId += '_' + '';
+    }
+    return path.join(os.tmpdir(), BUILD_TEMP_PATH, Buffer.from(buildId).toString('base64'));
+}
+
+function isProjectSupported() {
+    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
+    return utils.compareVersions(cliVersion, projectsSupportMinVer) >= 0;
 }
 
 module.exports = {

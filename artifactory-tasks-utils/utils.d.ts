@@ -16,7 +16,7 @@ declare module 'artifactory-tasks-utils' {
     export function encodePath(str: string): string;
     export function getArchitecture(): string;
     export function determineCliWorkDir(defaultPath: string, providedPath: string): string;
-    export function comparVersions(version1: string, version2: string): number;
+    export function compareVersions(version1: string, version2: string): number;
     export function executeCliCommand(cliCommand: string, runningDir: string, stdio?: string | any[]): IExecSyncResult;
     export function deleteCliServers(cliPath: string, buildDir: string, serverIdArray: string[]): void;
     export function createBuildToolConfigFile(
@@ -28,4 +28,5 @@ declare module 'artifactory-tasks-utils' {
         repoResolver: string,
         repoDeploy: string
     ): string[];
+    export { taskSelectedCliVersionEnv };
 }
