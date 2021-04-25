@@ -1,5 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
-const utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils/utils.js');
 
 const cliExecName = 'jfrog';
 const cliCommandPrefix = cliExecName + ' rt ';
@@ -7,15 +7,22 @@ const cliCommandPrefix = cliExecName + ' rt ';
 RunJfrogCliCommand(RunTaskCbk);
 
 function RunJfrogCliCommand(RunTaskCbk) {
-    let cliVersion = utils.defaultJfrogCliVersion;
-    // If a custom version was requested and provided (by a variable or a specific value) we will try to use it
-    if (tl.getBoolInput('useCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
-        cliVersion = tl.getInput('cliVersion', true);
-        // If the min version allowed is higher than the requested version we will fail the task.
-        if (utils.comparVersions(utils.minCustomCliVersion, cliVersion) > 0) {
-            tl.setResult(tl.TaskResult.Failed, 'Custom JFrog CLI Version must be at least ' + utils.minCustomCliVersion);
-            return;
-        }
+    // If no custom version requested, run with the version of the rest of the pipeline.
+    if (!tl.getBoolInput('useCustomVersion')) {
+        utils.executeCliTask(RunTaskCbk);
+        return;
+    }
+    // Custom version selected, but placeholder provided.
+    if (tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') === 0) {
+        utils.executeCliTask(RunTaskCbk);
+        return;
+    }
+
+    let cliVersion = tl.getInput('cliVersion', true);
+    // If the min version allowed is higher than the requested version we will fail the task.
+    if (utils.compareVersions(utils.minCustomCliVersion, cliVersion) > 0) {
+        tl.setResult(tl.TaskResult.Failed, 'Custom JFrog CLI Version must be at least ' + utils.minCustomCliVersion);
+        return;
     }
     utils.executeCliTask(RunTaskCbk, cliVersion);
 }
@@ -31,8 +38,7 @@ function RunTaskCbk(cliPath) {
     if (!cliCommand.startsWith(cliCommandPrefix)) {
         tl.setResult(
             tl.TaskResult.Failed,
-            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jfrog rt'. The command received is: ",
-            cliCommand
+            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jfrog rt'. The command received is: " + cliCommand
         );
         return;
     }

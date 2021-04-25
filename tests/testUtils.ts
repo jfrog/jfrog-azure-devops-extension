@@ -146,7 +146,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'remote',
             packageType: 'generic',
-            url: 'https://jfrog.bintray.com/jfrog-cli-go/'
+            url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v1'
         })
     );
     createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
@@ -155,7 +155,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'remote',
             packageType: 'maven',
-            url: 'https://jcenter.bintray.com'
+            url: 'https://repo.maven.apache.org/maven2'
         })
     );
     createRepo(

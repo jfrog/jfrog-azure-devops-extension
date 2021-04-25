@@ -1,5 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
-const utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils/utils.js');
 
 const cliDiscardCommand = 'rt bdi';
 

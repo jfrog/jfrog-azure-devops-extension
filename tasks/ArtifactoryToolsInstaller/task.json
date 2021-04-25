@@ -24,7 +24,7 @@
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to download tools from. The service should proxy Bintray, to allow downloading the tools."
+            "helpMarkDown": "Artifactory service to download tools from."
         },
         {
             "name": "cliInstallationRepo",
@@ -32,7 +32,7 @@
             "label": "Install JFrog CLI from:",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jfrog.bintray.com/jfrog-cli-go/\".",
+            "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://releases.jfrog.io/artifactory/jfrog-cli/v1/\".",
             "visibleRule": "artifactoryService != \"\"",
             "properties": {
                 "EditableOptions": "True"
@@ -77,7 +77,7 @@
             "label": "From:",
             "defaultValue": "",
             "required": "true",
-            "helpMarkDown": "Sets the repository from which the Maven and Gradle Extractors should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://jcenter.bintray.com\".",
+            "helpMarkDown": "Sets the repository from which the Maven and Gradle Extractors should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://oss.jfrog.org/artifactory/oss-release-local/\".",
             "visibleRule": "installExtractors == true && artifactoryService != \"\"",
             "properties": {
                 "EditableOptions": "True"

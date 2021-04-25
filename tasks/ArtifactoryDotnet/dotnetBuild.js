@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
-const utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils/utils.js');
 const path = require('path');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const cliDotnetCoreRestoreCommand = 'rt dotnet restore';

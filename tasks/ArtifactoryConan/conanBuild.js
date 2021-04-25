@@ -1,6 +1,6 @@
 const conanutils = require('./conanUtils');
 const tl = require('azure-pipelines-task-lib/task');
-const utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils/utils.js');
 
 function run() {
     let conanCommand = tl.getInput('conanCommand', true);

@@ -1,5 +1,5 @@
 const testUtils = require('../../testUtils');
-const jfrogUtils = require('artifactory-tasks-utils');
+const jfrogUtils = require('artifactory-tasks-utils/utils.js');
 
 let inputs = {
     artifactoryResolverService: 'mock-service',
