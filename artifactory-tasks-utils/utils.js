@@ -3,7 +3,7 @@ const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
-const credentialsHandler = require('./credentialsHandler');
+const credentialsHandler = require('typed-rest-client/Handlers');
 
 const fileName = getCliExecutableName();
 const toolName = 'jfrog';
@@ -129,7 +129,7 @@ function createAuthHandlers(artifactoryService) {
 
     // Check if Artifactory should be accessed using access-token.
     if (artifactoryAccessToken) {
-        return [credentialsHandler.accessTokenHandler(artifactoryAccessToken)];
+        return [new credentialsHandler.BearerCredentialHandler(artifactoryAccessToken, false)];
     }
 
     // Check if Artifactory should be accessed anonymously.
@@ -138,7 +138,7 @@ function createAuthHandlers(artifactoryService) {
     }
 
     // Use basic authentication.
-    return [credentialsHandler.basicAuthHandler(artifactoryUser, artifactoryPassword)];
+    return [new credentialsHandler.BasicCredentialHandler(artifactoryUser, artifactoryPassword, false)];
 }
 
 function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
