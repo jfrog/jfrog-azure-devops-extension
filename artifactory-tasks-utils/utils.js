@@ -728,6 +728,7 @@ function removeExtractorsDownloadVariables(cliPath, workDir) {
         let ind = extractorsEnv.lastIndexOf('/');
         if (ind === -1) {
             console.warn('Unexpected value for the "' + extractorsRemoteEnv + '" environment variable:' + 'expected to contain at least one "/"');
+            return;
         }
         serverId = extractorsEnv.substring(0, ind);
     }
