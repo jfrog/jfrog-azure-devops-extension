@@ -370,31 +370,53 @@ export function deleteRepo(repoKey: any): void {
 }
 
 export function getLocalReleaseBundle(bundleName: string, bundleVersion: string, expectExist: boolean): syncRequest.Response {
-    const res: syncRequest.Response = syncRequest.default('GET', stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion, {
-        headers: {
-            Authorization: getAuthorizationHeaderValue()
+    const res: syncRequest.Response = syncRequest.default(
+        'GET',
+        stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion,
+        {
+            headers: {
+                Authorization: getAuthorizationHeaderValue()
+            }
         }
-    });
+    );
     if (!expectExist) {
         assert.ok(
             res.statusCode === 404,
-            'Expected release bundle "' + bundleName + '/' + bundleVersion + '" not to exist. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8')
+            'Expected release bundle "' +
+                bundleName +
+                '/' +
+                bundleVersion +
+                '" not to exist. Status code: ' +
+                res.statusCode +
+                '. Error: ' +
+                res.getBody('utf8')
         );
         return res;
     }
     assert.ok(
         res.statusCode === 200,
-        'Expected release bundle "' + bundleName + '/' + bundleVersion + '" to exist. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8')
+        'Expected release bundle "' +
+            bundleName +
+            '/' +
+            bundleVersion +
+            '" to exist. Status code: ' +
+            res.statusCode +
+            '. Error: ' +
+            res.getBody('utf8')
     );
     return res;
 }
 
 export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string): syncRequest.Response {
-    return syncRequest.default('GET', stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion + '/distribution', {
-        headers: {
-            Authorization: getAuthorizationHeaderValue()
+    return syncRequest.default(
+        'GET',
+        stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion + '/distribution',
+        {
+            headers: {
+                Authorization: getAuthorizationHeaderValue()
+            }
         }
-    });
+    );
 }
 
 export function getAuthorizationHeaderValue(): string {

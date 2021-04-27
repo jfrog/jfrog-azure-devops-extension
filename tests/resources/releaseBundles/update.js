@@ -9,7 +9,7 @@ fs.writeFileSync(
     JSON.stringify({
         files: [
             {
-                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + 'b.in',
+                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + 'b.in'
             }
         ]
     }),

@@ -10,7 +10,7 @@ fs.writeFileSync(
             {
                 site_name: '*',
                 city_name: '*',
-                country_codes: ['*'],
+                country_codes: ['*']
             }
         ]
     }),

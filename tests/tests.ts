@@ -816,17 +816,17 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const rbVersion: string = TestUtils.getRepoKeys().releaseBundleVersion;
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'create');
-                assertLocalReleaseBundle(rbName, rbVersion, true,['OPEN'], 'ADO DESC', );
+                assertLocalReleaseBundle(rbName, rbVersion, true, ['OPEN'], 'ADO DESC');
                 mockTask(testDir, 'update');
-                assertLocalReleaseBundle(rbName, rbVersion, true,['OPEN'], 'ADO DESC UPDATE');
+                assertLocalReleaseBundle(rbName, rbVersion, true, ['OPEN'], 'ADO DESC UPDATE');
                 mockTask(testDir, 'sign');
-                assertLocalReleaseBundle(rbName, rbVersion, true,['SIGNED','STORED','READY_FOR_DISTRIBUTION'], '');
+                assertLocalReleaseBundle(rbName, rbVersion, true, ['SIGNED', 'STORED', 'READY_FOR_DISTRIBUTION'], '');
                 mockTask(testDir, 'distributeDryRun');
                 assertRemoteReleaseBundle(rbName, rbVersion, false);
                 mockTask(testDir, 'distribute');
                 assertRemoteReleaseBundle(rbName, rbVersion, true);
                 mockTask(testDir, 'delete');
-                assertBundleDeletedWithWait(rbName, rbVersion).then();
+                assertBundleDeletedWithWait(rbName, rbVersion).catch((): string => 'deletion failed');
             },
             TestUtils.isSkipTest('distribution')
         );
@@ -999,8 +999,8 @@ function assertRemoteReleaseBundle(bundleName: string, bundleVersion: string, ex
         'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8')
     );
     let bodyStr: string = response.getBody('utf8');
-    if (bodyStr[0] !== "[") {
-        bodyStr = "[" + bodyStr + "]";
+    if (bodyStr[0] !== '[') {
+        bodyStr = '[' + bodyStr + ']';
     }
     const body: any = JSON.parse(bodyStr);
 
@@ -1022,12 +1022,10 @@ async function assertBundleDeletedWithWait(bundleName: string, bundleVersion: st
             response.statusCode !== 200,
             'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8')
         );
-        console.log("Waiting for distribution deletion " + bundleName + "/" + bundleVersion + "...");
+        console.log('Waiting for distribution deletion ' + bundleName + '/' + bundleVersion + '...');
         await sleep(1000);
     }
-    assert.fail(
-        'Timeout for release bundle deletion ' + bundleName + '/' +bundleVersion
-    );
+    assert.fail('Timeout for release bundle deletion ' + bundleName + '/' + bundleVersion);
 }
 
 function sleep(ms: number): Promise<void> {
