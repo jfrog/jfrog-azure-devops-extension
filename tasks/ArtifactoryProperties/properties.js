@@ -45,7 +45,7 @@ function RunTaskCbk(cliPath) {
         '--url=' + utils.quote(artifactoryUrl),
         '--spec=' + utils.quote(specPath)
     );
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
 
     try {
         utils.executeCliCommand(cliCommand, workDir);

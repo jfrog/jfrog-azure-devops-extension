@@ -21,7 +21,7 @@ function RunTaskCbk(cliPath) {
         '--url=' + utils.quote(artifactoryUrl)
     );
 
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addStringParam(cliCommand, 'status', 'status');
     cliCommand = utils.addStringParam(cliCommand, 'comment', 'comment');
     cliCommand = utils.addStringParam(cliCommand, 'sourceRepo', 'source-repo');

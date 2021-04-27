@@ -24,6 +24,8 @@
     "tags": [
         "JFrog",
         "Artifactory",
+        "Distribution",
+        "Xray",
         "Artifact",
         "Build",
         "Release",
@@ -75,10 +77,10 @@
             ],
             "properties": {
                 "name": "artifactoryService",
-                "displayName": "Artifactory",
+                "displayName": "JFrog Artifactory",
                 "url": {
                     "displayName": "Server URL",
-                    "helpText": "Specify the root URL of your Artifactory installation. For example, http://repo.jfrog.org/artifactory"
+                    "helpText": "Specify the root URL of your Artifactory installation. For example, https://repo.jfrog.org/artifactory"
                 },
                 "dataSources": [
                     {
@@ -136,7 +138,91 @@
                             {
                                 "id": "apitoken",
                                 "name": "Access Token",
-                                "description": "Access Token with deploy permissions. Click <a href=\"https://https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "distribution-service",
+            "description": "Service Endpoint type for Distribution connections",
+            "type": "ms.vss-endpoint.service-endpoint-type",
+            "targets": [
+                "ms.vss-endpoint.endpoint-types"
+            ],
+            "properties": {
+                "name": "distributionService",
+                "displayName": "JFrog Distribution",
+                "url": {
+                    "displayName": "Server URL",
+                    "helpText": "Specify the root URL of your Distribution installation. For example, https://repo.jfrog.org/distribution"
+                },
+                "icon": "images/distribution.png",
+                "dataSources": [
+                    {
+                        "name": "TestConnection",
+                        "endpointUrl": "{{endpoint.url}}/api/v1/system/ping",
+                        "resultSelector": "jsonpath:$.values[*]"
+                    },
+                    {
+                        "name": "BuildNames",
+                        "endpointUrl": "{{endpoint.url}}/api/build",
+                        "resultSelector": "jsonpath:$.builds[*]"
+                    },
+                    {
+                        "name": "BuildNumbers",
+                        "endpointUrl": "{{endpoint.url}}/api/build/{{definition}}",
+                        "resultSelector": "jsonpath:$.buildsNumbers[*]"
+                    }
+                ],
+                "authenticationSchemes": [
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+                        "inputDescriptors": [
+                            {
+                                "id": "username",
+                                "name": "Username",
+                                "description": "Distribution username with deploy permissions.",
+                                "inputMode": "textbox",
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "password",
+                                "name": "Password",
+                                "description": "Password or API key of an Distribution user with deploy permissions.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+                        "headers": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{ endpoint.apitoken }}"
+                            }
+                        ],
+                        "inputDescriptors": [
+                            {
+                                "id": "apitoken",
+                                "name": "Access Token",
+                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -450,6 +536,16 @@
             }
         },
         {
+            "id": "distribution-release-bundle",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/DistributionReleaseBundle"
+            }
+        },
+        {
             "id": "artifactory-collect-issues",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -534,6 +630,9 @@
         },
         {
             "path": "tasks/ArtifactoryPip"
+        },
+        {
+            "path": "tasks/DistributionReleaseBundle"
         },
         {
             "path": "tasks/ArtifactoryCollectIssues"

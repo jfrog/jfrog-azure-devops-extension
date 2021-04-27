@@ -121,7 +121,7 @@ function addArtifactoryServer(nugetCommandCli) {
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
 
     nugetCommandCli = utils.cliJoin(nugetCommandCli, '--url=' + utils.quote(artifactoryUrl));
-    nugetCommandCli = utils.addArtifactoryCredentials(nugetCommandCli, artifactoryService);
+    nugetCommandCli = utils.addServiceConnectionCredentials(nugetCommandCli, artifactoryService);
     return nugetCommandCli;
 }
 

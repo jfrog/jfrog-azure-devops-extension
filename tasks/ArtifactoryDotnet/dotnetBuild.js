@@ -31,7 +31,7 @@ function performDotnetRestore(cliPath) {
         } else {
             sourcePath = sourceFile;
         }
-        let configuredServerId = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo', null);
+        let configuredServerId = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
         let dotnetArguments = buildDotnetCliArgs();
         let dotnetCommand = utils.cliJoin(cliPath, cliDotnetCoreRestoreCommand, dotnetArguments);
         executeCliCommand(dotnetCommand, sourcePath, cliPath, configuredServerId);
@@ -73,8 +73,8 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerId) {
 }
 
 // Create dotnet config
-function performDotnetConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
-    configuredServerId = utils.createBuildToolConfigFile(
+function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
+    return utils.createBuildToolConfigFile(
         cliPath,
         'artifactoryService',
         'dotnet',

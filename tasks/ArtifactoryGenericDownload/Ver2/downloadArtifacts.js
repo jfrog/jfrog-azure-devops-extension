@@ -46,7 +46,7 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
         '--flat',
         '--fail-no-op'
     );
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
 
     try {
         utils.executeCliCommand(cliCommand, workDir);
@@ -74,7 +74,7 @@ function performGenericDownload(cliPath, workDir, artifactoryService, artifactor
 
     // Build the cli command.
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, '--url=' + utils.quote(artifactoryUrl), '--spec=' + utils.quote(specPath));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
     // Add build info collection.
     if (collectBuildInfo) {
