@@ -36,13 +36,18 @@ Use the following commands to run from terminal:
     export ADO_ARTIFACTORY_PASSWORD=password
     ```
     
-2. Set the ADO_ARTIFACTORY_DOCKER_DOMAIN and ADO_ARTIFACTORY_DOCKER_REPO environment variables with your Artifactory Docker registry domain and Artifactory Docker repository name:
+2. If you'd like to run docker tests, set the ADO_ARTIFACTORY_DOCKER_DOMAIN and ADO_ARTIFACTORY_DOCKER_REPO environment variables with your Artifactory Docker registry domain and Artifactory Docker repository name:
     ```
     export ADO_ARTIFACTORY_DOCKER_DOMAIN='localhost:8081/docker-local'
     export ADO_ARTIFACTORY_DOCKER_REPO=docker-local
     ```
-    
-3. Run the following commands:
+
+3. If you'd like to run distribution tests, set the ADO_DISTRIBUTION_URL environment variable with Distribution URL:
+    ```
+    export ADO_DISTRIBUTION_URL='http://localhost:8081/distribution'
+    ```
+   
+4. Run the following commands:
     ```
     npm i -g jfrog-cli-go
     npm t
@@ -52,7 +57,7 @@ Note: If you are running tests via your IDE, make sure you are registering tests
 
 ### Skipping Tests
 In order to skip tests, set the ADO_ARTIFACTORY_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
-The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy** and **docker**.
+The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy**, **distribution** and **docker**.
 
 For example, for setting the nuget and docker tests:  
 ```

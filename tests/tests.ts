@@ -25,6 +25,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         assert.ok(TestUtils.artifactoryUsername, 'Tests are missing environment variable: ADO_ARTIFACTORY_USERNAME');
         assert.ok(TestUtils.artifactoryPassword, 'Tests are missing environment variable: ADO_ARTIFACTORY_PASSWORD');
 
+        if (!TestUtils.isSkipTest('distribution')) {
+            assert.ok(TestUtils.distributionUrl, 'Tests are missing environment variable: ADO_DISTRIBUTION_URL');
+        }
         TestUtils.initTests();
         repoKeys = TestUtils.getRepoKeys();
     });
@@ -803,6 +806,31 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('pip')
         );
     });
+
+    describe('Release Bundle Tests', (): void => {
+        runSyncTest(
+            'Release Bundle',
+            (): void => {
+                const testDir: string = 'releaseBundles';
+                const rbName: string = 'ado-test-rb';
+                const rbVersion: string = TestUtils.getRepoKeys().releaseBundleVersion;
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'create');
+                assertLocalReleaseBundle(rbName, rbVersion, true,['OPEN'], 'ADO DESC', );
+                mockTask(testDir, 'update');
+                assertLocalReleaseBundle(rbName, rbVersion, true,['OPEN'], 'ADO DESC UPDATE');
+                mockTask(testDir, 'sign');
+                assertLocalReleaseBundle(rbName, rbVersion, true,['SIGNED','STORED','READY_FOR_DISTRIBUTION'], '');
+                mockTask(testDir, 'distributeDryRun');
+                assertRemoteReleaseBundle(rbName, rbVersion, false);
+                mockTask(testDir, 'distribute');
+                assertRemoteReleaseBundle(rbName, rbVersion, true);
+                mockTask(testDir, 'delete');
+                assertBundleDeletedWithWait(rbName, rbVersion).then();
+            },
+            TestUtils.isSkipTest('distribution')
+        );
+    });
 });
 
 /**
@@ -949,6 +977,61 @@ function assertBuild(build: any, buildName: string, buildNumber: string): void {
 
 function deleteBuild(buildName: string): void {
     TestUtils.deleteBuild(buildName);
+}
+
+function assertLocalReleaseBundle(bundleName: string, bundleVersion: string, expectExist: boolean, state: string[], description: string): void {
+    const response: syncRequest.Response = TestUtils.getLocalReleaseBundle(bundleName, bundleVersion, expectExist);
+    if (expectExist) {
+        const body: any = JSON.parse(response.getBody('utf8'));
+        assert.ok(body.name === bundleName, 'Wrong bundle name');
+        assert.ok(body.version === bundleVersion, 'Wrong bundle version');
+        assert.ok(state.includes(body.state), 'Wrong bundle state');
+        if (description) {
+            assert.ok(body.description === description, 'Wrong bundle description');
+        }
+    }
+}
+
+function assertRemoteReleaseBundle(bundleName: string, bundleVersion: string, expectExist: boolean): void {
+    const response: syncRequest.Response = TestUtils.getRemoteReleaseBundle(bundleName, bundleVersion);
+    assert.ok(
+        response.statusCode === 200,
+        'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8')
+    );
+    let bodyStr: string = response.getBody('utf8');
+    if (bodyStr[0] !== "[") {
+        bodyStr = "[" + bodyStr + "]";
+    }
+    const body: any = JSON.parse(bodyStr);
+
+    if (!expectExist) {
+        assert.ok(body.length === 0, 'Expected no remote release bundles.');
+        return;
+    }
+    assert.ok(body[0].status === 'Completed', 'Wrong bundle state');
+}
+
+async function assertBundleDeletedWithWait(bundleName: string, bundleVersion: string): Promise<void> {
+    // Wait for deletion of release bundle.
+    for (let i: number = 0; i < 120; i++) {
+        const response: syncRequest.Response = TestUtils.getRemoteReleaseBundle(bundleName, bundleVersion);
+        if (response.statusCode === 404) {
+            return;
+        }
+        assert.ok(
+            response.statusCode !== 200,
+            'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8')
+        );
+        console.log("Waiting for distribution deletion " + bundleName + "/" + bundleVersion + "...");
+        await sleep(1000);
+    }
+    assert.fail(
+        'Timeout for release bundle deletion ' + bundleName + '/' +bundleVersion
+    );
+}
+
+function sleep(ms: number): Promise<void> {
+    return new Promise((resolve): any => setTimeout(resolve, ms));
 }
 
 function assertPathExists(pathToCheck: string): void {

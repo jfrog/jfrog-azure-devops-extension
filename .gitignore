@@ -7,6 +7,6 @@ vss-extension-private.json
 artifactory-tasks-utils-*.tgz
 *package-lock.json
 .DS_Store
-.testData
+*testData
 .taskkey
 *.log
