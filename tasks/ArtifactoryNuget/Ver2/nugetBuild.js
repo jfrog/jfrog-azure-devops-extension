@@ -124,15 +124,7 @@ function addArtifactoryServer(nugetCommandCli) {
 
 // Create nuget config
 function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
-    return utils.createBuildToolConfigFile(
-        cliPath,
-        'artifactoryService',
-        'nuget',
-        requiredWorkDir,
-        nugetConfigCommand,
-        repoResolve,
-        null
-    );
+    return utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'nuget', requiredWorkDir, nugetConfigCommand, repoResolve, null);
 }
 
 // Creates the Nuget arguments

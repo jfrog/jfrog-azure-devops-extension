@@ -74,15 +74,7 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerId) {
 
 // Create dotnet config
 function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
-    return utils.createBuildToolConfigFile(
-        cliPath,
-        'artifactoryService',
-        'dotnet',
-        requiredWorkDir,
-        dotnetConfigCommand,
-        repoResolve,
-        null
-    );
+    return utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'dotnet', requiredWorkDir, dotnetConfigCommand, repoResolve, null);
 }
 
 // Creates the .NET Core CLI arguments

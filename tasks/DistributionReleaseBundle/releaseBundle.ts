@@ -1,6 +1,6 @@
 import * as utils from 'artifactory-tasks-utils/utils';
 import * as tl from 'azure-pipelines-task-lib/task';
-import * as path from "path";
+import * as path from 'path';
 
 const cliRbcCommand: string = 'rt rbc';
 const cliRbuCommand: string = 'rt rbu';
