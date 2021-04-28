@@ -4,7 +4,7 @@ const TEST_NAME = testUtils.getTestName(__dirname);
 let inputs = {
     command: 'create',
     rbName: 'ado-test-rb',
-    rbVersion: testUtils.getRepoKeys().releaseBundleVersion,
+    rbVersion: '123',
     fileSpec: JSON.stringify({
         files: [
             {
@@ -16,7 +16,8 @@ let inputs = {
     replaceSpecVars: true,
     specVars: 'key1=a.in',
     autoSign: false,
-    useCustomRepo: false,
+    useCustomRepo: true,
+    customRepoName: testUtils.getRepoKeys().releaseBundlesRepo,
     addReleaseNotes: true,
     releaseNotesFile: testUtils.getTestLocalFilesDir(__dirname) + 'releaseNotes',
     releaseNotesSyntax: 'plain_text',

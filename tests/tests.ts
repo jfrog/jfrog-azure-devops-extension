@@ -808,12 +808,20 @@ describe('JFrog Artifactory Extension Tests', (): void => {
     });
 
     describe('Release Bundle Tests', (): void => {
+        let rbName: string;
+        let rbVersion: string;
+        before(function(): void {
+            this.timeout(180000); // 2 minute timer for the before hook only.
+            rbName = 'ado-test-rb';
+            rbVersion = '123';
+            TestUtils.deleteReleaseBundle(rbName, rbVersion);
+            waitForBundleDeletion(rbName, rbVersion, false).catch((): string => 'deletion failed');
+        });
+
         runSyncTest(
             'Release Bundle',
             (): void => {
                 const testDir: string = 'releaseBundles';
-                const rbName: string = 'ado-test-rb';
-                const rbVersion: string = TestUtils.getRepoKeys().releaseBundleVersion;
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'create');
                 assertLocalReleaseBundle(rbName, rbVersion, true, ['OPEN'], 'ADO DESC');
@@ -826,10 +834,16 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'distribute');
                 assertRemoteReleaseBundle(rbName, rbVersion, true);
                 mockTask(testDir, 'delete');
-                assertBundleDeletedWithWait(rbName, rbVersion).catch((): string => 'deletion failed');
+                waitForBundleDeletion(rbName, rbVersion, true).catch((): string => 'deletion failed');
             },
             TestUtils.isSkipTest('distribution')
         );
+
+        after(function(): void {
+            this.timeout(180000); // 2 minute timer for the after hook only.
+            TestUtils.deleteReleaseBundle(rbName, rbVersion);
+            waitForBundleDeletion(rbName, rbVersion, false).catch((): string => 'deletion failed');
+        });
     });
 });
 
@@ -1011,21 +1025,32 @@ function assertRemoteReleaseBundle(bundleName: string, bundleVersion: string, ex
     assert.ok(body[0].status === 'Completed', 'Wrong bundle state');
 }
 
-async function assertBundleDeletedWithWait(bundleName: string, bundleVersion: string): Promise<void> {
+async function waitForBundleDeletion(bundleName: string, bundleVersion: string, doAssert: boolean): Promise<void> {
     // Wait for deletion of release bundle.
     for (let i: number = 0; i < 120; i++) {
         const response: syncRequest.Response = TestUtils.getRemoteReleaseBundle(bundleName, bundleVersion);
         if (response.statusCode === 404) {
             return;
         }
-        assert.ok(
-            response.statusCode !== 200,
-            'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8')
-        );
+        const failMsg: string = 'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8');
+        if (response.statusCode !== 200) {
+            if (doAssert) {
+                assert.fail(failMsg);
+            } else {
+                console.log(failMsg);
+                return;
+            }
+        }
         console.log('Waiting for distribution deletion ' + bundleName + '/' + bundleVersion + '...');
         await sleep(1000);
     }
-    assert.fail('Timeout for release bundle deletion ' + bundleName + '/' + bundleVersion);
+    const timeoutMsg: string = 'Timeout for release bundle deletion ' + bundleName + '/' + bundleVersion;
+    if (doAssert) {
+        assert.fail(timeoutMsg);
+    } else {
+        console.log(timeoutMsg);
+        return;
+    }
 }
 
 function sleep(ms: number): Promise<void> {

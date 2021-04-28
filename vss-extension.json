@@ -171,16 +171,6 @@
                         "name": "TestConnection",
                         "endpointUrl": "{{endpoint.url}}/api/v1/system/ping",
                         "resultSelector": "jsonpath:$.values[*]"
-                    },
-                    {
-                        "name": "BuildNames",
-                        "endpointUrl": "{{endpoint.url}}/api/build",
-                        "resultSelector": "jsonpath:$.builds[*]"
-                    },
-                    {
-                        "name": "BuildNumbers",
-                        "endpointUrl": "{{endpoint.url}}/api/build/{{definition}}",
-                        "resultSelector": "jsonpath:$.buildsNumbers[*]"
                     }
                 ],
                 "authenticationSchemes": [

@@ -39,7 +39,8 @@ const repoKeys: any = {
     goVirtualRepo: 'go-virtual',
     pipLocalRepo: 'pip-local',
     pipRemoteRepo: 'pip-remote',
-    pipVirtualRepo: 'pip-virtual'
+    pipVirtualRepo: 'pip-virtual',
+    releaseBundlesRepo: 'rb-repo'
 };
 
 export {
@@ -274,6 +275,7 @@ export function createTestRepositories(): void {
             repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo]
         })
     );
+    createRepo(repoKeys.releaseBundlesRepo, JSON.stringify({ rclass: 'releaseBundles' }));
 }
 
 /**
@@ -285,7 +287,6 @@ export function createUniqueReposKeys(): void {
         repoKeys[repoVar] = [testReposPrefix, repoKeys[repoVar]].join('-');
         repoKeys[repoVar] = [repoKeys[repoVar], timestamp].join('-');
     });
-    repoKeys.releaseBundleVersion = timestamp.toString();
     fs.outputFileSync(repoKeysPath, JSON.stringify(repoKeys));
 }
 
@@ -417,6 +418,16 @@ export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string
             }
         }
     );
+}
+
+export function deleteReleaseBundle(bundleName: string, bundleVersion: string): void {
+    syncRequest.default('POST', stripTrailingSlash(distributionUrl) + '/api/v1/distribution/' + bundleName + '/' + bundleVersion + '/delete', {
+        headers: {
+            Authorization: getAuthorizationHeaderValue(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ dry_run: false, distribution_rules: [{ site_name: '*' }], on_success: 'delete' })
+    });
 }
 
 export function getAuthorizationHeaderValue(): string {

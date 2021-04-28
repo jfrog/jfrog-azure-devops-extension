@@ -20,7 +20,7 @@ fs.writeFileSync(
 let inputs = {
     command: 'delete',
     rbName: 'ado-test-rb',
-    rbVersion: testUtils.getRepoKeys().releaseBundleVersion,
+    rbVersion: '123',
     distRulesSource: 'file',
     distRulesFilePath: filePath,
     deleteFromDist: true,

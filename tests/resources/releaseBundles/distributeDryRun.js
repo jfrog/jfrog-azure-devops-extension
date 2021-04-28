@@ -3,7 +3,7 @@ const testUtils = require('../../testUtils');
 let inputs = {
     command: 'distribute',
     rbName: 'ado-test-rb',
-    rbVersion: testUtils.getRepoKeys().releaseBundleVersion,
+    rbVersion: '123',
     distRulesSource: 'taskConfiguration',
     distRulesTaskFile: JSON.stringify({
         distribution_rules: [

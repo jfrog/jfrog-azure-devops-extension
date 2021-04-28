@@ -3,9 +3,10 @@ const testUtils = require('../../testUtils');
 let inputs = {
     command: 'sign',
     rbName: 'ado-test-rb',
-    rbVersion: testUtils.getRepoKeys().releaseBundleVersion,
+    rbVersion: '123',
     passphrase: '',
-    useCustomRepo: false,
+    useCustomRepo: true,
+    customRepoName: testUtils.getRepoKeys().releaseBundlesRepo,
     insecureTls: false
 };
 
