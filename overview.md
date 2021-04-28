@@ -11,6 +11,12 @@ Gain full traceability for your builds as the environment data associated with y
 The extension currently supports the following package managers:
 Maven, Gradle, npm, NuGet, Docker, Go, Pip and Conan. It also allows downloading and uploading generic files from and to Artifactory.
 
+**JFrog Distribution** is a centralized platform that lets you provision software release distribution.
+
+[Learn more](https://jfrog.com/distribution/)
+
+The **JFrog Artifactory Extension** also allows managing Release Bundles and their distribution processes, including release content, and target destinations. 
+
 ## Documentation and source code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
 <br>
@@ -93,3 +99,9 @@ The **Artifactory Publish Build-Info** task allows publishing builds to Artifact
 you can select a published build, to make its artifacts available for the release.
 
 ![ArtifactsSource](images/marketplace/artifacts-source.png)
+
+## Handling Distribution
+The **Distribution** task allows managing release bundles.
+The task provides the capability to create, update, sign, distribute or delete release bundles from JFrog Distribution.
+
+![Distribution](images/marketplace/distribution.png)
