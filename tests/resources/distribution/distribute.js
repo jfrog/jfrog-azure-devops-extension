@@ -19,4 +19,4 @@ let inputs = {
     insecureTls: false
 };
 
-testUtils.runDistTask(testUtils.releaseBundle, {}, inputs);
+testUtils.runDistributionTask(testUtils.distribution, {}, inputs);

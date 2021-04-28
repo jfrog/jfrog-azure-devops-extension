@@ -10,4 +10,4 @@ let inputs = {
     buildNumber: BUILD_NUMBER
 };
 
-testUtils.runTask(testUtils.publish, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.publish, {}, inputs);

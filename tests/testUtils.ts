@@ -17,7 +17,7 @@ const artifactoryAccessToken: string = process.env.ADO_ARTIFACTORY_ACCESS_TOKEN 
 const distributionUrl: string = process.env.ADO_DISTRIBUTION_URL || '';
 const artifactoryDockerDomain: string = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN || '';
 const artifactoryDockerRepo: string = process.env.ADO_ARTIFACTORY_DOCKER_REPO || '';
-const skipTests: string[] = process.env.ADO_ARTIFACTORY_SKIP_TESTS ? process.env.ADO_ARTIFACTORY_SKIP_TESTS.split(',') : [];
+const skipTests: string[] = process.env.ADO_SKIP_TESTS ? process.env.ADO_SKIP_TESTS.split(',') : [];
 
 const testReposPrefix: string = 'ado-extension-test';
 const repoKeys: any = {
@@ -75,7 +75,7 @@ export const collectIssues: string = path.join(__dirname, '..', 'tasks', 'Artifa
 export const toolsInstaller: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryToolsInstaller', 'toolsInstaller.js');
 export const genericCli: string = path.join(__dirname, '..', 'tasks', 'JfrogCli', 'jfrogCliRun.js');
 export const pip: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryPip', 'pipBuild.js');
-export const releaseBundle: string = path.join(__dirname, '..', 'tasks', 'DistributionReleaseBundle', 'releaseBundle.js');
+export const distribution: string = path.join(__dirname, '..', 'tasks', 'Distribution', 'distribution.js');
 
 export function initTests(): void {
     process.env.JFROG_CLI_REPORT_USAGE = 'false';
@@ -92,12 +92,12 @@ export function initTests(): void {
     createTestRepositories();
 }
 
-export function runTask(testMain: string, variables: any, inputs: any): void {
+export function runArtifactoryTask(testMain: string, variables: any, inputs: any): void {
     setServiceConnectionCredentials(artifactoryUrl);
     runTaskForService(testMain, variables, inputs);
 }
 
-export function runDistTask(testMain: string, variables: any, inputs: any): void {
+export function runDistributionTask(testMain: string, variables: any, inputs: any): void {
     setServiceConnectionCredentials(distributionUrl);
     runTaskForService(testMain, variables, inputs);
 }

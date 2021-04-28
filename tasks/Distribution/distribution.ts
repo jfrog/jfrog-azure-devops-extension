@@ -138,7 +138,7 @@ function getDistRulesFilePath(workDir: string): string {
         filePath = path.join(workDir, 'distRules' + Date.now() + '.json');
         tl.writeFile(filePath, distRulesTaskFile);
     } else {
-        throw new Error('Failed creating File-Spec, since the provided File-Spec source value is invalid.');
+        throw new Error('Failed creating distribution rules file, since the provided file source value is invalid.');
     }
     return filePath;
 }
@@ -150,7 +150,7 @@ function getWorkDir(): string {
 }
 
 /**
- * Returns the base of the CLI command, which will include:
+ * Returns the base of the CLI command, which includes:
  * CLI path, command prefix, command name, release bundle name & version, and credentials by flags.
  * @param cliPath - Path to the CLI's executable.
  * @param cliCommandName - Command name to run, including prefix.

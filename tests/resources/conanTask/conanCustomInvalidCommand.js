@@ -19,4 +19,4 @@ let inputs = {
     customArguments: 'invalid'
 };
 
-testUtils.runTask(testUtils.conan, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

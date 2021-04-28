@@ -1,4 +1,0 @@
-# Ignore ts outputs
-releaseBundle.js.map
-releaseBundle.d.ts
-releaseBundle.js

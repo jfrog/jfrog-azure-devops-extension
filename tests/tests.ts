@@ -807,7 +807,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Release Bundle Tests', (): void => {
+    describe('Distribution Tests', (): void => {
         let rbName: string;
         let rbVersion: string;
         before(function(): void {
@@ -819,7 +819,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         });
 
         runSyncTest(
-            'Release Bundle',
+            'Distribution',
             (): void => {
                 const testDir: string = 'releaseBundles';
                 mockTask(testDir, 'upload');

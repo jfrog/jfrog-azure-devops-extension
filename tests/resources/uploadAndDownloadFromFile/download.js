@@ -29,4 +29,4 @@ let inputs = {
     validateSymlinks: false
 };
 
-testUtils.runTask(testUtils.download, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.download, {}, inputs);

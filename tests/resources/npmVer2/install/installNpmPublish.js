@@ -10,4 +10,4 @@ let inputs = {
     arguments: ''
 };
 
-testUtils.runTask(testUtils.npmVer2, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.npmVer2, {}, inputs);

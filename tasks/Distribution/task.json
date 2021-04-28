@@ -1,7 +1,7 @@
 {
     "id": "e32cef69-9959-488f-8820-afbc87c8a726",
-    "name": "DistributionReleaseBundle",
-    "friendlyName": "Distribution Release Bundle",
+    "name": "Distribution",
+    "friendlyName": "Distribution",
     "description": "Create, update, sign, distribute or delete release bundles from JFrog Distribution",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Distribution)",
@@ -17,7 +17,7 @@
     },
     "demands": [],
     "minimumAgentVersion": "1.83.0",
-    "instanceNameFormat": "Distribution Release Bundle $(command)",
+    "instanceNameFormat": "Distribution $(command)",
     "groups": [
         {
             "name": "advanced",
@@ -32,14 +32,14 @@
             "label": "Distribution service",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Distribution service used release bundle management."
+            "helpMarkDown": "JFrog Distribution service."
         },
         {
             "name": "command",
             "type": "pickList",
             "label": "Command",
             "defaultValue": "create",
-            "helpMarkDown": "The Release bundle command to run.",
+            "helpMarkDown": "The release bundle operation to perform.",
             "required": true,
             "properties": {
                 "EditableOptions": "False"
@@ -277,7 +277,7 @@
     ],
     "execution": {
         "Node": {
-            "target": "releaseBundle.js",
+            "target": "distribution.js",
             "workingDirectory": "$(currentDirectory)"
         }
     }

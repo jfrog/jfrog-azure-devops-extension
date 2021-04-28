@@ -21,4 +21,4 @@ let inputs = {
     conanUserHome: '/tmp/custom/' + BUILD_NAME + '/' + BUILD_NUMBER
 };
 
-testUtils.runTask(testUtils.conan, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

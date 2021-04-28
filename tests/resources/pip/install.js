@@ -14,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'install');
-testUtils.runTask(testUtils.pip, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.pip, {}, inputs);

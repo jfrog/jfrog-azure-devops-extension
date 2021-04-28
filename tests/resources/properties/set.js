@@ -15,4 +15,4 @@ let inputs = {
     setProps: 'propKey1=propVal1;propKey2=propVal2'
 };
 
-testUtils.runTask(testUtils.properties, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.properties, {}, inputs);

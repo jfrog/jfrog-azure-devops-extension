@@ -7,4 +7,4 @@ let inputs = {
     command: 'jfrog rt del ' + testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + 'a.in'
 };
 
-testUtils.runTask(testUtils.genericCli, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.genericCli, {}, inputs);

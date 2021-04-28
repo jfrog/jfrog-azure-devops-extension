@@ -1,0 +1,4 @@
+# Ignore ts outputs
+distribution.js.map
+distribution.d.ts
+distribution.js

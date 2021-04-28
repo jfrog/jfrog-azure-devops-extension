@@ -32,4 +32,4 @@ let inputs = {
     specSource: 'taskConfiguration'
 };
 
-testUtils.runTask(testUtils.upload, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.upload, variables, inputs);

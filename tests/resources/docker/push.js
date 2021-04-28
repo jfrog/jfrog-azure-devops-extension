@@ -9,4 +9,4 @@ let inputs = {
     imageName: testUtils.artifactoryDockerDomain + '/docker-test:1'
 };
 
-testUtils.runTask(testUtils.docker, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.docker, {}, inputs);

@@ -12,4 +12,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'push');
-testUtils.runTask(testUtils.nugetVer1, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.nugetVer1, {}, inputs);

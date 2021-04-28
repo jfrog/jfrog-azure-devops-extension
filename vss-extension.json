@@ -180,7 +180,7 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "Distribution username with deploy permissions.",
+                                "description": "Distribution username.",
                                 "inputMode": "textbox",
                                 "validation": {
                                     "isRequired": true,
@@ -190,7 +190,7 @@
                             {
                                 "id": "password",
                                 "name": "Password",
-                                "description": "Password or API key of an Distribution user with deploy permissions.",
+                                "description": "Password or API key of an Distribution user.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -526,13 +526,13 @@
             }
         },
         {
-            "id": "distribution-release-bundle",
+            "id": "distribution",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/DistributionReleaseBundle"
+                "name": "tasks/Distribution"
             }
         },
         {
@@ -622,7 +622,7 @@
             "path": "tasks/ArtifactoryPip"
         },
         {
-            "path": "tasks/DistributionReleaseBundle"
+            "path": "tasks/Distribution"
         },
         {
             "path": "tasks/ArtifactoryCollectIssues"

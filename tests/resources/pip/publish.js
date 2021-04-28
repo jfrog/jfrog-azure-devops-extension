@@ -5,4 +5,4 @@ let inputs = {
     buildNumber: '17'
 };
 
-testUtils.runTask(testUtils.publish, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.publish, {}, inputs);

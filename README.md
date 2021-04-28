@@ -56,12 +56,12 @@ Use the following commands to run from terminal:
 Note: If you are running tests via your IDE, make sure you are registering tests with ts-node: `mocha -r ts-node/register tests.ts -t 600000`. 
 
 ### Skipping Tests
-In order to skip tests, set the ADO_ARTIFACTORY_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
+In order to skip tests, set the ADO_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
 The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy**, **distribution** and **docker**.
 
 For example, for setting the nuget and docker tests:  
 ```
-export ADO_ARTIFACTORY_SKIP_TESTS=nuget,docker
+export ADO_SKIP_TESTS=nuget,docker
 ```
     
 # Pull Requests

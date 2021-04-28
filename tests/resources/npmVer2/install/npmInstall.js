@@ -14,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.runTask(testUtils.npmVer2, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.npmVer2, {}, inputs);

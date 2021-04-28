@@ -27,4 +27,4 @@ let inputs = {
     symlinks: false
 };
 
-testUtils.runTask(testUtils.upload, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.upload, {}, inputs);
