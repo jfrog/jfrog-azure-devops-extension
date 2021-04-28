@@ -821,7 +821,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Distribution',
             (): void => {
-                const testDir: string = 'releaseBundles';
+                const testDir: string = 'distribution';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'create');
                 assertLocalReleaseBundle(rbName, rbVersion, true, ['OPEN'], 'ADO DESC');
