@@ -4,9 +4,8 @@ skip_tags: true
 environment:
   matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-        ADO_SKIP_TESTS: docker,maven,gradle,npm,go,nuget,dotnet,pip,proxy # todo ADO_SKIP_TESTS: docker
+        ADO_SKIP_TESTS: docker
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-        ADO_SKIP_TESTS: docker,maven,gradle,npm,go,nuget,dotnet,pip,proxy # todo
 
   nodejs_version: "10"
   ADO_ARTIFACTORY_URL:
