@@ -13,4 +13,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'push');
-testUtils.runTask(testUtils.dotnet, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.dotnet, {}, inputs);

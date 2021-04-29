@@ -14,9 +14,10 @@ const artifactoryUrl: string = process.env.ADO_ARTIFACTORY_URL || '';
 const artifactoryUsername: string = process.env.ADO_ARTIFACTORY_USERNAME || '';
 const artifactoryPassword: string = process.env.ADO_ARTIFACTORY_PASSWORD || '';
 const artifactoryAccessToken: string = process.env.ADO_ARTIFACTORY_ACCESS_TOKEN || '';
+const distributionUrl: string = process.env.ADO_DISTRIBUTION_URL || '';
 const artifactoryDockerDomain: string = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN || '';
 const artifactoryDockerRepo: string = process.env.ADO_ARTIFACTORY_DOCKER_REPO || '';
-const skipTests: string[] = process.env.ADO_ARTIFACTORY_SKIP_TESTS ? process.env.ADO_ARTIFACTORY_SKIP_TESTS.split(',') : [];
+const skipTests: string[] = process.env.ADO_SKIP_TESTS ? process.env.ADO_SKIP_TESTS.split(',') : [];
 
 const testReposPrefix: string = 'ado-extension-test';
 const repoKeys: any = {
@@ -38,10 +39,20 @@ const repoKeys: any = {
     goVirtualRepo: 'go-virtual',
     pipLocalRepo: 'pip-local',
     pipRemoteRepo: 'pip-remote',
-    pipVirtualRepo: 'pip-virtual'
+    pipVirtualRepo: 'pip-virtual',
+    releaseBundlesRepo: 'rb-repo'
 };
 
-export { testDataDir, repoKeys, artifactoryDockerDomain, artifactoryDockerRepo, artifactoryUrl, artifactoryPassword, artifactoryUsername };
+export {
+    testDataDir,
+    repoKeys,
+    artifactoryDockerDomain,
+    artifactoryDockerRepo,
+    artifactoryUrl,
+    artifactoryPassword,
+    artifactoryUsername,
+    distributionUrl
+};
 
 export const promote: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryBuildPromotion', 'buildPromotion.js');
 export const conan: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryConan', 'conanBuild.js');
@@ -64,6 +75,7 @@ export const collectIssues: string = path.join(__dirname, '..', 'tasks', 'Artifa
 export const toolsInstaller: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryToolsInstaller', 'toolsInstaller.js');
 export const genericCli: string = path.join(__dirname, '..', 'tasks', 'JfrogCli', 'jfrogCliRun.js');
 export const pip: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryPip', 'pipBuild.js');
+export const distribution: string = path.join(__dirname, '..', 'tasks', 'Distribution', 'distribution.js');
 
 export function initTests(): void {
     process.env.JFROG_CLI_REPORT_USAGE = 'false';
@@ -80,7 +92,17 @@ export function initTests(): void {
     createTestRepositories();
 }
 
-export function runTask(testMain: string, variables: any, inputs: any): void {
+export function runArtifactoryTask(testMain: string, variables: any, inputs: any): void {
+    setServiceConnectionCredentials(artifactoryUrl);
+    runTaskForService(testMain, variables, inputs);
+}
+
+export function runDistributionTask(testMain: string, variables: any, inputs: any): void {
+    setServiceConnectionCredentials(distributionUrl);
+    runTaskForService(testMain, variables, inputs);
+}
+
+export function runTaskForService(testMain: string, variables: any, inputs: any): void {
     variables['Agent.WorkFolder'] = testDataDir;
     variables['Agent.TempDirectory'] = testDataDir;
     variables['Agent.ToolsDirectory'] = testDataDir;
@@ -89,7 +111,6 @@ export function runTask(testMain: string, variables: any, inputs: any): void {
     const tmr: TaskMockRunner = new mockRun.TaskMockRunner(testMain);
 
     setVariables(variables);
-    setArtifactoryCredentials();
     mockGetInputs(inputs);
 
     tmr.registerMock('azure-pipelines-task-lib/mock-task', tl);
@@ -254,6 +275,9 @@ export function createTestRepositories(): void {
             repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo]
         })
     );
+    if (!isSkipTest('distribution')) {
+        createRepo(repoKeys.releaseBundlesRepo, JSON.stringify({ rclass: 'releaseBundles' }));
+    }
 }
 
 /**
@@ -348,6 +372,66 @@ export function deleteRepo(repoKey: any): void {
     });
 }
 
+export function getLocalReleaseBundle(bundleName: string, bundleVersion: string, expectExist: boolean): syncRequest.Response {
+    const res: syncRequest.Response = syncRequest.default(
+        'GET',
+        stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion,
+        {
+            headers: {
+                Authorization: getAuthorizationHeaderValue()
+            }
+        }
+    );
+    if (!expectExist) {
+        assert.ok(
+            res.statusCode === 404,
+            'Expected release bundle "' +
+                bundleName +
+                '/' +
+                bundleVersion +
+                '" not to exist. Status code: ' +
+                res.statusCode +
+                '. Error: ' +
+                res.getBody('utf8')
+        );
+        return res;
+    }
+    assert.ok(
+        res.statusCode === 200,
+        'Expected release bundle "' +
+            bundleName +
+            '/' +
+            bundleVersion +
+            '" to exist. Status code: ' +
+            res.statusCode +
+            '. Error: ' +
+            res.getBody('utf8')
+    );
+    return res;
+}
+
+export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string): syncRequest.Response {
+    return syncRequest.default(
+        'GET',
+        stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion + '/distribution',
+        {
+            headers: {
+                Authorization: getAuthorizationHeaderValue()
+            }
+        }
+    );
+}
+
+export function deleteReleaseBundle(bundleName: string, bundleVersion: string): void {
+    syncRequest.default('POST', stripTrailingSlash(distributionUrl) + '/api/v1/distribution/' + bundleName + '/' + bundleVersion + '/delete', {
+        headers: {
+            Authorization: getAuthorizationHeaderValue(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ dry_run: false, distribution_rules: [{ site_name: '*' }], on_success: 'delete' })
+    });
+}
+
 export function getAuthorizationHeaderValue(): string {
     if (artifactoryAccessToken) {
         return 'Bearer ' + artifactoryAccessToken;
@@ -356,9 +440,9 @@ export function getAuthorizationHeaderValue(): string {
     }
 }
 
-export function setArtifactoryCredentials(): void {
+export function setServiceConnectionCredentials(url: string): void {
     (tl as any).getEndpointUrl = (): string => {
-        return artifactoryUrl;
+        return url;
     };
     (tl as any).getEndpointAuthorizationParameter = (id: string, key: string): string => {
         switch (key) {

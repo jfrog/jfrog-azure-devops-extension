@@ -9,4 +9,4 @@ let inputs = {
     async: false
 };
 
-testUtils.runTask(testUtils.discard, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.discard, {}, inputs);

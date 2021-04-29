@@ -10,7 +10,7 @@ const toolName = 'jfrog';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jfrog'));
 const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder') || '', '_jfrog'));
-const defaultJfrogCliVersion = '1.46.4';
+const defaultJfrogCliVersion = '1.47.1';
 const minCustomCliVersion = '1.37.1';
 const pluginVersion = '1.11.8';
 const buildAgent = 'artifactory-azure-devops-extension';
@@ -46,12 +46,13 @@ module.exports = {
     cliJoin: cliJoin,
     quote: quote,
     isWindows: isWindows,
-    addArtifactoryCredentials: addArtifactoryCredentials,
+    addServiceConnectionCredentials: addServiceConnectionCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     addIntParam: addIntParam,
     addCommonGenericParams: addCommonGenericParams,
     addUrlAndCredentialsParams: addUrlAndCredentialsParams,
+    addDistUrlAndCredentialsParams: addDistUrlAndCredentialsParams,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
@@ -72,6 +73,7 @@ module.exports = {
     useCliServer: useCliServer,
     getCurrentTimestamp: getCurrentTimestamp,
     removeExtractorsDownloadVariables: removeExtractorsDownloadVariables,
+    handleSpecFile: handleSpecFile,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion,
     pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
@@ -225,7 +227,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    return str.replace(/--password=".*"/g, '--password=***').replace(/--access-token=".*"/g, '--access-token=***');
+    return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
 }
 
 /**
@@ -330,23 +332,23 @@ function quote(str) {
     return '"' + str + '"';
 }
 
-function addArtifactoryCredentials(cliCommand, artifactoryService) {
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, 'username', true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, 'password', true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, 'apitoken', true);
+function addServiceConnectionCredentials(cliCommand, serviceConnection) {
+    let user = tl.getEndpointAuthorizationParameter(serviceConnection, 'username', true);
+    let password = tl.getEndpointAuthorizationParameter(serviceConnection, 'password', true);
+    let accessToken = tl.getEndpointAuthorizationParameter(serviceConnection, 'apitoken', true);
 
     // Check if should use Access Token.
-    if (artifactoryAccessToken) {
-        return cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
+    if (accessToken) {
+        return cliJoin(cliCommand, '--access-token=' + quote(accessToken));
     }
 
     // Check if Artifactory should be accessed anonymously.
-    if (artifactoryUser === '') {
-        artifactoryUser = 'anonymous';
-        return cliJoin(cliCommand, '--user=' + quote(artifactoryUser));
+    if (user === '') {
+        user = 'anonymous';
+        return cliJoin(cliCommand, '--user=' + quote(user));
     }
 
-    return cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
+    return cliJoin(cliCommand, '--user=' + quote(user), '--password=' + quote(password));
 }
 
 function addStringParam(cliCommand, inputParam, cliParam, require) {
@@ -377,7 +379,14 @@ function addIntParam(cliCommand, inputParam, cliParam) {
 function addUrlAndCredentialsParams(cliCommand, artifactoryService) {
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     cliCommand = cliJoin(cliCommand, '--url=' + quote(artifactoryUrl));
-    cliCommand = addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = addServiceConnectionCredentials(cliCommand, artifactoryService);
+    return cliCommand;
+}
+
+function addDistUrlAndCredentialsParams(cliCommand, distributionService) {
+    let distUrl = tl.getEndpointUrl(distributionService, false);
+    cliCommand = cliJoin(cliCommand, '--dist-url=' + quote(distUrl));
+    cliCommand = addServiceConnectionCredentials(cliCommand, distributionService);
     return cliCommand;
 }
 
@@ -391,11 +400,7 @@ function handleSpecFile(cliCommand, specPath) {
         return;
     }
     cliCommand = cliJoin(cliCommand, '--spec=' + quote(specPath));
-    return cliCommand;
-}
 
-function addCommonGenericParams(cliCommand, specPath) {
-    cliCommand = handleSpecFile(cliCommand, specPath);
     // Add spec-vars
     let replaceSpecVars = tl.getBoolInput('replaceSpecVars');
     if (replaceSpecVars) {
@@ -404,6 +409,12 @@ function addCommonGenericParams(cliCommand, specPath) {
             cliCommand = cliJoin(cliCommand, '--spec-vars=' + quote(fixWindowsPaths(specVars)));
         }
     }
+    return cliCommand;
+}
+
+function addCommonGenericParams(cliCommand, specPath) {
+    cliCommand = handleSpecFile(cliCommand, specPath);
+
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
     // Add build info collection
     if (collectBuildInfo) {

@@ -8,4 +8,4 @@ let inputs = {
     cliVersion: jfrogUtils.defaultJfrogCliVersion
 };
 
-testUtils.runTask(testUtils.toolsInstaller, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.toolsInstaller, {}, inputs);

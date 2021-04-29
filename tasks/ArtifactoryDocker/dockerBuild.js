@@ -46,7 +46,7 @@ function RunTaskCbk(cliPath) {
         utils.quote(dockerRepository),
         '--url=' + utils.quote(artifactoryUrl)
     );
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
 
     // Add build info collection
     if (collectBuildInfo) {

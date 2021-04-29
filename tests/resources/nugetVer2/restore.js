@@ -14,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'restore');
-testUtils.runTask(testUtils.nugetVer2, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.nugetVer2, {}, inputs);

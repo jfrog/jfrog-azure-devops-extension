@@ -14,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'restore');
-testUtils.runTask(testUtils.dotnet, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.dotnet, {}, inputs);

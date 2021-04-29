@@ -25,4 +25,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.runTask(testUtils.mavenVer1, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.mavenVer1, variables, inputs);

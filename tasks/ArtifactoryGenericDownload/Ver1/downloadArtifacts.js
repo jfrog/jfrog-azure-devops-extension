@@ -41,7 +41,7 @@ function RunTaskCbk(cliPath) {
     }
 
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, '--url=' + utils.quote(artifactoryUrl), '--spec=' + utils.quote(specPath));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
 
     // Add build info collection.

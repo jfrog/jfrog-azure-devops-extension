@@ -21,4 +21,4 @@ let inputs = {
     collectBuildInfo: true
 };
 
-testUtils.runTask(testUtils.conan, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

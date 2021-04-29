@@ -19,4 +19,4 @@ let inputs = {
     specVars: 'patternVar=a*.in'
 };
 
-testUtils.runTask(testUtils.upload, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.upload, {}, inputs);

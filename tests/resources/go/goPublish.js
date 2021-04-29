@@ -20,4 +20,4 @@ let inputs = {
     collectBuildInfo: true
 };
 
-testUtils.runTask(testUtils.go, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.go, variables, inputs);

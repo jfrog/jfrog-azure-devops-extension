@@ -25,6 +25,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         assert.ok(TestUtils.artifactoryUsername, 'Tests are missing environment variable: ADO_ARTIFACTORY_USERNAME');
         assert.ok(TestUtils.artifactoryPassword, 'Tests are missing environment variable: ADO_ARTIFACTORY_PASSWORD');
 
+        if (!TestUtils.isSkipTest('distribution')) {
+            assert.ok(TestUtils.distributionUrl, 'Tests are missing environment variable: ADO_DISTRIBUTION_URL');
+        }
         TestUtils.initTests();
         repoKeys = TestUtils.getRepoKeys();
     });
@@ -803,6 +806,45 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('pip')
         );
     });
+
+    describe('Distribution Tests', (): void => {
+        let rbName: string;
+        let rbVersion: string;
+        before(function(): void {
+            this.timeout(180000); // 2 minute timer for the before hook only.
+            rbName = 'ado-test-rb';
+            rbVersion = '123';
+            TestUtils.deleteReleaseBundle(rbName, rbVersion);
+            waitForBundleDeletion(rbName, rbVersion, false).catch((): string => 'deletion failed');
+        });
+
+        runSyncTest(
+            'Distribution',
+            (): void => {
+                const testDir: string = 'distribution';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'create');
+                assertLocalReleaseBundle(rbName, rbVersion, true, ['OPEN'], 'ADO DESC');
+                mockTask(testDir, 'update');
+                assertLocalReleaseBundle(rbName, rbVersion, true, ['OPEN'], 'ADO DESC UPDATE');
+                mockTask(testDir, 'sign');
+                assertLocalReleaseBundle(rbName, rbVersion, true, ['SIGNED', 'STORED', 'READY_FOR_DISTRIBUTION'], '');
+                mockTask(testDir, 'distributeDryRun');
+                assertRemoteReleaseBundle(rbName, rbVersion, false);
+                mockTask(testDir, 'distribute');
+                assertRemoteReleaseBundle(rbName, rbVersion, true);
+                mockTask(testDir, 'delete');
+                waitForBundleDeletion(rbName, rbVersion, true).catch((): string => 'deletion failed');
+            },
+            TestUtils.isSkipTest('distribution')
+        );
+
+        after(function(): void {
+            this.timeout(180000); // 2 minute timer for the after hook only.
+            TestUtils.deleteReleaseBundle(rbName, rbVersion);
+            waitForBundleDeletion(rbName, rbVersion, false).catch((): string => 'deletion failed');
+        });
+    });
 });
 
 /**
@@ -949,6 +991,70 @@ function assertBuild(build: any, buildName: string, buildNumber: string): void {
 
 function deleteBuild(buildName: string): void {
     TestUtils.deleteBuild(buildName);
+}
+
+function assertLocalReleaseBundle(bundleName: string, bundleVersion: string, expectExist: boolean, state: string[], description: string): void {
+    const response: syncRequest.Response = TestUtils.getLocalReleaseBundle(bundleName, bundleVersion, expectExist);
+    if (expectExist) {
+        const body: any = JSON.parse(response.getBody('utf8'));
+        assert.ok(body.name === bundleName, 'Wrong bundle name');
+        assert.ok(body.version === bundleVersion, 'Wrong bundle version');
+        assert.ok(state.includes(body.state), 'Wrong bundle state');
+        if (description) {
+            assert.ok(body.description === description, 'Wrong bundle description');
+        }
+    }
+}
+
+function assertRemoteReleaseBundle(bundleName: string, bundleVersion: string, expectExist: boolean): void {
+    const response: syncRequest.Response = TestUtils.getRemoteReleaseBundle(bundleName, bundleVersion);
+    assert.ok(
+        response.statusCode === 200,
+        'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8')
+    );
+    let bodyStr: string = response.getBody('utf8');
+    if (bodyStr[0] !== '[') {
+        bodyStr = '[' + bodyStr + ']';
+    }
+    const body: any = JSON.parse(bodyStr);
+
+    if (!expectExist) {
+        assert.ok(body.length === 0, 'Expected no remote release bundles.');
+        return;
+    }
+    assert.ok(body[0].status === 'Completed', 'Wrong bundle state');
+}
+
+async function waitForBundleDeletion(bundleName: string, bundleVersion: string, doAssert: boolean): Promise<void> {
+    // Wait for deletion of release bundle.
+    for (let i: number = 0; i < 120; i++) {
+        const response: syncRequest.Response = TestUtils.getRemoteReleaseBundle(bundleName, bundleVersion);
+        if (response.statusCode === 404) {
+            return;
+        }
+        const failMsg: string = 'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8');
+        if (response.statusCode !== 200) {
+            if (doAssert) {
+                assert.fail(failMsg);
+            } else {
+                console.log(failMsg);
+                return;
+            }
+        }
+        console.log('Waiting for distribution deletion ' + bundleName + '/' + bundleVersion + '...');
+        await sleep(1000);
+    }
+    const timeoutMsg: string = 'Timeout for release bundle deletion ' + bundleName + '/' + bundleVersion;
+    if (doAssert) {
+        assert.fail(timeoutMsg);
+    } else {
+        console.log(timeoutMsg);
+        return;
+    }
+}
+
+function sleep(ms: number): Promise<void> {
+    return new Promise((resolve): any => setTimeout(resolve, ms));
 }
 
 function assertPathExists(pathToCheck: string): void {

@@ -22,4 +22,4 @@ let inputs = {
     extraArguments: ''
 };
 
-testUtils.runTask(testUtils.conan, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

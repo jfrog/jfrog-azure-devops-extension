@@ -1,4 +1,4 @@
-const conanutils = require('./conanUtils');
+const conanutils = require('./conanUtils.js');
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils/utils.js');
 

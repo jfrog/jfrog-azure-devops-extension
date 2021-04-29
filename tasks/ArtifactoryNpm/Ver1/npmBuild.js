@@ -57,7 +57,7 @@ function RunTaskCbk(cliPath) {
 function performNpmCommand(cliNpmCommand, npmRepository, addThreads, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir) {
     // Build the cli command.
     let cliCommand = utils.cliJoin(cliPath, cliNpmCommand, utils.quote(npmRepository), '--url=' + utils.quote(artifactoryUrl));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addStringParam(cliCommand, 'arguments', 'npm-args');
 
     // Add build info collection.

@@ -407,7 +407,14 @@ function getCliPartialsBuildDir(buildName, buildNumber) {
 }
 
 function isProjectSupported() {
+    // Check if a JFrog CLI version was previously selected / requested, otherwise assume default version.
     let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
+    if (!cliVersion) {
+        cliVersion = tl.getVariable(utils.pipelineRequestedCliVersionEnv);
+    }
+    if (!cliVersion) {
+        return true;
+    }
     return utils.compareVersions(cliVersion, projectsSupportMinVer) >= 0;
 }
 

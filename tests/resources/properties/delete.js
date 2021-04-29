@@ -15,4 +15,4 @@ let inputs = {
     deleteProps: 'propKey1'
 };
 
-testUtils.runTask(testUtils.properties, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.properties, {}, inputs);

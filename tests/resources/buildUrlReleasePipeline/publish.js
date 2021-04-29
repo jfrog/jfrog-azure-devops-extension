@@ -11,4 +11,4 @@ let inputs = {
     buildNumber: '3'
 };
 
-testUtils.runTask(testUtils.publish, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.publish, variables, inputs);

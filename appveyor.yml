@@ -4,7 +4,7 @@ skip_tags: true
 environment:
   matrix:
       - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-        ADO_ARTIFACTORY_SKIP_TESTS: docker
+        ADO_SKIP_TESTS: docker
       - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
 
   nodejs_version: "10"
@@ -18,6 +18,8 @@ environment:
     secure: ppjr6mrLIKXVptLX8WPOlffTwOLtRIoaIpsVEvmje/9mDtLojTqpwI9OIC5VZnx1
   ADO_ARTIFACTORY_DOCKER_REPO:
     secure: UjixvF6E1Bp1p8zgPRLCVA==
+  ADO_DISTRIBUTION_URL:
+    secure: RIh0gGFDn2JAnLUEEqLsQrfLmtDrzDd5Qphea4gOE0Lu1Uz2Xa/y+D0Mld917gwy
 
 install:
 - cmd: powershell Install-Product node $env:nodejs_version

@@ -61,9 +61,11 @@ function RunTaskCbk(cliPath) {
         let envVal = serverId + '/' + tl.getInput('extractorsInstallationRepo');
         tl.setVariable(utils.extractorsRemoteEnv, envVal);
     } else {
-        console.warn("The version of JFrog CLI you are using downloads Maven and Gradle Extractors from Jcenter. " +
-            "Due to the sunset of Bintray and Jcenter, please use version 1.46.1 of JFrog CLI or above and modify your Extractors download repository as described in: " +
-            "https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ArtifactoryToolsInstaller")
+        console.warn(
+            'The version of JFrog CLI you are using downloads Maven and Gradle Extractors from Jcenter. ' +
+                'Due to the sunset of Bintray and Jcenter, please use version 1.46.1 of JFrog CLI or above and modify your Extractors download repository as described in: ' +
+                'https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ArtifactoryToolsInstaller'
+        );
         tl.setVariable(utils.jcenterRemoteServerEnv, serverId);
         tl.setVariable(utils.jcenterRemoteRepoEnv, tl.getInput('extractorsInstallationRepo'));
     }

@@ -29,4 +29,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir('gradle', 'resources');
-testUtils.runTask(testUtils.gradle, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.gradle, variables, inputs);

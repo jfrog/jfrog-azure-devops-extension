@@ -11,7 +11,7 @@ function RunTaskCbk(cliPath) {
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
 
     let cliCommand = utils.cliJoin(cliPath, cliDiscardCommand, utils.quote(buildName), '--url=' + utils.quote(artifactoryUrl));
-    cliCommand = utils.addArtifactoryCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addStringParam(cliCommand, 'maxDays', 'max-days');
     cliCommand = utils.addStringParam(cliCommand, 'maxBuilds', 'max-builds');
     cliCommand = utils.addStringParam(cliCommand, 'excludeBuilds', 'exclude-builds');

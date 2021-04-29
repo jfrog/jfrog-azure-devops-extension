@@ -27,4 +27,4 @@ let inputs = {
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'collectIssues_.git_suffix', '.git');
-testUtils.runTask(testUtils.collectIssues, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.collectIssues, {}, inputs);

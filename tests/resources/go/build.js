@@ -20,4 +20,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.runTask(testUtils.go, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.go, variables, inputs);

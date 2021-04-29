@@ -20,4 +20,4 @@ let inputs = {
     specSource: 'taskConfiguration'
 };
 
-testUtils.runTask(testUtils.download, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.download, {}, inputs);

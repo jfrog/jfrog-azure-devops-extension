@@ -13,4 +13,4 @@ let inputs = {
     dryRun: 'false'
 };
 
-testUtils.runTask(testUtils.promote, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.promote, {}, inputs);

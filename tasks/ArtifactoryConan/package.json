@@ -5,6 +5,7 @@
     "private": true,
     "license": "Apache-2.0",
     "main": "conanBuild.js",
+    "typings": "utils",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
