@@ -275,7 +275,9 @@ export function createTestRepositories(): void {
             repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo]
         })
     );
-    createRepo(repoKeys.releaseBundlesRepo, JSON.stringify({ rclass: 'releaseBundles' }));
+    if (!isSkipTest('distribution')) {
+        createRepo(repoKeys.releaseBundlesRepo, JSON.stringify({ rclass: 'releaseBundles' }));
+    }
 }
 
 /**
