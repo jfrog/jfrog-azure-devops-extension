@@ -175,6 +175,17 @@
             "required": false,
             "visibleRule": "collectBuildInfo == true",
             "helpMarkDown": "Select to include environment variables in the published build info."
+        },
+        {
+            "name": "nugetProtocolVersion",
+            "type": "radio",
+            "label": "NuGet protocol version",
+            "required": false,
+            "defaultValue": "v2",
+            "options": {
+                "v2": "v2",
+                "v3": "v3"
+            }
         }
     ],
     "dataSourceBindings": [
