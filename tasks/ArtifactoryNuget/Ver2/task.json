@@ -182,6 +182,7 @@
             "label": "NuGet protocol version",
             "required": false,
             "defaultValue": "v2",
+            "visibleRule": "command = restore",
             "options": {
                 "v2": "v2",
                 "v3": "v3"
