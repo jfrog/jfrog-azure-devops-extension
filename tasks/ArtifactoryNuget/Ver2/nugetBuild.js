@@ -5,6 +5,7 @@ const utils = require('artifactory-tasks-utils/utils.js');
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
 const NUGET_VERSION = '5.4.0';
+const MIN_CLI_VERSION_SUPPORTING_NUGET_V2 = '1.46.3'
 const path = require('path');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const cliNuGetCommand = 'rt nuget';
@@ -124,7 +125,36 @@ function addArtifactoryServer(nugetCommandCli) {
 
 // Create nuget config
 function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
-    return utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'nuget', requiredWorkDir, nugetConfigCommand, repoResolve, null);
+    const artService = tl.getInput('artifactoryService');
+    let cliCommand = utils.cliJoin(cliPath, nugetConfigCommand);
+
+    // Create serverId
+    let serverIdResolve = utils.assembleBuildToolServerId('nuget', tl.getInput('command', true) + 'Resolve');
+    utils.configureCliServer(artService, serverIdResolve, cliPath, requiredWorkDir);
+    // Add serverId and repo to config command
+    cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolve));
+    cliCommand = utils.addStringParam(cliCommand, repoResolve, 'repo-resolve', true);
+
+    if (isNugetProtocolSelectionSupported()) {
+        // Using Nuget protocol v2 by default.
+        let nugetProtocolVersion = tl.getInput('nugetProtocolVersion', false);
+        if (!nugetProtocolVersion || nugetProtocolVersion === 'v2') {
+            cliCommand = utils.cliJoin(cliCommand, '--nuget-v2');
+        }
+    }
+
+    // Execute cli.
+    try {
+        utils.executeCliCommand(cliCommand, requiredWorkDir, null);
+        return serverIdResolve
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
+}
+
+function isNugetProtocolSelectionSupported() {
+    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
+    return utils.compareVersions(cliVersion, MIN_CLI_VERSION_SUPPORTING_NUGET_V2) >= 0;
 }
 
 // Creates the Nuget arguments
