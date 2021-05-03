@@ -6,7 +6,7 @@ const npmInstallCommand = 'rt npmi';
 const npmPublishCommand = 'rt npmp';
 const npmCiCommand = 'rt npmci';
 const npmConfigCommand = 'rt npmc';
-let configuredServerId;
+let configuredServerIdsArray;
 
 function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -66,12 +66,12 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerId);
+        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerIdsArray);
     }
 }
 
 function performNpmConfigCommand(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
-    configuredServerId = utils.createBuildToolConfigFile(
+    configuredServerIdsArray = utils.createBuildToolConfigFile(
         cliPath,
         'artifactoryService',
         'npm',

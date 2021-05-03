@@ -8,7 +8,7 @@ const cliGoConfigCommand = 'rt go-config';
 const newGpCommandMinVersion = '1.46.1';
 const resolutionRepoInputName = 'resolutionRepo';
 const deploymentRepoInputName = 'targetRepo';
-let configuredServerId;
+let configuredServerIdsArray;
 
 function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -70,7 +70,7 @@ function performGoCommand(goCommand, cliPath, requiredWorkDir) {
  * @param repoDeploy - Deployment repo input name, null if not needed.
  */
 function performGoConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
-    configuredServerId = utils.createBuildToolConfigFile(
+    configuredServerIdsArray = utils.createBuildToolConfigFile(
         cliPath,
         'artifactoryService',
         'go',
@@ -125,7 +125,7 @@ function executeGoCliCommand(cliCommand, cliPath, requiredWorkDir) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerId);
+        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerIdsArray);
     }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
@@ -135,7 +135,7 @@ function configureGoCliServer(cliPath, buildDir, serverType) {
     const serverId = utils.assembleBuildToolServerId('go', serverType);
     let artifactoryService = tl.getInput('artifactoryService', false);
     utils.configureCliServer(artifactoryService, serverId, cliPath, buildDir);
-    configuredServerId = [serverId];
+    configuredServerIdsArray = [serverId];
 }
 
 function shouldUseLegacyGpCmd() {

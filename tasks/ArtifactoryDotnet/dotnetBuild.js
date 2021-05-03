@@ -31,10 +31,10 @@ function performDotnetRestore(cliPath) {
         } else {
             sourcePath = sourceFile;
         }
-        let configuredServerId = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
+        let configuredServerIdsArray = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
         let dotnetArguments = buildDotnetCliArgs();
         let dotnetCommand = utils.cliJoin(cliPath, cliDotnetCoreRestoreCommand, dotnetArguments);
-        executeCliCommand(dotnetCommand, sourcePath, cliPath, configuredServerId);
+        executeCliCommand(dotnetCommand, sourcePath, cliPath, configuredServerIdsArray);
     });
 }
 
@@ -53,7 +53,7 @@ function performDotnetNugetPush(cliPath) {
     executeCliCommand(uploadCommand, buildDir, cliPath);
 }
 
-function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerId) {
+function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) {
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
     if (collectBuildInfo) {
         let buildName = tl.getInput('buildName', true);
@@ -66,8 +66,8 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerId) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        if (configuredServerId) {
-            utils.deleteCliServers(cliPath, buildDir, configuredServerId);
+        if (configuredServerIdsArray) {
+            utils.deleteCliServers(cliPath, buildDir, configuredServerIdsArray);
         }
     }
 }
