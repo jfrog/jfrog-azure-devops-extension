@@ -76,8 +76,8 @@ function exec(cliPath, nugetCommand) {
             }
             let nugetArguments = addNugetArgsToCommands();
             nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
-            let configuredServerId = performNugetConfig(cliPath, solutionPath, 'targetResolveRepo');
-            runNuGet(nugetCommandCli, solutionPath, cliPath, configuredServerId);
+            let resolverServerId = performNugetConfig(cliPath, solutionPath, 'targetResolveRepo');
+            runNuGet(nugetCommandCli, solutionPath, cliPath, [resolverServerId]);
         });
     } else {
         // Perform push command.
@@ -93,7 +93,7 @@ function exec(cliPath, nugetCommand) {
     }
 }
 
-function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerId) {
+function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerIdsArray) {
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
 
     if (collectBuildInfo) {
@@ -107,8 +107,8 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerId) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        if (configuredServerId) {
-            utils.deleteCliServers(cliPath, buildDir, configuredServerId);
+        if (configuredServerIdsArray) {
+            utils.deleteCliServers(cliPath, buildDir, configuredServerIdsArray);
         }
     }
 }
