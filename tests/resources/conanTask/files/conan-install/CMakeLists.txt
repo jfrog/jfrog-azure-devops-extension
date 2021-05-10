@@ -1,25 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
-project(BoostPoco)
-add_compile_options(-std=c++11)
+cmake_minimum_required(VERSION 3.5)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+set(CMAKE_CXX_STANDARD 17)
 
-add_executable(timer timer.cpp)
-target_link_libraries(timer ${CONAN_LIBS})
+project(testproj)
 
+# If conan is being used, configure CMake to use conan for dependencies.
+include(${CMAKE_BINARY_DIR}/conan_paths.cmake OPTIONAL)
 
-# if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-#   include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-#    conan_basic_setup()
-# endif()
-
-# But we could use CMake find_package as well, or link with libraries individually
-#find_package(Boost REQUIRED regex)
-
-#if(Boost_FOUND)
-#  include_directories(${Boost_INCLUDE_DIRS})
-#  target_link_libraries(timer ${Boost_LIBRARIES})
-#endif()
-	
-#target_link_libraries(timer ${CONAN_LIBS_POCO})
+add_subdirectory(src)

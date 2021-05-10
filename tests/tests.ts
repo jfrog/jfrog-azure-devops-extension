@@ -811,11 +811,12 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         let rbName: string;
         let rbVersion: string;
         before(function(): void {
-            this.timeout(180000); // 2 minute timer for the before hook only.
-            rbName = 'ado-test-rb';
-            rbVersion = '123';
-            TestUtils.deleteReleaseBundle(rbName, rbVersion);
-            waitForBundleDeletion(rbName, rbVersion, false).catch((): string => 'deletion failed');
+            this.timeout(180000); // 3 minute timer for the before hook only.
+            if (!TestUtils.isSkipTest('distribution')) {
+                rbName = 'ado-test-rb';
+                rbVersion = '123';
+                distributionCleanUp(rbName, rbVersion);
+            }
         });
 
         runSyncTest(
@@ -840,12 +841,18 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
 
         after(function(): void {
-            this.timeout(180000); // 2 minute timer for the after hook only.
-            TestUtils.deleteReleaseBundle(rbName, rbVersion);
-            waitForBundleDeletion(rbName, rbVersion, false).catch((): string => 'deletion failed');
+            this.timeout(180000); // 3 minute timer for the after hook only.
+            distributionCleanUp(rbName, rbVersion);
         });
     });
 });
+
+function distributionCleanUp(rbName: string, rbVersion: string): void {
+    if (!TestUtils.isSkipTest('distribution')) {
+        TestUtils.deleteReleaseBundle(rbName, rbVersion);
+        waitForBundleDeletion(rbName, rbVersion, false).catch((): string => 'deletion failed');
+    }
+}
 
 /**
  * Run a sync test using mocha suit.

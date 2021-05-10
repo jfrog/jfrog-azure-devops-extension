@@ -33,6 +33,7 @@ services:
 - docker
 
 test_script:
+- conan -v
 - node --version
 - npm --version
 - npm t
