@@ -6,7 +6,7 @@
 # Precondition: Set 2 environment variables:
 # 1. ADO_ARTIFACTORY_DEVELOPER - Developer ID in Visual Studio (Organization name in Azure DevOps)
 # 2. ADO_ARTIFACTORY_API_KEY - API key in Visual Studio (Personal access tokens under 'Security' menu, configured to 'All accessible organizations' in 'Organization' and 'Full access' in 'Scopes'.)
-# 3. Create publisher at https://aka.ms/vsm-create-publisher with the Name (and ID): '$ADO_ARTIFACTORY_DEVELOPER-private' (other details are not required).
+# 3. Create publisher at https://aka.ms/vsm-create-publisher. It's Name (and ID) should be the value of '$ADO_ARTIFACTORY_DEVELOPER-private' (other details are not required).
 
 if [ -z "$ADO_ARTIFACTORY_DEVELOPER" ]; then
     echo "Please set ADO_ARTIFACTORY_DEVELOPER first"
