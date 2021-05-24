@@ -36,8 +36,6 @@ function RunTaskCbk(cliPath) {
 
     // Get inputs and variables
     let artifactoryService = tl.getInput('artifactoryService');
-    let buildName = tl.getVariable('Build.DefinitionName');
-    let buildNumber = tl.getVariable('Build.BuildNumber');
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -45,7 +43,7 @@ function RunTaskCbk(cliPath) {
     }
 
     // Config a temporary serverId for maven and Gradle extractors download:
-    let serverId = buildName + '-' + buildNumber + '-forextractorsdownload';
+    let serverId = utils.assembleBuildToolServerId('extractors', 'resolver');
     try {
         utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
     } catch (ex) {
