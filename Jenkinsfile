@@ -25,6 +25,13 @@ node("docker") {
     withEnv(["PATH+=${WORKSPACE}/node-v${NPM_VERSION}-linux-x64/bin"]) {
         dir('artifactory-azure-devops-extension') {
 
+            stage('Git config') {
+                sh '''#!/bin/bash
+                    git config user.name "jfrog-ecosystem"
+                    git config user.email "eco-system@jfrog.com"
+                '''
+            }
+
             stage('Merge to master') {
                 sh("git merge origin/dev")
             }
@@ -44,13 +51,6 @@ node("docker") {
                     npm run create
                     # Verify vsix file is larger than 15M
                     find . -iname "JFrog.jfrog-artifactory-vsts-extension*" -size +15M | grep .
-                '''
-            }
-
-            stage('Git config') {
-                sh '''#!/bin/bash
-                    git config user.name "jfrog-ecosystem"
-                    git config user.email "eco-system@jfrog.com"
                 '''
             }
 
