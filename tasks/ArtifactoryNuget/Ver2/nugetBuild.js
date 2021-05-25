@@ -5,7 +5,7 @@ const utils = require('artifactory-tasks-utils/utils.js');
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
 const NUGET_VERSION = '5.4.0';
-const MIN_CLI_VERSION_SUPPORTING_NUGET_V2 = '1.46.3'
+const MIN_CLI_VERSION_SUPPORTING_NUGET_V2 = '1.46.3';
 const path = require('path');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const cliNuGetCommand = 'rt nuget';
@@ -146,7 +146,7 @@ function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
     // Execute cli.
     try {
         utils.executeCliCommand(cliCommand, requiredWorkDir, null);
-        return serverIdResolve
+        return serverIdResolve;
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }
