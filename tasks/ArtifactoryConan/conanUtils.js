@@ -408,6 +408,8 @@ function getCliPartialsBuildDir(buildName, buildNumber) {
 
 function isProjectSupported() {
     // Check if a JFrog CLI version was previously selected / requested, otherwise assume default version.
+    // Conan has a separate support check because it does not use the utils.executeCli function, and thus utils.taskSelectedCliVersionEnv
+    // might not be set.
     let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
     if (!cliVersion) {
         cliVersion = tl.getVariable(utils.pipelineRequestedCliVersionEnv);

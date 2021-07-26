@@ -43,6 +43,14 @@
             "helpMarkDown": "Build number to publish.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
         },
         {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
             "name": "excludeEnvVars",
             "type": "string",
             "label": "Exclude environment variables",

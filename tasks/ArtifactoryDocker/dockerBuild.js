@@ -53,6 +53,7 @@ function RunTaskCbk(cliPath) {
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
         cliCommand = utils.cliJoin(cliCommand, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+        cliCommand = utils.addProjectOption(cliCommand);
     }
 
     try {

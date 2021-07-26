@@ -17,6 +17,7 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addStringParam(cliCommand, 'excludeBuilds', 'exclude-builds');
     cliCommand = utils.addBoolParam(cliCommand, 'deleteArtifacts', 'delete-artifacts');
     cliCommand = utils.addBoolParam(cliCommand, 'async', 'async');
+    cliCommand = utils.addProjectOption(cliCommand);
 
     try {
         utils.executeCliCommand(cliCommand, process.cwd());

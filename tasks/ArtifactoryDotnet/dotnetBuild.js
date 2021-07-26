@@ -59,6 +59,7 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) 
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
         cliCmd = utils.cliJoin(cliCmd, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+        cliCmd = utils.addProjectOption(cliCmd);
     }
     try {
         utils.executeCliCommand(cliCmd, buildDir, null);

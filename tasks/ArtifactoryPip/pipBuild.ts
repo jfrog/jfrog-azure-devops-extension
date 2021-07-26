@@ -34,6 +34,7 @@ function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): v
         const buildName: string = tl.getInput('buildName', true) || '';
         const buildNumber: string = tl.getInput('buildNumber', true) || '';
         cliCmd = utils.cliJoin(cliCmd, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+        cliCmd = utils.addProjectOption(cliCmd);
     }
     try {
         utils.executeCliCommand(cliCmd, buildDir);

@@ -28,6 +28,7 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addBoolParam(cliCommand, 'includeDependencies', 'include-dependencies');
     cliCommand = utils.addBoolParam(cliCommand, 'copy', 'copy');
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
+    cliCommand = utils.addProjectOption(cliCommand);
 
     try {
         utils.executeCliCommand(cliCommand, process.cwd());
