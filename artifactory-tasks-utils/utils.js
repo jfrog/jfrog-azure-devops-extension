@@ -772,8 +772,14 @@ function failIfProjectProvidedButNotSupported() {
     }
     let cliVersion = tl.getVariable(taskSelectedCliVersionEnv);
     if (compareVersions(cliVersion, projectsSupportMinVer) < 0) {
-        tl.setResult(tl.TaskResult.Failed, 'Project key provided but not supported by' +
-            ' the JFrog CLI version used (' + cliVersion + '). Minimal supported version: ' + projectsSupportMinVer);
+        tl.setResult(
+            tl.TaskResult.Failed,
+            'Project key provided but not supported by' +
+                ' the JFrog CLI version used (' +
+                cliVersion +
+                '). Minimal supported version: ' +
+                projectsSupportMinVer
+        );
         return true;
     }
     return false;
