@@ -35,6 +35,14 @@
             "helpMarkDown": "Build name to discard builds from.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
         },
         {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
             "name": "maxDays",
             "type": "string",
             "label": "Max days",

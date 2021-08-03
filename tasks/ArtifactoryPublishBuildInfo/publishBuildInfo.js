@@ -28,6 +28,7 @@ function RunTaskCbk(cliPath) {
     );
     cliCommand = addBuildUrl(cliCommand);
     cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addProjectOption(cliCommand);
 
     try {
         utils.executeCliCommand(cliCommand, workDir);

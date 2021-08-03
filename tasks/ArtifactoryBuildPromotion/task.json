@@ -43,6 +43,14 @@
             "helpMarkDown": "Number of a build, which is already published to Artifactory, to be promoted.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'."
         },
         {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
             "name": "targetRepo",
             "type": "pickList",
             "label": "Target repository",

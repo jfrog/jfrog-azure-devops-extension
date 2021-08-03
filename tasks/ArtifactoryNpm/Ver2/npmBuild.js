@@ -87,6 +87,7 @@ function getCollectBuildInfoFlags(addThreads) {
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
     let commandAddition = utils.cliJoin('--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+    commandAddition = utils.addProjectOption(commandAddition);
 
     // Check if need to add threads.
     if (addThreads) {

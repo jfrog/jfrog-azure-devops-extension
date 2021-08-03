@@ -22,6 +22,7 @@ function RunTaskCbk(cliPath) {
         '--fail=false'
     );
     cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
+    cliCommand = utils.addProjectOption(cliCommand);
 
     try {
         let taskRes = utils.executeCliCommand(cliCommand, process.cwd(), 'pipe');

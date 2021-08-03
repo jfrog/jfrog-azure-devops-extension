@@ -32,5 +32,6 @@ declare module 'artifactory-tasks-utils' {
         repoResolver: string,
         repoDeploy: string
     ): string[];
+    export function addProjectOption(cliCommand: string): string;
     export { taskSelectedCliVersionEnv };
 }

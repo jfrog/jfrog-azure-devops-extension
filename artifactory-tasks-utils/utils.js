@@ -37,6 +37,9 @@ const jfrogCliConfigRmCommand = 'c remove';
 const jfrogCliConfigUseCommand = 'c use';
 const newConfigCommandMinVersion = '1.46.1';
 
+// Projects version support:
+const projectsSupportMinVer = '1.47.0';
+
 let runTaskCbk = null;
 
 module.exports = {
@@ -74,6 +77,7 @@ module.exports = {
     getCurrentTimestamp: getCurrentTimestamp,
     removeExtractorsDownloadVariables: removeExtractorsDownloadVariables,
     handleSpecFile: handleSpecFile,
+    addProjectOption: addProjectOption,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion,
     pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
@@ -422,6 +426,7 @@ function addCommonGenericParams(cliCommand, specPath) {
         let buildNumber = tl.getInput('buildNumber', true);
         cliCommand = cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
         cliCommand = addStringParam(cliCommand, 'module', 'module');
+        cliCommand = addProjectOption(cliCommand);
     }
     // Add boolean flags
     cliCommand = addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
@@ -460,6 +465,9 @@ function getCliVersion(cliPath) {
 function runCbk(cliPath) {
     console.log('Running jfrog-cli from ' + cliPath + '.');
     logCliVersionAndSetSelected(cliPath);
+    if (failIfProjectProvidedButNotSupported()) {
+        return;
+    }
     runTaskCbk(cliPath);
 }
 
@@ -630,6 +638,7 @@ function collectEnvVars(cliPath) {
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, 'rt bce', quote(buildName), quote(buildNumber));
+    cliEnvVarsCommand = addProjectOption(cliEnvVarsCommand);
     executeCliCommand(cliEnvVarsCommand, workDir, null);
 }
 
@@ -705,7 +714,8 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         // Construct the build-info collection flags.
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
-        return cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
+        cliCommand = cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
+        return addProjectOption(cliCommand);
     }
     return cliCommand;
 }
@@ -748,4 +758,39 @@ function removeExtractorsDownloadVariables(cliPath, workDir) {
     tl.setVariable(jcenterRemoteServerEnv, '');
     tl.setVariable(jcenterRemoteRepoEnv, '');
     deleteCliServers(cliPath, workDir, [serverId]);
+}
+
+/**
+ * Checks whether projectKey was provided, and if so is it supported by the JFrog CLI version used.
+ * If provided but not supported, fails the task and returns true.
+ * @returns {boolean} isFailed - true if provided but not supported.
+ */
+function failIfProjectProvidedButNotSupported() {
+    let val = tl.getInput('projectKey', false);
+    if (!val) {
+        return false;
+    }
+    let cliVersion = tl.getVariable(taskSelectedCliVersionEnv);
+    if (compareVersions(cliVersion, projectsSupportMinVer) < 0) {
+        tl.setResult(
+            tl.TaskResult.Failed,
+            'Project key provided but not supported by' +
+                ' the JFrog CLI version used (' +
+                cliVersion +
+                '). Minimal supported version: ' +
+                projectsSupportMinVer
+        );
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Adds project key, if provided, as the project option to the cli command.
+ * Should be called after {@link failIfProjectProvidedButNotSupported}
+ * @param cliCommand - Command to append to.
+ * @returns {string} - Command after addition.
+ */
+function addProjectOption(cliCommand) {
+    return addStringParam(cliCommand, 'projectKey', 'project');
 }

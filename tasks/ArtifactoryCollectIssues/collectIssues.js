@@ -36,6 +36,7 @@ function RunTaskCbk(cliPath) {
         '--config=' + utils.quote(configPath),
         '--server-id=' + utils.quote(artifactoryService)
     );
+    cliCommand = utils.addProjectOption(cliCommand);
 
     try {
         utils.executeCliCommand(cliCommand, defaultWorkDir);

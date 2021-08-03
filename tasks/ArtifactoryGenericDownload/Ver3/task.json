@@ -118,6 +118,15 @@
             "helpMarkDown": "Module name.\nOptional module name for the build-info.\nThe collected build-info should be published to Artifactory using the 'Artifactory Publish Build Info' task."
         },
         {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
             "name": "includeEnvVars",
             "type": "boolean",
             "label": "Include environment variables",

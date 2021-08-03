@@ -43,6 +43,14 @@
             "helpMarkDown": "Build number to scan.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe build should already be published to Artifactory."
         },
         {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
             "name": "allowFailBuild",
             "type": "boolean",
             "label": "Allow fail build",

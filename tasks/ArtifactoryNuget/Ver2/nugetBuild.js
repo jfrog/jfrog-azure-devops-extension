@@ -100,6 +100,7 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerIdsArray) 
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
         nugetCommandCli = utils.cliJoin(nugetCommandCli, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+        nugetCommandCli = utils.addProjectOption(nugetCommandCli);
     }
     try {
         utils.executeCliCommand(nugetCommandCli, buildDir, null);
