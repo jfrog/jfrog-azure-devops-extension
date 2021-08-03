@@ -90,6 +90,11 @@ function createMavenConfigFile(cliPath, buildDir) {
         cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
         cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
         cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
+        let filterDeployedArtifacts = tl.getBoolInput('filterDeployedArtifacts');
+        if (filterDeployedArtifacts) {
+            cliCommand = utils.addStringParam(cliCommand, 'includePatterns', 'include-patterns', false);
+            cliCommand = utils.addStringParam(cliCommand, 'excludePatterns', 'exclude-patterns', false);
+        }
     } else {
         console.info('Deployment skipped since artifactoryDeployService was not set.');
     }

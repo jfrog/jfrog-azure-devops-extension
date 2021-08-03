@@ -503,7 +503,14 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Maven Test', '3');
+                const build: syncRequest.Response = getAndAssertBuild('Maven Test', '3');
+                const body: any = JSON.parse(build.getBody('utf8'));
+                const modules: any[] = body.buildInfo.modules;
+                assert.ok(!!modules);
+                assert.ok(modules.length > 0);
+                assert.ok(modules[0].artifacts.length === 2);
+                assert.ok(modules[0].excludedArtifacts.length === 2);
+                assert.ok(modules[0].dependencies.length === 2);
                 deleteBuild('Maven Test');
             },
             TestUtils.isSkipTest('maven')
