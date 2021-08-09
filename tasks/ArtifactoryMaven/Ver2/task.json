@@ -145,7 +145,7 @@
             "defaultValue": "",
             "required": false,
             "visibleRule": "filterDeployedArtifacts=true",
-            "helpMarkDown": "Pattern to include artifacts by. You may provide multiple wildcard patterns, separated by ';'."
+            "helpMarkDown": "Pattern to include artifacts by. You may provide multiple wildcard patterns, separated by ', '."
         },
         {
             "name": "excludePatterns",
@@ -155,7 +155,7 @@
             "defaultValue": "",
             "required": false,
             "visibleRule": "filterDeployedArtifacts=true",
-            "helpMarkDown": "Pattern to exclude artifacts by. You may provide multiple wildcard patterns, separated by ';'."
+            "helpMarkDown": "Pattern to exclude artifacts by. You may provide multiple wildcard patterns, separated by ', '."
         },
         {
             "name": "collectBuildInfo",
