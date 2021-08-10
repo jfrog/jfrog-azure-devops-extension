@@ -6,6 +6,7 @@ const cliMavenCommand = 'rt mvn';
 const mavenConfigCommand = 'rt mvnc';
 let serverIdDeployer;
 let serverIdResolver;
+const MIN_CLI_VERSION_SUPPORTING_INCLUDE_PATTERNS = '1.51.0';
 
 utils.executeCliTask(RunTaskCbk);
 
@@ -90,6 +91,19 @@ function createMavenConfigFile(cliPath, buildDir) {
         cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
         cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
         cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
+        let filterDeployedArtifacts = tl.getBoolInput('filterDeployedArtifacts');
+        if (filterDeployedArtifacts) {
+            if (isMvnIncludePatternsSupported()) {
+                cliCommand = utils.addStringParam(cliCommand, 'includePatterns', 'include-patterns', false);
+                cliCommand = utils.addStringParam(cliCommand, 'excludePatterns', 'exclude-patterns', false);
+            } else {
+                tl.warning(
+                    'Filtering Maven deployed artifacts is only supported with JFrog CLI version ' +
+                        MIN_CLI_VERSION_SUPPORTING_INCLUDE_PATTERNS +
+                        ' or above.'
+                );
+            }
+        }
     } else {
         console.info('Deployment skipped since artifactoryDeployService was not set.');
     }
@@ -110,4 +124,9 @@ function cleanup(cliPath, workDir) {
     } catch (removeVariablesException) {
         tl.setResult(tl.TaskResult.Failed, removeVariablesException);
     }
+}
+
+function isMvnIncludePatternsSupported() {
+    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
+    return utils.compareVersions(cliVersion, MIN_CLI_VERSION_SUPPORTING_INCLUDE_PATTERNS) >= 0;
 }

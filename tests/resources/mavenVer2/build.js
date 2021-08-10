@@ -22,7 +22,10 @@ let inputs = {
     targetDeploySnapshotRepo: repoKeys.mavenLocalRepo,
     goals: 'clean install',
     mavenPOMFile: path.join(TEST_NAME, 'pom.xml'),
-    collectBuildInfo: true
+    collectBuildInfo: true,
+    filterDeployedArtifacts: true,
+    includePatterns: '*1.0-*.jar, *pom*',
+    excludePatterns: '*sources*'
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

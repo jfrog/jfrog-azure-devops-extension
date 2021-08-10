@@ -129,6 +129,35 @@
             }
         },
         {
+            "name": "filterDeployedArtifacts",
+            "type": "boolean",
+            "label": "Filter deployed artifacts",
+            "groupName": "deployer",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to filter out some of the deployed artifacts by wildcard include/exclude patterns.\nSupported with JFrog CLI version 1.51.0 or above."
+        },
+        {
+            "name": "includePatterns",
+            "type": "string",
+            "label": "Include patterns",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "filterDeployedArtifacts=true",
+            "helpMarkDown": "Pattern to include artifacts by. You may provide multiple wildcard patterns, separated by ', '."
+        },
+        {
+            "name": "excludePatterns",
+            "type": "string",
+            "label": "Exclude patterns",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "filterDeployedArtifacts=true",
+            "helpMarkDown": "Pattern to exclude artifacts by. You may provide multiple wildcard patterns, separated by ', '."
+        },
+        {
             "name": "collectBuildInfo",
             "type": "boolean",
             "label": "Collect build info",
