@@ -24,7 +24,7 @@ let inputs = {
     mavenPOMFile: path.join(TEST_NAME, 'pom.xml'),
     collectBuildInfo: true,
     filterDeployedArtifacts: true,
-    includePatterns: '*1.0-*.jar;*pom*',
+    includePatterns: '*1.0-*.jar, *pom*',
     excludePatterns: '*sources*'
 };
 
