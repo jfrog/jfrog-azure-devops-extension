@@ -135,7 +135,7 @@
             "groupName": "deployer",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Select to filter the deployed artifacts by wildcard include/exclude patterns."
+            "helpMarkDown": "Select to filter out some of the deployed artifacts by wildcard include/exclude patterns.\nSupported with JFrog CLI version 1.51.0 or above."
         },
         {
             "name": "includePatterns",
