@@ -145,7 +145,7 @@
             "defaultValue": "",
             "required": false,
             "visibleRule": "filterDeployedArtifacts=true",
-            "helpMarkDown": "Pattern to include artifacts by. You may provide multiple wildcard patterns, separated by ', '."
+            "helpMarkDown": "Filter deployed artifacts by setting a wildcard pattern that specifies which artifacts to include.\nYou may provide multiple patterns separated by a comma followed by a white-space.\nFor example:\nartifact-*.jar, artifact-*.pom"
         },
         {
             "name": "excludePatterns",
@@ -155,7 +155,7 @@
             "defaultValue": "",
             "required": false,
             "visibleRule": "filterDeployedArtifacts=true",
-            "helpMarkDown": "Pattern to exclude artifacts by. You may provide multiple wildcard patterns, separated by ', '."
+            "helpMarkDown": "Filter deployed artifacts by setting a wildcard pattern that specifies which artifacts to exclude.\nYou may provide multiple patterns separated by a comma followed by a white-space.\nFor example:\nartifact-*-test.jar, artifact-*-test.pom"
         },
         {
             "name": "collectBuildInfo",
