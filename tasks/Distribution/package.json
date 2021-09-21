@@ -10,7 +10,6 @@
         "compile": "npx tsc -p ./"
     },
     "dependencies": {
-        "@types/q": "^1.5.4",
         "artifactory-tasks-utils": "file:../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
     }
 }
