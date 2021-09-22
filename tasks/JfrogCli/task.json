@@ -5,7 +5,7 @@
     "description": "Run your own JFrog CLI command.",
     "author": "JFrog",
     "category": "Tool",
-    "helpMarkDown": "[Learn more about JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ExecutingJFrogCLICommands)",
     "visibility": [
         "Build",
         "Release"

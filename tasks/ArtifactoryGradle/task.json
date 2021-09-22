@@ -4,7 +4,7 @@
     "friendlyName": "Artifactory Gradle",
     "description": "Build with Gradle, while resolving dependencies and deploying artifacts from and to Artifactory and while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Working+with+Gradle)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringGradleBuilds)",
     "category": "Utility",
     "visibility": [
         "Build",
