@@ -62,7 +62,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     ['']
                 );
             } catch (ex) {
-                retVal = ex.toString();
+                retVal = ex as string;
             }
             assert.ok(retVal !== '', 'An exception should have been caught');
             process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;

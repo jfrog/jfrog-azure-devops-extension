@@ -86,7 +86,7 @@ function performRbDistribute(cliPath: string, workDir: string): void {
         const filePath: string = getDistRulesFilePath(workDir);
         cliCommand = utils.cliJoin(cliCommand, '--dist-rules=' + utils.quote(filePath));
     } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
+        tl.setResult(tl.TaskResult.Failed, ex as string);
         return;
     }
 
@@ -104,7 +104,7 @@ function performRbDelete(cliPath: string, workDir: string): void {
         const filePath: string = getDistRulesFilePath(workDir);
         cliCommand = utils.cliJoin(cliCommand, '--dist-rules=' + utils.quote(filePath));
     } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
+        tl.setResult(tl.TaskResult.Failed, ex as string);
         return;
     }
     cliCommand = utils.addBoolParam(cliCommand, 'deleteFromDist', 'delete-from-dist');
@@ -123,7 +123,7 @@ function execCli(cliCommand: string, allowDryRun: boolean, allowInsecureTls: boo
         utils.executeCliCommand(cliCommand, process.cwd());
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
+        tl.setResult(tl.TaskResult.Failed, ex as string);
     }
 }
 
