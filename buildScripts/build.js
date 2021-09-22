@@ -17,7 +17,7 @@ installTests();
 function installArtifactoryTaskUtils() {
     clean(TASKS_UTILS_DIR, true);
     execNpm('i', TASKS_UTILS_DIR);
-    exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" ' + path.join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
+    exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" --directory ' + path.join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
     execNpm('pack', TASKS_UTILS_DIR);
 }
 
