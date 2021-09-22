@@ -4,6 +4,7 @@
     "friendlyName": "Artifactory Properties",
     "description": "Set and delete properties on and from existing files in Artifactory.",
     "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-SettingandDeletingPropertiesonFilesinArtifactory)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -29,8 +30,8 @@
                 "EditableOptions": "False"
             },
             "options": {
-                "set": "set",
-                "delete": "delete"
+                "set": "Set properties",
+                "delete": "Delete properties"
             }
         },
         {

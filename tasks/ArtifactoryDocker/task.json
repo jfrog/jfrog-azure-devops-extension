@@ -4,7 +4,7 @@
     "friendlyName": "Artifactory Docker",
     "description": "Pull and push docker images from and to Artifactory, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/RTF/Docker+Registry)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-PushingandPullingDockerImagestoandfromArtifactory)",
     "category": "Utility",
     "visibility": [
         "Build",

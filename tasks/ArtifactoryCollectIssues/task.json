@@ -4,6 +4,7 @@
     "friendlyName": "Artifactory Collect Build Issues",
     "description": "Collect build issues from the git commit messages of the project and add them to the build-info.",
     "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-CollectingBuildIssues)",
     "category": "Utility",
     "visibility": [
         "Build",

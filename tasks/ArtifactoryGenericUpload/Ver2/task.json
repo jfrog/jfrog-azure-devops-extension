@@ -4,6 +4,7 @@
     "friendlyName": "Artifactory Generic Upload",
     "description": "Upload build artifacts to Artifactory using FileSpecs while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
     "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-UploadingGenericArtifactstoArtifactory)",
     "category": "Utility",
     "visibility": [
         "Build",
