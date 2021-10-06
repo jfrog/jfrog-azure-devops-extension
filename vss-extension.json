@@ -90,12 +90,12 @@
                     },
                     {
                         "name": "BuildNames",
-                        "endpointUrl": "{{endpoint.url}}/api/build",
+                        "endpointUrl": "{{endpoint.url}}/api/build?project={{projectKey}}",
                         "resultSelector": "jsonpath:$.builds[*]"
                     },
                     {
                         "name": "BuildNumbers",
-                        "endpointUrl": "{{endpoint.url}}/api/build/{{definition}}",
+                        "endpointUrl": "{{endpoint.url}}/api/build/{{definition}}?project={{projectKey}}",
                         "resultSelector": "jsonpath:$.buildsNumbers[*]"
                     }
                 ],
@@ -253,13 +253,26 @@
                         }
                     },
                     {
+                        "id": "projectKey",
+                        "name": "Project Key",
+                        "hasDynamicValueInformation": true,
+                        "inputMode": "textbox",
+                        "isConfidential": false,
+                        "validation": {
+                            "isRequired": false,
+                            "dataType": "string"
+                        },
+                        "description": "Artifactory project key."
+                    },
+                    {
                         "id": "definition",
                         "name": "Build Name",
                         "hasDynamicValueInformation": true,
                         "inputMode": "Combo",
                         "isConfidential": false,
                         "dependencyInputIds": [
-                            "connection"
+                            "connection",
+                            "projectKey"
                         ],
                         "validation": {
                             "isRequired": true,
@@ -307,7 +320,8 @@
                         "dependencyInputIds": [
                             "connection",
                             "definition",
-                            "defaultVersionType"
+                            "defaultVersionType",
+                            "projectKey"
                         ],
                         "validation": {
                             "isRequired": true,
