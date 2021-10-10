@@ -262,7 +262,7 @@
                             "isRequired": false,
                             "dataType": "string"
                         },
-                        "description": "Artifactory project key."
+                        "description": "JFrog project key."
                     },
                     {
                         "id": "definition",
