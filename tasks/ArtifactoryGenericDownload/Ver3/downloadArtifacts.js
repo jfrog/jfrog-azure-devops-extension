@@ -44,6 +44,9 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService) {
         '--flat',
         '--fail-no-op'
     );
+
+    // Add project flag if provided
+    cliCommand = utils.addProjectOption(cliCommand);
     cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
 
     try {
