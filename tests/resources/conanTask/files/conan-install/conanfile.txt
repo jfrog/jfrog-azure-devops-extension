@@ -1,5 +1,5 @@
 [requires]
-fmt/5.2.1@bincrafters/stable
+fmt/[>=8.0.1]
 
 [generators]
 cmake_paths

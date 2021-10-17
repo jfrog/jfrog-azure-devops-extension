@@ -152,6 +152,7 @@ function getWorkDir(): string {
 /**
  * Returns the base of the CLI command, which includes:
  * CLI path, command prefix, command name, release bundle name & version, and credentials by flags.
+ *
  * @param cliPath - Path to the CLI's executable.
  * @param cliCommandName - Command name to run, including prefix.
  */

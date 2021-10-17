@@ -81,7 +81,6 @@ export function initTests(): void {
     process.env.JFROG_CLI_REPORT_USAGE = 'false';
     process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_LOG_LEVEL = 'ERROR';
-    process.env.USE_UNSUPPORTED_CONAN_WITH_PYTHON_2 = 'true';
     tl.setStdStream(new NullWritable());
     tl.setVariable('Agent.WorkFolder', testDataDir);
     tl.setVariable('Agent.TempDirectory', testDataDir);
@@ -461,6 +460,7 @@ export function setServiceConnectionCredentials(url: string): void {
 /**
  * Copies "tests/<testDirName>/<folderToCopy>" to a corresponding folder under "testDataDir/<testDirName>".
  * If newTargetDir is provided, the folder will be renamed to its value.
+ *
  * @param testDirName - test directory
  * @param dirToCopy - the folder to copy, located inside the test resources directory
  * @param newTargetDir - optional new name for the copied directory.
@@ -485,6 +485,7 @@ export function setVariables(variables: any): void {
 /**
  * Override tl.getInput(), tl.getBoolInput() and tl.getPathInput() functions.
  * The test will return inputs[name] instead of using the original functions.
+ *
  * @param inputs - (String) - Test inputs
  */
 export function mockGetInputs(inputs: any): void {
