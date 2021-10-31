@@ -18,8 +18,5 @@ module.exports = {
         'no-extra-boolean-cast': 'off',
         '@typescript-eslint/no-inferrable-types': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
-        'jsdoc/check-alignment': 'warn',
-        'jsdoc/check-indentation': 'warn',
-        'jsdoc/newline-after-description': 'warn',
     }
 };
