@@ -17,16 +17,16 @@ To install the extension on TFS, see the [install extensions for Team Foundation
 ## Building
 To build and run the extension sources, please follow these steps:
 1. Clone the code from git.
-2. To Build and create the JFrog Artifactory extension vsix file, run the following command.
+2. To Build and create the JFrog Artifactory extension `vsix` file, run the following command.
     ```
     npm i
     npm run create
     ```
-After the build process is completed, you'll find the vsix file in the project directory.
-The vsix file can be loaded into Azure DevOps and TFS.
+After the build process is completed, you'll find the `vsix` file in the project directory.
+The `vsix` file can be loaded into Azure DevOps and TFS.
 
 ## Testing
-To run the tests, please make sure you are using node 10 or above.
+To run the tests, please make sure you are using node 14 or above.
 
 Use the following commands to run from terminal:
 1. Set the ADO_ARTIFACTORY_URL, ADO_ARTIFACTORY_USERNAME and ADO_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password:
@@ -57,7 +57,7 @@ Note: If you are running tests via your IDE, make sure you are registering tests
 
 ### Skipping Tests
 In order to skip tests, set the ADO_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
-The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy**, **distribution** and **docker**.
+The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy**, **distribution**, **unit**, **installer**, **generic** and **docker**.
 
 For example, for setting the nuget and docker tests:  
 ```
@@ -67,7 +67,7 @@ export ADO_SKIP_TESTS=nuget,docker
 # Pull Requests
 We welcome pull requests from the community!
 ## Guidelines
-* Before creating your first pull request, please join our contributors community by signing [JFrog's CLA](https://secure.echosign.com/public/hostedForm?formid=5IYKLZ2RXB543N).
+* Before creating your first pull request, please join our contributors' community by signing [JFrog's CLA](https://secure.echosign.com/public/hostedForm?formid=5IYKLZ2RXB543N).
 * Pull requests should be created on the *dev* branch.
 * Please make sure the code is covered by tests. 
 * Please run `npm run format` for formatting the code before submitting the pull request.

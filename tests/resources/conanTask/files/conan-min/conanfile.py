@@ -14,7 +14,7 @@ class ConanminConan(ConanFile):
     exports_sources = "src/*"
 
     def requirements(self):
-        self.requires("boost/1.67.0@conan/stable")
+        self.requires("boost/[>=1.77]")
 
     def build(self):
         cmake = CMake(self)
