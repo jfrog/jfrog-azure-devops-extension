@@ -292,7 +292,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "downloadArtifacts.js"
         }
     }

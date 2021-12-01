@@ -149,7 +149,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "pipBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }

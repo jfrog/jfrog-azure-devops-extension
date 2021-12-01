@@ -206,7 +206,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "dotnetBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }

@@ -134,7 +134,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "dockerBuild.js"
         }
     }

@@ -215,7 +215,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "gradleBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }
