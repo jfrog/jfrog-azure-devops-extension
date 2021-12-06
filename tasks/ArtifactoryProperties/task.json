@@ -94,7 +94,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "properties.js",
             "workingDirectory": "$(currentDirectory)"
         }

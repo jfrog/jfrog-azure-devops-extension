@@ -221,7 +221,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "conanBuild.js"
         }
     }

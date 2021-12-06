@@ -276,7 +276,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "distribution.js",
             "workingDirectory": "$(currentDirectory)"
         }

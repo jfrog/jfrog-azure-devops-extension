@@ -168,7 +168,7 @@
         }
     ],
     "execution": {
-        "Node": {
+        "Node10": {
             "target": "npmBuild.js"
         }
     }

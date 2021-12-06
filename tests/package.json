@@ -8,20 +8,20 @@
     "main": "testUtils.ts",
     "dependencies": {
         "artifactory-tasks-utils": "file:../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz",
-        "azure-pipelines-task-lib": "2.8.0",
+        "azure-pipelines-task-lib": "^3.1.10",
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.13.1",
-        "mocha": "^8.2.1",
-        "node-tunnel": "^4.0.0",
-        "null-writable": "^1.0.5",
-        "path": "^0.12.7",
-        "sync-request": "^6.0.0"
+        "path": "^0.12.7"
     },
     "devDependencies": {
         "@types/fs-extra": "^9.0.2",
         "@types/mocha": "^8.0.4",
         "@types/node": "^14.14.7",
-        "@types/rimraf": "^3.0.0"
+        "@types/rimraf": "^3.0.0",
+        "mocha": "^8.2.1",
+        "node-tunnel": "^4.0.0",
+        "null-writable": "^1.0.5",
+        "sync-request": "^6.0.0"
     },
     "scripts": {
         "test": "npm i && mocha -r ts-node/register tests.ts -t 600000"
