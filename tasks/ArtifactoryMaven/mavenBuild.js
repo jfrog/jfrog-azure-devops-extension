@@ -1,19 +1,16 @@
 const tl = require('azure-pipelines-task-lib/task');
-const path = require('path');
-const utils = require('artifactory-tasks-utils/utils.js');
-const fs = require('fs');
-const yaml = require('js-yaml');
-const buildToolsConfigVersion = 1;
-const cliMavenCommand = 'rt mvn';
+const utils = require('artifactory-tasks-utils');
 const execSync = require('child_process').execSync;
 
+const cliMavenCommand = 'rt mvn';
+const mavenConfigCommand = 'rt mvnc';
 let serverIdDeployer;
 let serverIdResolver;
+const MIN_CLI_VERSION_SUPPORTING_INCLUDE_PATTERNS = '1.51.0';
 
 utils.executeCliTask(RunTaskCbk);
 
 function RunTaskCbk(cliPath) {
-    utils.deprecatedTaskMessage('1', '2');
     checkAndSetMavenHome();
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
@@ -22,9 +19,8 @@ function RunTaskCbk(cliPath) {
     }
 
     // Create Maven config file.
-    let configPath = path.join(workDir, 'config');
     try {
-        createMavenConfigFile(configPath, cliPath, workDir);
+        createMavenConfigFile(cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         cleanup(cliPath, workDir);
@@ -39,7 +35,7 @@ function RunTaskCbk(cliPath) {
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
-    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, utils.quote(goalsAndOptions), configPath);
+    let mavenCommand = utils.cliJoin(cliPath, cliMavenCommand, goalsAndOptions);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
     try {
         utils.executeCliCommand(mavenCommand, workDir, null);
@@ -72,32 +68,51 @@ function checkAndSetMavenHome() {
     }
 }
 
-function createMavenConfigFile(configPath, cliPath, buildDir) {
+function createMavenConfigFile(cliPath, buildDir) {
+    let cliCommand = utils.cliJoin(cliPath, mavenConfigCommand);
+
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
-    let resolverObj = {};
-    if (artifactoryResolver != null) {
+    if (artifactoryResolver) {
         serverIdResolver = utils.assembleBuildToolServerId('maven', 'resolver');
         utils.configureCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
-        let targetResolveReleaseRepo = tl.getInput('targetResolveReleaseRepo');
-        let targetResolveSnapshotRepo = tl.getInput('targetResolveSnapshotRepo');
-        resolverObj = getDeployerResolverObj(targetResolveSnapshotRepo, targetResolveReleaseRepo, serverIdResolver);
+        cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolver));
+        cliCommand = utils.addStringParam(cliCommand, 'targetResolveReleaseRepo', 'repo-resolve-releases', true);
+        cliCommand = utils.addStringParam(cliCommand, 'targetResolveSnapshotRepo', 'repo-resolve-snapshots', true);
     } else {
         console.log('Resolution from Artifactory is not configured');
     }
 
-    // Configure deployer server, throws on failure.
+    // Configure deployer server, skip if missing. This allows user to resolve dependencies from artifactory without deployment.
     let artifactoryDeployer = tl.getInput('artifactoryDeployService');
-    serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
-    utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
-    let targetDeployReleaseRepo = tl.getInput('targetDeployReleaseRepo');
-    let targetDeploySnapshotRepo = tl.getInput('targetDeploySnapshotRepo');
-    let deployerObj = getDeployerResolverObj(targetDeploySnapshotRepo, targetDeployReleaseRepo, serverIdDeployer);
-    createYamlFile(configPath, 'maven', resolverObj, deployerObj);
-}
-
-function getDeployerResolverObj(snapshotRepo, releaseRepo, serverID) {
-    return { snapshotRepo: snapshotRepo, releaseRepo: releaseRepo, serverId: serverID };
+    if (artifactoryDeployer) {
+        serverIdDeployer = utils.assembleBuildToolServerId('maven', 'deployer');
+        utils.configureCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
+        cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
+        cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
+        cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
+        let filterDeployedArtifacts = tl.getBoolInput('filterDeployedArtifacts');
+        if (filterDeployedArtifacts) {
+            if (isMvnIncludePatternsSupported()) {
+                cliCommand = utils.addStringParam(cliCommand, 'includePatterns', 'include-patterns', false);
+                cliCommand = utils.addStringParam(cliCommand, 'excludePatterns', 'exclude-patterns', false);
+            } else {
+                tl.warning(
+                    'Filtering Maven deployed artifacts is only supported with JFrog CLI version ' +
+                        MIN_CLI_VERSION_SUPPORTING_INCLUDE_PATTERNS +
+                        ' or above.'
+                );
+            }
+        }
+    } else {
+        console.info('Deployment skipped since artifactoryDeployService was not set.');
+    }
+    // Execute cli.
+    try {
+        utils.executeCliCommand(cliCommand, buildDir, null);
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
 }
 
 function cleanup(cliPath, workDir) {
@@ -111,22 +126,7 @@ function cleanup(cliPath, workDir) {
     }
 }
 
-/**
- * Creates a Maven config file at a desired absolute path.
- * Resolver / Deployer object should consist serverID and repos according to the build tool used. For example,:
- * {snapshotRepo: 'jcenter', releaseRepo: 'jcenter', serverID: 'local'}
- */
-function createYamlFile(configPath, buildToolType, resolverObj, deployerObj) {
-    let yamlDocument = {};
-    yamlDocument.version = buildToolsConfigVersion;
-    yamlDocument.type = buildToolType;
-    if (resolverObj && Object.keys(resolverObj).length > 0) {
-        yamlDocument.resolver = resolverObj;
-    }
-    if (deployerObj && Object.keys(deployerObj).length > 0) {
-        yamlDocument.deployer = deployerObj;
-    }
-    let configInfo = yaml.safeDump(yamlDocument);
-    console.log(configInfo);
-    fs.writeFileSync(configPath, configInfo);
+function isMvnIncludePatternsSupported() {
+    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
+    return utils.compareVersions(cliVersion, MIN_CLI_VERSION_SUPPORTING_INCLUDE_PATTERNS) >= 0;
 }

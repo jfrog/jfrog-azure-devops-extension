@@ -1,5 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
-const utils = require('artifactory-tasks-utils/utils.js');
+const utils = require('artifactory-tasks-utils');
 const path = require('path');
 
 const cliDownloadCommand = 'rt dl';
@@ -11,20 +11,19 @@ function RunTaskCbk(cliPath) {
         return;
     }
     let artifactoryService = tl.getInput('connection', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
 
     // Decide if the task runs as generic download or artifact-source.
     let definition = tl.getInput('definition', false);
     if (definition) {
         console.log('Artifact source download...');
-        performArtifactSourceDownload(cliPath, workDir, artifactoryService, artifactoryUrl);
+        performArtifactSourceDownload(cliPath, workDir, artifactoryService);
     } else {
         console.log('Generic download...');
-        performGenericDownload(cliPath, workDir, artifactoryService, artifactoryUrl);
+        performGenericDownload(cliPath, workDir, artifactoryService);
     }
 }
 
-function performArtifactSourceDownload(cliPath, workDir, artifactoryService, artifactoryUrl) {
+function performArtifactSourceDownload(cliPath, workDir, artifactoryService) {
     // 'ARTIFACTORY_RELEASE_BUILD_NUMBER' is used to support providing 'LATEST' version by the user.
     // When Azure DevOps Server supports Artifactory's LATEST version natively, this variable could be removed.
     let buildNumber = tl.getVariable('ARTIFACTORY_RELEASE_BUILD_NUMBER') || tl.getInput('version', true);
@@ -42,11 +41,13 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
         utils.quote('*'),
         utils.quote(downloadPath),
         '--build=' + utils.quote(buildName + '/' + buildNumber),
-        '--url=' + utils.quote(artifactoryUrl),
         '--flat',
         '--fail-no-op'
     );
-    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
+
+    // Add project flag if provided
+    cliCommand = utils.addProjectOption(cliCommand);
+    cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
 
     try {
         utils.executeCliCommand(cliCommand, workDir);
@@ -56,35 +57,17 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService, art
     }
 }
 
-function performGenericDownload(cliPath, workDir, artifactoryService, artifactoryUrl) {
-    utils.deprecatedTaskMessage('2', '3');
+function performGenericDownload(cliPath, workDir, artifactoryService) {
     let specPath = path.join(workDir, 'downloadSpec' + Date.now() + '.json');
-
-    // Get input parameters.
-    let specSource = tl.getInput('specSource', false);
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
-
-    // Create download FileSpec.
+    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand);
+    cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
     try {
-        utils.writeSpecContentToSpecPath(specSource, specPath);
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
-        return;
-    }
-
-    // Build the cli command.
-    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand, '--url=' + utils.quote(artifactoryUrl), '--spec=' + utils.quote(specPath));
-    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
-    cliCommand = utils.addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
-    // Add build info collection.
-    if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName', true);
-        let buildNumber = tl.getInput('buildNumber', true);
-        cliCommand = utils.cliJoin(cliCommand, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
-    }
-
-    // Execute the cli command.
-    try {
+        cliCommand = utils.addCommonGenericParams(cliCommand, specPath);
+        // Add unique download flags
+        cliCommand = utils.addBoolParam(cliCommand, 'validateSymlinks', 'validate-symlinks');
+        cliCommand = utils.addIntParam(cliCommand, 'splitCount', 'split-count');
+        cliCommand = utils.addIntParam(cliCommand, 'minSplit', 'min-split');
+        // Execute the cli command.
         utils.executeCliCommand(cliCommand, workDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);

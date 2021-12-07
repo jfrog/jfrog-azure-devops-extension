@@ -1,12 +1,14 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
-const utils = require('artifactory-tasks-utils/utils.js');
+const utils = require('artifactory-tasks-utils');
+
 const npmInstallCommand = 'rt npmi';
 const npmPublishCommand = 'rt npmp';
 const npmCiCommand = 'rt npmci';
+const npmConfigCommand = 'rt npmc';
+let configuredServerIdsArray;
 
 function RunTaskCbk(cliPath) {
-    utils.deprecatedTaskMessage('1', '2');
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -14,8 +16,6 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters.
-    let artifactoryService = tl.getInput('artifactoryService', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
 
     // Determine working directory for the cli.
@@ -28,37 +28,31 @@ function RunTaskCbk(cliPath) {
 
     // Determine npm command.
     let inputCommand = tl.getInput('command', true);
-    let npmRepository;
     switch (inputCommand) {
         case 'install':
-            npmRepository = tl.getInput('sourceRepo', true);
-            performNpmCommand(npmInstallCommand, npmRepository, true, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
+            performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
+            performNpmCommand(npmInstallCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'ci':
-            npmRepository = tl.getInput('sourceRepo', true);
-            performNpmCommand(npmCiCommand, npmRepository, true, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir);
+            performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
+            performNpmCommand(npmCiCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
         case 'pack and publish':
-            npmRepository = tl.getInput('targetRepo', true);
-            performNpmCommand(
-                npmPublishCommand,
-                npmRepository,
-                false,
-                cliPath,
-                artifactoryUrl,
-                artifactoryService,
-                collectBuildInfo,
-                requiredWorkDir
-            );
+            performNpmConfigCommand(cliPath, requiredWorkDir, null, 'targetRepo');
+            performNpmCommand(npmPublishCommand, false, cliPath, collectBuildInfo, requiredWorkDir);
             break;
     }
 }
 
-function performNpmCommand(cliNpmCommand, npmRepository, addThreads, cliPath, artifactoryUrl, artifactoryService, collectBuildInfo, requiredWorkDir) {
+function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo, requiredWorkDir) {
     // Build the cli command.
-    let cliCommand = utils.cliJoin(cliPath, cliNpmCommand, utils.quote(npmRepository), '--url=' + utils.quote(artifactoryUrl));
-    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
-    cliCommand = utils.addStringParam(cliCommand, 'arguments', 'npm-args');
+    let cliCommand = utils.cliJoin(cliPath, cliNpmCommand);
+
+    // Add npm args
+    let npmParam = tl.getInput('arguments', false);
+    if (npmParam) {
+        cliCommand = utils.cliJoin(cliCommand, npmParam);
+    }
 
     // Add build info collection.
     if (collectBuildInfo) {
@@ -71,7 +65,21 @@ function performNpmCommand(cliNpmCommand, npmRepository, addThreads, cliPath, ar
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
+    } finally {
+        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerIdsArray);
     }
+}
+
+function performNpmConfigCommand(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
+    configuredServerIdsArray = utils.createBuildToolConfigFile(
+        cliPath,
+        'artifactoryService',
+        'npm',
+        requiredWorkDir,
+        npmConfigCommand,
+        repoResolve,
+        repoDeploy
+    );
 }
 
 function getCollectBuildInfoFlags(addThreads) {
@@ -79,6 +87,7 @@ function getCollectBuildInfoFlags(addThreads) {
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
     let commandAddition = utils.cliJoin('--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
+    commandAddition = utils.addProjectOption(commandAddition);
 
     // Check if need to add threads.
     if (addThreads) {
