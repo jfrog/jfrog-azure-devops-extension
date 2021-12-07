@@ -29,14 +29,9 @@ const jcenterRemoteServerEnv = 'JFROG_CLI_JCENTER_REMOTE_SERVER';
 const jcenterRemoteRepoEnv = 'JFROG_CLI_JCENTER_REMOTE_REPO';
 
 // Config commands:
-const jfrogCliLegacyConfigCommand = 'rt c';
 const jfrogCliConfigAddCommand = 'c add';
 const jfrogCliConfigRmCommand = 'c remove';
 const jfrogCliConfigUseCommand = 'c use';
-const newConfigCommandMinVersion = '1.46.1';
-
-// Projects version support:
-const projectsSupportMinVer = '1.47.0';
 
 let runTaskCbk = null;
 
@@ -234,12 +229,7 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, 'username', true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, 'password', true);
     let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactory, 'apitoken', true);
-    let cliCommand;
-    if (shouldUseNewConfigCmd()) {
-        cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), '--artifactory-url=' + quote(artifactoryUrl), '--interactive=false');
-    } else {
-        cliCommand = cliJoin(cliPath, jfrogCliLegacyConfigCommand, quote(serverId), '--url=' + quote(artifactoryUrl), '--interactive=false');
-    }
+    let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), '--artifactory-url=' + quote(artifactoryUrl), '--interactive=false');
     if (artifactoryAccessToken) {
         // Add access-token if required.
         cliCommand = cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
@@ -250,21 +240,13 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
     return executeCliCommand(cliCommand, buildDir, null);
 }
 
-function shouldUseNewConfigCmd() {
-    let cliVersion = tl.getVariable(taskSelectedCliVersionEnv);
-    return compareVersions(cliVersion, newConfigCommandMinVersion) >= 0;
-}
-
 /**
  * Use given serverId as default
  * @returns {Buffer|string}
  * @throws In CLI execution failure.
  */
 function useCliServer(serverId, cliPath, buildDir) {
-    let cliCommand = cliJoin(cliPath, 'rt use', quote(serverId));
-    if (shouldUseNewConfigCmd()) {
-        cliCommand = cliJoin(cliPath, jfrogCliConfigUseCommand, quote(serverId));
-    }
+    const cliCommand = cliJoin(cliPath, jfrogCliConfigUseCommand, quote(serverId));
     return executeCliCommand(cliCommand, buildDir, null);
 }
 
@@ -277,12 +259,7 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
         try {
             if (serverIdArray[i]) {
-                let deleteServerIDCommand;
-                if (shouldUseNewConfigCmd()) {
-                    deleteServerIDCommand = cliJoin(cliPath, jfrogCliConfigRmCommand, quote(serverIdArray[i]), '--quiet');
-                } else {
-                    deleteServerIDCommand = cliJoin(cliPath, jfrogCliLegacyConfigCommand, 'delete', quote(serverIdArray[i]), '--interactive=false');
-                }
+                const deleteServerIDCommand = cliJoin(cliPath, jfrogCliConfigRmCommand, quote(serverIdArray[i]), '--quiet');
                 // This operation throws an exception in case of failure.
                 executeCliCommand(deleteServerIDCommand, buildDir, null);
             }
@@ -455,9 +432,6 @@ function getCliVersion(cliPath) {
 function runCbk(cliPath) {
     console.log('Running jfrog-cli from ' + cliPath + '.');
     logCliVersionAndSetSelected(cliPath);
-    if (failIfProjectProvidedButNotSupported()) {
-        return;
-    }
     runTaskCbk(cliPath);
 }
 
@@ -742,33 +716,7 @@ function removeExtractorsDownloadVariables(cliPath, workDir) {
 }
 
 /**
- * Checks whether projectKey was provided, and if so is it supported by the JFrog CLI version used.
- * If provided but not supported, fails the task and returns true.
- * @returns {boolean} isFailed - true if provided but not supported.
- */
-function failIfProjectProvidedButNotSupported() {
-    let val = tl.getInput('projectKey', false);
-    if (!val) {
-        return false;
-    }
-    let cliVersion = tl.getVariable(taskSelectedCliVersionEnv);
-    if (compareVersions(cliVersion, projectsSupportMinVer) < 0) {
-        tl.setResult(
-            tl.TaskResult.Failed,
-            'Project key provided but not supported by' +
-                ' the JFrog CLI version used (' +
-                cliVersion +
-                '). Minimal supported version: ' +
-                projectsSupportMinVer
-        );
-        return true;
-    }
-    return false;
-}
-
-/**
  * Adds project key, if provided, as the project option to the cli command.
- * Should be called after {@link failIfProjectProvidedButNotSupported}
  * @param cliCommand - Command to append to.
  * @returns {string} - Command after addition.
  */
