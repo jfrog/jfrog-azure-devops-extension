@@ -1,5 +1,5 @@
 {
-    "id": "7b0900d8-19d2-4c2a-9131-473d431266af",
+    "id": "bf0e8eea-ad19-4b7d-8415-374d83397de5",
     "name": "ArtifactoryGo",
     "friendlyName": "Artifactory Go",
     "description": "Build and publish go packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",

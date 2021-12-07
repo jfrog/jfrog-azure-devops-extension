@@ -1,5 +1,5 @@
 {
-    "id": "07fc5c20-6752-1e11-abde-6a01c3d00486",
+    "id": "b700f673-acfc-4f5f-8b5e-24a585646319",
     "name": "ArtifactoryPublishBuildInfo",
     "friendlyName": "Artifactory Publish Build Info",
     "description": "Publish the build-info collected in previous tasks to Artifactory.",

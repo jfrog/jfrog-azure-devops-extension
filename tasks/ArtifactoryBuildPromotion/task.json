@@ -1,5 +1,5 @@
 {
-    "id": "58521715-7f44-4090-a3a6-28153049ce37",
+    "id": "32f70de9-cdd0-4009-831a-856c52a4a0ba",
     "name": "ArtifactoryBuildPromotion",
     "friendlyName": "Artifactory Build Promotion",
     "description": "Promote a published build in Artifactory.",

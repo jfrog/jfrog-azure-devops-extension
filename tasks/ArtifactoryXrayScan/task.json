@@ -1,5 +1,5 @@
 {
-    "id": "07a15c20-6352-1d11-abde-aa01c4d0331d",
+    "id": "6344f8dc-e3e4-4658-84c6-bc26f7fd7de2",
     "name": "ArtifactoryXrayScan",
     "friendlyName": "Artifactory Xray Scan",
     "description": "Scan a build with JFrog Xray.\nThe scanned build must be published to Artifactory prior to scanning, using the 'Publish Build Info' task.",

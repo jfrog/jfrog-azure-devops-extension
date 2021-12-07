@@ -1,5 +1,5 @@
 {
-    "id": "f0932c23-5028-4468-94c4-ffe60ef33415",
+    "id": "625ba5b8-a30b-4103-8400-8ec94e2aef16",
     "name": "ArtifactoryDiscardBuilds",
     "friendlyName": "Artifactory Discard Builds",
     "description": "Discard old builds from Artifactory.",

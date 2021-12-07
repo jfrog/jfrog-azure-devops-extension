@@ -1,5 +1,5 @@
 {
-    "id": "07fc5c20-6772-11e5-abde-6901d3d11476",
+    "id": "475870bd-8ef1-45bb-83dd-1b39902a8ace",
     "name": "ArtifactoryNuGet",
     "friendlyName": "Artifactory Nuget",
     "description": "Restore and push NuGet packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",

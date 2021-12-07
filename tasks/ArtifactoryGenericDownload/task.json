@@ -1,5 +1,5 @@
 {
-    "id": "07fc5c20-6772-11e5-abde-6901d3c00755",
+    "id": "1ec77624-b4e2-48c0-ac15-e1dc8435dbef",
     "name": "ArtifactoryGenericDownload",
     "friendlyName": "Artifactory Generic Download",
     "description": "Download artifacts from Artifactory using FileSpecs, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",

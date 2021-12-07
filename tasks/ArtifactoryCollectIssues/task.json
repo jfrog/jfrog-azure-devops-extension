@@ -1,5 +1,5 @@
 {
-    "id": "07a15c20-6352-1d11-abde-ab31c4c12f1d",
+    "id": "1b03a764-f8b0-4eec-81bf-5abe1a15afff",
     "name": "ArtifactoryCollectIssues",
     "friendlyName": "Artifactory Collect Build Issues",
     "description": "Collect build issues from the git commit messages of the project and add them to the build-info.",

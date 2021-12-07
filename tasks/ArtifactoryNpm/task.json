@@ -1,5 +1,5 @@
 {
-    "id": "07fc5c20-6772-11d2-cace-6501d1a00335",
+    "id": "3a5a35c4-b755-4821-b4d9-f10ce6e1f86c",
     "name": "ArtifactoryNpm",
     "friendlyName": "Artifactory npm",
     "description": "Install, pack and publish npm packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",

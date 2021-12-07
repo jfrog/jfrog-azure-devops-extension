@@ -1,5 +1,5 @@
 {
-    "id": "07fc5c20-6772-11e5-abde-6901d3d00476",
+    "id": "d7eca331-9d2a-405a-9374-4014532462b6",
     "name": "ArtifactoryMaven",
     "friendlyName": "Artifactory Maven",
     "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory and while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",

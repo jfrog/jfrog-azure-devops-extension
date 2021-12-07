@@ -1,5 +1,5 @@
 {
-    "id": "9605c9d9-b8a7-45b1-9887-89c330f138c9",
+    "id": "5cfb06f3-4e91-44d8-a850-85c2dc11f36f",
     "name": "ArtifactoryPip",
     "friendlyName": "Artifactory Pip",
     "description": "Run 'pip install' while resolving the Python dependencies from Artifactory. This task also allows collecting build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",

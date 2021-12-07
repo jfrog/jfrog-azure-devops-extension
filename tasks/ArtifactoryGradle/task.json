@@ -1,5 +1,5 @@
 {
-    "id": "4fe54fab-ecf8-441e-989e-5d9cbd861743",
+    "id": "02572ee8-ad56-4738-bed8-63fa41d9f1e0",
     "name": "ArtifactoryGradle",
     "friendlyName": "Artifactory Gradle",
     "description": "Build with Gradle, while resolving dependencies and deploying artifacts from and to Artifactory and while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",

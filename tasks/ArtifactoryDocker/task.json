@@ -1,5 +1,5 @@
 {
-    "id": "07fc5c20-6882-a1c2-cbcd-6531d5a72113",
+    "id": "dc95d492-a9a6-4495-8827-4ffdf82e89c2",
     "name": "ArtifactoryDocker",
     "friendlyName": "Artifactory Docker",
     "description": "Pull and push docker images from and to Artifactory, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"Artifactory Publish Build Info\" task.",
