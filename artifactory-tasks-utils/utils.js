@@ -6,17 +6,15 @@ const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 
 const fileName = getCliExecutableName();
-const toolName = 'jfrog';
+const toolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jfrog'));
-const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder') || '', '_jfrog'));
+const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
 const defaultJfrogCliVersion = '2.8.3';
 const minCustomCliVersion = '2.8.3';
 const pluginVersion = '0.0.1';
 const buildAgent = 'artifactory-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
-const customLegacyCliPath = encodePath(path.join(jfrogLegacyFolderPath, 'current', fileName));
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
 
 // Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
@@ -123,14 +121,7 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
     return new Promise(function(resolve, reject) {
         let cliDir = toolLib.findLocalTool(toolName, cliVersion);
         if (fs.existsSync(customCliPath)) {
-            tl.debug('Using cli from custom cli path: ' + customCliPath);
-            resolve(customCliPath);
-        } else if (fs.existsSync(customLegacyCliPath)) {
-            tl.warning(
-                'Found JFrog CLI in deprecated custom path: ' + customLegacyCliPath + '. Copying JFrog CLI to new supported path: ' + customFolderPath
-            );
-            tl.mkdirP(customFolderPath);
-            tl.cp(customLegacyCliPath, customFolderPath, '-f');
+            tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
             resolve(customCliPath);
         } else if (cliDir) {
             let cliPath = path.join(cliDir, fileName);
