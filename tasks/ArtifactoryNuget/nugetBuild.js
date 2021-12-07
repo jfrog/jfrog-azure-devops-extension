@@ -1,11 +1,10 @@
 const tl = require('azure-pipelines-task-lib/task');
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const fs = require('fs');
-const utils = require('artifactory-tasks-utils');
+const utils = require('artifactory-tasks-utils/utils.js');
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
 const NUGET_VERSION = '5.4.0';
-const MIN_CLI_VERSION_SUPPORTING_NUGET_V2 = '1.46.3';
 const path = require('path');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
 const cliNuGetCommand = 'rt nuget';
@@ -136,12 +135,10 @@ function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
     cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolve));
     cliCommand = utils.addStringParam(cliCommand, repoResolve, 'repo-resolve', true);
 
-    if (isNugetProtocolSelectionSupported()) {
-        // Using Nuget protocol v2 by default.
-        let nugetProtocolVersion = tl.getInput('nugetProtocolVersion', false);
-        if (!nugetProtocolVersion || nugetProtocolVersion === 'v2') {
-            cliCommand = utils.cliJoin(cliCommand, '--nuget-v2');
-        }
+    // Using Nuget protocol v2 by default. // todo maybe change
+    let nugetProtocolVersion = tl.getInput('nugetProtocolVersion', false);
+    if (!nugetProtocolVersion || nugetProtocolVersion === 'v2') {
+        cliCommand = utils.cliJoin(cliCommand, '--nuget-v2');
     }
 
     // Execute cli.
@@ -151,11 +148,6 @@ function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }
-}
-
-function isNugetProtocolSelectionSupported() {
-    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
-    return utils.compareVersions(cliVersion, MIN_CLI_VERSION_SUPPORTING_NUGET_V2) >= 0;
 }
 
 // Creates the Nuget arguments

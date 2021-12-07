@@ -5,7 +5,6 @@ const utils = require('artifactory-tasks-utils/utils.js');
 const cliGoCommand = 'rt go';
 const cliGoPublishCommand = 'rt gp';
 const cliGoConfigCommand = 'rt go-config';
-const newGpCommandMinVersion = '1.46.1';
 const resolutionRepoInputName = 'resolutionRepo';
 const deploymentRepoInputName = 'targetRepo';
 let configuredServerIdsArray;
@@ -81,27 +80,8 @@ function performGoConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
     );
 }
 
-function performLegacyGoPublishCommand(cliPath, requiredWorkDir, version) {
-    try {
-        configureGoCliServer(cliPath, requiredWorkDir, 'deployer');
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
-        return;
-    }
-
-    // Build go publish command and execute
-    let targetRepo = tl.getInput('targetRepo', true);
-    let cliCommand = utils.cliJoin(cliPath, cliGoPublishCommand, targetRepo, version);
-    executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
-}
-
 function performGoPublishCommand(cliPath, requiredWorkDir) {
     let version = tl.getInput('version', false);
-
-    if (shouldUseLegacyGpCmd()) {
-        performLegacyGoPublishCommand(cliPath, requiredWorkDir, version);
-        return;
-    }
 
     try {
         performGoConfig(cliPath, requiredWorkDir, null, deploymentRepoInputName);
@@ -129,18 +109,6 @@ function executeGoCliCommand(cliCommand, cliPath, requiredWorkDir) {
     }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
-}
-
-function configureGoCliServer(cliPath, buildDir, serverType) {
-    const serverId = utils.assembleBuildToolServerId('go', serverType);
-    let artifactoryService = tl.getInput('artifactoryService', false);
-    utils.configureCliServer(artifactoryService, serverId, cliPath, buildDir);
-    configuredServerIdsArray = [serverId];
-}
-
-function shouldUseLegacyGpCmd() {
-    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
-    return utils.compareVersions(cliVersion, newGpCommandMinVersion) < 0;
 }
 
 utils.executeCliTask(RunTaskCbk);

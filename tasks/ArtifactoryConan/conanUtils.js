@@ -14,7 +14,7 @@ const BUILD_INFO_BUILD_NUMBER = 'number';
 const BUILD_INFO_BUILD_STARTED = 'started';
 const BUILD_INFO_FILE_NAME = 'generatedBuildInfo';
 const BUILD_TEMP_PATH = 'jfrog/builds';
-const projectsSupportMinVer = '1.45.0';
+const projectsSupportMinVer = '1.45.0'; // todo
 
 /**
  * Execute Artifactory Conan Task

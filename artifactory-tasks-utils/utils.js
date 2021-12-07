@@ -23,10 +23,8 @@ const pipelineRequestedCliVersionEnv = 'JFROG_CLI_PIPELINE_REQUESTED_VERSION_AZU
 // The actual JFrog CLI version used in a task.
 const taskSelectedCliVersionEnv = 'JFROG_CLI_TASK_SELECTED_VERSION_AZURE';
 
-// Extractors Env:
+// Maven/Gradle Extractors Env:
 const extractorsRemoteEnv = 'JFROG_CLI_EXTRACTORS_REMOTE';
-const jcenterRemoteServerEnv = 'JFROG_CLI_JCENTER_REMOTE_SERVER';
-const jcenterRemoteRepoEnv = 'JFROG_CLI_JCENTER_REMOTE_REPO';
 
 // Config commands:
 const jfrogCliConfigAddCommand = 'c add';
@@ -74,9 +72,7 @@ module.exports = {
     defaultJfrogCliVersion: defaultJfrogCliVersion,
     pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
     taskSelectedCliVersionEnv: taskSelectedCliVersionEnv,
-    extractorsRemoteEnv: extractorsRemoteEnv,
-    jcenterRemoteServerEnv: jcenterRemoteServerEnv,
-    jcenterRemoteRepoEnv: jcenterRemoteRepoEnv
+    extractorsRemoteEnv: extractorsRemoteEnv
 };
 
 /**
@@ -696,22 +692,17 @@ function getCurrentTimestamp() {
  * @throws In CLI execution failure.
  */
 function removeExtractorsDownloadVariables(cliPath, workDir) {
-    let serverId = tl.getVariable(jcenterRemoteServerEnv);
-    if (!serverId) {
-        let extractorsEnv = tl.getVariable(extractorsRemoteEnv);
-        if (!extractorsEnv) {
-            return;
-        }
-        let ind = extractorsEnv.lastIndexOf('/');
-        if (ind === -1) {
-            console.warn('Unexpected value for the "' + extractorsRemoteEnv + '" environment variable:' + 'expected to contain at least one "/"');
-            return;
-        }
-        serverId = extractorsEnv.substring(0, ind);
+    let extractorsEnv = tl.getVariable(extractorsRemoteEnv);
+    if (!extractorsEnv) {
+        return;
     }
+    let ind = extractorsEnv.lastIndexOf('/');
+    if (ind === -1) {
+        console.warn('Unexpected value for the "' + extractorsRemoteEnv + '" environment variable:' + 'expected to contain at least one "/"');
+        return;
+    }
+    const serverId = extractorsEnv.substring(0, ind);
     tl.setVariable(extractorsRemoteEnv, '');
-    tl.setVariable(jcenterRemoteServerEnv, '');
-    tl.setVariable(jcenterRemoteRepoEnv, '');
     deleteCliServers(cliPath, workDir, [serverId]);
 }
 

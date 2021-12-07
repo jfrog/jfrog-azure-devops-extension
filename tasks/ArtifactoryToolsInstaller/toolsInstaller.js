@@ -1,6 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils/utils.js');
-const extractorsEnvMinCliVersion = '1.46.1';
 
 InstallCliAndExecuteCliTask(RunTaskCbk);
 
@@ -55,22 +54,7 @@ function RunTaskCbk(cliPath) {
 
     // Set the environment variables needed for the cli to download the extractor from artifactory
     // The extractor download will occur during the execution of the Artifactory Maven and Gradle tasks, then the config and environment variables will be removed
-    if (isExtractorsEnvSupported()) {
-        let envVal = serverId + '/' + tl.getInput('extractorsInstallationRepo');
-        tl.setVariable(utils.extractorsRemoteEnv, envVal);
-    } else {
-        console.warn(
-            'The version of JFrog CLI you are using downloads Maven and Gradle Extractors from Jcenter. ' +
-                'Due to the sunset of Bintray and Jcenter, please use version 1.46.1 of JFrog CLI or above and modify your Extractors download repository as described in: ' +
-                'https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ArtifactoryToolsInstaller'
-        );
-        tl.setVariable(utils.jcenterRemoteServerEnv, serverId);
-        tl.setVariable(utils.jcenterRemoteRepoEnv, tl.getInput('extractorsInstallationRepo'));
-    }
+    let envVal = serverId + '/' + tl.getInput('extractorsInstallationRepo');
+    tl.setVariable(utils.extractorsRemoteEnv, envVal);
     tl.setResult(tl.TaskResult.Succeeded, 'Tools installed successfully.');
-}
-
-function isExtractorsEnvSupported() {
-    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
-    return utils.compareVersions(cliVersion, extractorsEnvMinCliVersion) >= 0;
 }
