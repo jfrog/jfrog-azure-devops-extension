@@ -1,4 +1,4 @@
-import * as utils from 'artifactory-tasks-utils/utils';
+import * as utils from '@jfrog/artifactory-tasks-utils/utils';
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as path from 'path';
 

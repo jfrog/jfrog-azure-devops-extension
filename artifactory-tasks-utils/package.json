@@ -1,5 +1,5 @@
 {
-    "name": "artifactory-tasks-utils",
+    "name": "@jfrog/artifactory-tasks-utils",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,
