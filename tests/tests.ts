@@ -257,13 +257,13 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 0);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 0);
                 // Run tools installer to download CLI from a fresh repository
                 mockTask(testDir, 'toolsInstaller');
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1);
                 // Run tools installer again to make sure the JFrog CLI downloaded from Artifactory remote cache
                 mockTask(testDir, 'toolsInstaller');
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1);
             },
             TestUtils.isSkipTest('installer')
         );
@@ -274,10 +274,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 0);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 0);
                 // Run tools installer to download CLI from a fresh repository
                 mockTask(testDir, 'toolsInstallerCustomVersion');
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1);
             },
             TestUtils.isSkipTest('installer')
         );
@@ -549,7 +549,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Npm install and publish',
             (): void => {
-                const testDir: string = 'npmi';
+                const testDir: string = 'npm';
                 mockTask(testDir, path.join('install', 'npmInstall'));
                 mockTask(testDir, path.join('install', 'installNpmPublish'));
                 mockTask(testDir, path.join('install', 'installDownload'));
@@ -563,7 +563,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Npm ci and publish',
             (): void => {
-                const testDir: string = 'npmci';
+                const testDir: string = 'npm';
                 mockTask(testDir, path.join('ci', 'npmCi'));
                 mockTask(testDir, path.join('ci', 'ciNpmPublish'));
                 mockTask(testDir, path.join('ci', 'ciDownload'));

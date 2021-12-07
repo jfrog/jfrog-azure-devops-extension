@@ -4,7 +4,7 @@ let inputs = {
     buildName: 'npm Test',
     buildNumber: '2',
     collectBuildInfo: true,
-    workingFolder: 'npmci',
+    workingFolder: 'npm',
     command: 'pack and publish',
     targetRepo: testUtils.getRepoKeys().npmLocalRepo,
     arguments: ''

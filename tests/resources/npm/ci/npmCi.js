@@ -1,6 +1,6 @@
 const testUtils = require('../../../testUtils');
 
-const TEST_NAME = 'npmci';
+const TEST_NAME = 'npm';
 
 let inputs = {
     buildName: 'npm Test',

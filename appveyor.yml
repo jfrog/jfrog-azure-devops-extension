@@ -4,9 +4,10 @@ skip_tags: true
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ADO_SKIP_TESTS: docker
+      ADO_SKIP_TESTS: docker,distribution
       PYTHON_HOME: "C:\\Python38"
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+      ADO_SKIP_TESTS: docker,distribution
 
   nodejs_version: "14"
   ADO_ARTIFACTORY_URL:
