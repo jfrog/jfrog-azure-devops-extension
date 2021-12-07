@@ -51,7 +51,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 let retVal: string = '';
                 try {
                     jfrogUtils.executeCliCommand(
-                        'jfrog rt del ' +
+                        'jf rt del ' +
                             repoKeys.repo1 +
                             '/' +
                             ' --url=' +
@@ -102,11 +102,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Cli join',
             (): void => {
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u'), 'jfrog rt u');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog'), 'jfrog');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u', 'a/b/c', 'a/b/c'), 'jfrog rt u a/b/c a/b/c');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u', 'a\bc', 'a\bc'), 'jfrog rt u a\bc a\bc');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u', 'a\\bc\\', 'a\\bc\\'), 'jfrog rt u a\\bc\\ a\\bc\\');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u'), 'jf rt u');
+                assert.strictEqual(jfrogUtils.cliJoin('jf'), 'jf');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a/b/c', 'a/b/c'), 'jf rt u a/b/c a/b/c');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\bc', 'a\bc'), 'jf rt u a\bc a\bc');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\\bc\\', 'a\\bc\\'), 'jf rt u a\\bc\\ a\\bc\\');
             },
             TestUtils.isSkipTest('unit')
         );
@@ -274,10 +274,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
-                assert.ok(toolLib.findLocalToolVersions('jf').length === 0);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 0, 'tool already exists in cache');
                 // Run tools installer to download CLI from a fresh repository
                 mockTask(testDir, 'toolsInstallerCustomVersion');
-                assert.ok(toolLib.findLocalToolVersions('jf').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool was not downloaded to cache');
             },
             TestUtils.isSkipTest('installer')
         );
@@ -1204,6 +1204,6 @@ function testGetCliPartialsBuildDir(jfrogCliVersion: string): void {
 }
 
 function runBuildCommand(command: string, buildName: string, buildNumber: string): void {
-    jfrogUtils.executeCliCommand('jfrog rt ' + command + ' "' + buildName + '" ' + buildNumber, TestUtils.testDataDir);
+    jfrogUtils.executeCliCommand('jf rt ' + command + ' "' + buildName + '" ' + buildNumber, TestUtils.testDataDir);
 }
 */

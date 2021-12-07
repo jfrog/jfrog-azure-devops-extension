@@ -1,7 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils/utils.js');
 
-const cliExecName = 'jfrog';
+const cliExecName = 'jf';
 const cliCommandPrefix = cliExecName + ' rt '; //todo
 
 RunJfrogCliCommand(RunTaskCbk);
@@ -38,7 +38,7 @@ function RunTaskCbk(cliPath) {
     if (!cliCommand.startsWith(cliCommandPrefix)) {
         tl.setResult(
             tl.TaskResult.Failed,
-            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jfrog rt'. The command received is: " + cliCommand
+            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf rt'. The command received is: " + cliCommand
         );
         return;
     }
@@ -48,7 +48,7 @@ function RunTaskCbk(cliPath) {
         utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
         // Use the server we just created
         utils.useCliServer(serverId, cliPath, workDir);
-        // Remove 'jfrog' and space from the beginning of the command string, so we can use the CLI's path
+        // Remove 'jf' and space from the beginning of the command string, so we can use the CLI's path
         cliCommand = cliCommand.slice(cliExecName.length + 1);
         cliCommand = utils.cliJoin(cliPath, cliCommand);
         // Execute the cli command.

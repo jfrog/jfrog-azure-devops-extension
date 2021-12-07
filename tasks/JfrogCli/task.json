@@ -48,12 +48,12 @@
             "name": "command",
             "type": "multiLine",
             "label": "Command to run",
-            "defaultValue": "jfrog rt <COMMAND>",
+            "defaultValue": "jf rt <COMMAND>",
             "required": true,
-            "helpMarkDown": "Set your JFrog CLI command after 'jfrog rt '. There is no need to provide the URL, the credentials or the server ID options.",
+            "helpMarkDown": "Set your JFrog CLI command after 'jf rt '. There is no need to provide the URL, the credentials or the server ID options.",
             "validation": {
-                "expression": "isMatch(value, '^jfrog rt ', 'IgnoreCase')",
-                "message": "The command must start with `jfrog rt `."
+                "expression": "isMatch(value, '^jf rt ', 'IgnoreCase')",
+                "message": "The command must start with `jf rt `."
             }
         }
     ],

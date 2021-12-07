@@ -137,7 +137,7 @@ export function deleteBuild(buildName: string): void {
 }
 
 export function cleanToolCache(): void {
-    const jfrogToolDirectory: string = path.join(testDataDir, 'jfrog');
+    const jfrogToolDirectory: string = path.join(testDataDir, 'jf');
     if (fs.pathExistsSync(jfrogToolDirectory)) {
         fs.removeSync(jfrogToolDirectory);
     }

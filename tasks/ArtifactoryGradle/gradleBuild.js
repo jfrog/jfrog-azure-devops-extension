@@ -40,7 +40,7 @@ function getWorkDir() {
 }
 
 /**
- * Run 'jfrog gradle-config'.
+ * Run 'jf gradle-config'.
  * @param cliPath - Path to JFrog CLI
  * @param workDir - Gradle project directory
  */
@@ -81,7 +81,7 @@ function executeGradleConfig(cliPath, workDir) {
 }
 
 /**
- * Run 'jfrog gradle'.
+ * Run 'jf gradle'.
  * @param cliPath - Path to JFrog CLI
  * @param workDir - Gradle project directory
  */
