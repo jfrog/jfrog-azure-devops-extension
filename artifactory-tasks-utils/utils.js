@@ -523,7 +523,7 @@ function getArchitecture() {
 }
 
 function getCliExecutableName() {
-    let executable = 'jfrog';
+    let executable = 'jf';
     if (isWindows()) {
         executable += '.exe';
     }
