@@ -460,9 +460,9 @@ export function setServiceConnectionCredentials(url: string): void {
  *
  * @param testDirName - test directory
  * @param dirToCopy - the folder to copy, located inside the test resources directory
- * @param newTargetDir - optional new name for the copied directory.
+ * @param newTargetDir - [Optional] new name for the copied directory.
  */
-export function copyTestFilesToTestWorkDir(testDirName: string, dirToCopy: string, newTargetDir: string): void {
+export function copyTestFilesToTestWorkDir(testDirName: string, dirToCopy: string, newTargetDir?: string): void {
     const sourceDir: string = path.join(__dirname, 'resources', testDirName, dirToCopy);
     let targetDir: string = path.join(testDataDir, testDirName);
     if (newTargetDir) {

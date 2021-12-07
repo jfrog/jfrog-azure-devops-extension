@@ -9,9 +9,9 @@ import * as TestUtils from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as assert from 'assert';
 import * as os from 'os';
-import * as tl from 'azure-pipelines-task-lib/task';
+//import * as tl from 'azure-pipelines-task-lib/task'; todo
 import { execSync } from 'child_process';
-import conanUtils from '../tasks/ArtifactoryConan/conanUtils';
+//import conanUtils from '../tasks/ArtifactoryConan/conanUtils'; todo
 import { Tunnel } from 'node-tunnel';
 
 let tasksOutput: string;
@@ -221,14 +221,14 @@ describe('JFrog Artifactory Extension Tests', (): void => {
          * getCliPartialsBuildDir method. Testing versions before and after the introduction of projects.
          */
         // todo is test needed if no version check?
-        runSyncTest(
-            'Conan Utils - Get Cli Partials Build Dir',
-            (): void => {
-                const jfrogCliVersions: any = ['1.44.0', '1.45.2'];
-                jfrogCliVersions.forEach((version: string): void => testGetCliPartialsBuildDir(version));
-            },
-            TestUtils.isSkipTest('unit')
-        );
+        // runSyncTest(
+        //     'Conan Utils - Get Cli Partials Build Dir',
+        //     (): void => {
+        //         const jfrogCliVersions: any = ['1.44.0', '1.45.2'];
+        //         jfrogCliVersions.forEach((version: string): void => testGetCliPartialsBuildDir(version));
+        //     },
+        //     TestUtils.isSkipTest('unit')
+        // );
     });
 
     describe('JFrog CLI Task Tests', (): void => {
@@ -974,7 +974,9 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  */
 function mockTask(testDir: string, taskName: string, isNegative?: boolean): void {
     const taskPath: string = path.join(__dirname, 'resources', testDir, taskName + '.js');
-    const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath);
+    // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
+    const taskJsonDummy: string = path.join(__dirname, 'resources', 'task.json');
+    const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
     mockRunner.run(); // Mock a test
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
     assert.ok(isNegative ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
@@ -1145,9 +1147,11 @@ function sleep(ms: number): Promise<void> {
     return new Promise((resolve): any => setTimeout(resolve, ms));
 }
 
+/* todo
 function assertPathExists(pathToCheck: string): void {
     assert.ok(fs.existsSync(pathToCheck), pathToCheck + ' should exist!');
 }
+*/
 
 function assertIssuesCollection(buildName: string, buildNumber: string): void {
     // Get build from Artifactory.
@@ -1173,6 +1177,7 @@ function assertIssuesCollection(buildName: string, buildNumber: string): void {
     );
 }
 
+/* todo
 function testGetCliPartialsBuildDir(jfrogCliVersion: string): void {
     console.debug('Testing getCliPartialsBuildDir() for CLI version: ' + jfrogCliVersion);
     tl.setVariable(jfrogUtils.taskSelectedCliVersionEnv, jfrogCliVersion);
@@ -1201,3 +1206,4 @@ function testGetCliPartialsBuildDir(jfrogCliVersion: string): void {
 function runBuildCommand(command: string, buildName: string, buildNumber: string): void {
     jfrogUtils.executeCliCommand('jfrog rt ' + command + ' "' + buildName + '" ' + buildNumber, TestUtils.testDataDir);
 }
+*/
