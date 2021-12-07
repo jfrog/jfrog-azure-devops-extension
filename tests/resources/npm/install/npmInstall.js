@@ -1,12 +1,12 @@
 const testUtils = require('../../../testUtils');
 
-const TEST_NAME = 'npmVer2';
+const TEST_NAME = 'npmi';
 
 let inputs = {
     buildName: 'npm Test',
     buildNumber: '1',
     collectBuildInfo: true,
-    workingFolder: 'npmVer2',
+    workingFolder: TEST_NAME,
     command: 'install',
     sourceRepo: testUtils.getRepoKeys().npmVirtualRepo,
     arguments: '',
@@ -14,4 +14,4 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.runArtifactoryTask(testUtils.npmVer2, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.npm, {}, inputs);

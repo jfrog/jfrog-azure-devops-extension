@@ -15,14 +15,18 @@ let inputs = {
     buildName: BUILD_NAME,
     buildNumber: BUILD_NUMBER,
     artifactoryResolverService: 'mock-service',
+    artifactoryDeployService: 'mock-service',
     targetResolveSnapshotRepo: repoKeys.mavenRemoteRepo,
     targetResolveReleaseRepo: repoKeys.mavenRemoteRepo,
     targetDeployReleaseRepo: repoKeys.mavenLocalRepo,
     targetDeploySnapshotRepo: repoKeys.mavenLocalRepo,
     goals: 'clean install',
     mavenPOMFile: path.join(TEST_NAME, 'pom.xml'),
-    collectBuildInfo: true
+    collectBuildInfo: true,
+    filterDeployedArtifacts: true,
+    includePatterns: '*1.0-*.jar, *pom*',
+    excludePatterns: '*sources*'
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.runArtifactoryTask(testUtils.mavenVer1, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.maven, variables, inputs);

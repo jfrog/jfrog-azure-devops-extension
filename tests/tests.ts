@@ -220,6 +220,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
          * This test was created to ensure the equality of the build partials paths created by the CLI and the ones provided by
          * getCliPartialsBuildDir method. Testing versions before and after the introduction of projects.
          */
+        // todo is test needed if no version check?
         runSyncTest(
             'Conan Utils - Get Cli Partials Build Dir',
             (): void => {
@@ -546,9 +547,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
     describe('Npm Tests', (): void => {
         runSyncTest(
-            'Npm install and publish Ver 1 ',
+            'Npm install and publish',
             (): void => {
-                const testDir: string = 'npmVer1';
+                const testDir: string = 'npmi';
                 mockTask(testDir, path.join('install', 'npmInstall'));
                 mockTask(testDir, path.join('install', 'installNpmPublish'));
                 mockTask(testDir, path.join('install', 'installDownload'));
@@ -560,37 +561,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('npm')
         );
         runSyncTest(
-            'Npm install and publish Ver 2',
+            'Npm ci and publish',
             (): void => {
-                const testDir: string = 'npmVer2';
-                mockTask(testDir, path.join('install', 'npmInstall'));
-                mockTask(testDir, path.join('install', 'installNpmPublish'));
-                mockTask(testDir, path.join('install', 'installDownload'));
-                mockTask(testDir, path.join('install', 'installPublish'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, '1'));
-                getAndAssertBuild('npm Test', '1');
-                deleteBuild('npm Test');
-            },
-            TestUtils.isSkipTest('npm')
-        );
-        runSyncTest(
-            'Npm ci and publish Ver 1',
-            (): void => {
-                const testDir: string = 'npmVer1';
-                mockTask(testDir, path.join('ci', 'npmCi'));
-                mockTask(testDir, path.join('ci', 'ciNpmPublish'));
-                mockTask(testDir, path.join('ci', 'ciDownload'));
-                mockTask(testDir, path.join('ci', 'ciPublish'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, '2'));
-                getAndAssertBuild('npm Test', '2');
-                deleteBuild('npm Test');
-            },
-            TestUtils.isSkipTest('npm')
-        );
-        runSyncTest(
-            'Npm ci and publish Ver 2',
-            (): void => {
-                const testDir: string = 'npmVer2';
+                const testDir: string = 'npmci';
                 mockTask(testDir, path.join('ci', 'npmCi'));
                 mockTask(testDir, path.join('ci', 'ciNpmPublish'));
                 mockTask(testDir, path.join('ci', 'ciDownload'));
@@ -605,22 +578,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
     describe('Maven Tests', (): void => {
         runSyncTest(
-            'Maven Ver1',
+            'Maven',
             (): void => {
-                const testDir: string = 'mavenVer1';
-                mockTask(testDir, 'build');
-                mockTask(testDir, 'publish');
-                mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Maven Test', '3');
-                deleteBuild('Maven Test');
-            },
-            TestUtils.isSkipTest('maven')
-        );
-        runSyncTest(
-            'Maven Ver2',
-            (): void => {
-                const testDir: string = 'mavenVer2';
+                const testDir: string = 'maven';
                 mockTask(testDir, 'build');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
@@ -687,20 +647,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
     describe('NuGet Tests', (): void => {
         runSyncTest(
-            'NuGet restore Ver1',
+            'NuGet restore',
             (): void => {
-                const testDir: string = 'nugetVer1';
-                mockTask(testDir, 'restore');
-                mockTask(testDir, 'publish');
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
-            },
-            !TestUtils.isWindows() || TestUtils.isSkipTest('nuget')
-        );
-        runSyncTest(
-            'NuGet restore Ver2',
-            (): void => {
-                const testDir: string = 'nugetVer2';
+                const testDir: string = 'nuget';
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
                 getAndAssertBuild('NuGet Test', '3');
@@ -709,22 +658,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('nuget')
         );
         runSyncTest(
-            'NuGet push Ver1',
+            'NuGet push',
             (): void => {
-                const testDir: string = 'nugetVer1';
-                mockTask(testDir, 'push');
-                mockTask(testDir, 'publish');
-                mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
-            },
-            !TestUtils.isWindows() || TestUtils.isSkipTest('nuget')
-        );
-        runSyncTest(
-            'NuGet push Ver2',
-            (): void => {
-                const testDir: string = 'nugetVer2';
+                const testDir: string = 'nuget';
                 mockTask(testDir, 'push');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
