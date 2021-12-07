@@ -2,8 +2,8 @@ const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils/utils.js');
 const execSync = require('child_process').execSync;
 
-const cliMavenCommand = 'rt mvn';
-const mavenConfigCommand = 'rt mvnc';
+const cliMavenCommand = 'mvn';
+const mavenConfigCommand = 'mvnc';
 let serverIdDeployer;
 let serverIdResolver;
 

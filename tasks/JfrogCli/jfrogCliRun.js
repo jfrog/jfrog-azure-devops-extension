@@ -2,7 +2,7 @@ const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils/utils.js');
 
 const cliExecName = 'jfrog';
-const cliCommandPrefix = cliExecName + ' rt ';
+const cliCommandPrefix = cliExecName + ' rt '; //todo
 
 RunJfrogCliCommand(RunTaskCbk);
 

@@ -2,10 +2,10 @@ const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
 const utils = require('artifactory-tasks-utils/utils.js');
 
-const npmInstallCommand = 'rt npmi';
-const npmPublishCommand = 'rt npmp';
-const npmCiCommand = 'rt npmci';
-const npmConfigCommand = 'rt npmc';
+const npmInstallCommand = 'npm i';
+const npmPublishCommand = 'npm p';
+const npmCiCommand = 'npm ci';
+const npmConfigCommand = 'npmc';
 let configuredServerIdsArray;
 
 function RunTaskCbk(cliPath) {

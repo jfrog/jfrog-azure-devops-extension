@@ -2,7 +2,7 @@ const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils/utils.js');
 const path = require('path');
 
-const cliXrayScanCommand = 'rt bs';
+const cliXrayScanCommand = 'rt bs'; // todo
 
 function RunTaskCbk(cliPath) {
     let buildName = tl.getInput('buildName', true);

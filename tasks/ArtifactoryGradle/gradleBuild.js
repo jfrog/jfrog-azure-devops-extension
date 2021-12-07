@@ -1,8 +1,8 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('artifactory-tasks-utils/utils.js');
 
-const cliGradleCommand = 'rt gradle';
-const gradleConfigCommand = 'rt gradlec';
+const cliGradleCommand = 'gradle';
+const gradleConfigCommand = 'gradlec';
 let serverIdDeployer;
 let serverIdResolver;
 
@@ -40,7 +40,7 @@ function getWorkDir() {
 }
 
 /**
- * Run 'jfrog rt gradle-config'.
+ * Run 'jfrog gradle-config'.
  * @param cliPath - Path to JFrog CLI
  * @param workDir - Gradle project directory
  */
@@ -81,7 +81,7 @@ function executeGradleConfig(cliPath, workDir) {
 }
 
 /**
- * Run 'jfrog rt gradle'.
+ * Run 'jfrog gradle'.
  * @param cliPath - Path to JFrog CLI
  * @param workDir - Gradle project directory
  */

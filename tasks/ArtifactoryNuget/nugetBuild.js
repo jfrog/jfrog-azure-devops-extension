@@ -7,9 +7,9 @@ const NUGET_EXE_FILENAME = 'nuget.exe';
 const NUGET_VERSION = '5.4.0';
 const path = require('path');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
-const cliNuGetCommand = 'rt nuget';
+const cliNuGetCommand = 'nuget';
 const cliUploadCommand = 'rt u';
-const nugetConfigCommand = 'rt nugetc';
+const nugetConfigCommand = 'nugetc';
 
 /**
  * Adds the nuget executable to the Path and execute the CLI.

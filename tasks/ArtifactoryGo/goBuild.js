@@ -2,9 +2,9 @@ const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
 const utils = require('artifactory-tasks-utils/utils.js');
 
-const cliGoCommand = 'rt go';
-const cliGoPublishCommand = 'rt gp';
-const cliGoConfigCommand = 'rt go-config';
+const cliGoCommand = 'go';
+const cliGoPublishCommand = 'gp';
+const cliGoConfigCommand = 'go-config';
 const resolutionRepoInputName = 'resolutionRepo';
 const deploymentRepoInputName = 'targetRepo';
 let configuredServerIdsArray;

@@ -3,9 +3,9 @@ const fs = require('fs');
 const utils = require('artifactory-tasks-utils/utils.js');
 const path = require('path');
 const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
-const cliDotnetCoreRestoreCommand = 'rt dotnet restore';
+const cliDotnetCoreRestoreCommand = 'dotnet restore';
 const cliUploadCommand = 'rt u';
-const dotnetConfigCommand = 'rt dotnetc';
+const dotnetConfigCommand = 'dotnetc';
 
 // The .NET Core CLI is included in all Azure-hosted agents
 function RunTaskCbk(cliPath) {

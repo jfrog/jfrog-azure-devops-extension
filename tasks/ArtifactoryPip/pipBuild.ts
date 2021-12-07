@@ -1,8 +1,8 @@
 import * as utils from 'artifactory-tasks-utils';
 import * as tl from 'azure-pipelines-task-lib/task';
 
-const cliPipInstallCommand: string = 'rt pip-install';
-const pipConfigCommand: string = 'rt pip-config';
+const cliPipInstallCommand: string = 'pip install';
+const pipConfigCommand: string = 'pip-config';
 const disablePipCacheFlags: string = '--no-cache-dir --force-reinstall';
 
 function RunTaskCbk(cliPath: string): void {
