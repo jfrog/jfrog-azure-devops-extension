@@ -11,9 +11,9 @@
         "Release"
     ],
     "version": {
-        "Major": "2",
-        "Minor": "13",
-        "Patch": "3"
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
     },
     "demands": [
         "npm"
