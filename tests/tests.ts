@@ -257,13 +257,13 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
-                assert.ok(toolLib.findLocalToolVersions('jf').length === 0);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 0, 'tool already exists in cache');
                 // Run tools installer to download CLI from a fresh repository
                 mockTask(testDir, 'toolsInstaller');
-                assert.ok(toolLib.findLocalToolVersions('jf').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool was not downloaded to cache');
                 // Run tools installer again to make sure the JFrog CLI downloaded from Artifactory remote cache
                 mockTask(testDir, 'toolsInstaller');
-                assert.ok(toolLib.findLocalToolVersions('jf').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool is missing from cache');
             },
             TestUtils.isSkipTest('installer')
         );

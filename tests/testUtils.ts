@@ -163,7 +163,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'remote',
             packageType: 'generic',
-            url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v1'
+            url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf'
         })
     );
     createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
