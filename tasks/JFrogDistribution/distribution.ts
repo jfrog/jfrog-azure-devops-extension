@@ -2,14 +2,14 @@ import * as utils from 'jfrog-tasks-utils/utils';
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as path from 'path';
 
-const cliRbcCommand: string = 'rt rbc';
-const cliRbuCommand: string = 'rt rbu';
-const cliRbsCommand: string = 'rt rbs';
-const cliRbdCommand: string = 'rt rbd';
-const cliRbdelCommand: string = 'rt rbdel';
+const cliRbcCommand: string = 'ds rbc';
+const cliRbuCommand: string = 'ds rbu';
+const cliRbsCommand: string = 'ds rbs';
+const cliRbdCommand: string = 'ds rbd';
+const cliRbdelCommand: string = 'ds rbdel';
 
 function RunTaskCbk(cliPath: string): void {
-    // Disable usage report because Artifactory URL is missing.
+    // Disable usage report because Artifactory URL is missing. // todo
     process.env.JFROG_CLI_REPORT_USAGE = 'false';
 
     const workDir: string = getWorkDir();
