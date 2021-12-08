@@ -4,10 +4,10 @@ skip_tags: true
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ADO_SKIP_TESTS: docker,distribution
+      ADO_SKIP_TESTS: maven,gradle,npm,go,nuget,dotnet,conan,pip,proxy,distribution,unit,installer,generic,docker #docker,distribution #todo
       PYTHON_HOME: "C:\\Python38"
-    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-      ADO_SKIP_TESTS: docker,distribution
+    ## - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+    ##   ADO_SKIP_TESTS: docker,distribution #todo
 
   nodejs_version: "14"
   ADO_ARTIFACTORY_URL:
@@ -38,6 +38,7 @@ services:
 
 test_script:
   - cmake --version
+  - go version
   - pip -V
   - python -V
   - conan -v
