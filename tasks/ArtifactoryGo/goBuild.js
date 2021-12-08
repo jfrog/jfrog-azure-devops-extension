@@ -3,7 +3,7 @@ const fs = require('fs');
 const utils = require('artifactory-tasks-utils/utils.js');
 
 const cliGoCommand = 'go';
-const cliGoPublishCommand = 'gp';
+const cliGoPublishCommand = 'rt gp'; // todo
 const cliGoConfigCommand = 'go-config';
 const resolutionRepoInputName = 'resolutionRepo';
 const deploymentRepoInputName = 'targetRepo';
