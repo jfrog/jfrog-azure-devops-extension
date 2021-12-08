@@ -4,15 +4,15 @@ skip_tags: true
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ADO_SKIP_TESTS: maven,gradle,npm,nuget,dotnet,conan,pip,proxy,distribution,unit,installer,generic,docker #docker,distribution #todo
+      ADO_SKIP_TESTS: docker,distribution # maven,gradle,npm,nuget,dotnet,conan,pip,proxy,distribution,unit,installer,generic,docker # #todo
       PYTHON_HOME: "C:\\Python38"
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
-      ADO_SKIP_TESTS: maven,gradle,npm,nuget,dotnet,conan,pip,proxy,distribution,unit,installer,generic,docker #docker,distribution #todo
+      ADO_SKIP_TESTS: docker,distribution # maven,gradle,npm,nuget,dotnet,conan,pip,proxy,distribution,unit,installer,generic,docker # #todo
 
   nodejs_version: "14"
 
   GOPATH: c:\gopath
-  GOVERSION: 1.17
+  GOVERSION: 1.17.4
   GOROOT: c:\Program Files\Go
   # Added in order to prevent fetching the outdated dependencies versions from go cache.
   GOPROXY: direct
