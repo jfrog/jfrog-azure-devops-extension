@@ -10,6 +10,15 @@ environment:
       ADO_SKIP_TESTS: maven,gradle,npm,nuget,dotnet,conan,pip,proxy,distribution,unit,installer,generic,docker #docker,distribution #todo
 
   nodejs_version: "14"
+
+  GOPATH: c:\gopath
+  GOVERSION: 1.17
+  GOROOT: c:\Program Files\Go
+  # Added in order to prevent fetching the outdated dependencies versions from go cache.
+  GOPROXY: direct
+  GO111MODULE: on
+  CGO_ENABLED: 0
+
   ADO_ARTIFACTORY_URL:
     secure: RIh0gGFDn2JAnLUEEqLsQnZ5H3XFWg1s+Qq8Z4i+Xu+FtQf6Tsu2AnfY4/6AaXJ8
   ADO_ARTIFACTORY_USERNAME:
@@ -32,6 +41,12 @@ install:
   - cmd: nuget update -self
   - sh: conan profile new default --detect # This command produces a warning that is handled by the following command.
   - sh: conan profile update settings.compiler.libcxx=libc++ default
+  # Download requested golang version:
+  - cmd: rmdir c:\go /s /q
+  - cmd: appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+  - cmd: msiexec /i go%GOVERSION%.windows-amd64.msi /q
+  - cmd: set PATH=%GOPATH%\bin;c:\Program Files\Go\bin;%PATH%
+  - cmd: go version
 
 services:
   - docker
