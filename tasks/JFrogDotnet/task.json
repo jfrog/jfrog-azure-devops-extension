@@ -1,0 +1,214 @@
+{
+    "id": "16358c16-3185-4979-8375-845dedcb6b8d",
+    "name": "JFrogDotnetCore",
+    "friendlyName": "JFrog .NET Core",
+    "description": "Restore and push .NET applications from and to Artifactory's NuGet repositories, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"JFrog Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringNugetand.NETCoreBuilds)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "demands": [],
+    "minimumAgentVersion": "2.115.0",
+    "instanceNameFormat": "JFrog .NET $(command)",
+    "groups": [
+        {
+            "name": "advancedRestore",
+            "displayName": "Advanced",
+            "isExpanded": false,
+            "visibleRule": "command = restore"
+        }
+    ],
+    "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "restore",
+            "helpMarkDown": "The .NET Core CLI command to run.",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "restore": "restore",
+                "push": "NuGet push"
+            }
+        },
+        {
+            "name": "arguments",
+            "type": "string",
+            "label": "Arguments",
+            "defaultValue": "",
+            "helpMarkDown": "The arguments which will be passed to .NET Core CLI for execution. Arguments should be quoted, and space separated.",
+            "required": false,
+            "visibleRule": "command = restore"
+        },
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service for artifacts resolution/deployment."
+        },
+        {
+            "name": "targetResolveRepo",
+            "type": "pickList",
+            "label": "Resolution repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = restore",
+            "helpMarkDown": "Sets the resolution repository.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetDeployRepo",
+            "type": "pickList",
+            "label": "Deployment repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = push",
+            "helpMarkDown": "Sets the deployment repository.",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetDeployPath",
+            "type": "string",
+            "label": "Relative deployment path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "command = push",
+            "helpMarkDown": "Sets the relative deployment path in the chosen repository."
+        },
+        {
+            "name": "rootPath",
+            "type": "filePath",
+            "label": "Path to the root directory of a solution/project file to use",
+            "defaultValue": "**/*.sln",
+            "helpMarkDown": "Path to the root directory of a solution/project file to use. If the directory includes more than one sln files, then the first argument passed in the Arguments field should be the name (not the path) of the sln file. Accepts Ant-style patterns.",
+            "required": "true",
+            "visibleRule": "command = restore"
+        },
+        {
+            "name": "pathToNupkg",
+            "type": "filePath",
+            "label": "Path to NuGet package(s) to publish",
+            "defaultValue": "*.nupkg",
+            "helpMarkDown": "The path to nupkg file(s) to be uploaded. Accepts wildcards.",
+            "required": "true",
+            "visibleRule": "command = push"
+        },
+        {
+            "name": "noNuGetCache",
+            "type": "boolean",
+            "label": "Disable local cache",
+            "defaultValue": "false",
+            "helpMarkDown": "Prevents NuGet from using packages from local machine caches.",
+            "required": "false",
+            "groupName": "advancedRestore"
+        },
+        {
+            "name": "packagesDirectory",
+            "type": "filePath",
+            "label": "Destination directory",
+            "helpMarkDown": "Specifies the folder in which packages are installed. If no folder is specified, packages are restored into the default NuGet package cache.",
+            "required": "false",
+            "groupName": "advancedRestore"
+        },
+        {
+            "name": "verbosityRestore",
+            "type": "pickList",
+            "label": "Verbosity",
+            "defaultValue": "None",
+            "helpMarkDown": "Specifies the amount of detail displayed in the output: normal, quiet, detailed.",
+            "required": "false",
+            "groupName": "advancedRestore",
+            "options": {
+                "None": "-",
+                "Quiet": "Quiet",
+                "Minimal": "Minimal",
+                "Normal": "Normal",
+                "Detailed": "Detailed",
+                "Diagnostic": "Diagnostic"
+            }
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo == true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetResolveRepo",
+            "resultSelector": "jsonpath:$[?(@.packageType=='NuGet')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetDeployRepo",
+            "resultSelector": "jsonpath:$[?(@.packageType=='NuGet' && @.type!='REMOTE')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "dotnetBuild.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

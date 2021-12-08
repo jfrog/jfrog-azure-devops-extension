@@ -1,0 +1,157 @@
+{
+    "id": "5cfb06f3-4e91-44d8-a850-85c2dc11f36f",
+    "name": "JFrogPip",
+    "friendlyName": "JFrog Pip",
+    "description": "Run 'pip install' while resolving the Python dependencies from Artifactory. This task also allows collecting build-info. The collected build-info can be later published to Artifactory by the \"JFrog Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringPythonBuildsUsingPip)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "demands": [],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "JFrog Pip",
+    "groups": [
+        {
+            "name": "advancedInstall",
+            "displayName": "Advanced",
+            "isExpanded": false,
+            "visibleRule": "command = install"
+        }
+    ],
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to run the command against."
+        },
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "install",
+            "helpMarkDown": "The pip command",
+            "required": "true",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "install": "install"
+            }
+        },
+        {
+            "name": "arguments",
+            "type": "string",
+            "label": "Arguments",
+            "defaultValue": "",
+            "helpMarkDown": "The arguments which will be passed to pip for execution.",
+            "required": false,
+            "visibleRule": "command = install"
+        },
+        {
+            "name": "targetResolveRepo",
+            "type": "pickList",
+            "label": "Resolution repository",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command = install",
+            "helpMarkDown": "Sets the resolution repository."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo = true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo = true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo = true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        },
+        {
+            "name": "noPipCache",
+            "type": "boolean",
+            "label": "Disable local pip cache",
+            "defaultValue": "false",
+            "helpMarkDown": "Prevents pip from using cached packages.",
+            "required": "false",
+            "groupName": "advancedInstall"
+        },
+        {
+            "name": "virtualEnvActivation",
+            "type": "string",
+            "label": "Virtual environment setup command",
+            "defaultValue": "",
+            "helpMarkDown": "It is mostly recommended to run pip commands inside a virtual environment, to achieve isolation for the pip build. To follow this recommendation, provide a shell command which sets up a virtual environment.",
+            "required": "false",
+            "groupName": "advancedInstall"
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory.",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advancedInstall",
+            "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetResolveRepo",
+            "resultSelector": "jsonpath:$[?(@.packageType=='Pypi')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "pipBuild.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

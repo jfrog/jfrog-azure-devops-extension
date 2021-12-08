@@ -1,0 +1,69 @@
+{
+    "id": "6344f8dc-e3e4-4658-84c6-bc26f7fd7de2",
+    "name": "JFrogXrayScan",
+    "friendlyName": "JFrog Xray Scan",
+    "description": "Scan a build with JFrog Xray.\nThe scanned build must be published to Artifactory prior to scanning, using the 'Publish Build Info' task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ScanningPublishedBuildswithJFrogXray)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "JFrog Xray Scan",
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used for scanning the build."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "helpMarkDown": "Build name to scan.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe build should already be published to Artifactory."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "helpMarkDown": "Build number to scan.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe build should already be published to Artifactory."
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
+            "name": "allowFailBuild",
+            "type": "boolean",
+            "label": "Allow fail build",
+            "defaultValue": "true",
+            "required": true,
+            "helpMarkDown": "Uncheck if you do not wish to fail the build if Xray scan matches a rule with 'Fail Build' action."
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "xrayScan.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

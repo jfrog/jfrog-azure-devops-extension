@@ -1,10 +1,10 @@
 {
     "manifestVersion": 1,
     "public": true,
-    "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.13.3",
-    "name": "JFrog Artifactory",
-    "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
+    "id": "jfrog-azure-devops-extension",
+    "version": "1.0.0",
+    "name": "JFrog",
+    "description": "Integrate your JFrog Platform with Visual Studio Team Services.",
     "publisher": "JFrog",
     "targets": [
         {
@@ -370,203 +370,203 @@
             }
         },
         {
-            "id": "artifactory-promote-build-task",
+            "id": "jfrog-promote-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryBuildPromotion"
+                "name": "tasks/JFrogBuildPromotion"
             }
         },
         {
-            "id": "artifactory-generic-download",
+            "id": "jfrog-generic-download",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGenericDownload"
+                "name": "tasks/JFrogGenericDownload"
             }
         },
         {
-            "id": "artifactory-generic-upload",
+            "id": "jfrog-generic-upload",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGenericUpload"
+                "name": "tasks/JFrogGenericUpload"
             }
         },
         {
-            "id": "artifactory-maven",
+            "id": "jfrog-maven",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryMaven"
+                "name": "tasks/JFrogMaven"
             }
         },
         {
-            "id": "artifactory-gradle",
+            "id": "jfrog-gradle",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGradle"
+                "name": "tasks/JFrogGradle"
             }
         },
         {
-            "id": "artifactory-npm",
+            "id": "jfrog-npm",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryNpm"
+                "name": "tasks/JFrogNpm"
             }
         },
         {
-            "id": "artifactory-nuget",
+            "id": "jfrog-nuget",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryNuget"
+                "name": "tasks/JFrogNuget"
             }
         },
         {
-            "id": "artifactory-dotnet",
+            "id": "jfrog-dotnet",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryDotnet"
+                "name": "tasks/JFrogDotnet"
             }
         },
         {
-            "id": "artifactory-publish-build-info",
+            "id": "jfrog-publish-build-info",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryPublishBuildInfo"
+                "name": "tasks/JFrogPublishBuildInfo"
             }
         },
         {
-            "id": "artifactory-docker",
+            "id": "jfrog-docker",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryDocker"
+                "name": "tasks/JFrogDocker"
             }
         },
         {
-            "id": "artifactory-conan-build-task",
+            "id": "jfrog-conan-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryConan"
+                "name": "tasks/JFrogConan"
             }
         },
         {
-            "id": "artifactory-xray-scan-task",
+            "id": "jfrog-xray-scan-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryXrayScan"
+                "name": "tasks/JFrogXrayScan"
             }
         },
         {
-            "id": "artifactory-discard-builds-task",
+            "id": "jfrog-discard-builds-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryDiscardBuilds"
+                "name": "tasks/JFrogDiscardBuilds"
             }
         },
         {
-            "id": "artifactory-tools-installer-task",
+            "id": "jfrog-tools-installer-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryToolsInstaller"
+                "name": "tasks/JFrogToolsInstaller"
             }
         },
         {
-            "id": "artifactory-properties-task",
+            "id": "jfrog-properties-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryProperties"
+                "name": "tasks/JFrogProperties"
             }
         },
         {
-            "id": "artifactory-go",
+            "id": "jfrog-go",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGo"
+                "name": "tasks/JFrogGo"
             }
         },
         {
-            "id": "artifactory-pip",
+            "id": "jfrog-pip",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryPip"
+                "name": "tasks/JFrogPip"
             }
         },
         {
-            "id": "distribution",
+            "id": "jfrog-distribution",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/Distribution"
+                "name": "tasks/JFrogDistribution"
             }
         },
         {
-            "id": "artifactory-collect-issues",
+            "id": "jfrog-collect-issues",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryCollectIssues"
+                "name": "tasks/JFrogCollectIssues"
             }
         },
         {
-            "id": "jfrog-cli-generic",
+            "id": "jfrog-cli-v2",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/JfrogCli"
+                "name": "tasks/JFrogCliV2"
             }
         }
     ],
@@ -588,64 +588,64 @@
             "addressable": true
         },
         {
-            "path": "tasks/ArtifactoryBuildPromotion"
+            "path": "tasks/JFrogBuildPromotion"
         },
         {
-            "path": "tasks/ArtifactoryGenericDownload"
+            "path": "tasks/JFrogGenericDownload"
         },
         {
-            "path": "tasks/ArtifactoryGenericUpload"
+            "path": "tasks/JFrogGenericUpload"
         },
         {
-            "path": "tasks/ArtifactoryMaven"
+            "path": "tasks/JFrogMaven"
         },
         {
-            "path": "tasks/ArtifactoryGradle"
+            "path": "tasks/JFrogGradle"
         },
         {
-            "path": "tasks/ArtifactoryNpm"
+            "path": "tasks/JFrogNpm"
         },
         {
-            "path": "tasks/ArtifactoryNuget"
+            "path": "tasks/JFrogNuget"
         },
         {
-            "path": "tasks/ArtifactoryPublishBuildInfo"
+            "path": "tasks/JFrogPublishBuildInfo"
         },
         {
-            "path": "tasks/ArtifactoryDocker"
+            "path": "tasks/JFrogDocker"
         },
         {
-            "path": "tasks/ArtifactoryConan"
+            "path": "tasks/JFrogConan"
         },
         {
-            "path": "tasks/ArtifactoryXrayScan"
+            "path": "tasks/JFrogXrayScan"
         },
         {
-            "path": "tasks/ArtifactoryDiscardBuilds"
+            "path": "tasks/JFrogDiscardBuilds"
         },
         {
-            "path": "tasks/ArtifactoryToolsInstaller"
+            "path": "tasks/JFrogToolsInstaller"
         },
         {
-            "path": "tasks/ArtifactoryProperties"
+            "path": "tasks/JFrogProperties"
         },
         {
-            "path": "tasks/ArtifactoryGo"
+            "path": "tasks/JFrogGo"
         },
         {
-            "path": "tasks/ArtifactoryPip"
+            "path": "tasks/JFrogPip"
         },
         {
-            "path": "tasks/Distribution"
+            "path": "tasks/JFrogDistribution"
         },
         {
-            "path": "tasks/ArtifactoryCollectIssues"
+            "path": "tasks/JFrogCollectIssues"
         },
         {
-            "path": "tasks/ArtifactoryDotnet"
+            "path": "tasks/JFrogDotnet"
         },
         {
-            "path": "tasks/JfrogCli"
+            "path": "tasks/JFrogCliV2"
         }
     ]
 }

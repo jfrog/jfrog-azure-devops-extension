@@ -1,0 +1,18 @@
+{
+    "name": "jfrog-tasks-utils",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "private": true,
+    "license": "Apache-2.0",
+    "description": "Utilities for the JFrog Extension",
+    "main": "utils.js",
+    "typings": "utils",
+    "dependencies": {
+        "azure-pipelines-task-lib": "^3.1.10",
+        "azure-pipelines-tool-lib": "^0.13.2",
+        "typed-rest-client": "^1.8.3"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }
+}

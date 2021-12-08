@@ -20,9 +20,11 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Versions**
-- Artifactory Azure DevOps extension version: 
+- JFrog Azure DevOps Extension version: 
 - Agent operating system:
 - JFrog Artifactory version:
+- JFrog Xray version (if relevant):
+- JFrog Distribution version (if relevant):
 
 **Additional context**
 Add any other context about the problem here.

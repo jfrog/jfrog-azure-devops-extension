@@ -1,0 +1,15 @@
+{
+    "name": "jfrog-nuget",
+    "version": "1.0.0",
+    "author": "JFrog",
+    "private": true,
+    "license": "Apache-2.0",
+    "description": "This task triggers NuGet restore command and can push the nupkg file to Artifactory.",
+    "main": "nugetBuild.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "jfrog-tasks-utils": "file:../../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz"
+    }
+}

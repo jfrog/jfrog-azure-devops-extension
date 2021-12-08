@@ -1,5 +1,5 @@
 {
-    "name": "artifactory-vsts-extension",
+    "name": "jfrog-azure-devops-extension",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,

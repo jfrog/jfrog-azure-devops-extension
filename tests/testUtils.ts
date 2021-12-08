@@ -54,25 +54,25 @@ export {
     distributionUrl
 };
 
-export const promote: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryBuildPromotion', 'buildPromotion.js');
-export const conan: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryConan', 'conanBuild.js');
-export const docker: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryDocker', 'dockerBuild.js');
-export const download: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericDownload', 'downloadArtifacts.js');
-export const upload: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryGenericUpload', 'uploadArtifacts.js');
-export const maven: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryMaven', 'mavenBuild.js');
-export const npm: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryNpm', 'npmBuild.js');
-export const nuget: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryNuget', 'nugetBuild.js');
-export const dotnet: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryDotnet', 'dotnetBuild.js');
-export const gradle: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryGradle', 'gradleBuild.js');
-export const publish: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryPublishBuildInfo', 'publishBuildInfo.js');
-export const discard: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryDiscardBuilds', 'discardBuilds.js');
-export const properties: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryProperties', 'properties.js');
-export const go: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryGo', 'goBuild.js');
-export const collectIssues: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryCollectIssues', 'collectIssues.js');
-export const toolsInstaller: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryToolsInstaller', 'toolsInstaller.js');
-export const genericCli: string = path.join(__dirname, '..', 'tasks', 'JfrogCli', 'jfrogCliRun.js');
-export const pip: string = path.join(__dirname, '..', 'tasks', 'ArtifactoryPip', 'pipBuild.js');
-export const distribution: string = path.join(__dirname, '..', 'tasks', 'Distribution', 'distribution.js');
+export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
+export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
+export const docker: string = path.join(__dirname, '..', 'tasks', 'JFrogDocker', 'dockerBuild.js');
+export const download: string = path.join(__dirname, '..', 'tasks', 'JFrogGenericDownload', 'downloadArtifacts.js');
+export const upload: string = path.join(__dirname, '..', 'tasks', 'JFrogGenericUpload', 'uploadArtifacts.js');
+export const maven: string = path.join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
+export const npm: string = path.join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');
+export const nuget: string = path.join(__dirname, '..', 'tasks', 'JFrogNuget', 'nugetBuild.js');
+export const dotnet: string = path.join(__dirname, '..', 'tasks', 'JFrogDotnet', 'dotnetBuild.js');
+export const gradle: string = path.join(__dirname, '..', 'tasks', 'JFrogGradle', 'gradleBuild.js');
+export const publish: string = path.join(__dirname, '..', 'tasks', 'JFrogPublishBuildInfo', 'publishBuildInfo.js');
+export const discard: string = path.join(__dirname, '..', 'tasks', 'JFrogDiscardBuilds', 'discardBuilds.js');
+export const properties: string = path.join(__dirname, '..', 'tasks', 'JFrogProperties', 'properties.js');
+export const go: string = path.join(__dirname, '..', 'tasks', 'JFrogGo', 'goBuild.js');
+export const collectIssues: string = path.join(__dirname, '..', 'tasks', 'JFrogCollectIssues', 'collectIssues.js');
+export const toolsInstaller: string = path.join(__dirname, '..', 'tasks', 'JFrogToolsInstaller', 'toolsInstaller.js');
+export const genericCli: string = path.join(__dirname, '..', 'tasks', 'JfrogCliV2', 'jfrogCliRun.js');
+export const pip: string = path.join(__dirname, '..', 'tasks', 'JFrogPip', 'pipBuild.js');
+export const distribution: string = path.join(__dirname, '..', 'tasks', 'JFrogDistribution', 'distribution.js');
 
 export function initTests(): void {
     process.env.JFROG_CLI_REPORT_USAGE = 'false';

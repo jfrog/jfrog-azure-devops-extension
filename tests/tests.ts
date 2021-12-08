@@ -1,7 +1,7 @@
 /// <reference types="./node_modules/node-tunnel/typings/basic-auth-parser" />
 import * as adoMockTest from 'azure-pipelines-task-lib/mock-test';
 import * as fs from 'fs-extra';
-import * as jfrogUtils from 'artifactory-tasks-utils';
+import * as jfrogUtils from 'jfrog-tasks-utils';
 import * as mocha from 'mocha';
 import * as path from 'path';
 import * as syncRequest from 'sync-request';

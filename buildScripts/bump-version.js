@@ -12,8 +12,8 @@ const optionDefinitions = [
 ];
 const usage = commandLineUsage([
     {
-        header: 'Bump version of JFrog Artifactory extension',
-        content: 'Tool to Bump version of JFrog Artifactory extension. It bumps version in all task.json files and in vss-extension.json.'
+        header: 'Bump version of JFrog Extension',
+        content: 'Tool to Bump version of JFrog Extension. It bumps version in all task.json files and in vss-extension.json.'
     },
     {
         header: 'Options',

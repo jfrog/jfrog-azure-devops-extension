@@ -4,7 +4,7 @@
 |dev|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-azure-devops-extension/branch/dev)|
 
 # Overview
-JFrog Artifactory provides tight integration with Azure DevOps through the **JFrog Artifactory Extension**.
+JFrog provides tight integration with Azure DevOps through the **JFrog Extension**.
 Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about artifacts deployed, dependencies resolved, environment data associated with the build runs and more, 
 that effectively facilitates fully traceable builds.
 See the full extension documentation at the [Artifactory Azure DevOps Extension User Guide](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).

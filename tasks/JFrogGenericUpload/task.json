@@ -1,0 +1,288 @@
+{
+    "id": "0bffed50-b8a8-4d05-a2c7-d9bbed02efba",
+    "name": "JFrogGenericUpload",
+    "friendlyName": "JFrog Generic Upload",
+    "description": "Upload build artifacts to Artifactory using FileSpecs while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"JFrog Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-UploadingGenericArtifactstoArtifactory)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "JFrog Generic Upload",
+    "groups": [
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "artifactoryService",
+            "type": "connectedService:artifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service used for uploading artifacts."
+        },
+        {
+            "name": "specSource",
+            "type": "radio",
+            "label": "File spec source",
+            "required": true,
+            "defaultValue": "taskConfiguration",
+            "helpMarkDown": "To specify the artifacts you wish to upload to Artifactory, please create a File Spec. \nTo read more about the File Spec schema click <a href=\"https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs\" target=\"_blank\">here</a>.",
+            "options": {
+                "taskConfiguration": "Task Configuration",
+                "file": "File"
+            }
+        },
+        {
+            "name": "fileSpec",
+            "type": "multiLine",
+            "label": "Spec",
+            "visibleRule": "specSource=taskConfiguration",
+            "defaultValue": "{\n  \"files\": [\n    {\n      \"pattern\": \"REPLACE_ME\",\n      \"target\": \"REPLACE_ME\"\n    }\n  ]\n}",
+            "properties": {
+                "resizable": "true",
+                "rows": "10",
+                "maxLength": "10000"
+            },
+            "helpMarkDown": "Use file spec from task configuration."
+        },
+        {
+            "name": "file",
+            "type": "filePath",
+            "label": "File path",
+            "visibleRule": "specSource=file",
+            "helpMarkDown": "Use file spec from a local file."
+        },
+        {
+            "name": "replaceSpecVars",
+            "type": "boolean",
+            "label": "Replace spec variables",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to replace variables in your File Spec.\nIn the File Spec, the variables should be used as follows: ${key1}."
+        },
+        {
+            "name": "specVars",
+            "type": "string",
+            "label": "Spec vars",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "replaceSpecVars=true",
+            "helpMarkDown": "List of Spec vars.\nList of variables in the form of \"key1=value1;key2=value2;...\" to be replaced in the File Spec."
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"JFrog Publish Build Info\" task."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "module",
+            "type": "string",
+            "label": "Module name",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Module name.\nOptional module name for the build-info.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        },
+        {
+            "name": "dryRun",
+            "type": "boolean",
+            "label": "Dry run",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select if you'd like the task only indicates which artifacts would have been uploaded\nIf not, the task is fully executed and uploads artifacts as specified"
+        },
+        {
+            "name": "failNoOp",
+            "type": "boolean",
+            "label": "Fail task if no files were uploaded",
+            "defaultValue": true,
+            "required": true,
+            "helpMarkDown": "Select if you'd like the task to fail if no files were uploaded."
+        },
+        {
+            "name": "insecureTls",
+            "type": "boolean",
+            "label": "Skip TLS certificates verification",
+            "defaultValue": "false",
+            "required": false,
+            "groupName": "advanced"
+        },
+        {
+            "name": "threads",
+            "type": "pickList",
+            "label": "# of threads",
+            "defaultValue": "3",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "The number of parallel threads that should be used to upload where each thread uploads a single artifact at a time.",
+            "options": {
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7",
+                "8": "8",
+                "9": "9",
+                "10": "10",
+                "11": "11",
+                "12": "12",
+                "13": "13",
+                "14": "14",
+                "15": "15",
+                "16": "16",
+                "17": "17",
+                "18": "18",
+                "19": "19",
+                "20": "20"
+            }
+        },
+        {
+            "name": "retries",
+            "type": "pickList",
+            "label": "# of retries",
+            "defaultValue": "3",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "Number of upload retries.",
+            "options": {
+                "0": "0",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7",
+                "8": "8",
+                "9": "9",
+                "10": "10",
+                "11": "11",
+                "12": "12"
+            }
+        },
+        {
+            "name": "symlinks",
+            "type": "boolean",
+            "label": "Preserve soft links structure in Artifactory",
+            "defaultValue": "false",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "Select if you'd like that Symlink file representation will contain the symbolic link and checksum properties."
+        },
+        {
+            "name": "setDebianProps",
+            "type": "boolean",
+            "label": "Set Debian properties",
+            "defaultValue": "false",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "Select if you'd like to Specify the distribution/component/architecture of the package.\nUsed for Debian packages only."
+        },
+        {
+            "name": "debDistribution",
+            "type": "string",
+            "label": "Distribution",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "advanced",
+            "visibleRule": "setDebianProps=true"
+        },
+        {
+            "name": "debComponent",
+            "type": "string",
+            "label": "Component",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "advanced",
+            "visibleRule": "setDebianProps=true"
+        },
+        {
+            "name": "debArchitecture",
+            "type": "string",
+            "label": "Architecture",
+            "defaultValue": "",
+            "required": true,
+            "groupName": "advanced",
+            "visibleRule": "setDebianProps=true"
+        },
+        {
+            "name": "syncDeletes",
+            "type": "boolean",
+            "label": "Sync and delete files from a path in Artifactory",
+            "defaultValue": "false",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "Select if you'd like to set a specific path in Artifactory, under which to sync artifacts after the upload.\nAfter the upload, this path will include only the artifacts uploaded during this upload operation. The other files under this path will be deleted."
+        },
+        {
+            "name": "syncDeletesPath",
+            "type": "string",
+            "label": "Sync path",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advanced",
+            "visibleRule": "syncDeletes=true"
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "uploadArtifacts.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}
