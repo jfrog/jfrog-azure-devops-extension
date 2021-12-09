@@ -3,7 +3,7 @@ const uuid = require('uuid/v1');
 const os = require('os');
 const fs = require('fs-extra');
 const path = require('path');
-const utils = require('jfrog-tasks-utils/utils.js');
+const crypto = require('crypto');
 
 // Helper Constants
 const CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME = 'artifact_property_build.name';
@@ -14,7 +14,6 @@ const BUILD_INFO_BUILD_NUMBER = 'number';
 const BUILD_INFO_BUILD_STARTED = 'started';
 const BUILD_INFO_FILE_NAME = 'generatedBuildInfo';
 const BUILD_TEMP_PATH = 'jfrog/builds';
-const projectsSupportMinVer = '1.45.0'; // todo
 
 /**
  * Execute Artifactory Conan Task
@@ -361,7 +360,7 @@ function purgeConanRemotes() {
     /*
      * Set Conan Environment Variable
      * Conan User Home is set as a variable in the phase scope so it will be
-     * availabe to every task running after this one
+     * available to every task running after this one
      */
     if (!conanUserHome) {
         conanUserHome = getDefaultConanUserHome();
@@ -398,26 +397,9 @@ function initCliPartialsBuildDir(buildName, buildNumber) {
 }
 
 function getCliPartialsBuildDir(buildName, buildNumber) {
-    let buildId = buildName + '_' + buildNumber;
-    if (isProjectSupported()) {
-        // Add project name.
-        buildId += '_' + '';
-    }
-    return path.join(os.tmpdir(), BUILD_TEMP_PATH, Buffer.from(buildId).toString('base64'));
-}
-
-function isProjectSupported() {
-    // Check if a JFrog CLI version was previously selected / requested, otherwise assume default version.
-    // Conan has a separate support check because it does not use the utils.executeCli function, and thus utils.taskSelectedCliVersionEnv
-    // might not be set.
-    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
-    if (!cliVersion) {
-        cliVersion = tl.getVariable(utils.pipelineRequestedCliVersionEnv);
-    }
-    if (!cliVersion) {
-        return true;
-    }
-    return utils.compareVersions(cliVersion, projectsSupportMinVer) >= 0;
+    const buildId = buildName + '_' + buildNumber + '_' + ''; // todo add project support here
+    const hexId = crypto.createHash('sha256').update(buildId).digest('hex');
+    return path.join(os.tmpdir(), BUILD_TEMP_PATH, hexId);
 }
 
 module.exports = {
