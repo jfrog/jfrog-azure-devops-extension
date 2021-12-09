@@ -3,7 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    buildName: 'downloadArtifactSource',
+    buildName: 'downloadArtifactSourceBuild',
     buildNumber: '5',
     fileSpec: JSON.stringify({
         files: [

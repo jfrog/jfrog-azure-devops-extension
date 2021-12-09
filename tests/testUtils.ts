@@ -70,7 +70,7 @@ export const properties: string = path.join(__dirname, '..', 'tasks', 'JFrogProp
 export const go: string = path.join(__dirname, '..', 'tasks', 'JFrogGo', 'goBuild.js');
 export const collectIssues: string = path.join(__dirname, '..', 'tasks', 'JFrogCollectIssues', 'collectIssues.js');
 export const toolsInstaller: string = path.join(__dirname, '..', 'tasks', 'JFrogToolsInstaller', 'toolsInstaller.js');
-export const genericCli: string = path.join(__dirname, '..', 'tasks', 'JfrogCliV2', 'jfrogCliRun.js');
+export const genericCli: string = path.join(__dirname, '..', 'tasks', 'JFrogCliV2', 'jfrogCliRun.js');
 export const pip: string = path.join(__dirname, '..', 'tasks', 'JFrogPip', 'pipBuild.js');
 export const distribution: string = path.join(__dirname, '..', 'tasks', 'JFrogDistribution', 'distribution.js');
 

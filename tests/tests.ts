@@ -345,6 +345,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), testDir);
+                deleteBuild('downloadArtifactSourceBuild');
             },
             TestUtils.isSkipTest('generic')
         );
