@@ -161,7 +161,7 @@ function getCliCmdBase(cliPath: string, cliCommandName: string): string {
     const rbVersion: string = tl.getInput('rbVersion', true) || '';
     const cliCommand: string = utils.cliJoin(cliPath, cliCommandName, rbName, rbVersion);
     const distributionService: string = tl.getInput('distributionService', true) || '';
-    return utils.addDistUrlAndCredentialsParams(cliCommand, distributionService);
+    return utils.addUrlAndCredentialsParams(cliCommand, distributionService);
 }
 
 utils.executeCliTask(RunTaskCbk);

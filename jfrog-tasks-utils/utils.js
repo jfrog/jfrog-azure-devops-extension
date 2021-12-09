@@ -46,7 +46,6 @@ module.exports = {
     addIntParam: addIntParam,
     addCommonGenericParams: addCommonGenericParams,
     addUrlAndCredentialsParams: addUrlAndCredentialsParams,
-    addDistUrlAndCredentialsParams: addDistUrlAndCredentialsParams,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
@@ -343,17 +342,10 @@ function addIntParam(cliCommand, inputParam, cliParam) {
     return cliCommand;
 }
 
-function addUrlAndCredentialsParams(cliCommand, artifactoryService) {
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+function addUrlAndCredentialsParams(cliCommand, connectionService) {
+    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
     cliCommand = cliJoin(cliCommand, '--url=' + quote(artifactoryUrl));
-    cliCommand = addServiceConnectionCredentials(cliCommand, artifactoryService);
-    return cliCommand;
-}
-
-function addDistUrlAndCredentialsParams(cliCommand, distributionService) {
-    let distUrl = tl.getEndpointUrl(distributionService, false);
-    cliCommand = cliJoin(cliCommand, '--dist-url=' + quote(distUrl));
-    cliCommand = addServiceConnectionCredentials(cliCommand, distributionService);
+    cliCommand = addServiceConnectionCredentials(cliCommand, connectionService);
     return cliCommand;
 }
 
