@@ -50,7 +50,7 @@ node("docker") {
                     npm i --unsafe-perm
                     npm run create
                     # Verify vsix file is larger than 15M
-                    find . -iname "JFrog.jfrog-artifactory-vsts-extension*" -size +15M | grep .
+                    find . -iname "JFrog.jfrog-azure-devops-extension*" -size +15M | grep .
                 '''
             }
 

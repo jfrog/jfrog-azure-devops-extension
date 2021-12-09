@@ -12,7 +12,7 @@
         }
     ],
     "icons": {
-        "default": "images/artifactory.png"
+        "default": "images/jfrog-logo-200.png"
     },
     "scopes": [
         "vso.build",

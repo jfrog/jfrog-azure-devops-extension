@@ -9,8 +9,8 @@ Beyond managing efficient deployment of your artifacts to Artifactory, the exten
 that effectively facilitates fully traceable builds.
 See the full extension documentation at the [Artifactory Azure DevOps Extension User Guide](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
 
-# Download and Installation [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version-short/JFrog.jfrog-artifactory-vsts-extension.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension)
-The extension is available for installation on your Azure DevOps organization in the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension).
+# Download and Installation [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version-short/JFrog.jfrog-azure-devops-extension.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
+The extension is available for installation on your Azure DevOps organization in the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension).
 To install the extension on TFS, see the [install extensions for Team Foundation Server (TFS)](https://docs.microsoft.com/en-us/azure/devops/marketplace/get-tfs-extensions?view=tfs-2018#install-extensions-while-connected-to-tfs) documentation page.
 
 # Building and Testing the Sources

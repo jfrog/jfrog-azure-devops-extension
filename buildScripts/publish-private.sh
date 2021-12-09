@@ -27,11 +27,11 @@ sed -i '' 's/Build and release/Azure Pipelines/g' vss-extension-private.json
 sed -i '' "s/\"version\": \".*..*..*\"/\"version\": \"${RANDOM}.${RANDOM}.${RANDOM}\"/g" vss-extension-private.json
 
 
-tfx extension unshare -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-artifactory-vsts-extension --publisher $PUBLISHER --unshare-with $ADO_ARTIFACTORY_DEVELOPER 2>/dev/null
-tfx extension unpublish -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-artifactory-vsts-extension --publisher $PUBLISHER
+tfx extension unshare -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER --unshare-with $ADO_ARTIFACTORY_DEVELOPER 2>/dev/null
+tfx extension unpublish -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER
 tfx extension create --manifest-globs vss-extension-private.json --publisher $PUBLISHER
 tfx extension publish -t $ADO_ARTIFACTORY_API_KEY --publisher $PUBLISHER --manifests vss-extension-private.json --override "{\"public\": false}" --share-with $ADO_ARTIFACTORY_DEVELOPER
-tfx extension install --publisher $PUBLISHER --extension-id jfrog-artifactory-vsts-extension --service-url https://$ADO_ARTIFACTORY_DEVELOPER.visualstudio.com -t $ADO_ARTIFACTORY_API_KEY
+tfx extension install --publisher $PUBLISHER --extension-id jfrog-azure-devops-extension --service-url https://$ADO_ARTIFACTORY_DEVELOPER.visualstudio.com -t $ADO_ARTIFACTORY_API_KEY
 
 rm *.vsix
 rm vss-extension-private.json
