@@ -226,6 +226,80 @@
             }
         },
         {
+            "id": "xray-service",
+            "description": "Service Endpoint type for Xray connections",
+            "type": "ms.vss-endpoint.service-endpoint-type",
+            "targets": [
+                "ms.vss-endpoint.endpoint-types"
+            ],
+            "properties": {
+                "name": "xrayService",
+                "displayName": "JFrog Xray",
+                "url": {
+                    "displayName": "Server URL",
+                    "helpText": "Specify the root URL of your Xray installation. For example, https://repo.jfrog.org/xray"
+                },
+                "icon": "images/xray.png",
+                "dataSources": [
+                    {
+                        "name": "TestConnection",
+                        "endpointUrl": "{{endpoint.url}}/api/v1/system/ping",
+                        "resultSelector": "jsonpath:$.values[*]"
+                    }
+                ],
+                "authenticationSchemes": [
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+                        "inputDescriptors": [
+                            {
+                                "id": "username",
+                                "name": "Username",
+                                "description": "Xray username.",
+                                "inputMode": "textbox",
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "password",
+                                "name": "Password",
+                                "description": "Password or API key of an Xray user.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+                        "headers": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{ endpoint.apitoken }}"
+                            }
+                        ],
+                        "inputDescriptors": [
+                            {
+                                "id": "apitoken",
+                                "name": "Access Token",
+                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
             "id": "artifactory-release-artifact-type",
             "description": "Artifactory",
             "type": "ms.vss-releaseartifact.release-artifact-type",
