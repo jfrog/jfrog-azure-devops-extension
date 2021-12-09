@@ -69,19 +69,20 @@
     },
     "contributions": [
         {
-            "id": "artifactory-service",
+            "id": "jfrog-artifactory-service",
             "description": "Service Endpoint type for Artifactory connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
             ],
             "properties": {
-                "name": "artifactoryService",
-                "displayName": "JFrog Artifactory",
+                "name": "jfrogArtifactoryService",
+                "displayName": "Artifactory by JFrog",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Artifactory installation. For example, https://repo.jfrog.org/artifactory"
                 },
+                "icon": "images/artifactory.png",
                 "dataSources": [
                     {
                         "name": "TestConnection",
@@ -152,15 +153,15 @@
             }
         },
         {
-            "id": "distribution-service",
+            "id": "jfrog-distribution-service",
             "description": "Service Endpoint type for Distribution connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
             ],
             "properties": {
-                "name": "distributionService",
-                "displayName": "JFrog Distribution",
+                "name": "jfrogDistributionService",
+                "displayName": "Distribution by JFrog",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Distribution installation. For example, https://repo.jfrog.org/distribution"
@@ -226,15 +227,15 @@
             }
         },
         {
-            "id": "xray-service",
+            "id": "jfrog-xray-service",
             "description": "Service Endpoint type for Xray connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
             ],
             "properties": {
-                "name": "xrayService",
-                "displayName": "JFrog Xray",
+                "name": "jfrogXrayService",
+                "displayName": "Xray by JFrog",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Xray installation. For example, https://repo.jfrog.org/xray"
@@ -243,7 +244,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/v1/system/ping",
+                        "endpointUrl": "{{endpoint.url}}/api/v1/system/version",
                         "resultSelector": "jsonpath:$.values[*]"
                     }
                 ],
