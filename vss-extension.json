@@ -77,7 +77,7 @@
             ],
             "properties": {
                 "name": "jfrogArtifactoryService",
-                "displayName": "Artifactory by JFrog",
+                "displayName": "JFrog NEW Artifactory",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Artifactory installation. For example, https://repo.jfrog.org/artifactory"
@@ -161,7 +161,7 @@
             ],
             "properties": {
                 "name": "jfrogDistributionService",
-                "displayName": "Distribution by JFrog",
+                "displayName": "JFrog NEW Distribution",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Distribution installation. For example, https://repo.jfrog.org/distribution"
@@ -235,7 +235,7 @@
             ],
             "properties": {
                 "name": "jfrogXrayService",
-                "displayName": "Xray by JFrog",
+                "displayName": "JFrog NEW Xray",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Xray installation. For example, https://repo.jfrog.org/xray"
@@ -244,7 +244,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/v1/system/version",
+                        "endpointUrl": "{{endpoint.url}}/api/v1/system/ping",
                         "resultSelector": "jsonpath:$.values[*]"
                     }
                 ],
@@ -301,7 +301,7 @@
             }
         },
         {
-            "id": "artifactory-release-artifact-type",
+            "id": "jfrog-artifactory-release-artifact-type",
             "description": "Artifactory",
             "type": "ms.vss-releaseartifact.release-artifact-type",
             "targets": [
