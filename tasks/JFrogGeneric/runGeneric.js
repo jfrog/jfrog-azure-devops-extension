@@ -89,13 +89,13 @@ function handleGenericDownload(cliPath, workDir, artifactoryService) {
 
 function handleGenericSetProperties(cliPath, workDir, artifactoryService) {
     let props = tl.getInput('setProps', false);
-    let cliCommand = utils.cliJoin(cliPath, cliSetPropertiesCommand, props);
+    let cliCommand = utils.cliJoin(cliPath, cliSetPropertiesCommand, utils.quote(props));
     performGenericTask(cliCommand, workDir, artifactoryService)
 }
 
 function handleGenericDeleteProperties(cliPath, workDir, artifactoryService) {
     let props = tl.getInput('deleteProps', false);
-    let cliCommand = utils.cliJoin(cliPath, cliDeletePropertiesCommand, props);
+    let cliCommand = utils.cliJoin(cliPath, cliDeletePropertiesCommand, utils.quote(props));
     performGenericTask(cliCommand, workDir, artifactoryService)
 }
 
