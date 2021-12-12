@@ -60,7 +60,7 @@
         },
         {
             "name": "artifactoryResolverService",
-            "type": "connectedService:artifactoryService",
+            "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service",
             "defaultValue": "",
             "groupName": "resolve",
@@ -95,7 +95,7 @@
         },
         {
             "name": "artifactoryDeployService",
-            "type": "connectedService:artifactoryService",
+            "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service",
             "defaultValue": "",
             "groupName": "deployer",

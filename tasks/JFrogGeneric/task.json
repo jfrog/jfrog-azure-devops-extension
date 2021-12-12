@@ -45,7 +45,7 @@
         },
         {
             "name": "connection",
-            "type": "connectedService:artifactoryService",
+            "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,

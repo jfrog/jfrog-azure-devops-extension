@@ -28,7 +28,7 @@
     "inputs": [
         {
             "name": "distributionService",
-            "type": "connectedService:distributionService",
+            "type": "connectedService:jfrogDistributionService",
             "label": "Distribution service",
             "defaultValue": "",
             "required": true,

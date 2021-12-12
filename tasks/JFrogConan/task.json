@@ -53,7 +53,7 @@
         },
         {
             "name": "artifactoryService",
-            "type": "connectedService:artifactoryService",
+            "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory Service",
             "visibleRule": "conanCommand = Add Remote",
             "defaultValue": "",
@@ -213,7 +213,7 @@
     ],
     "dataSourceBindings": [
         {
-            "endpointId": "$(artifactoryService)",
+            "endpointId": "$(jfrogArtifactoryService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "conanRepo",
             "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",

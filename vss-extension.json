@@ -308,7 +308,7 @@
                 "ms.vss-releaseartifact.artifact-types"
             ],
             "properties": {
-                "name": "Artifactory",
+                "name": "JFrogArtifactory",
                 "displayName": "Artifactory NEW",
                 "endpointTypeId": "jfrogArtifactoryService",
                 "uniqueSourceIdentifier": "{{connection}}:{{definition}}:{{buildNumber}}",

@@ -53,7 +53,7 @@
         },
         {
             "name": "artifactoryService",
-            "type": "connectedService:artifactoryService",
+            "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service",
             "defaultValue": "",
             "required": true,
@@ -191,14 +191,14 @@
     ],
     "dataSourceBindings": [
         {
-            "endpointId": "$(artifactoryService)",
+            "endpointId": "$(jfrogArtifactoryService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "targetResolveRepo",
             "resultSelector": "jsonpath:$[?(@.packageType=='NuGet')]",
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         },
         {
-            "endpointId": "$(artifactoryService)",
+            "endpointId": "$(jfrogArtifactoryService)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "targetDeployRepo",
             "resultSelector": "jsonpath:$[?(@.packageType=='NuGet' && @.type!='REMOTE')]",
