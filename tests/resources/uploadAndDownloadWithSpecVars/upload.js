@@ -2,6 +2,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
+    command: 'Upload',
     fileSpec: JSON.stringify({
         files: [
             {
@@ -13,10 +14,10 @@ let inputs = {
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
-    symlinks: false,
+    preserveSymlinks: false,
     specSource: 'taskConfiguration',
     replaceSpecVars: true,
     specVars: 'patternVar=a*.in'
 };
 
-testUtils.runArtifactoryTask(testUtils.upload, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

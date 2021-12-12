@@ -21,6 +21,7 @@ fs.writeFileSync(
 );
 
 let inputs = {
+    command: 'Download',
     specSource: 'file',
     file: specPath,
     failNoOp: true,
@@ -29,4 +30,4 @@ let inputs = {
     validateSymlinks: false
 };
 
-testUtils.runArtifactoryTask(testUtils.download, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

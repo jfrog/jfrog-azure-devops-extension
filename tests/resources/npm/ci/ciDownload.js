@@ -4,6 +4,7 @@ const path = require('path');
 const TEST_NAME = 'npm';
 
 let inputs = {
+    command: 'Download',
     fileSpec: JSON.stringify({
         files: [
             {
@@ -20,4 +21,4 @@ let inputs = {
     specSource: 'taskConfiguration'
 };
 
-testUtils.runArtifactoryTask(testUtils.download, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

@@ -57,8 +57,7 @@ export {
 export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
 export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
 export const docker: string = path.join(__dirname, '..', 'tasks', 'JFrogDocker', 'dockerBuild.js');
-export const download: string = path.join(__dirname, '..', 'tasks', 'JFrogGenericDownload', 'downloadArtifacts.js');
-export const upload: string = path.join(__dirname, '..', 'tasks', 'JFrogGenericUpload', 'uploadArtifacts.js');
+export const generic: string = path.join(__dirname, '..', 'tasks', 'JFrogGeneric', 'runGeneric.js');
 export const maven: string = path.join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
 export const npm: string = path.join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');
 export const nuget: string = path.join(__dirname, '..', 'tasks', 'JFrogNuget', 'nugetBuild.js');
@@ -66,7 +65,6 @@ export const dotnet: string = path.join(__dirname, '..', 'tasks', 'JFrogDotnet',
 export const gradle: string = path.join(__dirname, '..', 'tasks', 'JFrogGradle', 'gradleBuild.js');
 export const publish: string = path.join(__dirname, '..', 'tasks', 'JFrogPublishBuildInfo', 'publishBuildInfo.js');
 export const discard: string = path.join(__dirname, '..', 'tasks', 'JFrogDiscardBuilds', 'discardBuilds.js');
-export const properties: string = path.join(__dirname, '..', 'tasks', 'JFrogProperties', 'properties.js');
 export const go: string = path.join(__dirname, '..', 'tasks', 'JFrogGo', 'goBuild.js');
 export const collectIssues: string = path.join(__dirname, '..', 'tasks', 'JFrogCollectIssues', 'collectIssues.js');
 export const toolsInstaller: string = path.join(__dirname, '..', 'tasks', 'JFrogToolsInstaller', 'toolsInstaller.js');

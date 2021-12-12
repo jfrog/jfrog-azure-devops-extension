@@ -13,6 +13,7 @@ let variables = {
     'Build.null': 'null'
 };
 let inputs = {
+    command: 'Upload',
     buildName: BUILD_NAME,
     buildNumber: BUILD_NUMBER,
     fileSpec: JSON.stringify({
@@ -26,10 +27,10 @@ let inputs = {
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
-    symlinks: false,
+    preserveSymlinks: false,
     includeEnvVars: true,
     collectBuildInfo: true,
     specSource: 'taskConfiguration'
 };
 
-testUtils.runArtifactoryTask(testUtils.upload, variables, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, variables, inputs);

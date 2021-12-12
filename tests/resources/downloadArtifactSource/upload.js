@@ -3,6 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
+    command: 'Upload',
     buildName: 'downloadArtifactSourceBuild',
     buildNumber: '5',
     fileSpec: JSON.stringify({
@@ -16,9 +17,9 @@ let inputs = {
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
-    symlinks: false,
+    preserveSymlinks: false,
     collectBuildInfo: true,
     specSource: 'taskConfiguration'
 };
 
-testUtils.runArtifactoryTask(testUtils.upload, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

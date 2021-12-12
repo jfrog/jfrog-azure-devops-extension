@@ -9,4 +9,4 @@ let inputs = {
     downloadPath: testUtils.getLocalTestDir(TEST_NAME)
 };
 
-testUtils.runArtifactoryTask(testUtils.download, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

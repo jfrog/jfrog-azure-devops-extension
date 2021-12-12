@@ -374,24 +374,10 @@ function handleSpecFile(cliCommand, specPath) {
 function addCommonGenericParams(cliCommand, specPath) {
     cliCommand = handleSpecFile(cliCommand, specPath);
 
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
-    // Add build info collection
-    if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName', true);
-        let buildNumber = tl.getInput('buildNumber', true);
-        cliCommand = cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
-        cliCommand = addStringParam(cliCommand, 'module', 'module');
-        cliCommand = addProjectOption(cliCommand);
-    }
     // Add boolean flags
     cliCommand = addBoolParam(cliCommand, 'failNoOp', 'fail-no-op');
-    cliCommand = addBoolParam(cliCommand, 'dryRun', 'dry-run');
     cliCommand = addBoolParam(cliCommand, 'insecureTls', 'insecure-tls');
-    // Add sync-deletes
-    let syncDeletes = tl.getBoolInput('syncDeletes');
-    if (syncDeletes) {
-        cliCommand = addStringParam(cliCommand, 'syncDeletesPath', 'sync-deletes');
-    }
+
     // Add numeric flags, may throw exception for illegal value
     cliCommand = addIntParam(cliCommand, 'threads', 'threads');
     cliCommand = addIntParam(cliCommand, 'retries', 'retries');
@@ -667,6 +653,7 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         let buildName = tl.getInput('buildName', true);
         let buildNumber = tl.getInput('buildNumber', true);
         cliCommand = cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
+        cliCommand = addStringParam(cliCommand, 'module', 'module', false);
         return addProjectOption(cliCommand);
     }
     return cliCommand;

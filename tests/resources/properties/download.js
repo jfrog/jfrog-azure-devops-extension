@@ -3,6 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
+    command: 'Download',
     buildName: 'setAndDeleteProps',
     buildNumber: '4',
     fileSpec: JSON.stringify({
@@ -23,4 +24,4 @@ let inputs = {
     specSource: 'taskConfiguration'
 };
 
-testUtils.runArtifactoryTask(testUtils.download, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

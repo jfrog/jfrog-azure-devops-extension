@@ -3,6 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
+    command: 'DeleteProperties',
     fileSpec: JSON.stringify({
         files: [
             {
@@ -11,8 +12,7 @@ let inputs = {
         ]
     }),
     specSource: 'taskConfiguration',
-    command: 'delete',
     deleteProps: 'propKey1'
 };
 
-testUtils.runArtifactoryTask(testUtils.properties, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);
