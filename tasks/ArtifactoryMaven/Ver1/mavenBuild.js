@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
-const utils = require('artifactory-tasks-utils/utils.js');
+const utils = require('@jfrog/artifactory-tasks-utils/utils.js');
 const fs = require('fs');
 const yaml = require('js-yaml');
 const buildToolsConfigVersion = 1;

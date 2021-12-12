@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
-const utils = require('artifactory-tasks-utils/utils.js');
+const utils = require('@jfrog/artifactory-tasks-utils/utils.js');
 const npmInstallCommand = 'rt npmi';
 const npmPublishCommand = 'rt npmp';
 const npmCiCommand = 'rt npmci';

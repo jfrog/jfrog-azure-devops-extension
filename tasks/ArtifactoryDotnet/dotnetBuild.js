@@ -1,8 +1,8 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
-const utils = require('artifactory-tasks-utils/utils.js');
+const utils = require('@jfrog/artifactory-tasks-utils/utils.js');
 const path = require('path');
-const solutionPathUtil = require('artifactory-tasks-utils/solutionPathUtil');
+const solutionPathUtil = require('@jfrog/artifactory-tasks-utils/solutionPathUtil');
 const cliDotnetCoreRestoreCommand = 'rt dotnet restore';
 const cliUploadCommand = 'rt u';
 const dotnetConfigCommand = 'rt dotnetc';

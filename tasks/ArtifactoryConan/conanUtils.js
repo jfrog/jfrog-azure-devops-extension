@@ -3,7 +3,7 @@ const uuid = require('uuid/v1');
 const os = require('os');
 const fs = require('fs-extra');
 const path = require('path');
-const utils = require('artifactory-tasks-utils/utils.js');
+const utils = require('@jfrog/artifactory-tasks-utils/utils.js');
 
 // Helper Constants
 const CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME = 'artifact_property_build.name';

@@ -1,4 +1,4 @@
-import * as utils from 'artifactory-tasks-utils';
+import * as utils from '@jfrog/artifactory-tasks-utils';
 import * as tl from 'azure-pipelines-task-lib/task';
 
 const cliPipInstallCommand: string = 'rt pip-install';

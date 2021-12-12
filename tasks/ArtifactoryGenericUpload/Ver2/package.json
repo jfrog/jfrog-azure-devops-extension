@@ -1,5 +1,5 @@
 {
-    "name": "artifactory-generic-upload",
+    "name": "@jfrog/artifactory-generic-upload",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,
@@ -10,6 +10,6 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "artifactory-tasks-utils": "file:../../../artifactory-tasks-utils/artifactory-tasks-utils-1.0.0.tgz"
+        "@jfrog/artifactory-tasks-utils": "file:../../../artifactory-tasks-utils/jfrog-artifactory-tasks-utils-1.0.0.tgz"
     }
 }
