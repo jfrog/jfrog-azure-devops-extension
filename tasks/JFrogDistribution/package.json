@@ -1,5 +1,5 @@
 {
-    "name": "jfrog-distribution",
+    "name": "@jfrog/jfrog-distribution",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,
@@ -10,6 +10,6 @@
         "compile": "npx tsc -p ./"
     },
     "dependencies": {
-        "jfrog-tasks-utils": "file:../../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz"
+        "@jfrog/tasks-utils": "file:../../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz"
     }
 }

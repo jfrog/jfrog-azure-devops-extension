@@ -1,5 +1,5 @@
 {
-    "name": "jfrog-test-utils",
+    "name": "@jfrog/test-utils",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,
@@ -7,7 +7,7 @@
     "description": "Test utils",
     "main": "testUtils.ts",
     "dependencies": {
-        "jfrog-tasks-utils": "file:../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz",
+        "@jfrog/tasks-utils": "file:../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz",
         "azure-pipelines-task-lib": "^3.1.10",
         "fs-extra": "^7.0.1",
         "js-yaml": "^3.13.1",

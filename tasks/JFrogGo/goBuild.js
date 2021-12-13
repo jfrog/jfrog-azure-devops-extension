@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
-const utils = require('jfrog-tasks-utils/utils.js');
+const utils = require('@jfrog/tasks-utils/utils.js');
 
 const cliGoCommand = 'go';
 const cliGoPublishCommand = 'gp';

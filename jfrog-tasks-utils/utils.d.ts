@@ -2,7 +2,7 @@
 import * as ifm from 'typed-rest-client/Interfaces';
 import { IExecSyncResult } from 'azure-pipelines-task-lib/toolrunner';
 
-declare module 'jfrog-tasks-utils' {
+declare module '@jfrog/tasks-utils' {
     export function executeCliTask(
         runTaskFunc: (cliPath: string) => void,
         cliVersion?: string,

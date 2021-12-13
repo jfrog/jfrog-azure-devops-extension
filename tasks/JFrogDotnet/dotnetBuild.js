@@ -1,8 +1,8 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
-const utils = require('jfrog-tasks-utils/utils.js');
+const utils = require('@jfrog/tasks-utils/utils.js');
 const path = require('path');
-const solutionPathUtil = require('jfrog-tasks-utils/solutionPathUtil');
+const solutionPathUtil = require('@jfrog/tasks-utils/solutionPathUtil');
 const cliDotnetCoreRestoreCommand = 'dotnet restore';
 const cliUploadCommand = 'rt u';
 const dotnetConfigCommand = 'dotnetc';

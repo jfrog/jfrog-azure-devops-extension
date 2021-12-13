@@ -1,5 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
-const utils = require('jfrog-tasks-utils/utils.js');
+const utils = require('@jfrog/tasks-utils/utils.js');
 
 const dockerPushCommand = 'rt dp';
 const dockerPullCommand = 'rt dpl';

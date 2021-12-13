@@ -1,5 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
-const utils = require('jfrog-tasks-utils/utils.js');
+const utils = require('@jfrog/tasks-utils/utils.js');
 const execSync = require('child_process').execSync;
 
 const cliMavenCommand = 'mvn';

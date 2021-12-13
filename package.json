@@ -1,5 +1,5 @@
 {
-    "name": "jfrog-azure-devops-extension",
+    "name": "@jfrog/jfrog-azure-devops-extension",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,

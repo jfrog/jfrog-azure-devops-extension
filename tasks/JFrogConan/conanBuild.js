@@ -1,6 +1,6 @@
 const conanutils = require('./conanUtils.js');
 const tl = require('azure-pipelines-task-lib/task');
-const utils = require('jfrog-tasks-utils/utils.js');
+const utils = require('@jfrog/tasks-utils/utils.js');
 
 function run() {
     let conanCommand = tl.getInput('conanCommand', true);

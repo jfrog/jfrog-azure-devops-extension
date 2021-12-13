@@ -1,4 +1,4 @@
-import * as utils from 'jfrog-tasks-utils';
+import * as utils from '@jfrog/tasks-utils';
 import * as tl from 'azure-pipelines-task-lib/task';
 
 const cliPipInstallCommand: string = 'pip install';
