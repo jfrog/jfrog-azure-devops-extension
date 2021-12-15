@@ -2,7 +2,7 @@ const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 const path = require('path');
 
-const cliXrayBuildScanCommand = 'bs'; // todo
+const cliXrayBuildScanCommand = 'bs';
 let serverId;
 
 function RunTaskCbk(cliPath) {

@@ -219,27 +219,22 @@ function maskSecrets(str) {
     return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
 }
 
-// todo add docs
 function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(jfrogService, '--url', serverId, cliPath, buildDir);
 }
 
-// todo add docs
 function configureArtifactoryCliServer(artifactoryService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(artifactoryService, '--artifactory-url', serverId, cliPath, buildDir);
 }
 
-// todo add docs
 function configureDistributionCliServer(distributionService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(distributionService, '--distribution-url', serverId, cliPath, buildDir);
 }
 
-// todo add docs
 function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
 }
 
-// todo add docs
 function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
     let serviceUrl = tl.getEndpointUrl(service, false);
     let serviceUser = tl.getEndpointAuthorizationParameter(service, 'username', true);
@@ -256,7 +251,13 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     return executeCliCommand(cliCommand, buildDir, null);
 }
 
-// todo add docs
+/**
+ * Configure a JFrog CLI server for a JFrog platform service connection that is expected to be named 'jfrogPlatformConnection'.
+ * @param serverId - Requested server ID.
+ * @param cliPath - Path to JFrog CLI executable.
+ * @param workDir - Working directory.
+ * @returns {boolean} - Whether the server was configured or not.
+ */
 function configureDefaultJfrogServer(serverId, cliPath, workDir) {
     let jfrogPlatformService = tl.getInput('jfrogPlatformConnection', false);
     if (!jfrogPlatformService) {
@@ -267,28 +268,51 @@ function configureDefaultJfrogServer(serverId, cliPath, workDir) {
     return true;
 }
 
-// todo add docs
+/**
+ * Configure a JFrog CLI server for an Artifactory service connection that is expected to be named 'artifactoryConnection'.
+ * @param serverId - Requested server ID.
+ * @param cliPath - Path to JFrog CLI executable.
+ * @param workDir - Working directory.
+ */
 function configureDefaultArtifactoryServer(serverId, cliPath, workDir) {
     let artifactoryService = tl.getInput('artifactoryConnection', false);
     configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
 }
 
-// todo add docs
+/**
+ * Configure a JFrog CLI server for a Distribution service connection that is expected to be named 'distributionConnection'.
+ * @param serverId - Requested server ID.
+ * @param cliPath - Path to JFrog CLI executable.
+ * @param workDir - Working directory.
+ */
 function configureDefaultDistributionServer(serverId, cliPath, workDir) {
     let distributionService = tl.getInput('distributionConnection', false);
     configureDistributionCliServer(distributionService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
 }
 
-// todo add docs
+/**
+ * Configure a JFrog CLI server for a Xray service connection that is expected to be named 'xrayConnection'.
+ * @param serverId - Requested server ID.
+ * @param cliPath - Path to JFrog CLI executable.
+ * @param workDir - Working directory.
+ */
 function configureDefaultXrayServer(serverId, cliPath, workDir) {
     let xrayService = tl.getInput('xrayConnection', false);
     configureXrayCliServer(xrayService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
 }
 
-// todo add docs
+/**
+ * Configure a JFrog CLI server for a JFrog platform service connection, if one was provided.
+ * Otherwise, configure a server for an Artifactory service connection.
+ * The JFrog connection is expected to be named 'jfrogPlatformConnection', while the Artifactory connection 'artifactoryConnection'.
+ * @param buildToolType - String that describes the server's use. Will be used to name the server ID.
+ * @param cliPath - Path to JFrog CLI executable.
+ * @param workDir - Working directory.
+ * @returns {string} - Configured server ID.
+ */
 function configureDefaultJfrogOrArtifactoryServer(buildToolType, cliPath, workDir) {
     let serverId = assembleUniqueServerId(buildToolType);
     if (!configureDefaultJfrogServer(serverId, cliPath, workDir)) {
@@ -649,7 +673,18 @@ function assembleUniqueServerId(buildToolType) {
     let timestamp = Math.floor(Date.now());
     return [buildName, buildNumber, buildToolType, timestamp].join('_');
 }
-// todo docs
+
+/**
+ * Run the corresponding JFrog CLI config command for the build tool used.
+ * Also configures a JFrog CLI server by the same logic described in {@link configureDefaultJfrogOrArtifactoryServer}.
+ * @param cliPath - Path to JFrog CLI executable.
+ * @param cmd - String to be used for the server ID.
+ * @param requiredWorkDir - Working directory.
+ * @param configCommand - JFrog CLI config command name.
+ * @param repoResolver - Repository to use for resolving. Pass a falsy value to skip.
+ * @param repoDeploy - Repository to use for deploying. Pass a falsy value to skip.
+ * @returns {string[]}
+ */
 function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand, repoResolver, repoDeploy) {
     let cliCommand = cliJoin(cliPath, configCommand);
     let serverIdResolve;
