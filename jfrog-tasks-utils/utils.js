@@ -6,7 +6,7 @@ const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 
 const fileName = getCliExecutableName();
-const toolName = 'jf';
+const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
 const defaultJfrogCliVersion = '2.8.3';
@@ -40,25 +40,22 @@ module.exports = {
     cliJoin: cliJoin,
     quote: quote,
     isWindows: isWindows,
-    addServiceConnectionCredentials: addServiceConnectionCredentials,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
     addIntParam: addIntParam,
     addCommonGenericParams: addCommonGenericParams,
-    addUrlAndCredentialsParams: addUrlAndCredentialsParams,
     fixWindowsPaths: fixWindowsPaths,
     encodePath: encodePath,
     getArchitecture: getArchitecture,
     isToolExists: isToolExists,
     buildCliArtifactoryDownloadUrl: buildCliArtifactoryDownloadUrl,
     createAuthHandlers: createAuthHandlers,
-    configureCliServer: configureCliServer,
     deleteCliServers: deleteCliServers,
     writeSpecContentToSpecPath: writeSpecContentToSpecPath,
     stripTrailingSlash: stripTrailingSlash,
     determineCliWorkDir: determineCliWorkDir,
     createBuildToolConfigFile: createBuildToolConfigFile,
-    assembleBuildToolServerId: assembleBuildToolServerId,
+    assembleUniqueServerId: assembleUniqueServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
     compareVersions: compareVersions,
     addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
@@ -67,11 +64,19 @@ module.exports = {
     removeExtractorsDownloadVariables: removeExtractorsDownloadVariables,
     handleSpecFile: handleSpecFile,
     addProjectOption: addProjectOption,
+    addServerIdOption: addServerIdOption,
+    configureArtifactoryCliServer: configureArtifactoryCliServer,
+    configureJfrogCliServer: configureJfrogCliServer,
+    configureDefaultJfrogServer: configureDefaultJfrogServer,
+    configureDefaultDistributionServer: configureDefaultDistributionServer,
+    configureDefaultXrayServer: configureDefaultXrayServer,
+    configureDefaultJfrogOrArtifactoryServer: configureDefaultJfrogOrArtifactoryServer,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion,
     pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
     taskSelectedCliVersionEnv: taskSelectedCliVersionEnv,
-    extractorsRemoteEnv: extractorsRemoteEnv
+    extractorsRemoteEnv: extractorsRemoteEnv,
+    jfrogCliToolName: jfrogCliToolName
 };
 
 /**
@@ -108,7 +113,7 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 
 function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
     return new Promise(function(resolve, reject) {
-        let cliDir = toolLib.findLocalTool(toolName, cliVersion);
+        let cliDir = toolLib.findLocalTool(jfrogCliToolName, cliVersion);
         if (fs.existsSync(customCliPath)) {
             tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
             resolve(customCliPath);
@@ -145,10 +150,10 @@ function getCliExePathInArtifactory(cliVersion) {
     return cliVersion + '/' + cliPackage + '/' + fileName;
 }
 
-function createAuthHandlers(artifactoryService) {
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, 'username', true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, 'password', true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, 'apitoken', true);
+function createAuthHandlers(serviceConnection) {
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(serviceConnection, 'username', true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(serviceConnection, 'password', true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(serviceConnection, 'apitoken', true);
 
     // Check if Artifactory should be accessed using access-token.
     if (artifactoryAccessToken) {
@@ -214,25 +219,82 @@ function maskSecrets(str) {
     return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
 }
 
-/**
- * Add a new server to the CLI config.
- * @returns {Buffer|string}
- * @throws In CLI execution failure.
- */
-function configureCliServer(artifactory, serverId, cliPath, buildDir) {
-    let artifactoryUrl = tl.getEndpointUrl(artifactory, false);
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactory, 'username', true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactory, 'password', true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactory, 'apitoken', true);
-    let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), '--artifactory-url=' + quote(artifactoryUrl), '--interactive=false');
-    if (artifactoryAccessToken) {
+// todo add docs
+function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
+    return configureSpecificCliServer(jfrogService, '--url', serverId, cliPath, buildDir);
+}
+
+// todo add docs
+function configureArtifactoryCliServer(artifactoryService, serverId, cliPath, buildDir) {
+    return configureSpecificCliServer(artifactoryService, '--artifactory-url', serverId, cliPath, buildDir);
+}
+
+// todo add docs
+function configureDistributionCliServer(distributionService, serverId, cliPath, buildDir) {
+    return configureSpecificCliServer(distributionService, '--distribution-url', serverId, cliPath, buildDir);
+}
+
+// todo add docs
+function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
+    return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
+}
+
+// todo add docs
+function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
+    let serviceUrl = tl.getEndpointUrl(service, false);
+    let serviceUser = tl.getEndpointAuthorizationParameter(service, 'username', true);
+    let servicePassword = tl.getEndpointAuthorizationParameter(service, 'password', true);
+    let serviceAccessToken = tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
+    let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
+    if (serviceAccessToken) {
         // Add access-token if required.
-        cliCommand = cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
+        cliCommand = cliJoin(cliCommand, '--access-token=' + quote(serviceAccessToken));
     } else {
         // Add username and password.
-        cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
+        cliCommand = cliJoin(cliCommand, '--user=' + quote(serviceUser), '--password=' + quote(servicePassword), '--basic-auth-only');
     }
     return executeCliCommand(cliCommand, buildDir, null);
+}
+
+// todo add docs
+function configureDefaultJfrogServer(serverId, cliPath, workDir) {
+    let jfrogPlatformService = tl.getInput('jfrogPlatformConnection', false);
+    if (!jfrogPlatformService) {
+        return false;
+    }
+    configureJfrogCliServer(jfrogPlatformService, serverId, cliPath, workDir);
+    useCliServer(serverId, cliPath, workDir);
+    return true;
+}
+
+// todo add docs
+function configureDefaultArtifactoryServer(serverId, cliPath, workDir) {
+    let artifactoryService = tl.getInput('artifactoryConnection', false);
+    configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
+    useCliServer(serverId, cliPath, workDir);
+}
+
+// todo add docs
+function configureDefaultDistributionServer(serverId, cliPath, workDir) {
+    let distributionService = tl.getInput('distributionConnection', false);
+    configureDistributionCliServer(distributionService, serverId, cliPath, workDir);
+    useCliServer(serverId, cliPath, workDir);
+}
+
+// todo add docs
+function configureDefaultXrayServer(serverId, cliPath, workDir) {
+    let xrayService = tl.getInput('xrayConnection', false);
+    configureXrayCliServer(xrayService, serverId, cliPath, workDir);
+    useCliServer(serverId, cliPath, workDir);
+}
+
+// todo add docs
+function configureDefaultJfrogOrArtifactoryServer(buildToolType, cliPath, workDir) {
+    let serverId = assembleUniqueServerId(buildToolType);
+    if (!configureDefaultJfrogServer(serverId, cliPath, workDir)) {
+        configureDefaultArtifactoryServer(serverId, cliPath, workDir);
+    }
+    return serverId;
 }
 
 /**
@@ -298,25 +360,6 @@ function quote(str) {
     return '"' + str + '"';
 }
 
-function addServiceConnectionCredentials(cliCommand, serviceConnection) {
-    let user = tl.getEndpointAuthorizationParameter(serviceConnection, 'username', true);
-    let password = tl.getEndpointAuthorizationParameter(serviceConnection, 'password', true);
-    let accessToken = tl.getEndpointAuthorizationParameter(serviceConnection, 'apitoken', true);
-
-    // Check if should use Access Token.
-    if (accessToken) {
-        return cliJoin(cliCommand, '--access-token=' + quote(accessToken));
-    }
-
-    // Check if Artifactory should be accessed anonymously.
-    if (user === '') {
-        user = 'anonymous';
-        return cliJoin(cliCommand, '--user=' + quote(user));
-    }
-
-    return cliJoin(cliCommand, '--user=' + quote(user), '--password=' + quote(password));
-}
-
 function addStringParam(cliCommand, inputParam, cliParam, require) {
     let val = tl.getInput(inputParam, require);
     if (val) {
@@ -339,13 +382,6 @@ function addIntParam(cliCommand, inputParam, cliParam) {
         }
         cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
     }
-    return cliCommand;
-}
-
-function addUrlAndCredentialsParams(cliCommand, connectionService) {
-    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
-    cliCommand = cliJoin(cliCommand, '--url=' + quote(artifactoryUrl));
-    cliCommand = addServiceConnectionCredentials(cliCommand, connectionService);
     return cliCommand;
 }
 
@@ -425,7 +461,7 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
         toolLib
             .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
             .then(downloadPath => {
-                toolLib.cacheFile(downloadPath, fileName, toolName, cliVersion).then(cliDir => {
+                toolLib.cacheFile(downloadPath, fileName, jfrogCliToolName, cliVersion).then(cliDir => {
                     let cliPath = path.join(cliDir, fileName);
                     if (!isWindows()) {
                         fs.chmodSync(cliPath, 0o555);
@@ -607,30 +643,33 @@ function determineCliWorkDir(defaultPath, providedPath) {
 }
 
 // Creates a server Id from build and build tool parameters.
-function assembleBuildToolServerId(buildToolType, buildToolCmd) {
+function assembleUniqueServerId(buildToolType) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     let timestamp = Math.floor(Date.now());
-    return [buildName, buildNumber, buildToolType, buildToolCmd, timestamp].join('_');
+    return [buildName, buildNumber, buildToolType, timestamp].join('_');
 }
-
-function createBuildToolConfigFile(cliPath, artifactoryService, cmd, requiredWorkDir, configCommand, repoResolver, repoDeploy) {
-    const artService = tl.getInput(artifactoryService);
+// todo docs
+function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand, repoResolver, repoDeploy) {
     let cliCommand = cliJoin(cliPath, configCommand);
     let serverIdResolve;
     let serverIdDeploy;
     if (repoResolver) {
         // Create serverId
-        serverIdResolve = assembleBuildToolServerId(cmd, tl.getInput('command', true) + 'Resolve');
-        configureCliServer(artService, serverIdResolve, cliPath, requiredWorkDir);
+        serverIdResolve = assembleUniqueServerId(cmd + tl.getInput('command', true) + '_resolver');
+        if (!configureDefaultJfrogServer(serverIdResolve, cliPath, requiredWorkDir)) {
+            configureDefaultArtifactoryServer(serverIdResolve, cliPath, requiredWorkDir);
+        }
         // Add serverId and repo to config command
         cliCommand = cliJoin(cliCommand, '--server-id-resolve=' + quote(serverIdResolve));
         cliCommand = addStringParam(cliCommand, repoResolver, 'repo-resolve', true);
     }
     if (repoDeploy) {
         // Create serverId
-        serverIdDeploy = assembleBuildToolServerId(cmd, tl.getInput('command', true) + 'Deploy');
-        configureCliServer(artService, serverIdDeploy, cliPath, requiredWorkDir);
+        serverIdDeploy = assembleUniqueServerId(cmd, tl.getInput('command', true) + '_deployer');
+        if (!configureDefaultJfrogServer(serverIdDeploy, cliPath, requiredWorkDir)) {
+            configureDefaultArtifactoryServer(serverIdDeploy, cliPath, requiredWorkDir);
+        }
         // Add serverId and repo to config command
         cliCommand = cliJoin(cliCommand, '--server-id-deploy=' + quote(serverIdDeploy));
         cliCommand = addStringParam(cliCommand, repoDeploy, 'repo-deploy', true);
@@ -692,4 +731,8 @@ function removeExtractorsDownloadVariables(cliPath, workDir) {
  */
 function addProjectOption(cliCommand) {
     return addStringParam(cliCommand, 'projectKey', 'project');
+}
+
+function addServerIdOption(cliCommand, serverId) {
+    return cliJoin(cliCommand, '--server-id=' + quote(serverId));
 }

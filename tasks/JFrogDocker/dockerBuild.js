@@ -3,6 +3,7 @@ const utils = require('@jfrog/tasks-utils/utils.js');
 
 const dockerPushCommand = 'rt dp';
 const dockerPullCommand = 'rt dpl';
+let serverId;
 
 function RunTaskCbk(cliPath) {
     // Validate docker exists on agent
@@ -18,8 +19,7 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters
-    let artifactoryService = tl.getInput('artifactoryService', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    serverId = utils.configureDefaultJfrogOrArtifactoryServer('build_promotion', cliPath, defaultWorkDir);
     let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
     let imageName = tl.getInput('imageName', true);
     let dockerRepository;
@@ -39,14 +39,8 @@ function RunTaskCbk(cliPath) {
     }
 
     // Build the cli command
-    let cliCommand = utils.cliJoin(
-        cliPath,
-        cliDockerCommand,
-        utils.quote(imageName),
-        utils.quote(dockerRepository),
-        '--url=' + utils.quote(artifactoryUrl)
-    );
-    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
+    let cliCommand = utils.cliJoin(cliPath, cliDockerCommand, utils.quote(imageName), utils.quote(dockerRepository));
+    cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     // Add build info collection
     if (collectBuildInfo) {
@@ -61,6 +55,8 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
+    } finally {
+        utils.deleteCliServers(cliPath, defaultWorkDir, [serverId]);
     }
 }
 

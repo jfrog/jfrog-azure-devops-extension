@@ -20,7 +20,6 @@ const configString = yaml.safeDump(configYaml);
 let inputs = {
     buildName: 'Collect issues',
     buildNumber: '3',
-    artifactoryService: 'mock-service',
     configSource: 'taskConfiguration',
     taskConfig: configString
 };

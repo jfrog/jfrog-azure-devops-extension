@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const cliCollectIssuesCommand = 'rt bag';
+let serverId;
 
 function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -13,7 +14,6 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters.
-    let artifactoryService = tl.getInput('artifactoryService', false);
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
     let configSource = tl.getInput('configSource', false);
@@ -27,23 +27,24 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    utils.configureCliServer(artifactoryService, artifactoryService, cliPath, defaultWorkDir);
+    serverId = utils.configureDefaultJfrogOrArtifactoryServer('build_promotion', cliPath, defaultWorkDir);
+
     let cliCommand = utils.cliJoin(
         cliPath,
         cliCollectIssuesCommand,
         utils.quote(buildName),
         utils.quote(buildNumber),
-        '--config=' + utils.quote(configPath),
-        '--server-id=' + utils.quote(artifactoryService)
+        '--config=' + utils.quote(configPath)
     );
     cliCommand = utils.addProjectOption(cliCommand);
+    cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     try {
         utils.executeCliCommand(cliCommand, defaultWorkDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
-        utils.deleteCliServers(cliPath, defaultWorkDir, [artifactoryService]);
+        utils.deleteCliServers(cliPath, defaultWorkDir, [serverId]);
         // Remove created config file from file system.
         try {
             tl.rmRF(configPath);

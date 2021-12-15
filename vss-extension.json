@@ -69,6 +69,90 @@
     },
     "contributions": [
         {
+            "id": "jfrog-platform-service",
+            "description": "Service Endpoint type for JFrog Platform connections",
+            "type": "ms.vss-endpoint.service-endpoint-type",
+            "targets": [
+                "ms.vss-endpoint.endpoint-types"
+            ],
+            "properties": {
+                "name": "jfrogPlatformService",
+                "displayName": "JFrog NEW Platform",
+                "url": {
+                    "displayName": "Server URL",
+                    "helpText": "Specify the root URL of your JFrog platform. For example, https://my.jfrog.io/"
+                },
+                "icon": "images/jfrog-logo-200.png",
+                "dataSources": [
+                    {
+                        "name": "TestConnection",
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/plugins",
+                        "resultSelector": "jsonpath:$.values[*]"
+                    },
+                    {
+                        "name": "BuildNames",
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/build?project={{projectKey}}",
+                        "resultSelector": "jsonpath:$.builds[*]"
+                    },
+                    {
+                        "name": "BuildNumbers",
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/build/{{definition}}?project={{projectKey}}",
+                        "resultSelector": "jsonpath:$.buildsNumbers[*]"
+                    }
+                ],
+                "authenticationSchemes": [
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+                        "inputDescriptors": [
+                            {
+                                "id": "username",
+                                "name": "Username",
+                                "description": "JFrog username with deploy permissions.",
+                                "inputMode": "textbox",
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "password",
+                                "name": "Password",
+                                "description": "Password or API key of an JFrog user with deploy permissions.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+                        "headers": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{ endpoint.apitoken }}"
+                            }
+                        ],
+                        "inputDescriptors": [
+                            {
+                                "id": "apitoken",
+                                "name": "Access Token",
+                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
             "id": "jfrog-artifactory-service",
             "description": "Service Endpoint type for Artifactory connections",
             "type": "ms.vss-endpoint.service-endpoint-type",

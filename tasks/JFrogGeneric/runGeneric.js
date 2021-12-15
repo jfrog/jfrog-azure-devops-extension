@@ -5,10 +5,11 @@ const path = require('path');
 const cliUploadCommand = 'rt u';
 const cliDownloadCommand = 'rt dl';
 const cliSetPropertiesCommand = 'rt sp';
-const cliDeletePropertiesCommand = 'rt delp';
+const cliDeletePropertiesCommand = 'rt delete-props';
 const cliMoveCommand = 'rt mv';
 const cliCopyCommand = 'rt cp';
 const cliDeleteArtifactsCommand = 'rt del';
+let serverId;
 
 function RunTaskCbk(cliPath) {
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -16,13 +17,19 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
-    let artifactoryService = tl.getInput('connection', false);
+
+    serverId = utils.assembleUniqueServerId('generic');
+    if (!utils.configureDefaultJfrogServer(serverId, cliPath, workDir)) {
+        // The 'connection' parameter is used by Artifact Source Download and cannot be renamed due to Azure limitations.
+        let artifactoryService = tl.getInput('connection', false);
+        utils.configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
+    }
 
     // Decide if the task runs as generic or artifact-source download.
     let definition = tl.getInput('definition', false);
     if (definition) {
         console.log('Artifact source download...');
-        performArtifactSourceDownload(cliPath, workDir, artifactoryService);
+        performArtifactSourceDownload(cliPath, workDir);
         return;
     }
 
@@ -30,34 +37,34 @@ function RunTaskCbk(cliPath) {
 
     switch (genericCommand) {
         case 'Upload':
-            handleGenericUpload(cliPath, workDir, artifactoryService);
+            handleGenericUpload(cliPath, workDir);
             break;
         case 'Download':
-            handleGenericDownload(cliPath, workDir, artifactoryService);
+            handleGenericDownload(cliPath, workDir);
             break;
         case 'SetProperties':
-            handleGenericSetProperties(cliPath, workDir, artifactoryService);
+            handleGenericSetProperties(cliPath, workDir);
             break;
         case 'DeleteProperties':
-            handleGenericDeleteProperties(cliPath, workDir, artifactoryService);
+            handleGenericDeleteProperties(cliPath, workDir);
             break;
         case 'Move':
-            handleGenericMove(cliPath, workDir, artifactoryService);
+            handleGenericMove(cliPath, workDir);
             break;
         case 'Copy':
-            handleGenericCopy(cliPath, workDir, artifactoryService);
+            handleGenericCopy(cliPath, workDir);
             break;
         case 'DeleteArtifacts':
-            handleGenericDeleteArtifacts(cliPath, workDir, artifactoryService);
+            handleGenericDeleteArtifacts(cliPath, workDir);
             break;
         default:
             tl.setResult(tl.TaskResult.Failed, 'Command not supported: ' + genericCommand);
     }
 }
 
-function handleGenericUpload(cliPath, workDir, artifactoryService) {
+function handleGenericUpload(cliPath, workDir) {
     let cliCommand = utils.cliJoin(cliPath, cliUploadCommand);
-    cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand)
+    cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
 
     cliCommand = utils.addBoolParam(cliCommand, 'preserveSymlinks', 'symlinks');
@@ -65,14 +72,14 @@ function handleGenericUpload(cliPath, workDir, artifactoryService) {
 
     let syncDeletes = tl.getBoolInput('syncDeletesRemote');
     if (syncDeletes) {
-        cliCommand = utils.addStringParam(cliCommand, 'syncDeletesPathRemote', 'sync-deletes');
+        cliCommand = utils.addStringParam(cliCommand, 'syncDeletesPathRemote', 'sync-deletes', false);
     }
-    performGenericTask(cliCommand, workDir, artifactoryService)
+    performGenericTask(cliCommand, cliPath, workDir);
 }
 
-function handleGenericDownload(cliPath, workDir, artifactoryService) {
+function handleGenericDownload(cliPath, workDir) {
     let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand);
-    cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand)
+    cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
 
     cliCommand = utils.addIntParam(cliCommand, 'splitCount', 'split-count');
@@ -82,44 +89,44 @@ function handleGenericDownload(cliPath, workDir, artifactoryService) {
 
     let syncDeletes = tl.getBoolInput('syncDeletesLocal');
     if (syncDeletes) {
-        cliCommand = utils.addStringParam(cliCommand, 'syncDeletesPathLocal', 'sync-deletes');
+        cliCommand = utils.addStringParam(cliCommand, 'syncDeletesPathLocal', 'sync-deletes', false);
     }
-    performGenericTask(cliCommand, workDir, artifactoryService)
+    performGenericTask(cliCommand, cliPath, workDir);
 }
 
-function handleGenericSetProperties(cliPath, workDir, artifactoryService) {
+function handleGenericSetProperties(cliPath, workDir) {
     let props = tl.getInput('setProps', false);
     let cliCommand = utils.cliJoin(cliPath, cliSetPropertiesCommand, utils.quote(props));
-    performGenericTask(cliCommand, workDir, artifactoryService)
+    performGenericTask(cliCommand, cliPath, workDir);
 }
 
-function handleGenericDeleteProperties(cliPath, workDir, artifactoryService) {
+function handleGenericDeleteProperties(cliPath, workDir) {
     let props = tl.getInput('deleteProps', false);
     let cliCommand = utils.cliJoin(cliPath, cliDeletePropertiesCommand, utils.quote(props));
-    performGenericTask(cliCommand, workDir, artifactoryService)
+    performGenericTask(cliCommand, cliPath, workDir);
 }
 
-function handleGenericMove(cliPath, workDir, artifactoryService) {
+function handleGenericMove(cliPath, workDir) {
     let cliCommand = utils.cliJoin(cliPath, cliMoveCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
-    performGenericTask(cliCommand, workDir, artifactoryService)
+    performGenericTask(cliCommand, cliPath, workDir);
 }
 
-function handleGenericCopy(cliPath, workDir, artifactoryService) {
+function handleGenericCopy(cliPath, workDir) {
     let cliCommand = utils.cliJoin(cliPath, cliCopyCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
-    performGenericTask(cliCommand, workDir, artifactoryService)
+    performGenericTask(cliCommand, cliPath, workDir);
 }
 
-function handleGenericDeleteArtifacts(cliPath, workDir, artifactoryService) {
+function handleGenericDeleteArtifacts(cliPath, workDir) {
     let cliCommand = utils.cliJoin(cliPath, cliDeleteArtifactsCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
-    performGenericTask(cliCommand, workDir, artifactoryService)
+    performGenericTask(cliCommand, cliPath, workDir);
 }
 
-function performGenericTask(cliCommand, workDir, artifactoryService) {
+function performGenericTask(cliCommand, cliPath, workDir) {
     let specPath = path.join(workDir, 'genericSpec' + Date.now() + '.json');
-    cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
+    cliCommand = utils.addServerIdOption(cliCommand, serverId);
     try {
         cliCommand = utils.addCommonGenericParams(cliCommand, specPath);
         // Execute the cli command.
@@ -127,6 +134,7 @@ function performGenericTask(cliCommand, workDir, artifactoryService) {
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
         // Remove created fileSpec from file system.
         try {
             tl.rmRF(specPath);
@@ -151,7 +159,7 @@ function addDebParam(cliCommand) {
     return cliCommand;
 }
 
-function performArtifactSourceDownload(cliPath, workDir, artifactoryService) {
+function performArtifactSourceDownload(cliPath, workDir) {
     // 'ARTIFACTORY_RELEASE_BUILD_NUMBER' is used to support providing 'LATEST' version by the user.
     // When Azure DevOps Server supports Artifactory's LATEST version natively, this variable could be removed.
     let buildNumber = tl.getVariable('ARTIFACTORY_RELEASE_BUILD_NUMBER') || tl.getInput('version', true);
@@ -175,13 +183,15 @@ function performArtifactSourceDownload(cliPath, workDir, artifactoryService) {
 
     // Add project flag if provided
     cliCommand = utils.addProjectOption(cliCommand);
-    cliCommand = utils.addUrlAndCredentialsParams(cliCommand, artifactoryService);
+    cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     try {
         utils.executeCliCommand(cliCommand, workDir, null);
         tl.setResult(tl.TaskResult.Succeeded, 'Download Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
+    } finally {
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
     }
 }
 

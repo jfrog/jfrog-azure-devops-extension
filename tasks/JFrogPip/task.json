@@ -28,12 +28,34 @@
     ],
     "inputs": [
         {
-            "name": "artifactoryService",
-            "type": "connectedService:jfrogArtifactoryService",
-            "label": "Artifactory service",
+            "name": "connectionSource",
+            "type": "radio",
+            "label": "Service connection source",
+            "required": true,
+            "defaultValue": "jfrogPlatformConnection",
+            "helpMarkDown": "You may either use a JFrog Platform service connection, or an Artifactory Custom service connection.",
+            "options": {
+                "jfrogPlatformConnection": "JFrog Platform Service Connection",
+                "artifactoryConnection": "Artifactory Custom Service Connection"
+            }
+        },
+        {
+            "name": "jfrogPlatformConnection",
+            "visibleRule": "connectionSource=jfrogPlatformConnection",
+            "type": "connectedService:jfrogPlatformService",
+            "label": "JFrog Platform service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to run the command against."
+            "helpMarkDown": "JFrog Platform service connection to use in the command."
+        },
+        {
+            "name": "artifactoryConnection",
+            "visibleRule": "connectionSource=artifactoryConnection",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to use in the command."
         },
         {
             "name": "command",
@@ -141,7 +163,7 @@
     ],
     "dataSourceBindings": [
         {
-            "endpointId": "$(jfrogArtifactoryService)",
+            "endpointId": "$(artifactoryConnection)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "targetResolveRepo",
             "resultSelector": "jsonpath:$[?(@.packageType=='Pypi')]",

@@ -52,13 +52,35 @@
             "helpMarkDown": "Alias that can be used to reference this Conan remote repository."
         },
         {
-            "name": "artifactoryService",
-            "type": "connectedService:jfrogArtifactoryService",
-            "label": "Artifactory Service",
+            "name": "connectionSource",
+            "type": "radio",
+            "label": "Service connection source",
             "visibleRule": "conanCommand = Add Remote",
+            "required": true,
+            "defaultValue": "jfrogPlatformConnection",
+            "helpMarkDown": "You may either use a JFrog Platform service connection, or an Artifactory Custom service connection.",
+            "options": {
+                "jfrogPlatformConnection": "JFrog Platform Service Connection",
+                "artifactoryConnection": "Artifactory Custom Service Connection"
+            }
+        },
+        {
+            "name": "jfrogPlatformConnection",
+            "visibleRule": "connectionSource=jfrogPlatformConnection",
+            "type": "connectedService:jfrogPlatformService",
+            "label": "JFrog Platform service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service used by this remote configuration."
+            "helpMarkDown": "JFrog Platform service connection to use in the command."
+        },
+        {
+            "name": "artifactoryConnection",
+            "visibleRule": "connectionSource=artifactoryConnection",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to use in the command."
         },
         {
             "name": "conanRepo",
@@ -213,7 +235,7 @@
     ],
     "dataSourceBindings": [
         {
-            "endpointId": "$(jfrogArtifactoryService)",
+            "endpointId": "$(artifactoryConnection)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "conanRepo",
             "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL' || @.type=='LOCAL')]",

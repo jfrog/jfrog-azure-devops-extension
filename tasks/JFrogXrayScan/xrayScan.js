@@ -2,27 +2,30 @@ const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 const path = require('path');
 
-const cliXrayScanCommand = 'rt bs'; // todo
+const cliXrayBuildScanCommand = 'bs'; // todo
+let serverId;
 
 function RunTaskCbk(cliPath) {
+    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
+    if (!workDir) {
+        tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
+        return;
+    }
+
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
 
+    serverId = utils.assembleUniqueServerId('xray_build_scan');
+    if (!utils.configureDefaultJfrogServer(serverId, cliPath, workDir)) {
+        utils.configureDefaultXrayServer(serverId, cliPath, workDir);
+    }
+
     // Get input parameters
-    let artifactoryService = tl.getInput('artifactoryService', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let allowFailBuild = tl.getBoolInput('allowFailBuild', false);
 
-    let cliCommand = utils.cliJoin(
-        cliPath,
-        cliXrayScanCommand,
-        utils.quote(buildName),
-        utils.quote(buildNumber),
-        '--url=' + utils.quote(artifactoryUrl),
-        '--fail=false'
-    );
-    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
+    let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber), '--fail=false');
     cliCommand = utils.addProjectOption(cliCommand);
+    utils.addServerIdOption(cliCommand, serverId);
 
     try {
         let taskRes = utils.executeCliCommand(cliCommand, process.cwd(), 'pipe');
@@ -44,6 +47,8 @@ function RunTaskCbk(cliPath) {
         }
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
+    } finally {
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
     }
 }
 

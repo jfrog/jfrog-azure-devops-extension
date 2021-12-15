@@ -69,15 +69,7 @@ function performGoCommand(goCommand, cliPath, requiredWorkDir) {
  * @param repoDeploy - Deployment repo input name, null if not needed.
  */
 function performGoConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
-    configuredServerIdsArray = utils.createBuildToolConfigFile(
-        cliPath,
-        'artifactoryService',
-        'go',
-        requiredWorkDir,
-        cliGoConfigCommand,
-        repoResolve,
-        repoDeploy
-    );
+    configuredServerIdsArray = utils.createBuildToolConfigFile(cliPath, 'go', requiredWorkDir, cliGoConfigCommand, repoResolve, repoDeploy);
 }
 
 function performGoPublishCommand(cliPath, requiredWorkDir) {

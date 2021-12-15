@@ -20,12 +20,12 @@
     "instanceNameFormat": "JFrog CLI V2",
     "inputs": [
         {
-            "name": "artifactoryService",
-            "type": "connectedService:jfrogArtifactoryService",
-            "label": "Artifactory service",
+            "name": "jfrogPlatformConnection",
+            "type": "connectedService:jfrogPlatformService",
+            "label": "JFrog Platform service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to run the command against."
+            "helpMarkDown": "JFrog Platform service connection to use in the command."
         },
         {
             "name": "useCustomVersion",
@@ -48,12 +48,12 @@
             "name": "command",
             "type": "multiLine",
             "label": "Command to run",
-            "defaultValue": "jf rt <COMMAND>",
+            "defaultValue": "jf <COMMAND>",
             "required": true,
-            "helpMarkDown": "Set your JFrog CLI command after 'jf rt '. There is no need to provide the URL, the credentials or the server ID options.",
+            "helpMarkDown": "Set your JFrog CLI command after 'jf '. There is no need to provide the URL, the credentials or the server ID options.",
             "validation": {
-                "expression": "isMatch(value, '^jf rt ', 'IgnoreCase')",
-                "message": "The command must start with `jf rt `."
+                "expression": "isMatch(value, '^jf ', 'IgnoreCase')",
+                "message": "The command must start with `jf `."
             }
         }
     ],

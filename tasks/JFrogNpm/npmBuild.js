@@ -73,7 +73,6 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
 function performNpmConfigCommand(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
     configuredServerIdsArray = utils.createBuildToolConfigFile(
         cliPath,
-        'artifactoryService',
         'npm',
         requiredWorkDir,
         npmConfigCommand,

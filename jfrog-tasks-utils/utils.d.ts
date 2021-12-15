@@ -19,13 +19,11 @@ declare module '@jfrog/tasks-utils' {
     export function compareVersions(version1: string, version2: string): number;
     export function executeCliCommand(cliCommand: string, runningDir: string, stdio?: string | any[]): IExecSyncResult;
     export function deleteCliServers(cliPath: string, buildDir: string, serverIdArray: string[]): void;
-    export function addUrlAndCredentialsParams(cliCommand: string, connectionService: string): string;
     export function handleSpecFile(cliCommand: string, specPath: string): string;
     export function addBoolParam(cliCommand: string, inputParam: string, cliParam: string): string;
     export function addStringParam(cliCommand: string, inputParam: string, cliParam: string, require: boolean): string;
     export function createBuildToolConfigFile(
         cliPath: string,
-        artifactoryService: any,
         cmd: string,
         requiredWorkDir: string,
         configCommand: string,
@@ -33,5 +31,9 @@ declare module '@jfrog/tasks-utils' {
         repoDeploy: string
     ): string[];
     export function addProjectOption(cliCommand: string): string;
+    export function addServerIdOption(cliCommand: string, serverId: string): string;
+    export function assembleUniqueServerId(buildToolType: string): string;
+    export function configureDefaultJfrogServer(serverId: string, cliPath: string, workDir: string): string;
+    export function configureDefaultDistributionServer(serverId: string, cliPath: string, workDir: string): string;
     export { taskSelectedCliVersionEnv };
 }

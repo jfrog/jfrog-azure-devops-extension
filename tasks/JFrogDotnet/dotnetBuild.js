@@ -48,9 +48,9 @@ function performDotnetNugetPush(cliPath) {
 
     let nupkgPath = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
     let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), utils.quote(targetPath));
-    let artifactoryService = tl.getInput('artifactoryService', true);
-    uploadCommand = utils.addUrlAndCredentialsParams(uploadCommand, artifactoryService);
-    executeCliCommand(uploadCommand, buildDir, cliPath);
+    let serverId = utils.configureDefaultJfrogOrArtifactoryServer('dotnet_nuget_push', cliPath, buildDir);
+    uploadCommand = utils.addServerIdOption(uploadCommand, serverId);
+    executeCliCommand(uploadCommand, buildDir, cliPath, [serverId]);
 }
 
 function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) {
@@ -75,7 +75,7 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) 
 
 // Create dotnet config
 function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
-    return utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'dotnet', requiredWorkDir, dotnetConfigCommand, repoResolve, null);
+    return utils.createBuildToolConfigFile(cliPath, 'dotnet', requiredWorkDir, dotnetConfigCommand, repoResolve, null);
 }
 
 // Creates the .NET Core CLI arguments

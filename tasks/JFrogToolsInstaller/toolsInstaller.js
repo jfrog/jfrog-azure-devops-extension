@@ -4,12 +4,16 @@ const utils = require('@jfrog/tasks-utils/utils.js');
 InstallCliAndExecuteCliTask(RunTaskCbk);
 
 function InstallCliAndExecuteCliTask(RunTaskCbk) {
-    let artifactoryService = tl.getInput('artifactoryService', true);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, true);
+    let connectionSource = tl.getInput('connectionSource', true);
+    let connectionService = tl.getInput(connectionSource, true);
+    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
+    if (connectionSource === 'jfrogPlatformConnection') {
+        artifactoryUrl = utils.addTrailingSlashIfNeeded(artifactoryUrl) + 'artifactory';
+    }
     let cliInstallationRepo = tl.getInput('cliInstallationRepo', true);
     let cliVersion = utils.defaultJfrogCliVersion;
     // If a custom version was requested and provided (by a variable or a specific value) we will use it
-    // If the variable place holder was passed (the variable was not set in the pipeline), use the default cli version.
+    // If the variable placeholder was passed (the variable was not set in the pipeline), use the default cli version.
     if (tl.getBoolInput('installCustomVersion') && tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') !== 0) {
         cliVersion = tl.getInput('cliVersion', true);
         // If the min version allowed is higher than the requested version we will fail the task.
@@ -21,7 +25,7 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     // Set the requested CLI version env to download it now, and to use in succeeding tasks.
     tl.setVariable(utils.pipelineRequestedCliVersionEnv, cliVersion);
     let downloadUrl = utils.buildCliArtifactoryDownloadUrl(artifactoryUrl, cliInstallationRepo, cliVersion);
-    let authHandlers = utils.createAuthHandlers(artifactoryService);
+    let authHandlers = utils.createAuthHandlers(connectionService);
     utils.executeCliTask(RunTaskCbk, cliVersion, downloadUrl, authHandlers);
 }
 
@@ -34,7 +38,6 @@ function RunTaskCbk(cliPath) {
     console.log('Installing Maven and Gradle Extractors...');
 
     // Get inputs and variables
-    let artifactoryService = tl.getInput('artifactoryService');
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -42,9 +45,9 @@ function RunTaskCbk(cliPath) {
     }
 
     // Config a temporary serverId for maven and Gradle extractors download:
-    let serverId = utils.assembleBuildToolServerId('extractors', 'resolver');
+    let serverId;
     try {
-        utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
+        serverId = utils.configureDefaultJfrogOrArtifactoryServer('extractors_resolver', cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         utils.deleteCliServers(cliPath, workDir, [serverId]);

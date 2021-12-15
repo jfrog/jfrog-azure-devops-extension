@@ -398,7 +398,10 @@ function initCliPartialsBuildDir(buildName, buildNumber) {
 
 function getCliPartialsBuildDir(buildName, buildNumber) {
     const buildId = buildName + '_' + buildNumber + '_' + '';
-    const hexId = crypto.createHash('sha256').update(buildId).digest('hex');
+    const hexId = crypto
+        .createHash('sha256')
+        .update(buildId)
+        .digest('hex');
     return path.join(os.tmpdir(), BUILD_TEMP_PATH, hexId);
 }
 

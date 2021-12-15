@@ -3,6 +3,7 @@ const utils = require('@jfrog/tasks-utils/utils.js');
 const path = require('path');
 
 const cliBuildPublishCommand = 'rt bp';
+let serverId;
 
 function RunTaskCbk(cliPath) {
     let buildName = tl.getInput('buildName', true);
@@ -14,8 +15,7 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters
-    let artifactoryService = tl.getInput('artifactoryService', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    serverId = utils.configureDefaultJfrogOrArtifactoryServer('build_promotion', cliPath, workDir);
     let excludeEnvVars = tl.getInput('excludeEnvVars', false);
 
     let cliCommand = utils.cliJoin(
@@ -23,12 +23,11 @@ function RunTaskCbk(cliPath) {
         cliBuildPublishCommand,
         utils.quote(buildName),
         utils.quote(buildNumber),
-        '--url=' + utils.quote(artifactoryUrl),
         '--env-exclude=' + utils.quote(excludeEnvVars)
     );
     cliCommand = addBuildUrl(cliCommand);
-    cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
     cliCommand = utils.addProjectOption(cliCommand);
+    cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     try {
         utils.executeCliCommand(cliCommand, workDir);
@@ -36,12 +35,18 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
+    } finally {
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
     }
 }
 
 function attachBuildInfoUrl(buildName, buildNumber, workDir) {
-    let artifactory = tl.getInput('artifactoryService', false);
-    let artifactoryUrl = tl.getEndpointUrl(artifactory, false);
+    let connectionSource = tl.getInput('connectionSource', true);
+    let connectionService = tl.getInput(connectionSource, true);
+    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
+    if (connectionSource === 'jfrogPlatformConnection') {
+        artifactoryUrl = utils.addTrailingSlashIfNeeded(artifactoryUrl) + 'artifactory';
+    }
     let artifactoryUrlFile = path.join(workDir, 'artifactoryUrlFile');
     let buildDetails = {
         artifactoryUrl: artifactoryUrl,

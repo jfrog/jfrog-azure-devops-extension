@@ -87,8 +87,9 @@ function exec(cliPath, nugetCommand) {
         }
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(pathToNupkg), utils.quote(targetPath));
-        nugetCommandCli = addArtifactoryServer(nugetCommandCli);
-        runNuGet(nugetCommandCli, buildDir, cliPath);
+        const deployerServerId = utils.configureDefaultJfrogOrArtifactoryServer('nuget_deployer', cliPath, buildDir);
+        nugetCommandCli = utils.addServerIdOption(nugetCommandCli, deployerServerId);
+        runNuGet(nugetCommandCli, buildDir, cliPath, [deployerServerId]);
     }
 }
 
@@ -113,26 +114,15 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerIdsArray) 
     }
 }
 
-// Adds the Artifactory information to the command
-function addArtifactoryServer(nugetCommandCli) {
-    let artifactoryService = tl.getInput('artifactoryService', true);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, true);
-
-    nugetCommandCli = utils.cliJoin(nugetCommandCli, '--url=' + utils.quote(artifactoryUrl));
-    nugetCommandCli = utils.addServiceConnectionCredentials(nugetCommandCli, artifactoryService);
-    return nugetCommandCli;
-}
-
 // Create nuget config
 function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
-    const artService = tl.getInput('artifactoryService');
     let cliCommand = utils.cliJoin(cliPath, nugetConfigCommand);
 
     // Create serverId
-    let serverIdResolve = utils.assembleBuildToolServerId('nuget', tl.getInput('command', true) + 'Resolve');
-    utils.configureCliServer(artService, serverIdResolve, cliPath, requiredWorkDir);
+    const resolverServerId = utils.configureDefaultJfrogOrArtifactoryServer('nuget_resolver', cliPath, requiredWorkDir);
+
     // Add serverId and repo to config command
-    cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolve));
+    cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(resolverServerId));
     cliCommand = utils.addStringParam(cliCommand, repoResolve, 'repo-resolve', true);
 
     // Using Nuget protocol v3 by default.
@@ -144,7 +134,7 @@ function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
     // Execute cli.
     try {
         utils.executeCliCommand(cliCommand, requiredWorkDir, null);
-        return serverIdResolve;
+        return resolverServerId;
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     }

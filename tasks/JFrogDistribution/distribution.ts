@@ -7,11 +7,9 @@ const cliRbuCommand: string = 'ds rbu';
 const cliRbsCommand: string = 'ds rbs';
 const cliRbdCommand: string = 'ds rbd';
 const cliRbdelCommand: string = 'ds rbdel';
+let serverId: string;
 
 function RunTaskCbk(cliPath: string): void {
-    // Disable usage report because Artifactory URL is missing. // todo
-    process.env.JFROG_CLI_REPORT_USAGE = 'false';
-
     const workDir: string = getWorkDir();
     const rbCommand: string = tl.getInput('command', true) || '';
     switch (rbCommand) {
@@ -22,7 +20,7 @@ function RunTaskCbk(cliPath: string): void {
             performRbUpdate(cliPath, workDir);
             break;
         case 'sign':
-            performRbSign(cliPath);
+            performRbSign(cliPath, workDir);
             break;
         case 'distribute':
             performRbDistribute(cliPath, workDir);
@@ -42,7 +40,7 @@ function performRbUpdate(cliPath: string, workDir: string): void {
 }
 
 function performRbCreateUpdate(cliPath: string, workDir: string, cliCommandName: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliCommandName);
+    let cliCommand: string = getCliCmdBase(cliPath, cliCommandName, workDir);
 
     const specPath: string = path.join(workDir, 'rbSpec' + Date.now() + '.json');
     cliCommand = utils.handleSpecFile(cliCommand, specPath);
@@ -65,11 +63,11 @@ function performRbCreateUpdate(cliPath: string, workDir: string, cliCommandName:
         cliCommand = utils.addStringParam(cliCommand, 'releaseNotesSyntax', 'release-notes-syntax', true);
     }
     cliCommand = utils.addStringParam(cliCommand, 'description', 'desc', false);
-    execCli(cliCommand, true, true);
+    execCli(cliPath, workDir, cliCommand, true, true);
 }
 
-function performRbSign(cliPath: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliRbsCommand);
+function performRbSign(cliPath: string, workDir: string): void {
+    let cliCommand: string = getCliCmdBase(cliPath, cliRbsCommand, workDir);
 
     cliCommand = utils.addStringParam(cliCommand, 'passphrase', 'passphrase', false);
 
@@ -77,11 +75,11 @@ function performRbSign(cliPath: string): void {
     if (useCustomRepo) {
         cliCommand = utils.addStringParam(cliCommand, 'customRepoName', 'repo', true);
     }
-    execCli(cliCommand, false, true);
+    execCli(cliPath, workDir, cliCommand, false, true);
 }
 
 function performRbDistribute(cliPath: string, workDir: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliRbdCommand);
+    let cliCommand: string = getCliCmdBase(cliPath, cliRbdCommand, workDir);
     try {
         const filePath: string = getDistRulesFilePath(workDir);
         cliCommand = utils.cliJoin(cliCommand, '--dist-rules=' + utils.quote(filePath));
@@ -95,11 +93,11 @@ function performRbDistribute(cliPath: string, workDir: string): void {
         cliCommand = utils.cliJoin(cliCommand, '--sync');
         cliCommand = utils.addStringParam(cliCommand, 'maxWaitSync', 'max-wait-minutes', false);
     }
-    execCli(cliCommand, true, true);
+    execCli(cliPath, workDir, cliCommand, true, true);
 }
 
 function performRbDelete(cliPath: string, workDir: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliRbdelCommand);
+    let cliCommand: string = getCliCmdBase(cliPath, cliRbdelCommand, workDir);
     try {
         const filePath: string = getDistRulesFilePath(workDir);
         cliCommand = utils.cliJoin(cliCommand, '--dist-rules=' + utils.quote(filePath));
@@ -108,10 +106,10 @@ function performRbDelete(cliPath: string, workDir: string): void {
         return;
     }
     cliCommand = utils.addBoolParam(cliCommand, 'deleteFromDist', 'delete-from-dist');
-    execCli(cliCommand, true, true);
+    execCli(cliPath, workDir, cliCommand, true, true);
 }
 
-function execCli(cliCommand: string, allowDryRun: boolean, allowInsecureTls: boolean): void {
+function execCli(cliPath: string, workDir: string, cliCommand: string, allowDryRun: boolean, allowInsecureTls: boolean): void {
     if (allowDryRun) {
         cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
     }
@@ -124,6 +122,8 @@ function execCli(cliCommand: string, allowDryRun: boolean, allowInsecureTls: boo
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
+    } finally {
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
     }
 }
 
@@ -155,13 +155,17 @@ function getWorkDir(): string {
  *
  * @param cliPath - Path to the CLI's executable.
  * @param cliCommandName - Command name to run, including prefix.
+ * @param workDir - Working directory.
  */
-function getCliCmdBase(cliPath: string, cliCommandName: string): string {
+function getCliCmdBase(cliPath: string, cliCommandName: string, workDir: string): string {
     const rbName: string = tl.getInput('rbName', true) || '';
     const rbVersion: string = tl.getInput('rbVersion', true) || '';
     const cliCommand: string = utils.cliJoin(cliPath, cliCommandName, rbName, rbVersion);
-    const distributionService: string = tl.getInput('distributionService', true) || '';
-    return utils.addUrlAndCredentialsParams(cliCommand, distributionService);
+    serverId = utils.assembleUniqueServerId('distribution');
+    if (!utils.configureDefaultJfrogServer(serverId, cliPath, workDir)) {
+        utils.configureDefaultDistributionServer(serverId, cliPath, workDir);
+    }
+    return utils.addServerIdOption(cliCommand, serverId);
 }
 
 utils.executeCliTask(RunTaskCbk);

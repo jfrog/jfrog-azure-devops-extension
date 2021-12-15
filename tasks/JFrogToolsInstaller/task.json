@@ -20,12 +20,34 @@
     "instanceNameFormat": "JFrog Tools Installer",
     "inputs": [
         {
-            "name": "artifactoryService",
-            "type": "connectedService:jfrogArtifactoryService",
-            "label": "Artifactory service",
+            "name": "connectionSource",
+            "type": "radio",
+            "label": "Service connection source",
+            "required": true,
+            "defaultValue": "jfrogPlatformConnection",
+            "helpMarkDown": "You may either use a JFrog Platform service connection, or an Artifactory Custom service connection.",
+            "options": {
+                "jfrogPlatformConnection": "JFrog Platform Service Connection",
+                "artifactoryConnection": "Artifactory Custom Service Connection"
+            }
+        },
+        {
+            "name": "jfrogPlatformConnection",
+            "visibleRule": "connectionSource=jfrogPlatformConnection",
+            "type": "connectedService:jfrogPlatformService",
+            "label": "JFrog Platform service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to download tools from."
+            "helpMarkDown": "JFrog Platform service connection to use in the command."
+        },
+        {
+            "name": "artifactoryConnection",
+            "visibleRule": "connectionSource=artifactoryConnection",
+            "type": "connectedService:artifactoryConnection",
+            "label": "Artifactory service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to use in the command."
         },
         {
             "name": "cliInstallationRepo",
@@ -34,7 +56,7 @@
             "defaultValue": "",
             "required": "true",
             "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/\".",
-            "visibleRule": "artifactoryService != \"\"",
+            "visibleRule": "artifactoryConnection != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }
@@ -79,7 +101,7 @@
             "defaultValue": "",
             "required": "true",
             "helpMarkDown": "Sets the repository from which the Maven and Gradle Extractors should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://oss.jfrog.org/artifactory/oss-release-local/\".",
-            "visibleRule": "installExtractors == true && artifactoryService != \"\"",
+            "visibleRule": "installExtractors == true && artifactoryConnection != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }
@@ -87,14 +109,14 @@
     ],
     "dataSourceBindings": [
         {
-            "endpointId": "$(jfrogArtifactoryService)",
+            "endpointId": "$(artifactoryConnection)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "cliInstallationRepo",
             "resultSelector": "jsonpath:$[?(@.type=='REMOTE' || @.type=='VIRTUAL')]",
             "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
         },
         {
-            "endpointId": "$(jfrogArtifactoryService)",
+            "endpointId": "$(artifactoryConnection)",
             "endpointURL": "{{endpoint.url}}/api/repositories",
             "target": "extractorsInstallationRepo",
             "resultSelector": "jsonpath:$[?(@.type=='REMOTE' || @.type=='VIRTUAL')]",

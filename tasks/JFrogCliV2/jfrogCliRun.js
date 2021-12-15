@@ -1,9 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 
-const cliExecName = 'jf';
-const cliCommandPrefix = cliExecName + ' rt '; //todo
-
+let serverId;
 RunJfrogCliCommand(RunTaskCbk);
 
 function RunJfrogCliCommand(RunTaskCbk) {
@@ -33,30 +31,29 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
-    let artifactoryService = tl.getInput('artifactoryService', false);
+
+    serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
+    utils.configureDefaultJfrogServer(serverId, cliPath, workDir);
+
     let cliCommand = tl.getInput('command', true);
-    if (!cliCommand.startsWith(cliCommandPrefix)) {
+    if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {
         tl.setResult(
             tl.TaskResult.Failed,
-            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf rt'. The command received is: " + cliCommand
+            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf '. The command received is: " + cliCommand
         );
         return;
     }
     try {
-        let serverId = 'rt-server-' + utils.getCurrentTimestamp();
-        // Execute the cli config command.
-        utils.configureCliServer(artifactoryService, serverId, cliPath, workDir);
-        // Use the server we just created
-        utils.useCliServer(serverId, cliPath, workDir);
         // Remove 'jf' and space from the beginning of the command string, so we can use the CLI's path
-        cliCommand = cliCommand.slice(cliExecName.length + 1);
+        cliCommand = cliCommand.slice(utils.jfrogCliToolName.length + 1);
         cliCommand = utils.cliJoin(cliPath, cliCommand);
+        cliCommand = utils.addServerIdOption(cliCommand, serverId);
         // Execute the cli command.
         utils.executeCliCommand(cliCommand, workDir);
-        // delete the server we configured
-        utils.deleteCliServers(cliPath, workDir, [serverId]);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
+    } finally {
+        utils.deleteCliServers(cliPath, workDir, [serverId]);
     }
     tl.setResult(tl.TaskResult.Succeeded, 'Command Succeeded.', cliPath);
 }

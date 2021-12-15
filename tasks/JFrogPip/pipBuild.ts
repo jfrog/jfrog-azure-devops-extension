@@ -50,7 +50,7 @@ function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): v
 
 // Creates Python pip configuration and returns the configured resolver server ID
 function performPipConfig(cliPath: string, requiredWorkDir: string): string[] {
-    return utils.createBuildToolConfigFile(cliPath, 'artifactoryService', 'pip', requiredWorkDir, pipConfigCommand, 'targetResolveRepo', '');
+    return utils.createBuildToolConfigFile(cliPath, 'pip', requiredWorkDir, pipConfigCommand, 'targetResolveRepo', '');
 }
 
 // Creates the Python CLI arguments
