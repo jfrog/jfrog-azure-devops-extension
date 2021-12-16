@@ -619,13 +619,13 @@
             }
         },
         {
-            "id": "jfrog-xray-scan-task",
+            "id": "jfrog-xray-build-scan-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/JFrogXrayScan"
+                "name": "tasks/JFrogXrayBuildScan"
             }
         },
         {
@@ -751,7 +751,7 @@
             "path": "tasks/JFrogConan"
         },
         {
-            "path": "tasks/JFrogXrayScan"
+            "path": "tasks/JFrogXrayBuildScan"
         },
         {
             "path": "tasks/JFrogDiscardBuilds"

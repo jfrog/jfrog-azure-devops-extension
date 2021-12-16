@@ -1,10 +1,10 @@
 {
-    "name": "@jfrog/jfrog-xray-scan",
+    "name": "@jfrog/jfrog-xray-build-scan",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,
     "license": "Apache-2.0",
-    "main": "xrayScan.js",
+    "main": "xrayBuildScan.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
