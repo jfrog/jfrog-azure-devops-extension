@@ -2,7 +2,7 @@
     "id": "48966110-efbe-4151-a20d-d4160f8d69bb",
     "name": "JFrogToolsInstaller",
     "friendlyName": "JFrog Tools Installer",
-    "description": "Installs tools necessary for all Artifactory integration tasks.",
+    "description": "Installs tools necessary for JFrog integration tasks.",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ArtifactoryToolsInstaller)",
     "category": "Tool",
@@ -43,7 +43,7 @@
         {
             "name": "artifactoryConnection",
             "visibleRule": "connectionSource=artifactoryConnection",
-            "type": "connectedService:artifactoryConnection",
+            "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service connection",
             "defaultValue": "",
             "required": true,
@@ -56,7 +56,7 @@
             "defaultValue": "",
             "required": "true",
             "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/\".",
-            "visibleRule": "artifactoryConnection != \"\"",
+            "visibleRule": "artifactoryConnection != \"\" || jfrogPlatformConnection != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }
