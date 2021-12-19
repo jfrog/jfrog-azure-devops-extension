@@ -22,7 +22,7 @@ function RunTaskCbk(cliPath) {
 
     let allowFailBuild = tl.getBoolInput('allowFailBuild', false);
 
-    let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber), '--fail=false', '--format=json');
+    let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber), '--fail=true', '--format=table');
 
     // Add watches source if provided.
     let watchesSource = tl.getInput('watchesSource', false);
@@ -33,43 +33,21 @@ function RunTaskCbk(cliPath) {
     utils.addServerIdOption(cliCommand, serverId);
 
     try {
-        let taskRes = utils.executeCliCommand(cliCommand, process.cwd(), 'pipe');
-        console.log('Scan result:\n' + taskRes);
-        let resJson = JSON.parse(taskRes);
-        let scanUrl = resJson[0]['xray_data_url'];
-        if (scanUrl) {
-            persistScanUrl(scanUrl);
-        }
-
-        // Check if should fail build.
-        if (allowFailBuild) {
-            let buildFailed = resJson[0]['violations'].length > 0;
-            if (buildFailed) {
+        utils.executeCliCommand(cliCommand, process.cwd(), null);
+    } catch (ex) {
+        // Fail task iff the CLI throw exit code 3 and allowFailBuild is enabled.
+        if (ex.status === 3) {
+            if (allowFailBuild) {
                 tl.setResult(tl.TaskResult.Failed, "Build scan returned 'Fail Build'.");
+            } else {
+                tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
             }
         } else {
-            tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
+            tl.setResult(tl.TaskResult.Failed, ex);
         }
-    } catch (ex) {
-        tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
         utils.deleteCliServers(cliPath, workDir, [serverId]);
     }
-}
-
-// Persist the result scan url.
-// It is required for creating a scan link in the build's 'Artifactory' summary tab.
-function persistScanUrl(scanUrl) {
-    // Save build-scan link to a file.
-    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
-    if (!workDir) {
-        throw new Error('Failed getting default working directory.');
-    }
-    let scanUrlFile = path.join(workDir, 'scanUrlFile');
-    tl.writeFile(scanUrlFile, JSON.stringify(scanUrl));
-
-    // Persist file.
-    console.log('##vso[task.addattachment type=xrayType;name=scanDetails;]' + scanUrlFile);
 }
 
 utils.executeCliTask(RunTaskCbk);

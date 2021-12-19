@@ -205,8 +205,12 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         tl.debug('Executing cliCommand: ' + maskSecrets(cliCommand));
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
-        // Error occurred
-        throw maskSecrets(ex.toString());
+        // Error occurred - mask secrets in message.
+        if (ex.message) {
+            ex.message = maskSecrets(ex.toString())
+        }
+        // Throwing the same error to allow relying on its original exit code and stack trace.
+        throw ex
     }
 }
 

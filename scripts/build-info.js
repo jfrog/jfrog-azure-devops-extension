@@ -35,34 +35,6 @@ define(['TFS/DistributedTask/TaskRestClient'], taskRestClient => {
                 }
             });
 
-            // Create xray-scan div.
-            // Get 'xrayType' attachments from build agent.
-            taskClient.getPlanAttachments(vsoContext.project.id, 'build', build.orchestrationPlan.planId, 'xrayType').then(taskAttachments => {
-                let xrayScanParentDiv = $('#artifactory-build-info-parent');
-                if (taskAttachments.length > 0) {
-                    let recId = taskAttachments[0].recordId;
-                    let timelineId = taskAttachments[0].timelineId;
-                    taskClient
-                        .getAttachmentContent(
-                            vsoContext.project.id,
-                            'build',
-                            build.orchestrationPlan.planId,
-                            timelineId,
-                            recId,
-                            'xrayType',
-                            'scanDetails'
-                        )
-                        .then(attachmentContent => {
-                            let scanUrl = JSON.parse(bufferToString(attachmentContent));
-                            let xrayScanDiv = createXrayScanDiv(scanUrl);
-                            xrayScanParentDiv.append(xrayScanDiv);
-                        });
-                } else {
-                    let noXrayScanDiv = createNoXrayScanDiv();
-                    xrayScanParentDiv.append(noXrayScanDiv);
-                }
-            });
-
             VSS.notifyLoadSucceeded();
         });
     }
@@ -97,32 +69,6 @@ define(['TFS/DistributedTask/TaskRestClient'], taskRestClient => {
         noBuildInfoDiv.classList.add('build-info-url');
         noBuildInfoDiv.innerText = 'Build Info is not published to Artifactory';
         return noBuildInfoDiv;
-    }
-
-    /**
-     * Create a div element with xray icon and hyperlink to the scan result.
-     * @param scanUrl - link to the scan result.
-     */
-    function createXrayScanDiv(scanUrl) {
-        let xrayScanDiv = document.createElement('div');
-        let xrayScanIcon = document.createElement('img');
-        let xrayScanUrlDiv = document.createElement('a');
-
-        xrayScanIcon.src = 'images/artifactory-xray-scan.png';
-        xrayScanUrlDiv.classList.add('xray-scan-url');
-        xrayScanUrlDiv.href = scanUrl;
-        xrayScanUrlDiv.text = 'Xray Build Scan Report';
-        xrayScanUrlDiv.target = '_blank';
-        xrayScanDiv.append(xrayScanIcon);
-        xrayScanDiv.append(xrayScanUrlDiv);
-        return xrayScanDiv;
-    }
-
-    function createNoXrayScanDiv() {
-        let noXrayScanDiv = document.createElement('p');
-        noXrayScanDiv.classList.add('build-info-url');
-        noXrayScanDiv.innerText = 'Xray Scan for this build was not performed';
-        return noXrayScanDiv;
     }
 
     function stripTrailingSlash(str) {
