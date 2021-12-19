@@ -207,10 +207,10 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
     } catch (ex) {
         // Error occurred - mask secrets in message.
         if (ex.message) {
-            ex.message = maskSecrets(ex.toString())
+            ex.message = maskSecrets(ex.toString());
         }
         // Throwing the same error to allow relying on its original exit code and stack trace.
-        throw ex
+        throw ex;
     }
 }
 

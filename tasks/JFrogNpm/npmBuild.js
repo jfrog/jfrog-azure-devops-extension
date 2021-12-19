@@ -29,24 +29,28 @@ function RunTaskCbk(cliPath) {
     // Determine npm command.
     let inputCommand = tl.getInput('command', true);
     switch (inputCommand) {
-        case 'install':
+        case 'install': {
             performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
             performNpmCommand(npmInstallCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
-        case 'ci':
+        }
+        case 'ci': {
             performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
             performNpmCommand(npmCiCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
-        case 'custom':
+        }
+        case 'custom': {
             let customCommandAndArgs = tl.getInput('customCommandAndArgs', true);
-            let npmCustomCommand = "npm " + customCommandAndArgs;
+            let npmCustomCommand = 'npm ' + customCommandAndArgs;
             performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
             performNpmCommand(npmCustomCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
-        case 'pack and publish':
+        }
+        case 'pack and publish': {
             performNpmConfigCommand(cliPath, requiredWorkDir, null, 'targetRepo');
             performNpmCommand(npmPublishCommand, false, cliPath, collectBuildInfo, requiredWorkDir);
             break;
+        }
     }
 }
 
@@ -77,14 +81,7 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
 }
 
 function performNpmConfigCommand(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
-    configuredServerIdsArray = utils.createBuildToolConfigFile(
-        cliPath,
-        'npm',
-        requiredWorkDir,
-        npmConfigCommand,
-        repoResolve,
-        repoDeploy
-    );
+    configuredServerIdsArray = utils.createBuildToolConfigFile(cliPath, 'npm', requiredWorkDir, npmConfigCommand, repoResolve, repoDeploy);
 }
 
 function getCollectBuildInfoFlags(addThreads) {

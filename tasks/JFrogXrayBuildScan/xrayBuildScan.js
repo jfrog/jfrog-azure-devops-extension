@@ -1,6 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
-const path = require('path');
 
 const cliXrayBuildScanCommand = 'bs';
 let serverId;
@@ -22,14 +21,21 @@ function RunTaskCbk(cliPath) {
 
     let allowFailBuild = tl.getBoolInput('allowFailBuild', false);
 
-    let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber), '--fail=true', '--format=table');
+    let cliCommand = utils.cliJoin(
+        cliPath,
+        cliXrayBuildScanCommand,
+        utils.quote(buildName),
+        utils.quote(buildNumber),
+        '--fail=true',
+        '--format=table'
+    );
 
     // Add watches source if provided.
     let watchesSource = tl.getInput('watchesSource', false);
-    if (watchesSource !== "none") {
+    if (watchesSource !== 'none') {
         cliCommand = utils.addStringParam(cliCommand, watchesSource, watchesSource, true);
     }
-    cliCommand = utils.addBoolParam(cliCommand, "vuln", "vuln");
+    cliCommand = utils.addBoolParam(cliCommand, 'vuln', 'vuln');
     utils.addServerIdOption(cliCommand, serverId);
 
     try {

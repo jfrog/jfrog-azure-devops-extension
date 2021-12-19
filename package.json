@@ -30,6 +30,6 @@
         "test": "npm i --no-fund && npm t --prefix=tests",
         "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",
         "compile": "npx tsc -p ./",
-        "lint": "npx eslint . --ext .ts,.tsx"
+        "lint": "npx eslint ."
     }
 }

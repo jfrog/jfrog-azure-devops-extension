@@ -30,16 +30,19 @@ function RunTaskCbk(cliPath) {
         // Fall-through if command is build / test / get
         case 'build':
         case 'test':
-        case 'get':
+        case 'get': {
             performGoCommand(inputCommand, cliPath, requiredWorkDir);
             break;
-        case 'custom':
+        }
+        case 'custom': {
             let customCommand = tl.getInput('customCommand', true);
             performGoCommand(customCommand, cliPath, requiredWorkDir);
             break;
-        case 'publish':
+        }
+        case 'publish': {
             performGoPublishCommand(cliPath, requiredWorkDir);
             break;
+        }
     }
 }
 
