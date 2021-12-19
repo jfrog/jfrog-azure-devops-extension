@@ -33,9 +33,19 @@
             },
             "options": {
                 "install": "install",
+                "ci": "ci",
                 "pack and publish": "pack and publish",
-                "ci": "ci"
+                "custom": "custom"
             }
+        },
+        {
+            "name": "customCommandAndArgs",
+            "type": "string",
+            "label": "Command and arguments to execute",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command=custom",
+            "helpMarkDown": "Custom npm command to execute with JFrog CLI."
         },
         {
             "name": "connectionSource",
@@ -105,7 +115,7 @@
             "label": "Npm arguments",
             "defaultValue": "",
             "required": false,
-            "visibleRule": "command != ci",
+            "visibleRule": "command=install || command=pack and publish",
             "helpMarkDown": "A list of npm arguments and options in the form of \"--arg1=value1 --arg2=value2\"."
         },
         {
@@ -114,6 +124,7 @@
             "label": "Collect build info",
             "defaultValue": "false",
             "required": false,
+            "visibleRule": "command!=custom",
             "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"JFrog Publish Build Info\" task."
         },
         {

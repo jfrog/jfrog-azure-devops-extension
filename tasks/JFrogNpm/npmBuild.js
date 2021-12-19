@@ -37,6 +37,12 @@ function RunTaskCbk(cliPath) {
             performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
             performNpmCommand(npmCiCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
             break;
+        case 'custom':
+            let customCommandAndArgs = tl.getInput('customCommandAndArgs', true);
+            let npmCustomCommand = "npm " + customCommandAndArgs;
+            performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
+            performNpmCommand(npmCustomCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
+            break;
         case 'pack and publish':
             performNpmConfigCommand(cliPath, requiredWorkDir, null, 'targetRepo');
             performNpmCommand(npmPublishCommand, false, cliPath, collectBuildInfo, requiredWorkDir);
