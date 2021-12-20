@@ -228,6 +228,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
+    /* todo
     describe('JFrog CLI Task Tests', (): void => {
         runSyncTest(
             'JFrog CLI Task Test',
@@ -246,6 +247,8 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('generic')
         );
     });
+
+     */
 
     describe('Tools Installer Tests', (): void => {
         runSyncTest(
