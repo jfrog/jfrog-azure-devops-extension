@@ -19,16 +19,7 @@ function RunTaskCbk(cliPath) {
         utils.configureDefaultXrayServer(serverId, cliPath, workDir);
     }
 
-    let allowFailBuild = tl.getBoolInput('allowFailBuild', false);
-
-    let cliCommand = utils.cliJoin(
-        cliPath,
-        cliXrayBuildScanCommand,
-        utils.quote(buildName),
-        utils.quote(buildNumber),
-        '--fail=true',
-        '--format=table'
-    );
+    let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber));
 
     // Add watches source if provided.
     let watchesSource = tl.getInput('watchesSource', false);
@@ -36,21 +27,13 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.addStringParam(cliCommand, watchesSource, watchesSource, true);
     }
     cliCommand = utils.addBoolParam(cliCommand, 'vuln', 'vuln');
+    cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
     utils.addServerIdOption(cliCommand, serverId);
 
     try {
         utils.executeCliCommand(cliCommand, process.cwd(), null);
     } catch (ex) {
-        // Fail task iff the CLI throw exit code 3 and allowFailBuild is enabled.
-        if (ex.status === 3) {
-            if (allowFailBuild) {
-                tl.setResult(tl.TaskResult.Failed, "Build scan returned 'Fail Build'.");
-            } else {
-                tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
-            }
-        } else {
-            tl.setResult(tl.TaskResult.Failed, ex);
-        }
+        tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
         utils.deleteCliServers(cliPath, workDir, [serverId]);
     }
