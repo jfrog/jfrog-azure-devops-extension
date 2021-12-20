@@ -1,0 +1,4 @@
+# Ignore ts outputs
+audit.js.map
+audit.d.ts
+audit.js
