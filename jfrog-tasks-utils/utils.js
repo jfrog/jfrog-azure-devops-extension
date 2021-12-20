@@ -9,8 +9,8 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.8.3';
-const minCustomCliVersion = '2.8.3';
+const defaultJfrogCliVersion = '2.9.0';
+const minCustomCliVersion = '2.9.0';
 const pluginVersion = '1.0.0';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
@@ -207,7 +207,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
     } catch (ex) {
         // Error occurred - mask secrets in message.
         if (ex.message) {
-            ex.message = maskSecrets(ex.toString());
+            ex.message = maskSecrets(ex.message);
         }
         // Throwing the same error to allow relying on its original exit code and stack trace.
         throw ex;
