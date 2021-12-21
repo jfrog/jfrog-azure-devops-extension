@@ -599,16 +599,6 @@
             }
         },
         {
-            "id": "jfrog-docker",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "tasks/JFrogDocker"
-            }
-        },
-        {
             "id": "jfrog-conan-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -743,9 +733,6 @@
         },
         {
             "path": "tasks/JFrogPublishBuildInfo"
-        },
-        {
-            "path": "tasks/JFrogDocker"
         },
         {
             "path": "tasks/JFrogConan"

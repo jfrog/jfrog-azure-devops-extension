@@ -15,8 +15,6 @@ const artifactoryUsername: string = process.env.ADO_ARTIFACTORY_USERNAME || '';
 const artifactoryPassword: string = process.env.ADO_ARTIFACTORY_PASSWORD || '';
 const artifactoryAccessToken: string = process.env.ADO_ARTIFACTORY_ACCESS_TOKEN || '';
 const distributionUrl: string = process.env.ADO_DISTRIBUTION_URL || '';
-const artifactoryDockerDomain: string = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN || '';
-const artifactoryDockerRepo: string = process.env.ADO_ARTIFACTORY_DOCKER_REPO || '';
 const skipTests: string[] = process.env.ADO_SKIP_TESTS ? process.env.ADO_SKIP_TESTS.split(',') : [];
 
 const testReposPrefix: string = 'ado-extension-test';
@@ -43,20 +41,10 @@ const repoKeys: any = {
     releaseBundlesRepo: 'rb-repo'
 };
 
-export {
-    testDataDir,
-    repoKeys,
-    artifactoryDockerDomain,
-    artifactoryDockerRepo,
-    artifactoryUrl,
-    artifactoryPassword,
-    artifactoryUsername,
-    distributionUrl
-};
+export { testDataDir, repoKeys, artifactoryUrl, artifactoryPassword, artifactoryUsername, distributionUrl };
 
 export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
 export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
-export const docker: string = path.join(__dirname, '..', 'tasks', 'JFrogDocker', 'dockerBuild.js');
 export const generic: string = path.join(__dirname, '..', 'tasks', 'JFrogGeneric', 'runGeneric.js');
 export const maven: string = path.join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
 export const npm: string = path.join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');

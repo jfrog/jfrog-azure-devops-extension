@@ -20,29 +20,7 @@
     "instanceNameFormat": "JFrog Xray Build Scan",
     "inputs": [
         {
-            "name": "connectionSource",
-            "type": "radio",
-            "label": "Service connection source",
-            "required": true,
-            "defaultValue": "jfrogPlatformConnection",
-            "helpMarkDown": "You may either use a JFrog Platform service connection, or an Xray Custom service connection.",
-            "options": {
-                "jfrogPlatformConnection": "JFrog Platform Service Connection",
-                "xrayConnection": "Xray Custom Service Connection"
-            }
-        },
-        {
-            "name": "jfrogPlatformConnection",
-            "visibleRule": "connectionSource=jfrogPlatformConnection",
-            "type": "connectedService:jfrogPlatformService",
-            "label": "JFrog Platform service connection",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "JFrog Platform service connection to use in the command."
-        },
-        {
             "name": "xrayConnection",
-            "visibleRule": "connectionSource=xrayConnection",
             "type": "connectedService:jfrogXrayService",
             "label": "Xray service connection",
             "defaultValue": "",

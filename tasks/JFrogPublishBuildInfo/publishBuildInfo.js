@@ -15,7 +15,7 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters
-    serverId = utils.configureDefaultJfrogOrArtifactoryServer('build_promotion', cliPath, workDir);
+    serverId = utils.configureDefaultArtifactoryServer('build_publish', cliPath, workDir);
     let excludeEnvVars = tl.getInput('excludeEnvVars', false);
 
     let cliCommand = utils.cliJoin(

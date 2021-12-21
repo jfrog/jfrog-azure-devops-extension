@@ -66,15 +66,11 @@ function handleConfigInstallCommand() {
  */
 function handleAddRemoteCommand() {
     let remoteName = tl.getInput('remoteName', true);
-    let connectionSource = tl.getInput('connectionSource', true);
-    let connectionService = tl.getInput(connectionSource, true);
-    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
-    if (connectionSource === 'jfrogPlatformConnection') {
-        artifactoryUrl = utils.addTrailingSlashIfNeeded(artifactoryUrl) + 'artifactory';
-    }
-    let artifactoryUser = tl.getEndpointAuthorizationParameter(connectionService, 'username', true);
-    let artifactoryPassword = tl.getEndpointAuthorizationParameter(connectionService, 'password', true);
-    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(connectionService, 'apitoken', true);
+    let artifactoryService = tl.getInput('artifactoryConnection', true);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+    let artifactoryUser = tl.getEndpointAuthorizationParameter(artifactoryService, 'username', true);
+    let artifactoryPassword = tl.getEndpointAuthorizationParameter(artifactoryService, 'password', true);
+    let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(artifactoryService, 'apitoken', true);
     let conanRepo = tl.getInput('conanRepo', true);
     let purgeExistingRemotes = tl.getBoolInput('purgeExistingRemotes', true);
 

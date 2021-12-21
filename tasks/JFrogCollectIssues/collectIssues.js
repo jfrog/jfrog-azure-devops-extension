@@ -27,7 +27,7 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    serverId = utils.configureDefaultJfrogOrArtifactoryServer('build_promotion', cliPath, defaultWorkDir);
+    serverId = utils.configureDefaultArtifactoryServer('collect_issues', cliPath, defaultWorkDir);
 
     let cliCommand = utils.cliJoin(
         cliPath,

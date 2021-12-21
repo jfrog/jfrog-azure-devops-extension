@@ -9,7 +9,6 @@ import * as TestUtils from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as assert from 'assert';
 import * as os from 'os';
-import { execSync } from 'child_process';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
 import { Tunnel } from 'node-tunnel';
 
@@ -700,37 +699,6 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Docker Tests', (): void => {
-        runSyncTest(
-            'Docker push and pull',
-            (): void => {
-                assert.ok(TestUtils.artifactoryDockerDomain, 'Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_DOMAIN');
-                assert.ok(TestUtils.artifactoryDockerRepo, 'Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_REPO');
-
-                const testDir: string = 'docker';
-                const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
-                // Run docker build + tag
-                execSync(
-                    'docker build -t ' + TestUtils.artifactoryDockerDomain + '/docker-test:1 ' + path.join(__dirname, 'resources', testDir, filesDir)
-                );
-
-                // run docker push
-                mockTask(testDir, 'push');
-                mockTask(testDir, 'publishPush');
-                getAndAssertBuild('dockerTest', '1');
-
-                // Run docker pull
-                mockTask(testDir, 'pull');
-                mockTask(testDir, 'publishPull');
-                getAndAssertBuild('dockerTest', '2');
-
-                // Clean
-                deleteBuild('dockerTest');
-            },
-            TestUtils.isSkipTest('docker')
-        );
-    });
-
     describe('Collect Issues Tests', (): void => {
         runSyncTest(
             'Collect Issues',
@@ -885,7 +853,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         let rbName: string;
         let rbVersion: string;
         before(function(): void {
-            this.timeout(180000); // 3 minute timer for the before hook only.
+            this.timeout(180000); // 3 minutes timer for the before hook only.
             if (!TestUtils.isSkipTest('distribution')) {
                 rbName = 'ado-test-rb';
                 rbVersion = '123';

@@ -10,7 +10,7 @@ function RunTaskCbk(cliPath) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
-    serverId = utils.configureDefaultJfrogOrArtifactoryServer('build_promotion', cliPath, workDir);
+    serverId = utils.configureDefaultArtifactoryServer('discard_build', cliPath, workDir);
 
     let buildName = tl.getInput('buildName', true);
 

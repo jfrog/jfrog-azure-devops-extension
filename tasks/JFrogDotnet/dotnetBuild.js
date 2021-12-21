@@ -48,7 +48,7 @@ function performDotnetNugetPush(cliPath) {
 
     let nupkgPath = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
     let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), utils.quote(targetPath));
-    let serverId = utils.configureDefaultJfrogOrArtifactoryServer('dotnet_nuget_push', cliPath, buildDir);
+    let serverId = utils.configureDefaultArtifactoryServer('dotnet_nuget_push', cliPath, buildDir);
     uploadCommand = utils.addServerIdOption(uploadCommand, serverId);
     executeCliCommand(uploadCommand, buildDir, cliPath, [serverId]);
 }

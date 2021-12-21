@@ -18,12 +18,10 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
+    // The 'connection' input parameter is used by Artifact Source Download and cannot be renamed due to Azure limitations.
+    let artifactoryService = tl.getInput('connection', true);
     serverId = utils.assembleUniqueServerId('generic');
-    if (!utils.configureDefaultJfrogServer(serverId, cliPath, workDir)) {
-        // The 'connection' parameter is used by Artifact Source Download and cannot be renamed due to Azure limitations.
-        let artifactoryService = tl.getInput('connection', false);
-        utils.configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
-    }
+    utils.configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
 
     // Decide if the task runs as generic or artifact-source download.
     let definition = tl.getInput('definition', false);

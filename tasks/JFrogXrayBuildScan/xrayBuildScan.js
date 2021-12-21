@@ -14,10 +14,7 @@ function RunTaskCbk(cliPath) {
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
 
-    serverId = utils.assembleUniqueServerId('xray_build_scan');
-    if (!utils.configureDefaultJfrogServer(serverId, cliPath, workDir)) {
-        utils.configureDefaultXrayServer(serverId, cliPath, workDir);
-    }
+    serverId = utils.configureDefaultXrayServer('xray_build_scan', cliPath, workDir);
 
     let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber));
 
