@@ -34,7 +34,7 @@
             "defaultValue": "",
             "required": "true",
             "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/\".",
-            "visibleRule": "artifactoryConnection != \"\" || jfrogPlatformConnection != \"\"",
+            "visibleRule": "artifactoryConnection != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }

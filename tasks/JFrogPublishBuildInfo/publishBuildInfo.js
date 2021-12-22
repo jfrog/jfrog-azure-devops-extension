@@ -41,12 +41,8 @@ function RunTaskCbk(cliPath) {
 }
 
 function attachBuildInfoUrl(buildName, buildNumber, workDir) {
-    let connectionSource = tl.getInput('connectionSource', true);
-    let connectionService = tl.getInput(connectionSource, true);
-    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
-    if (connectionSource === 'jfrogPlatformConnection') {
-        artifactoryUrl = utils.addTrailingSlashIfNeeded(artifactoryUrl) + 'artifactory';
-    }
+    let artifactoryService = tl.getInput('artifactoryConnection', true);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let artifactoryUrlFile = path.join(workDir, 'artifactoryUrlFile');
     let buildDetails = {
         artifactoryUrl: artifactoryUrl,
