@@ -293,7 +293,7 @@ export function deleteTestRepositories(): void {
 }
 
 /**
- * Deletes repositories older than 24 hours that match the tests repository key pattern.
+ * Deletes repositories older than 24 hours that match the tests' repository key pattern.
  */
 export function cleanUpOldRepositories(): void {
     const repoKeysList: string[] = getRepoListFromArtifactory();
@@ -302,11 +302,11 @@ export function cleanUpOldRepositories(): void {
     // Search and delete matching repositories.
     repoKeysList.forEach((repoKey): void => {
         const regexGroups: RegExpExecArray | null = repoPattern.exec(repoKey);
-        // If does not match pattern, continue.
+        // If repo does not match pattern, continue.
         if (!regexGroups) {
             return;
         }
-        const repoTimestamp: number = parseInt(regexGroups[1], 10);
+        const repoTimestamp: number = Number(regexGroups[2]);
         // Subtract and convert seconds to hours
         const timeDifference: number = (getCurrentTimestamp() - repoTimestamp) / 3600;
         // If more than 24 hours have passed, delete the repository.

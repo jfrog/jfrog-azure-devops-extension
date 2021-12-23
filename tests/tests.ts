@@ -17,7 +17,7 @@ let tasksOutput: string;
 describe('JFrog Artifactory Extension Tests', (): void => {
     let repoKeys: any;
     before(function(): void {
-        this.timeout(120000); // 2 minute timer for the before hook only.
+        this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
         assert.ok(TestUtils.artifactoryUrl, 'Tests are missing environment variable: ADO_ARTIFACTORY_URL');
         assert.ok(TestUtils.artifactoryUsername, 'Tests are missing environment variable: ADO_ARTIFACTORY_USERNAME');
@@ -35,7 +35,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
     });
 
     after(function(): void {
-        this.timeout(120000); // 2 minute timer for the after hook only.
+        this.timeout(120000); // 2 minutes timer for the after hook only.
         TestUtils.cleanUpAllTests();
     });
 
@@ -388,6 +388,21 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('generic')
         );
     });
+
+    describe('Move Copy Delete Tests', (): void => {
+        runSyncTest(
+            'Move Copy Delete',
+            (): void => {
+                const testDir: string = 'moveCopyDelete';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'move');
+                mockTask(testDir, 'copy');
+                mockTask(testDir, 'delete');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'expectedFiles'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );    });
 
     describe('Publish Build Info Tests', (): void => {
         runSyncTest(
@@ -883,7 +898,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
 
         after(function(): void {
-            this.timeout(180000); // 3 minute timer for the after hook only.
+            this.timeout(180000); // 3 minutes timer for the after hook only.
             distributionCleanUp(rbName, rbVersion);
         });
     });
@@ -901,7 +916,7 @@ function distributionCleanUp(rbName: string, rbVersion: string): void {
  *
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean, Optional) - True if should skip the test
+ * @param skip (Boolean, Optional) - True if test should be skipped
  */
 function runSyncTest(description: string, testFunc: () => void, skip?: boolean): void {
     if (skip) {
@@ -916,11 +931,11 @@ function runSyncTest(description: string, testFunc: () => void, skip?: boolean):
 }
 
 /**
- * Run a async test using mocha suit.
+ * Run an async test using mocha suit.
  *
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean, Optional) - True if should skip the test
+ * @param skip (Boolean, Optional) - True if test should be skipped
  */
 
 function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void, skip?: boolean): void {

@@ -40,10 +40,10 @@ function RunTaskCbk(cliPath) {
         case 'Download':
             handleGenericDownload(cliPath, workDir);
             break;
-        case 'SetProperties':
+        case 'Set Properties':
             handleGenericSetProperties(cliPath, workDir);
             break;
-        case 'DeleteProperties':
+        case 'Delete Properties':
             handleGenericDeleteProperties(cliPath, workDir);
             break;
         case 'Move':
@@ -52,7 +52,7 @@ function RunTaskCbk(cliPath) {
         case 'Copy':
             handleGenericCopy(cliPath, workDir);
             break;
-        case 'DeleteArtifacts':
+        case 'Delete Artifacts':
             handleGenericDeleteArtifacts(cliPath, workDir);
             break;
         default:
