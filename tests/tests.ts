@@ -224,12 +224,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    /* todo
     describe('JFrog CLI Task Tests', (): void => {
         runSyncTest(
             'JFrog CLI Task Test',
             (): void => {
-                const testDir: string = 'genericCliTask';
+                const testDir: string = 'jfrogCliTask';
                 // Upload a.in. b.in and c.in
                 mockTask(testDir, 'upload');
                 // Delete a.in
@@ -243,8 +242,6 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('generic')
         );
     });
-
-     */
 
     describe('Tools Installer Tests', (): void => {
         runSyncTest(

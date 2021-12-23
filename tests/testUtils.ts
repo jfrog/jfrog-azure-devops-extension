@@ -74,18 +74,24 @@ export function initTests(): void {
     createTestRepositories();
 }
 
+export function runPlatformTask(testMain: string, variables: any, inputs: any): void {
+    runJfrogTask(testMain, variables, inputs, '');
+}
+
 export function runArtifactoryTask(testMain: string, variables: any, inputs: any): void {
-    setServiceConnectionCredentials(stripTrailingSlash(platformUrl) + '/artifactory/');
-    runTaskForService(testMain, variables, inputs);
+    runJfrogTask(testMain, variables, inputs, 'artifactory');
 }
 
 export function runDistributionTask(testMain: string, variables: any, inputs: any): void {
-    setServiceConnectionCredentials(stripTrailingSlash(platformUrl) + '/distribution/');
-    runTaskForService(testMain, variables, inputs);
+    runJfrogTask(testMain, variables, inputs, 'distribution');
 }
 
 export function runXrayTask(testMain: string, variables: any, inputs: any): void {
-    setServiceConnectionCredentials(stripTrailingSlash(platformUrl) + '/xray/');
+    runJfrogTask(testMain, variables, inputs, 'xray');
+}
+
+function runJfrogTask(testMain: string, variables: any, inputs: any, urlPrefix: string): void {
+    setServiceConnectionCredentials(stripTrailingSlash(platformUrl) + '/' + urlPrefix);
     runTaskForService(testMain, variables, inputs);
 }
 

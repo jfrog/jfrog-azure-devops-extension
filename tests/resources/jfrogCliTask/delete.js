@@ -7,4 +7,4 @@ let inputs = {
     command: 'jf rt del ' + testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + 'a.in'
 };
 
-testUtils.runArtifactoryTask(testUtils.genericCli, {}, inputs);
+testUtils.runPlatformTask(testUtils.genericCli, {}, inputs);
