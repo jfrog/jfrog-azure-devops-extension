@@ -19,13 +19,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
     before(function(): void {
         this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
-        assert.ok(TestUtils.artifactoryUrl, 'Tests are missing environment variable: ADO_ARTIFACTORY_URL');
-        assert.ok(TestUtils.artifactoryUsername, 'Tests are missing environment variable: ADO_ARTIFACTORY_USERNAME');
-        assert.ok(TestUtils.artifactoryPassword, 'Tests are missing environment variable: ADO_ARTIFACTORY_PASSWORD');
+        assert.ok(TestUtils.platformUrl, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_URL');
+        assert.ok(TestUtils.platformUsername, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_USERNAME');
+        assert.ok(TestUtils.platformPassword, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_PASSWORD');
 
-        if (!TestUtils.isSkipTest('distribution')) {
-            assert.ok(TestUtils.distributionUrl, 'Tests are missing environment variable: ADO_DISTRIBUTION_URL');
-        }
         TestUtils.initTests();
         repoKeys = TestUtils.getRepoKeys();
     });
