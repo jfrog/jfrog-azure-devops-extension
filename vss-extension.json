@@ -77,7 +77,7 @@
             ],
             "properties": {
                 "name": "jfrogPlatformService",
-                "displayName": "JFrog NEW Platform",
+                "displayName": "JFrog Platform V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your JFrog platform. For example, https://my.jfrog.io/"
@@ -161,7 +161,7 @@
             ],
             "properties": {
                 "name": "jfrogArtifactoryService",
-                "displayName": "JFrog NEW Artifactory",
+                "displayName": "JFrog Artifactory V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Artifactory installation. For example, https://repo.jfrog.org/artifactory"
@@ -245,7 +245,7 @@
             ],
             "properties": {
                 "name": "jfrogDistributionService",
-                "displayName": "JFrog NEW Distribution",
+                "displayName": "JFrog Distribution V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Distribution installation. For example, https://repo.jfrog.org/distribution"
@@ -319,7 +319,7 @@
             ],
             "properties": {
                 "name": "jfrogXrayService",
-                "displayName": "JFrog NEW Xray",
+                "displayName": "JFrog Xray V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Xray installation. For example, https://repo.jfrog.org/xray"
@@ -328,7 +328,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/v1/system/ping",
+                        "endpointUrl": "{{endpoint.url}}/api/v1/system/user_ping",
                         "resultSelector": "jsonpath:$.values[*]"
                     }
                 ],
@@ -393,7 +393,7 @@
             ],
             "properties": {
                 "name": "JFrogArtifactory",
-                "displayName": "Artifactory NEW",
+                "displayName": "Artifactory V2",
                 "endpointTypeId": "jfrogArtifactoryService",
                 "uniqueSourceIdentifier": "{{connection}}:{{definition}}:{{buildNumber}}",
                 "downloadTaskId": "c288dcae-5ae4-4a37-a59d-11bb07d393a9",
