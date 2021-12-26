@@ -5,7 +5,7 @@
     "private": true,
     "license": "Apache-2.0",
     "dependencies": {
-        "tfx-cli": "0.9.2"
+        "tfx-cli": "0.10.0"
     },
     "devDependencies": {
         "@types/mocha": "^8.0.4",
@@ -30,6 +30,6 @@
         "test": "npm i --no-fund && npm t --prefix=tests",
         "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",
         "compile": "npx tsc -p ./",
-        "lint": "npx eslint ."
+        "lint": "npx eslint . --ext .ts,.tsx,.js"
     }
 }

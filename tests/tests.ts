@@ -9,7 +9,6 @@ import * as TestUtils from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as assert from 'assert';
 import * as os from 'os';
-import { execSync } from 'child_process';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
 import { Tunnel } from 'node-tunnel';
 
@@ -18,15 +17,12 @@ let tasksOutput: string;
 describe('JFrog Artifactory Extension Tests', (): void => {
     let repoKeys: any;
     before(function(): void {
-        this.timeout(120000); // 2 minute timer for the before hook only.
+        this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
-        assert.ok(TestUtils.artifactoryUrl, 'Tests are missing environment variable: ADO_ARTIFACTORY_URL');
-        assert.ok(TestUtils.artifactoryUsername, 'Tests are missing environment variable: ADO_ARTIFACTORY_USERNAME');
-        assert.ok(TestUtils.artifactoryPassword, 'Tests are missing environment variable: ADO_ARTIFACTORY_PASSWORD');
+        assert.ok(TestUtils.platformUrl, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_URL');
+        assert.ok(TestUtils.platformUsername, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_USERNAME');
+        assert.ok(TestUtils.platformPassword, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_PASSWORD');
 
-        if (!TestUtils.isSkipTest('distribution')) {
-            assert.ok(TestUtils.distributionUrl, 'Tests are missing environment variable: ADO_DISTRIBUTION_URL');
-        }
         TestUtils.initTests();
         repoKeys = TestUtils.getRepoKeys();
     });
@@ -36,7 +32,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
     });
 
     after(function(): void {
-        this.timeout(120000); // 2 minute timer for the after hook only.
+        this.timeout(120000); // 2 minutes timer for the after hook only.
         TestUtils.cleanUpAllTests();
     });
 
@@ -228,12 +224,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    /* todo
     describe('JFrog CLI Task Tests', (): void => {
         runSyncTest(
             'JFrog CLI Task Test',
             (): void => {
-                const testDir: string = 'genericCliTask';
+                const testDir: string = 'jfrogCliTask';
                 // Upload a.in. b.in and c.in
                 mockTask(testDir, 'upload');
                 // Delete a.in
@@ -247,8 +242,6 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('generic')
         );
     });
-
-     */
 
     describe('Tools Installer Tests', (): void => {
         runSyncTest(
@@ -389,6 +382,21 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('generic')
         );
     });
+
+    describe('Move Copy Delete Tests', (): void => {
+        runSyncTest(
+            'Move Copy Delete',
+            (): void => {
+                const testDir: string = 'moveCopyDelete';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'move');
+                mockTask(testDir, 'copy');
+                mockTask(testDir, 'delete');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'expectedFiles'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );    });
 
     describe('Publish Build Info Tests', (): void => {
         runSyncTest(
@@ -700,37 +708,6 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Docker Tests', (): void => {
-        runSyncTest(
-            'Docker push and pull',
-            (): void => {
-                assert.ok(TestUtils.artifactoryDockerDomain, 'Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_DOMAIN');
-                assert.ok(TestUtils.artifactoryDockerRepo, 'Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_REPO');
-
-                const testDir: string = 'docker';
-                const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
-                // Run docker build + tag
-                execSync(
-                    'docker build -t ' + TestUtils.artifactoryDockerDomain + '/docker-test:1 ' + path.join(__dirname, 'resources', testDir, filesDir)
-                );
-
-                // run docker push
-                mockTask(testDir, 'push');
-                mockTask(testDir, 'publishPush');
-                getAndAssertBuild('dockerTest', '1');
-
-                // Run docker pull
-                mockTask(testDir, 'pull');
-                mockTask(testDir, 'publishPull');
-                getAndAssertBuild('dockerTest', '2');
-
-                // Clean
-                deleteBuild('dockerTest');
-            },
-            TestUtils.isSkipTest('docker')
-        );
-    });
-
     describe('Collect Issues Tests', (): void => {
         runSyncTest(
             'Collect Issues',
@@ -885,7 +862,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         let rbName: string;
         let rbVersion: string;
         before(function(): void {
-            this.timeout(180000); // 3 minute timer for the before hook only.
+            this.timeout(180000); // 3 minutes timer for the before hook only.
             if (!TestUtils.isSkipTest('distribution')) {
                 rbName = 'ado-test-rb';
                 rbVersion = '123';
@@ -915,7 +892,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
 
         after(function(): void {
-            this.timeout(180000); // 3 minute timer for the after hook only.
+            this.timeout(180000); // 3 minutes timer for the after hook only.
             distributionCleanUp(rbName, rbVersion);
         });
     });
@@ -933,7 +910,7 @@ function distributionCleanUp(rbName: string, rbVersion: string): void {
  *
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean, Optional) - True if should skip the test
+ * @param skip (Boolean, Optional) - True if test should be skipped
  */
 function runSyncTest(description: string, testFunc: () => void, skip?: boolean): void {
     if (skip) {
@@ -948,11 +925,11 @@ function runSyncTest(description: string, testFunc: () => void, skip?: boolean):
 }
 
 /**
- * Run a async test using mocha suit.
+ * Run an async test using mocha suit.
  *
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean, Optional) - True if should skip the test
+ * @param skip (Boolean, Optional) - True if test should be skipped
  */
 
 function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void, skip?: boolean): void {

@@ -5,7 +5,7 @@ const path = require('path');
 const cliUploadCommand = 'rt u';
 const cliDownloadCommand = 'rt dl';
 const cliSetPropertiesCommand = 'rt sp';
-const cliDeletePropertiesCommand = 'rt delete-props';
+const cliDeletePropertiesCommand = 'rt delp';
 const cliMoveCommand = 'rt mv';
 const cliCopyCommand = 'rt cp';
 const cliDeleteArtifactsCommand = 'rt del';
@@ -18,12 +18,10 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
+    // The 'connection' input parameter is used by Artifact Source Download and cannot be renamed due to Azure limitations.
+    let artifactoryService = tl.getInput('connection', true);
     serverId = utils.assembleUniqueServerId('generic');
-    if (!utils.configureDefaultJfrogServer(serverId, cliPath, workDir)) {
-        // The 'connection' parameter is used by Artifact Source Download and cannot be renamed due to Azure limitations.
-        let artifactoryService = tl.getInput('connection', false);
-        utils.configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
-    }
+    utils.configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
 
     // Decide if the task runs as generic or artifact-source download.
     let definition = tl.getInput('definition', false);
@@ -42,10 +40,10 @@ function RunTaskCbk(cliPath) {
         case 'Download':
             handleGenericDownload(cliPath, workDir);
             break;
-        case 'SetProperties':
+        case 'Set Properties':
             handleGenericSetProperties(cliPath, workDir);
             break;
-        case 'DeleteProperties':
+        case 'Delete Properties':
             handleGenericDeleteProperties(cliPath, workDir);
             break;
         case 'Move':
@@ -54,7 +52,7 @@ function RunTaskCbk(cliPath) {
         case 'Copy':
             handleGenericCopy(cliPath, workDir);
             break;
-        case 'DeleteArtifacts':
+        case 'Delete':
             handleGenericDeleteArtifacts(cliPath, workDir);
             break;
         default:

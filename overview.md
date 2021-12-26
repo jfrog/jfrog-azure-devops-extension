@@ -9,7 +9,7 @@ the extension lets you capture information about your build's resolved dependenc
 Gain full traceability for your builds as the environment data associated with your build is automatically collected.
 
 The extension currently supports the following package managers:
-Maven, Gradle, npm, NuGet, Docker, Go, Pip and Conan. It also allows downloading and uploading generic files from and to Artifactory.
+Maven, Gradle, npm, NuGet, Go, Pip and Conan. It also allows downloading and uploading generic files from and to Artifactory.
 
 **JFrog Distribution** is a centralized platform that lets you provision software release distribution.
 
@@ -42,12 +42,6 @@ The task can be also configured to capture build-info and stores the uploaded fi
 The extension adds the following tasks: **Artifactory NuGet**, **Artifactory .NET Core**, **Artifactory Maven**, **Artifactory Gradle**, **Artifactory npm** and **Artifactory Go** to support full build integration with Artifactory. All tasks allow resolving dependencies and deploying artifacts from and to Artifactory. These tasks can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
 
 ![PackageManagers](images/marketplace/package-managers.png)
-
-## Pushing and pulling docker images
-The **Artifactory Docker** task allows pushing and pulling docker images to and from Artifactory.
-The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **Artifactory Publish Build-Info** task.
-
-![Docker](images/marketplace/docker.png)
 
 ## Setting / deleting properties on files in Artifactory
 The **Artifactory Properties** task allows setting and deleting properties on both files in Artifactory.

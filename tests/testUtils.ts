@@ -10,13 +10,10 @@ import { TaskMockRunner } from 'azure-pipelines-task-lib/mock-run';
 
 const testDataDir: string = path.join(__dirname, 'testData');
 const repoKeysPath: string = path.join(testDataDir, 'configuration', 'repoKeys');
-const artifactoryUrl: string = process.env.ADO_ARTIFACTORY_URL || '';
-const artifactoryUsername: string = process.env.ADO_ARTIFACTORY_USERNAME || '';
-const artifactoryPassword: string = process.env.ADO_ARTIFACTORY_PASSWORD || '';
-const artifactoryAccessToken: string = process.env.ADO_ARTIFACTORY_ACCESS_TOKEN || '';
-const distributionUrl: string = process.env.ADO_DISTRIBUTION_URL || '';
-const artifactoryDockerDomain: string = process.env.ADO_ARTIFACTORY_DOCKER_DOMAIN || '';
-const artifactoryDockerRepo: string = process.env.ADO_ARTIFACTORY_DOCKER_REPO || '';
+const platformUrl: string = process.env.ADO_JFROG_PLATFORM_URL || '';
+const platformUsername: string = process.env.ADO_JFROG_PLATFORM_USERNAME || '';
+const platformPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD || '';
+const platformAccessToken: string = process.env.ADO_JFROG_PLATFORM_ACCESS_TOKEN || '';
 const skipTests: string[] = process.env.ADO_SKIP_TESTS ? process.env.ADO_SKIP_TESTS.split(',') : [];
 
 const testReposPrefix: string = 'ado-extension-test';
@@ -43,20 +40,10 @@ const repoKeys: any = {
     releaseBundlesRepo: 'rb-repo'
 };
 
-export {
-    testDataDir,
-    repoKeys,
-    artifactoryDockerDomain,
-    artifactoryDockerRepo,
-    artifactoryUrl,
-    artifactoryPassword,
-    artifactoryUsername,
-    distributionUrl
-};
+export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername };
 
 export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
 export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
-export const docker: string = path.join(__dirname, '..', 'tasks', 'JFrogDocker', 'dockerBuild.js');
 export const generic: string = path.join(__dirname, '..', 'tasks', 'JFrogGeneric', 'runGeneric.js');
 export const maven: string = path.join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
 export const npm: string = path.join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');
@@ -81,18 +68,30 @@ export function initTests(): void {
     tl.setVariable('Agent.TempDirectory', testDataDir);
     tl.setVariable('Agent.ToolsDirectory', testDataDir);
 
-    cleanUpOldRepositories();
+    // TODO uncomment when eco is back to normal
+    // cleanUpOldRepositories();
     recreateTestDataDir();
     createTestRepositories();
 }
 
+export function runPlatformTask(testMain: string, variables: any, inputs: any): void {
+    runJfrogTask(testMain, variables, inputs, '');
+}
+
 export function runArtifactoryTask(testMain: string, variables: any, inputs: any): void {
-    setServiceConnectionCredentials(artifactoryUrl);
-    runTaskForService(testMain, variables, inputs);
+    runJfrogTask(testMain, variables, inputs, 'artifactory');
 }
 
 export function runDistributionTask(testMain: string, variables: any, inputs: any): void {
-    setServiceConnectionCredentials(distributionUrl);
+    runJfrogTask(testMain, variables, inputs, 'distribution');
+}
+
+export function runXrayTask(testMain: string, variables: any, inputs: any): void {
+    runJfrogTask(testMain, variables, inputs, 'xray');
+}
+
+function runJfrogTask(testMain: string, variables: any, inputs: any, urlPrefix: string): void {
+    setServiceConnectionCredentials(stripTrailingSlash(platformUrl) + '/' + urlPrefix);
     runTaskForService(testMain, variables, inputs);
 }
 
@@ -119,7 +118,7 @@ export function recreateTestDataDir(): void {
 }
 
 export function getBuild(buildName: string, buildNumber: string): syncRequest.Response {
-    return syncRequest.default('GET', stripTrailingSlash(artifactoryUrl) + '/api/build/' + buildName + '/' + buildNumber, {
+    return syncRequest.default('GET', stripTrailingSlash(platformUrl) + '/artifactory/api/build/' + buildName + '/' + buildNumber, {
         headers: {
             Authorization: getAuthorizationHeaderValue()
         }
@@ -127,7 +126,7 @@ export function getBuild(buildName: string, buildNumber: string): syncRequest.Re
 }
 
 export function deleteBuild(buildName: string): void {
-    syncRequest.default('DELETE', stripTrailingSlash(artifactoryUrl) + '/api/build/' + buildName + '?deleteAll=1&artifacts=1', {
+    syncRequest.default('DELETE', stripTrailingSlash(platformUrl) + '/artifactory/api/build/' + buildName + '?deleteAll=1&artifacts=1', {
         headers: {
             Authorization: getAuthorizationHeaderValue()
         }
@@ -305,7 +304,7 @@ export function deleteTestRepositories(): void {
 }
 
 /**
- * Deletes repositories older than 24 hours that match the tests repository key pattern.
+ * Deletes repositories older than 24 hours that match the tests' repository key pattern.
  */
 export function cleanUpOldRepositories(): void {
     const repoKeysList: string[] = getRepoListFromArtifactory();
@@ -314,11 +313,11 @@ export function cleanUpOldRepositories(): void {
     // Search and delete matching repositories.
     repoKeysList.forEach((repoKey): void => {
         const regexGroups: RegExpExecArray | null = repoPattern.exec(repoKey);
-        // If does not match pattern, continue.
+        // If repo does not match pattern, continue.
         if (!regexGroups) {
             return;
         }
-        const repoTimestamp: number = parseInt(regexGroups[1], 10);
+        const repoTimestamp: number = Number(regexGroups[2]);
         // Subtract and convert seconds to hours
         const timeDifference: number = (getCurrentTimestamp() - repoTimestamp) / 3600;
         // If more than 24 hours have passed, delete the repository.
@@ -329,7 +328,7 @@ export function cleanUpOldRepositories(): void {
 }
 
 export function getRepoListFromArtifactory(): string[] {
-    const res: syncRequest.Response = syncRequest.default('GET', stripTrailingSlash(artifactoryUrl) + '/api/repositories/', {
+    const res: syncRequest.Response = syncRequest.default('GET', stripTrailingSlash(platformUrl) + '/artifactory/api/repositories/', {
         headers: {
             Authorization: getAuthorizationHeaderValue()
         }
@@ -343,7 +342,7 @@ export function getRepoListFromArtifactory(): string[] {
 }
 
 export function createRepo(repoKey: string, body: string): syncRequest.Response {
-    const res: syncRequest.Response = syncRequest.default('PUT', stripTrailingSlash(artifactoryUrl) + '/api/repositories/' + repoKey, {
+    const res: syncRequest.Response = syncRequest.default('PUT', stripTrailingSlash(platformUrl) + '/artifactory/api/repositories/' + repoKey, {
         headers: {
             Authorization: getAuthorizationHeaderValue(),
             'Content-Type': 'application/json'
@@ -358,7 +357,7 @@ export function createRepo(repoKey: string, body: string): syncRequest.Response 
 }
 
 export function deleteRepo(repoKey: any): void {
-    syncRequest.default('DELETE', stripTrailingSlash(artifactoryUrl) + '/api/repositories/' + repoKey, {
+    syncRequest.default('DELETE', stripTrailingSlash(platformUrl) + '/artifactory/api/repositories/' + repoKey, {
         headers: {
             Authorization: getAuthorizationHeaderValue(),
             'Content-Type': 'application/json'
@@ -369,7 +368,7 @@ export function deleteRepo(repoKey: any): void {
 export function getLocalReleaseBundle(bundleName: string, bundleVersion: string, expectExist: boolean): syncRequest.Response {
     const res: syncRequest.Response = syncRequest.default(
         'GET',
-        stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion,
+        stripTrailingSlash(platformUrl) + '/distribution/api/v1/release_bundle/' + bundleName + '/' + bundleVersion,
         {
             headers: {
                 Authorization: getAuthorizationHeaderValue()
@@ -407,7 +406,7 @@ export function getLocalReleaseBundle(bundleName: string, bundleVersion: string,
 export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string): syncRequest.Response {
     return syncRequest.default(
         'GET',
-        stripTrailingSlash(distributionUrl) + '/api/v1/release_bundle/' + bundleName + '/' + bundleVersion + '/distribution',
+        stripTrailingSlash(platformUrl) + '/distribution/api/v1/release_bundle/' + bundleName + '/' + bundleVersion + '/distribution',
         {
             headers: {
                 Authorization: getAuthorizationHeaderValue()
@@ -417,7 +416,7 @@ export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string
 }
 
 export function deleteReleaseBundle(bundleName: string, bundleVersion: string): void {
-    syncRequest.default('POST', stripTrailingSlash(distributionUrl) + '/api/v1/distribution/' + bundleName + '/' + bundleVersion + '/delete', {
+    syncRequest.default('POST', stripTrailingSlash(platformUrl) + '/distribution/api/v1/distribution/' + bundleName + '/' + bundleVersion + '/delete', {
         headers: {
             Authorization: getAuthorizationHeaderValue(),
             'Content-Type': 'application/json'
@@ -427,10 +426,10 @@ export function deleteReleaseBundle(bundleName: string, bundleVersion: string): 
 }
 
 export function getAuthorizationHeaderValue(): string {
-    if (artifactoryAccessToken) {
-        return 'Bearer ' + artifactoryAccessToken;
+    if (platformAccessToken) {
+        return 'Bearer ' + platformAccessToken;
     } else {
-        return 'Basic ' + Buffer.from(artifactoryUsername + ':' + artifactoryPassword).toString('base64');
+        return 'Basic ' + Buffer.from(platformUsername + ':' + platformPassword).toString('base64');
     }
 }
 
@@ -441,11 +440,11 @@ export function setServiceConnectionCredentials(url: string): void {
     (tl as any).getEndpointAuthorizationParameter = (id: string, key: string): string => {
         switch (key) {
             case 'username':
-                return artifactoryUsername;
+                return platformUsername;
             case 'password':
-                return artifactoryPassword;
+                return platformPassword;
             case 'apitoken':
-                return artifactoryAccessToken;
+                return platformAccessToken;
             default:
                 return '';
         }

@@ -20,29 +20,7 @@
     "instanceNameFormat": "JFrog Tools Installer",
     "inputs": [
         {
-            "name": "connectionSource",
-            "type": "radio",
-            "label": "Service connection source",
-            "required": true,
-            "defaultValue": "jfrogPlatformConnection",
-            "helpMarkDown": "You may either use a JFrog Platform service connection, or an Artifactory Custom service connection.",
-            "options": {
-                "jfrogPlatformConnection": "JFrog Platform Service Connection",
-                "artifactoryConnection": "Artifactory Custom Service Connection"
-            }
-        },
-        {
-            "name": "jfrogPlatformConnection",
-            "visibleRule": "connectionSource=jfrogPlatformConnection",
-            "type": "connectedService:jfrogPlatformService",
-            "label": "JFrog Platform service connection",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "JFrog Platform service connection to use in the command."
-        },
-        {
             "name": "artifactoryConnection",
-            "visibleRule": "connectionSource=artifactoryConnection",
             "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service connection",
             "defaultValue": "",
@@ -56,7 +34,7 @@
             "defaultValue": "",
             "required": "true",
             "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/\".",
-            "visibleRule": "artifactoryConnection != \"\" || jfrogPlatformConnection != \"\"",
+            "visibleRule": "artifactoryConnection != \"\"",
             "properties": {
                 "EditableOptions": "True"
             }

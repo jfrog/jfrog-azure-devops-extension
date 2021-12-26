@@ -15,7 +15,7 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters
-    serverId = utils.configureDefaultJfrogOrArtifactoryServer('build_promotion', cliPath, workDir);
+    serverId = utils.configureDefaultArtifactoryServer('build_publish', cliPath, workDir);
     let excludeEnvVars = tl.getInput('excludeEnvVars', false);
 
     let cliCommand = utils.cliJoin(
@@ -41,12 +41,8 @@ function RunTaskCbk(cliPath) {
 }
 
 function attachBuildInfoUrl(buildName, buildNumber, workDir) {
-    let connectionSource = tl.getInput('connectionSource', true);
-    let connectionService = tl.getInput(connectionSource, true);
-    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
-    if (connectionSource === 'jfrogPlatformConnection') {
-        artifactoryUrl = utils.addTrailingSlashIfNeeded(artifactoryUrl) + 'artifactory';
-    }
+    let artifactoryService = tl.getInput('artifactoryConnection', true);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let artifactoryUrlFile = path.join(workDir, 'artifactoryUrlFile');
     let buildDetails = {
         artifactoryUrl: artifactoryUrl,

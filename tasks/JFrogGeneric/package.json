@@ -4,7 +4,7 @@
     "author": "JFrog",
     "private": true,
     "license": "Apache-2.0",
-    "description": "This task performs generic actions on Artifactory.",
+    "description": "This task allows uploading, downloading, moving, copying, deleting, setting and deleting properties on artifacts in Artifactory.",
     "main": "runGeneric.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"

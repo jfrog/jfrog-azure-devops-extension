@@ -68,9 +68,9 @@ module.exports = {
     configureArtifactoryCliServer: configureArtifactoryCliServer,
     configureJfrogCliServer: configureJfrogCliServer,
     configureDefaultJfrogServer: configureDefaultJfrogServer,
+    configureDefaultArtifactoryServer: configureDefaultArtifactoryServer,
     configureDefaultDistributionServer: configureDefaultDistributionServer,
     configureDefaultXrayServer: configureDefaultXrayServer,
-    configureDefaultJfrogOrArtifactoryServer: configureDefaultJfrogOrArtifactoryServer,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion,
     pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
@@ -274,54 +274,43 @@ function configureDefaultJfrogServer(serverId, cliPath, workDir) {
 
 /**
  * Configure a JFrog CLI server for an Artifactory service connection that is expected to be named 'artifactoryConnection'.
- * @param serverId - Requested server ID.
+ * @param usageType - String that describes the server's use. Will be used to create a unique server ID.
  * @param cliPath - Path to JFrog CLI executable.
  * @param workDir - Working directory.
  */
-function configureDefaultArtifactoryServer(serverId, cliPath, workDir) {
-    let artifactoryService = tl.getInput('artifactoryConnection', false);
+function configureDefaultArtifactoryServer(usageType, cliPath, workDir) {
+    let artifactoryService = tl.getInput('artifactoryConnection', true);
+    const serverId = assembleUniqueServerId(usageType);
     configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
+    return serverId;
 }
 
 /**
  * Configure a JFrog CLI server for a Distribution service connection that is expected to be named 'distributionConnection'.
- * @param serverId - Requested server ID.
+ * @param usageType - String that describes the server's use. Will be used to create a unique server ID.
  * @param cliPath - Path to JFrog CLI executable.
  * @param workDir - Working directory.
  */
-function configureDefaultDistributionServer(serverId, cliPath, workDir) {
-    let distributionService = tl.getInput('distributionConnection', false);
+function configureDefaultDistributionServer(usageType, cliPath, workDir) {
+    let distributionService = tl.getInput('distributionConnection', true);
+    const serverId = assembleUniqueServerId(usageType);
     configureDistributionCliServer(distributionService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
+    return serverId;
 }
 
 /**
  * Configure a JFrog CLI server for a Xray service connection that is expected to be named 'xrayConnection'.
- * @param serverId - Requested server ID.
+ * @param usageType - String that describes the server's use. Will be used to create a unique server ID.
  * @param cliPath - Path to JFrog CLI executable.
  * @param workDir - Working directory.
  */
-function configureDefaultXrayServer(serverId, cliPath, workDir) {
-    let xrayService = tl.getInput('xrayConnection', false);
+function configureDefaultXrayServer(usageType, cliPath, workDir) {
+    let xrayService = tl.getInput('xrayConnection', true);
+    const serverId = assembleUniqueServerId(usageType);
     configureXrayCliServer(xrayService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
-}
-
-/**
- * Configure a JFrog CLI server for a JFrog platform service connection, if one was provided.
- * Otherwise, configure a server for an Artifactory service connection.
- * The JFrog connection is expected to be named 'jfrogPlatformConnection', while the Artifactory connection 'artifactoryConnection'.
- * @param buildToolType - String that describes the server's use. Will be used to name the server ID.
- * @param cliPath - Path to JFrog CLI executable.
- * @param workDir - Working directory.
- * @returns {string} - Configured server ID.
- */
-function configureDefaultJfrogOrArtifactoryServer(buildToolType, cliPath, workDir) {
-    let serverId = assembleUniqueServerId(buildToolType);
-    if (!configureDefaultJfrogServer(serverId, cliPath, workDir)) {
-        configureDefaultArtifactoryServer(serverId, cliPath, workDir);
-    }
     return serverId;
 }
 
@@ -671,16 +660,16 @@ function determineCliWorkDir(defaultPath, providedPath) {
 }
 
 // Creates a server Id from build and build tool parameters.
-function assembleUniqueServerId(buildToolType) {
+function assembleUniqueServerId(usageType) {
     let buildName = tl.getVariable('Build.DefinitionName');
     let buildNumber = tl.getVariable('Build.BuildNumber');
     let timestamp = Math.floor(Date.now());
-    return [buildName, buildNumber, buildToolType, timestamp].join('_');
+    return [buildName, buildNumber, usageType, timestamp].join('_');
 }
 
 /**
  * Run the corresponding JFrog CLI config command for the build tool used.
- * Also configures a JFrog CLI server by the same logic described in {@link configureDefaultJfrogOrArtifactoryServer}.
+ * Also configures a JFrog CLI server by using {@link configureDefaultArtifactoryServer}.
  * @param cliPath - Path to JFrog CLI executable.
  * @param cmd - String to be used for the server ID.
  * @param requiredWorkDir - Working directory.
@@ -694,22 +683,20 @@ function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand,
     let serverIdResolve;
     let serverIdDeploy;
     if (repoResolver) {
-        // Create serverId
-        serverIdResolve = assembleUniqueServerId(cmd + tl.getInput('command', true) + '_resolver');
-        if (!configureDefaultJfrogServer(serverIdResolve, cliPath, requiredWorkDir)) {
-            configureDefaultArtifactoryServer(serverIdResolve, cliPath, requiredWorkDir);
-        }
-        // Add serverId and repo to config command
+        // Configure Artifactory resolver server.
+        const usageType = cmd + tl.getInput('command', true) + '_resolver';
+        serverIdResolve = configureDefaultArtifactoryServer(usageType, cliPath, requiredWorkDir);
+
+        // Add serverId and repo to config command.
         cliCommand = cliJoin(cliCommand, '--server-id-resolve=' + quote(serverIdResolve));
         cliCommand = addStringParam(cliCommand, repoResolver, 'repo-resolve', true);
     }
     if (repoDeploy) {
-        // Create serverId
-        serverIdDeploy = assembleUniqueServerId(cmd, tl.getInput('command', true) + '_deployer');
-        if (!configureDefaultJfrogServer(serverIdDeploy, cliPath, requiredWorkDir)) {
-            configureDefaultArtifactoryServer(serverIdDeploy, cliPath, requiredWorkDir);
-        }
-        // Add serverId and repo to config command
+        // Configure Artifactory deployer server.
+        const usageType = cmd + tl.getInput('command', true) + '_deployer';
+        serverIdDeploy = configureDefaultArtifactoryServer(usageType, cliPath, requiredWorkDir);
+
+        // Add serverId and repo to config command.
         cliCommand = cliJoin(cliCommand, '--server-id-deploy=' + quote(serverIdDeploy));
         cliCommand = addStringParam(cliCommand, repoDeploy, 'repo-deploy', true);
     }

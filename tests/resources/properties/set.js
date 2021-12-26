@@ -3,7 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    command: 'SetProperties',
+    command: 'Set Properties',
     fileSpec: JSON.stringify({
         files: [
             {

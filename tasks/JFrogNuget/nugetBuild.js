@@ -87,7 +87,7 @@ function exec(cliPath, nugetCommand) {
         }
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(pathToNupkg), utils.quote(targetPath));
-        const deployerServerId = utils.configureDefaultJfrogOrArtifactoryServer('nuget_deployer', cliPath, buildDir);
+        const deployerServerId = utils.configureDefaultArtifactoryServer('nuget_deployer', cliPath, buildDir);
         nugetCommandCli = utils.addServerIdOption(nugetCommandCli, deployerServerId);
         runNuGet(nugetCommandCli, buildDir, cliPath, [deployerServerId]);
     }
@@ -119,7 +119,7 @@ function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
     let cliCommand = utils.cliJoin(cliPath, nugetConfigCommand);
 
     // Create serverId
-    const resolverServerId = utils.configureDefaultJfrogOrArtifactoryServer('nuget_resolver', cliPath, requiredWorkDir);
+    const resolverServerId = utils.configureDefaultArtifactoryServer('nuget_resolver', cliPath, requiredWorkDir);
 
     // Add serverId and repo to config command
     cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(resolverServerId));

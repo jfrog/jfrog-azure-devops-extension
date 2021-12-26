@@ -161,10 +161,7 @@ function getCliCmdBase(cliPath: string, cliCommandName: string, workDir: string)
     const rbName: string = tl.getInput('rbName', true) || '';
     const rbVersion: string = tl.getInput('rbVersion', true) || '';
     const cliCommand: string = utils.cliJoin(cliPath, cliCommandName, rbName, rbVersion);
-    serverId = utils.assembleUniqueServerId('distribution');
-    if (!utils.configureDefaultJfrogServer(serverId, cliPath, workDir)) {
-        utils.configureDefaultDistributionServer(serverId, cliPath, workDir);
-    }
+    serverId = utils.configureDefaultDistributionServer('distribution_' + cliCommandName.replace(' ', '_'), cliPath, workDir);
     return utils.addServerIdOption(cliCommand, serverId);
 }
 

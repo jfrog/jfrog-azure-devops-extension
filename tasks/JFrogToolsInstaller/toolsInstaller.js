@@ -4,12 +4,8 @@ const utils = require('@jfrog/tasks-utils/utils.js');
 InstallCliAndExecuteCliTask(RunTaskCbk);
 
 function InstallCliAndExecuteCliTask(RunTaskCbk) {
-    let connectionSource = tl.getInput('connectionSource', true);
-    let connectionService = tl.getInput(connectionSource, true);
-    let artifactoryUrl = tl.getEndpointUrl(connectionService, false);
-    if (connectionSource === 'jfrogPlatformConnection') {
-        artifactoryUrl = utils.addTrailingSlashIfNeeded(artifactoryUrl) + 'artifactory';
-    }
+    let artifactoryService = tl.getInput('artifactoryConnection', true);
+    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let cliInstallationRepo = tl.getInput('cliInstallationRepo', true);
     let cliVersion = utils.defaultJfrogCliVersion;
     // If a custom version was requested and provided (by a variable or a specific value) we will use it
@@ -25,7 +21,7 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     // Set the requested CLI version env to download it now, and to use in succeeding tasks.
     tl.setVariable(utils.pipelineRequestedCliVersionEnv, cliVersion);
     let downloadUrl = utils.buildCliArtifactoryDownloadUrl(artifactoryUrl, cliInstallationRepo, cliVersion);
-    let authHandlers = utils.createAuthHandlers(connectionService);
+    let authHandlers = utils.createAuthHandlers(artifactoryService);
     utils.executeCliTask(RunTaskCbk, cliVersion, downloadUrl, authHandlers);
 }
 
@@ -47,7 +43,7 @@ function RunTaskCbk(cliPath) {
     // Config a temporary serverId for maven and Gradle extractors download:
     let serverId;
     try {
-        serverId = utils.configureDefaultJfrogOrArtifactoryServer('extractors_resolver', cliPath, workDir);
+        serverId = utils.configureDefaultArtifactoryServer('extractors_resolver', cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         utils.deleteCliServers(cliPath, workDir, [serverId]);

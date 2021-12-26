@@ -4,7 +4,6 @@ skip_tags: true
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ADO_SKIP_TESTS: docker
       PYTHON_HOME: "C:\\Python38"
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
 
@@ -18,18 +17,12 @@ environment:
   GO111MODULE: on
   CGO_ENABLED: 0
 
-  ADO_ARTIFACTORY_URL:
-    secure: RIh0gGFDn2JAnLUEEqLsQnZ5H3XFWg1s+Qq8Z4i+Xu+FtQf6Tsu2AnfY4/6AaXJ8
-  ADO_ARTIFACTORY_USERNAME:
+  ADO_JFROG_PLATFORM_URL:
+    secure: RIh0gGFDn2JAnLUEEqLsQtJTP8G8Takh7Hlksn28wbk
+  ADO_JFROG_PLATFORM_USERNAME:
     secure: YEB5Wiv9a2vNpUhy+MfL+A==
-  ADO_ARTIFACTORY_PASSWORD:
+  ADO_JFROG_PLATFORM_PASSWORD:
     secure: Um8o75MQIieSavIemF4ySA==
-  ADO_ARTIFACTORY_DOCKER_DOMAIN:
-    secure: ppjr6mrLIKXVptLX8WPOlffTwOLtRIoaIpsVEvmje/9mDtLojTqpwI9OIC5VZnx1
-  ADO_ARTIFACTORY_DOCKER_REPO:
-    secure: UjixvF6E1Bp1p8zgPRLCVA==
-  ADO_DISTRIBUTION_URL:
-    secure: RIh0gGFDn2JAnLUEEqLsQrfLmtDrzDd5Qphea4gOE0Lu1Uz2Xa/y+D0Mld917gwy
 
 install:
   - cmd: set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%

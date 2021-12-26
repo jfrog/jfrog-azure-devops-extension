@@ -70,14 +70,14 @@
     "contributions": [
         {
             "id": "jfrog-platform-service",
-            "description": "Service Endpoint type for JFrog Platform connections",
+            "description": "Service Endpoint type for JFrog Platform connections. Currently only used by the 'JFrog CLI V2' task.",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
             ],
             "properties": {
                 "name": "jfrogPlatformService",
-                "displayName": "JFrog NEW Platform",
+                "displayName": "JFrog Platform V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your JFrog platform. For example, https://my.jfrog.io/"
@@ -161,7 +161,7 @@
             ],
             "properties": {
                 "name": "jfrogArtifactoryService",
-                "displayName": "JFrog NEW Artifactory",
+                "displayName": "JFrog Artifactory V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Artifactory installation. For example, https://repo.jfrog.org/artifactory"
@@ -245,7 +245,7 @@
             ],
             "properties": {
                 "name": "jfrogDistributionService",
-                "displayName": "JFrog NEW Distribution",
+                "displayName": "JFrog Distribution V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Distribution installation. For example, https://repo.jfrog.org/distribution"
@@ -319,7 +319,7 @@
             ],
             "properties": {
                 "name": "jfrogXrayService",
-                "displayName": "JFrog NEW Xray",
+                "displayName": "JFrog Xray V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Xray installation. For example, https://repo.jfrog.org/xray"
@@ -328,7 +328,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/v1/system/ping",
+                        "endpointUrl": "{{endpoint.url}}/api/v1/system/user_ping",
                         "resultSelector": "jsonpath:$.values[*]"
                     }
                 ],
@@ -393,7 +393,7 @@
             ],
             "properties": {
                 "name": "JFrogArtifactory",
-                "displayName": "Artifactory NEW",
+                "displayName": "Artifactory V2",
                 "endpointTypeId": "jfrogArtifactoryService",
                 "uniqueSourceIdentifier": "{{connection}}:{{definition}}:{{buildNumber}}",
                 "downloadTaskId": "c288dcae-5ae4-4a37-a59d-11bb07d393a9",
@@ -599,16 +599,6 @@
             }
         },
         {
-            "id": "jfrog-docker",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "tasks/JFrogDocker"
-            }
-        },
-        {
             "id": "jfrog-conan-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -619,13 +609,13 @@
             }
         },
         {
-            "id": "jfrog-xray-build-scan-task",
+            "id": "jfrog-build-scan-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/JFrogXrayBuildScan"
+                "name": "tasks/JFrogBuildScan"
             }
         },
         {
@@ -755,13 +745,10 @@
             "path": "tasks/JFrogPublishBuildInfo"
         },
         {
-            "path": "tasks/JFrogDocker"
-        },
-        {
             "path": "tasks/JFrogConan"
         },
         {
-            "path": "tasks/JFrogXrayBuildScan"
+            "path": "tasks/JFrogBuildScan"
         },
         {
             "path": "tasks/JFrogXrayAudit"

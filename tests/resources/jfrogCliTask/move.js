@@ -12,4 +12,4 @@ let inputs = {
         'd.in'
 };
 
-testUtils.runArtifactoryTask(testUtils.genericCli, {}, inputs);
+testUtils.runPlatformTask(testUtils.genericCli, {}, inputs);

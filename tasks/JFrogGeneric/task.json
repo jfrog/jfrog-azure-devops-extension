@@ -34,39 +34,17 @@
             "options": {
                 "Upload": "Upload",
                 "Download": "Download",
-                "SetProperties": "Set Properties",
-                "DeleteProperties": "Delete Properties",
+                "Set Properties": "Set Properties",
+                "Delete Properties": "Delete Properties",
                 "Move": "Move",
                 "Copy": "Copy",
-                "DeleteArtifacts": "Delete Artifacts"
+                "Delete": "Delete"
             },
             "required": true,
             "helpMarkDown": "The generic command to be run by this task."
         },
         {
-            "name": "connectionSource",
-            "type": "radio",
-            "label": "Service connection source",
-            "required": true,
-            "defaultValue": "jfrogPlatformConnection",
-            "helpMarkDown": "You may either use a JFrog Platform service connection, or an Artifactory Custom service connection.",
-            "options": {
-                "jfrogPlatformConnection": "JFrog Platform Service Connection",
-                "artifactoryConnection": "Artifactory Custom Service Connection"
-            }
-        },
-        {
-            "name": "jfrogPlatformConnection",
-            "visibleRule": "connectionSource=jfrogPlatformConnection",
-            "type": "connectedService:jfrogPlatformService",
-            "label": "JFrog Platform service connection",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "JFrog Platform service connection to use in the command."
-        },
-        {
             "name": "connection",
-            "visibleRule": "connectionSource=artifactoryConnection",
             "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service connection",
             "defaultValue": "",
@@ -77,7 +55,7 @@
             "name": "setProps",
             "type": "string",
             "label": "Properties to set",
-            "visibleRule": "command=SetProperties",
+            "visibleRule": "command=Set Properties",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "The list of properties, in the form of key1=value1;key2=value2,..., to be set on the matching artifacts."
@@ -86,7 +64,7 @@
             "name": "deleteProps",
             "type": "string",
             "label": "Properties to delete",
-            "visibleRule": "command=DeleteProperties",
+            "visibleRule": "command=Delete Properties",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "The list of properties, in the form of key1,key2,..., to be deleted from the matching artifacts."
@@ -200,7 +178,7 @@
             "label": "Dry run",
             "defaultValue": "false",
             "required": false,
-            "visibleRule": "command!=SetProperties && command!=DeleteProperties",
+            "visibleRule": "command!=Set Properties && command!=Delete Properties",
             "helpMarkDown": "Select if you'd like the task to only indicates which artifacts would have been affected.\nIf not, the command is fully executed as specified"
         },
         {
