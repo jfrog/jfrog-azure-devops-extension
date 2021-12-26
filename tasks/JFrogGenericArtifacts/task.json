@@ -1,7 +1,7 @@
 {
     "id": "c288dcae-5ae4-4a37-a59d-11bb07d393a9",
-    "name": "JFrogGeneric",
-    "friendlyName": "JFrog Generic",
+    "name": "JFrogGenericArtifacts",
+    "friendlyName": "JFrog Generic Artifacts",
     "description": "Run generic commands with Artifactory using FileSpecs, while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"JFrog Publish Build Info\" task.",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension)",
@@ -17,7 +17,7 @@
         "Patch": "0"
     },
     "minimumAgentVersion": "1.83.0",
-    "instanceNameFormat": "JFrog Generic $(command)",
+    "instanceNameFormat": "JFrog Generic Artifacts $(command)",
     "groups": [
         {
             "name": "advanced",
@@ -399,7 +399,7 @@
     ],
     "execution": {
         "Node10": {
-            "target": "runGeneric.js"
+            "target": "runGenericArtifacts.js"
         }
     }
 }

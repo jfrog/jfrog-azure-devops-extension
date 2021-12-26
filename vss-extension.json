@@ -619,7 +619,7 @@
             }
         },
         {
-            "id": "jfrog-audit",
+            "id": "jfrog-audit-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
@@ -699,13 +699,13 @@
             }
         },
         {
-            "id": "jfrog-generic",
+            "id": "jfrog-generic-artifacts",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/JFrogGeneric"
+                "name": "tasks/JFrogGenericArtifacts"
             }
         }
     ],
@@ -778,7 +778,7 @@
             "path": "tasks/JFrogCliV2"
         },
         {
-            "path": "tasks/JFrogGeneric"
+            "path": "tasks/JFrogGenericArtifacts"
         }
     ]
 }

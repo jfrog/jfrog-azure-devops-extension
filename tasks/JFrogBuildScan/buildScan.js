@@ -17,12 +17,6 @@ function RunTaskCbk(cliPath) {
     serverId = utils.configureDefaultXrayServer('xray_build_scan', cliPath, workDir);
 
     let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber));
-
-    // Add watches source if provided.
-    let watchesSource = tl.getInput('watchesSource', false);
-    if (watchesSource !== 'none') {
-        cliCommand = utils.addStringParam(cliCommand, watchesSource, watchesSource, true);
-    }
     cliCommand = utils.addBoolParam(cliCommand, 'vuln', 'vuln');
     cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
