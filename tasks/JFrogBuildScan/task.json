@@ -44,48 +44,12 @@
             "helpMarkDown": "Build number to scan.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe build should already be published to Artifactory."
         },
         {
-            "name": "watchesSource",
-            "type": "pickList",
-            "label": "Xray Watches Source",
-            "defaultValue": "none",
-            "helpMarkDown": "Choose the source to obtain Xray watches, to determine Xray's violations creation.",
-            "required": true,
-            "properties": {
-                "EditableOptions": "False"
-            },
-            "options": {
-                "none": "-",
-                "watches": "Watches List",
-                "project": "Project Key",
-                "repo-path": "Repository Path"
-            }
-        },
-        {
-            "name": "watches",
+            "name": "projectKey",
             "type": "string",
-            "label": "Xray watches list",
+            "label": "Project key",
             "defaultValue": "",
-            "required": true,
-            "visibleRule": "watchesSource=watches",
-            "helpMarkDown": "A comma separated list of Xray watches, to determine Xray's violations creation."
-        },
-        {
-            "name": "project",
-            "type": "string",
-            "label": "Artifactory Project key",
-            "defaultValue": "",
-            "required": true,
-            "visibleRule": "watchesSource=project",
+            "required": false,
             "helpMarkDown": "Artifactory project key that contains the build info."
-        },
-        {
-            "name": "repo-path",
-            "type": "string",
-            "label": "Repository path",
-            "defaultValue": "",
-            "required": true,
-            "visibleRule": "watchesSource=repo-path",
-            "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
         },
         {
             "name": "allowFailBuild",
