@@ -1,7 +1,7 @@
 {
     "id": "d1d65fc8-c86f-4de9-81d2-16d5d20ec6c7",
-    "name": "JFrogXrayAudit",
-    "friendlyName": "JFrog Xray Audit",
+    "name": "JFrogAudit",
+    "friendlyName": "JFrog Audit",
     "description": "Run 'jfrog audit'",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringPythonBuildsUsingPip)",
@@ -17,32 +17,10 @@
     },
     "demands": [],
     "minimumAgentVersion": "1.89.0",
-    "instanceNameFormat": "JFrog Xray Audit",
+    "instanceNameFormat": "JFrog Audit",
     "inputs": [
         {
-            "name": "connectionSource",
-            "type": "radio",
-            "label": "Service connection source",
-            "required": true,
-            "defaultValue": "jfrogPlatformConnection",
-            "helpMarkDown": "You may either use a JFrog Platform service connection, or an Artifactory Custom service connection.",
-            "options": {
-                "jfrogPlatformConnection": "JFrog Platform Service Connection",
-                "xrayConnection": "Xray Custom Service Connection"
-            }
-        },
-        {
-            "name": "jfrogPlatformConnection",
-            "visibleRule": "connectionSource=jfrogPlatformConnection",
-            "type": "connectedService:jfrogPlatformService",
-            "label": "JFrog Platform service connection",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "JFrog Platform service connection to use in the command."
-        },
-        {
             "name": "xrayConnection",
-            "visibleRule": "connectionSource=xrayConnection",
             "type": "connectedService:jfrogXrayService",
             "label": "Xray service connection",
             "defaultValue": "",

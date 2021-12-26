@@ -9,10 +9,7 @@ function RunTaskCbk(cliPath: string): void {
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || process.cwd();
     const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
 
-    serverId = utils.assembleUniqueServerId('xray_audit');
-    if (!utils.configureDefaultJfrogServer(serverId, cliPath, defaultWorkDir)) {
-        utils.configureDefaultXrayServer(serverId, cliPath, defaultWorkDir);
-    }
+    serverId = utils.configureDefaultXrayServer('xray_audit', cliPath, defaultWorkDir);
 
     let auditCommand: string = utils.cliJoin(
         cliPath,

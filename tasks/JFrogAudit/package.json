@@ -1,5 +1,5 @@
 {
-    "name": "@jfrog/jfrog-xray-audit",
+    "name": "@jfrog/jfrog-audit",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,

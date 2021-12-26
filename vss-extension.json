@@ -619,13 +619,13 @@
             }
         },
         {
-            "id": "jfrog-xray-audit",
+            "id": "jfrog-audit",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/JFrogXrayAudit"
+                "name": "tasks/JFrogAudit"
             }
         },
         {
@@ -751,7 +751,7 @@
             "path": "tasks/JFrogBuildScan"
         },
         {
-            "path": "tasks/JFrogXrayAudit"
+            "path": "tasks/JFrogAudit"
         },
         {
             "path": "tasks/JFrogDiscardBuilds"
