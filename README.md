@@ -4,13 +4,13 @@
 |dev|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-azure-devops-extension/branch/dev)|
 
 # Overview
-JFrog Artifactory provides tight integration with Azure DevOps through the **JFrog Artifactory Extension**.
+JFrog provides tight integration with Azure DevOps through the **JFrog Extension**.
 Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about artifacts deployed, dependencies resolved, environment data associated with the build runs and more, 
 that effectively facilitates fully traceable builds.
 See the full extension documentation at the [Artifactory Azure DevOps Extension User Guide](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
 
-# Download and Installation [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version-short/JFrog.jfrog-artifactory-vsts-extension.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension)
-The extension is available for installation on your Azure DevOps organization in the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension).
+# Download and Installation [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version-short/JFrog.jfrog-azure-devops-extension.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
+The extension is available for installation on your Azure DevOps organization in the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension).
 To install the extension on TFS, see the [install extensions for Team Foundation Server (TFS)](https://docs.microsoft.com/en-us/azure/devops/marketplace/get-tfs-extensions?view=tfs-2018#install-extensions-while-connected-to-tfs) documentation page.
 
 # Building and Testing the Sources
@@ -29,27 +29,16 @@ The `vsix` file can be loaded into Azure DevOps and TFS.
 To run the tests, please make sure you are using node 14 or above.
 
 Use the following commands to run from terminal:
-1. Set the ADO_ARTIFACTORY_URL, ADO_ARTIFACTORY_USERNAME and ADO_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password:
+1. Set the ADO_JFROG_PLATFORM_URL, ADO_JFROG_PLATFORM_USERNAME and ADO_JFROG_PLATFORM_PASSWORD environment variables with your JFrog Platform URL, username and password:
     ```
-    export ADO_ARTIFACTORY_URL='http://localhost:8081/artifactory'
-    export ADO_ARTIFACTORY_USERNAME=admin
-    export ADO_ARTIFACTORY_PASSWORD=password
-    ```
-    
-2. If you'd like to run docker tests, set the ADO_ARTIFACTORY_DOCKER_DOMAIN and ADO_ARTIFACTORY_DOCKER_REPO environment variables with your Artifactory Docker registry domain and Artifactory Docker repository name:
-    ```
-    export ADO_ARTIFACTORY_DOCKER_DOMAIN='localhost:8081/docker-local'
-    export ADO_ARTIFACTORY_DOCKER_REPO=docker-local
-    ```
-
-3. If you'd like to run distribution tests, set the ADO_DISTRIBUTION_URL environment variable with Distribution URL:
-    ```
-    export ADO_DISTRIBUTION_URL='http://localhost:8081/distribution'
+    export ADO_JFROG_PLATFORM_URL='https://myrepo.jfrog.io/'
+    export ADO_JFROG_PLATFORM_USERNAME=admin
+    export ADO_JFROG_PLATFORM_PASSWORD=password
     ```
    
-4. Run the following commands:
+2. Run the following commands:
     ```
-    npm i -g jfrog-cli-go
+    npm i -g jfrog-cli-v2-jf
     npm t
     ```
 
@@ -57,11 +46,11 @@ Note: If you are running tests via your IDE, make sure you are registering tests
 
 ### Skipping Tests
 In order to skip tests, set the ADO_SKIP_TESTS environment variable with the tests you wish to skip, separated by commas.
-The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy**, **distribution**, **unit**, **installer**, **generic** and **docker**.
+The supported values are: **maven**, **gradle**, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy**, **distribution**, **unit**, **installer** and **generic**.
 
-For example, for setting the nuget and docker tests:  
+For example, for skipping the nuget and dotnet tests:  
 ```
-export ADO_SKIP_TESTS=nuget,docker
+export ADO_SKIP_TESTS=nuget,dotnet
 ```
     
 # Pull Requests

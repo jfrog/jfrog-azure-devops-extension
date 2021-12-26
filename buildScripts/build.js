@@ -2,19 +2,19 @@ const exec = require('child_process').execSync;
 const rimraf = require('rimraf');
 const fs = require('fs-extra');
 const path = require('path');
-const TASKS_UTILS_DIR = 'artifactory-tasks-utils';
+const TASKS_UTILS_DIR = 'jfrog-tasks-utils';
 const TASKS_DIR = 'tasks';
 const TESTS_DIR = 'tests';
 
-installArtifactoryTaskUtils();
+installJfrogTaskUtils();
 installTasks();
 installTests();
 
 /**
  *
- * Install Artifactory task utils.
+ * Install JFrog task utils.
  */
-function installArtifactoryTaskUtils() {
+function installJfrogTaskUtils() {
     clean(TASKS_UTILS_DIR, true);
     execNpm('i', TASKS_UTILS_DIR);
     exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" --directory ' + path.join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
@@ -65,7 +65,7 @@ function installTests() {
 }
 
 /**
- * Copy artifactory-tasks-utils/node_modules to dest/node_modules
+ * Copy jfrog-tasks-utils/node_modules to dest/node_modules
  * @param dest - The destination
  */
 function copyTaskUtilsModules(dest) {

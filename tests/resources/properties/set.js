@@ -3,6 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
+    command: 'Set Properties',
     fileSpec: JSON.stringify({
         files: [
             {
@@ -11,8 +12,7 @@ let inputs = {
         ]
     }),
     specSource: 'taskConfiguration',
-    command: 'set',
     setProps: 'propKey1=propVal1;propKey2=propVal2'
 };
 
-testUtils.runArtifactoryTask(testUtils.properties, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

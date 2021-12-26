@@ -1,0 +1,241 @@
+{
+    "id": "d7eca331-9d2a-405a-9374-4014532462b6",
+    "name": "JFrogMaven",
+    "friendlyName": "JFrog Maven",
+    "description": "Build with Apache Maven, while resolving dependencies and deploying artifacts from and to Artifactory and while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"JFrog Publish Build Info\" task.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringMavenBuilds)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "demands": [
+        "maven"
+    ],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "JFrog Maven",
+    "groups": [
+        {
+            "name": "resolve",
+            "displayName": "Resolve dependencies from Artifactory",
+            "isExpanded": true
+        },
+        {
+            "name": "deployer",
+            "displayName": "Deploy artifacts to Artifactory",
+            "isExpanded": true
+        }
+    ],
+    "inputs": [
+        {
+            "name": "mavenPOMFile",
+            "aliases": [
+                "mavenPomFile"
+            ],
+            "type": "filePath",
+            "label": "Maven POM file",
+            "defaultValue": "pom.xml",
+            "required": true,
+            "helpMarkDown": "Path to the Maven POM file."
+        },
+        {
+            "name": "goals",
+            "type": "string",
+            "label": "Goal(s)",
+            "defaultValue": "install",
+            "required": true
+        },
+        {
+            "name": "options",
+            "type": "string",
+            "label": "Options",
+            "defaultValue": "",
+            "required": false
+        },
+        {
+            "name": "artifactoryResolverService",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "groupName": "resolve",
+            "required": false,
+            "helpMarkDown": "Artifactory service for dependencies resolution."
+        },
+        {
+            "name": "targetResolveReleaseRepo",
+            "type": "pickList",
+            "label": "Resolution repository for releases",
+            "groupName": "resolve",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the target release repository for resolution.",
+            "visibleRule": "artifactoryResolverService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetResolveSnapshotRepo",
+            "type": "pickList",
+            "label": "Resolution repository for snapshots",
+            "groupName": "resolve",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the target snapshot repository for resolution.",
+            "visibleRule": "artifactoryResolverService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "artifactoryDeployService",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service",
+            "defaultValue": "",
+            "groupName": "deployer",
+            "required": false,
+            "helpMarkDown": "Artifactory service for artifacts deployment."
+        },
+        {
+            "name": "targetDeployReleaseRepo",
+            "type": "pickList",
+            "label": "Deployment repository for releases",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Sets the target release repository for deploying release artifacts.",
+            "visibleRule": "artifactoryDeployService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "targetDeploySnapshotRepo",
+            "type": "pickList",
+            "label": "Deployment repository for snapshots",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Sets the target snapshot repository for deploying snapshot artifacts.",
+            "visibleRule": "artifactoryDeployService != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "filterDeployedArtifacts",
+            "type": "boolean",
+            "label": "Filter deployed artifacts",
+            "groupName": "deployer",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to filter out some of the deployed artifacts by wildcard include/exclude patterns."
+        },
+        {
+            "name": "includePatterns",
+            "type": "string",
+            "label": "Include patterns",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "filterDeployedArtifacts=true",
+            "helpMarkDown": "Filter deployed artifacts by setting a wildcard pattern that specifies which artifacts to include.\nYou may provide multiple patterns separated by a comma followed by a white-space.\nFor example:\nartifact-*.jar, artifact-*.pom"
+        },
+        {
+            "name": "excludePatterns",
+            "type": "string",
+            "label": "Exclude patterns",
+            "groupName": "deployer",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "filterDeployedArtifacts=true",
+            "helpMarkDown": "Filter deployed artifacts by setting a wildcard pattern that specifies which artifacts to exclude.\nYou may provide multiple patterns separated by a comma followed by a white-space.\nFor example:\nartifact-*-test.jar, artifact-*-test.pom"
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to collect build info and store it locally. The collected build info can be published to Artifactory using the \"JFrog Publish Build Info\" task."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo == true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryResolverService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetResolveReleaseRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryDeployService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetDeployReleaseRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryResolverService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetResolveSnapshotRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryDeployService)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "targetDeploySnapshotRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='LOCAL' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "mavenBuild.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

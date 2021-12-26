@@ -1,0 +1,110 @@
+{
+    "id": "48966110-efbe-4151-a20d-d4160f8d69bb",
+    "name": "JFrogToolsInstaller",
+    "friendlyName": "JFrog Tools Installer",
+    "description": "Installs tools necessary for JFrog integration tasks.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ArtifactoryToolsInstaller)",
+    "category": "Tool",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "demands": [],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "JFrog Tools Installer",
+    "inputs": [
+        {
+            "name": "artifactoryConnection",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to use in the command."
+        },
+        {
+            "name": "cliInstallationRepo",
+            "type": "pickList",
+            "label": "Install JFrog CLI from:",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the repository from which the JFrog CLI should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/\".",
+            "visibleRule": "artifactoryConnection != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        },
+        {
+            "name": "installCustomVersion",
+            "type": "boolean",
+            "label": "Install custom version",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to install a specific version of JFrog CLI."
+        },
+        {
+            "name": "cliVersion",
+            "type": "string",
+            "label": "Version",
+            "defaultValue": "$(jfrogCliVersion)",
+            "required": true,
+            "visibleRule": "installCustomVersion = true",
+            "helpMarkDown": "Specify the version of JFrog CLI to install.\nYou can also use $(jfrogCliVersion) as the value."
+        },
+        {
+            "name": "installExtractors",
+            "aliases": [
+                "installExtractors",
+                "installMavenExtractor"
+            ],
+            "type": "boolean",
+            "label": "Install Maven and Gradle Extractors",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select to make the JFrog Cli install the Maven and Gradle Extractors from Artifactory.\nThe Maven and Gradle Extractors are used by the 'Artifactory Maven' and 'Artifactory Gradle' tasks."
+        },
+        {
+            "name": "extractorsInstallationRepo",
+            "aliases": [
+                "extractorsInstallationRepo",
+                "mavenInstallationRepo"
+            ],
+            "type": "pickList",
+            "label": "From:",
+            "defaultValue": "",
+            "required": "true",
+            "helpMarkDown": "Sets the repository from which the Maven and Gradle Extractors should be downloaded and installed.\nThe repository has to be of type Remote (or Virtual that includes a Remote), pointing to \"https://oss.jfrog.org/artifactory/oss-release-local/\".",
+            "visibleRule": "installExtractors == true && artifactoryConnection != \"\"",
+            "properties": {
+                "EditableOptions": "True"
+            }
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "endpointId": "$(artifactoryConnection)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "cliInstallationRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='REMOTE' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        },
+        {
+            "endpointId": "$(artifactoryConnection)",
+            "endpointURL": "{{endpoint.url}}/api/repositories",
+            "target": "extractorsInstallationRepo",
+            "resultSelector": "jsonpath:$[?(@.type=='REMOTE' || @.type=='VIRTUAL')]",
+            "resultTemplate": "{ \"Value\" : \"{{{key}}}\", \"DisplayValue\" : \"{{{key}}}\" }"
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "toolsInstaller.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

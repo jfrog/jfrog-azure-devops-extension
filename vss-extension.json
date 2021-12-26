@@ -1,10 +1,10 @@
 {
     "manifestVersion": 1,
     "public": true,
-    "id": "jfrog-artifactory-vsts-extension",
-    "version": "1.13.3",
-    "name": "JFrog Artifactory",
-    "description": "Integrate your JFrog Artifactory with Visual Studio Team Services.",
+    "id": "jfrog-azure-devops-extension",
+    "version": "1.0.0",
+    "name": "JFrog",
+    "description": "Integrate your JFrog Platform with Visual Studio Team Services.",
     "publisher": "JFrog",
     "targets": [
         {
@@ -12,7 +12,7 @@
         }
     ],
     "icons": {
-        "default": "images/artifactory.png"
+        "default": "images/jfrog-logo-200.png"
     },
     "scopes": [
         "vso.build",
@@ -69,19 +69,104 @@
     },
     "contributions": [
         {
-            "id": "artifactory-service",
+            "id": "jfrog-platform-service",
+            "description": "Service Endpoint type for JFrog Platform connections. Currently only used by the 'JFrog CLI V2' task.",
+            "type": "ms.vss-endpoint.service-endpoint-type",
+            "targets": [
+                "ms.vss-endpoint.endpoint-types"
+            ],
+            "properties": {
+                "name": "jfrogPlatformService",
+                "displayName": "JFrog Platform V2",
+                "url": {
+                    "displayName": "Server URL",
+                    "helpText": "Specify the root URL of your JFrog platform. For example, https://my.jfrog.io/"
+                },
+                "icon": "images/jfrog-logo-200.png",
+                "dataSources": [
+                    {
+                        "name": "TestConnection",
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/plugins",
+                        "resultSelector": "jsonpath:$.values[*]"
+                    },
+                    {
+                        "name": "BuildNames",
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/build?project={{projectKey}}",
+                        "resultSelector": "jsonpath:$.builds[*]"
+                    },
+                    {
+                        "name": "BuildNumbers",
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/build/{{definition}}?project={{projectKey}}",
+                        "resultSelector": "jsonpath:$.buildsNumbers[*]"
+                    }
+                ],
+                "authenticationSchemes": [
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+                        "inputDescriptors": [
+                            {
+                                "id": "username",
+                                "name": "Username",
+                                "description": "JFrog username with deploy permissions.",
+                                "inputMode": "textbox",
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "password",
+                                "name": "Password",
+                                "description": "Password or API key of an JFrog user with deploy permissions.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+                        "headers": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{ endpoint.apitoken }}"
+                            }
+                        ],
+                        "inputDescriptors": [
+                            {
+                                "id": "apitoken",
+                                "name": "Access Token",
+                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "jfrog-artifactory-service",
             "description": "Service Endpoint type for Artifactory connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
             ],
             "properties": {
-                "name": "artifactoryService",
-                "displayName": "JFrog Artifactory",
+                "name": "jfrogArtifactoryService",
+                "displayName": "JFrog Artifactory V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Artifactory installation. For example, https://repo.jfrog.org/artifactory"
                 },
+                "icon": "images/artifactory.png",
                 "dataSources": [
                     {
                         "name": "TestConnection",
@@ -152,15 +237,15 @@
             }
         },
         {
-            "id": "distribution-service",
+            "id": "jfrog-distribution-service",
             "description": "Service Endpoint type for Distribution connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
             ],
             "properties": {
-                "name": "distributionService",
-                "displayName": "JFrog Distribution",
+                "name": "jfrogDistributionService",
+                "displayName": "JFrog Distribution V2",
                 "url": {
                     "displayName": "Server URL",
                     "helpText": "Specify the root URL of your Distribution installation. For example, https://repo.jfrog.org/distribution"
@@ -226,18 +311,92 @@
             }
         },
         {
-            "id": "artifactory-release-artifact-type",
+            "id": "jfrog-xray-service",
+            "description": "Service Endpoint type for Xray connections",
+            "type": "ms.vss-endpoint.service-endpoint-type",
+            "targets": [
+                "ms.vss-endpoint.endpoint-types"
+            ],
+            "properties": {
+                "name": "jfrogXrayService",
+                "displayName": "JFrog Xray V2",
+                "url": {
+                    "displayName": "Server URL",
+                    "helpText": "Specify the root URL of your Xray installation. For example, https://repo.jfrog.org/xray"
+                },
+                "icon": "images/xray.png",
+                "dataSources": [
+                    {
+                        "name": "TestConnection",
+                        "endpointUrl": "{{endpoint.url}}/api/v1/system/user_ping",
+                        "resultSelector": "jsonpath:$.values[*]"
+                    }
+                ],
+                "authenticationSchemes": [
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-basic",
+                        "inputDescriptors": [
+                            {
+                                "id": "username",
+                                "name": "Username",
+                                "description": "Xray username.",
+                                "inputMode": "textbox",
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "password",
+                                "name": "Password",
+                                "description": "Password or API key of an Xray user.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-token",
+                        "headers": [
+                            {
+                                "name": "Authorization",
+                                "value": "Bearer {{ endpoint.apitoken }}"
+                            }
+                        ],
+                        "inputDescriptors": [
+                            {
+                                "id": "apitoken",
+                                "name": "Access Token",
+                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "inputMode": "passwordbox",
+                                "isConfidential": true,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "id": "jfrog-artifactory-release-artifact-type",
             "description": "Artifactory",
             "type": "ms.vss-releaseartifact.release-artifact-type",
             "targets": [
                 "ms.vss-releaseartifact.artifact-types"
             ],
             "properties": {
-                "name": "Artifactory",
-                "displayName": "Artifactory",
-                "endpointTypeId": "artifactoryService",
+                "name": "JFrogArtifactory",
+                "displayName": "Artifactory V2",
+                "endpointTypeId": "jfrogArtifactoryService",
                 "uniqueSourceIdentifier": "{{connection}}:{{definition}}:{{buildNumber}}",
-                "downloadTaskId": "07fc5c20-6772-11e5-abde-6901d3c00755",
+                "downloadTaskId": "c288dcae-5ae4-4a37-a59d-11bb07d393a9",
                 "artifactType": "Package",
                 "inputDescriptors": [
                     {
@@ -370,203 +529,173 @@
             }
         },
         {
-            "id": "artifactory-promote-build-task",
+            "id": "jfrog-promote-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryBuildPromotion"
+                "name": "tasks/JFrogBuildPromotion"
             }
         },
         {
-            "id": "artifactory-generic-download",
+            "id": "jfrog-maven",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGenericDownload"
+                "name": "tasks/JFrogMaven"
             }
         },
         {
-            "id": "artifactory-generic-upload",
+            "id": "jfrog-gradle",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGenericUpload"
+                "name": "tasks/JFrogGradle"
             }
         },
         {
-            "id": "artifactory-maven",
+            "id": "jfrog-npm",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryMaven"
+                "name": "tasks/JFrogNpm"
             }
         },
         {
-            "id": "artifactory-gradle",
+            "id": "jfrog-nuget",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGradle"
+                "name": "tasks/JFrogNuget"
             }
         },
         {
-            "id": "artifactory-npm",
+            "id": "jfrog-dotnet",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryNpm"
+                "name": "tasks/JFrogDotnet"
             }
         },
         {
-            "id": "artifactory-nuget",
+            "id": "jfrog-publish-build-info",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryNuget"
+                "name": "tasks/JFrogPublishBuildInfo"
             }
         },
         {
-            "id": "artifactory-dotnet",
+            "id": "jfrog-conan-build-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryDotnet"
+                "name": "tasks/JFrogConan"
             }
         },
         {
-            "id": "artifactory-publish-build-info",
+            "id": "jfrog-build-scan-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryPublishBuildInfo"
+                "name": "tasks/JFrogBuildScan"
             }
         },
         {
-            "id": "artifactory-docker",
+            "id": "jfrog-discard-builds-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryDocker"
+                "name": "tasks/JFrogDiscardBuilds"
             }
         },
         {
-            "id": "artifactory-conan-build-task",
+            "id": "jfrog-tools-installer-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryConan"
+                "name": "tasks/JFrogToolsInstaller"
             }
         },
         {
-            "id": "artifactory-xray-scan-task",
+            "id": "jfrog-go",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryXrayScan"
+                "name": "tasks/JFrogGo"
             }
         },
         {
-            "id": "artifactory-discard-builds-task",
+            "id": "jfrog-pip",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryDiscardBuilds"
+                "name": "tasks/JFrogPip"
             }
         },
         {
-            "id": "artifactory-tools-installer-task",
+            "id": "jfrog-distribution",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryToolsInstaller"
+                "name": "tasks/JFrogDistribution"
             }
         },
         {
-            "id": "artifactory-properties-task",
+            "id": "jfrog-collect-issues",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryProperties"
+                "name": "tasks/JFrogCollectIssues"
             }
         },
         {
-            "id": "artifactory-go",
+            "id": "jfrog-cli-v2",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryGo"
+                "name": "tasks/JFrogCliV2"
             }
         },
         {
-            "id": "artifactory-pip",
+            "id": "jfrog-generic-artifacts",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/ArtifactoryPip"
-            }
-        },
-        {
-            "id": "distribution",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "tasks/Distribution"
-            }
-        },
-        {
-            "id": "artifactory-collect-issues",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "tasks/ArtifactoryCollectIssues"
-            }
-        },
-        {
-            "id": "jfrog-cli-generic",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "tasks/JfrogCli"
+                "name": "tasks/JFrogGenericArtifacts"
             }
         }
     ],
@@ -588,64 +717,55 @@
             "addressable": true
         },
         {
-            "path": "tasks/ArtifactoryBuildPromotion"
+            "path": "tasks/JFrogBuildPromotion"
         },
         {
-            "path": "tasks/ArtifactoryGenericDownload"
+            "path": "tasks/JFrogMaven"
         },
         {
-            "path": "tasks/ArtifactoryGenericUpload"
+            "path": "tasks/JFrogGradle"
         },
         {
-            "path": "tasks/ArtifactoryMaven"
+            "path": "tasks/JFrogNpm"
         },
         {
-            "path": "tasks/ArtifactoryGradle"
+            "path": "tasks/JFrogNuget"
         },
         {
-            "path": "tasks/ArtifactoryNpm"
+            "path": "tasks/JFrogPublishBuildInfo"
         },
         {
-            "path": "tasks/ArtifactoryNuget"
+            "path": "tasks/JFrogConan"
         },
         {
-            "path": "tasks/ArtifactoryPublishBuildInfo"
+            "path": "tasks/JFrogBuildScan"
         },
         {
-            "path": "tasks/ArtifactoryDocker"
+            "path": "tasks/JFrogDiscardBuilds"
         },
         {
-            "path": "tasks/ArtifactoryConan"
+            "path": "tasks/JFrogToolsInstaller"
         },
         {
-            "path": "tasks/ArtifactoryXrayScan"
+            "path": "tasks/JFrogGo"
         },
         {
-            "path": "tasks/ArtifactoryDiscardBuilds"
+            "path": "tasks/JFrogPip"
         },
         {
-            "path": "tasks/ArtifactoryToolsInstaller"
+            "path": "tasks/JFrogDistribution"
         },
         {
-            "path": "tasks/ArtifactoryProperties"
+            "path": "tasks/JFrogCollectIssues"
         },
         {
-            "path": "tasks/ArtifactoryGo"
+            "path": "tasks/JFrogDotnet"
         },
         {
-            "path": "tasks/ArtifactoryPip"
+            "path": "tasks/JFrogCliV2"
         },
         {
-            "path": "tasks/Distribution"
-        },
-        {
-            "path": "tasks/ArtifactoryCollectIssues"
-        },
-        {
-            "path": "tasks/ArtifactoryDotnet"
-        },
-        {
-            "path": "tasks/JfrogCli"
+            "path": "tasks/JFrogGenericArtifacts"
         }
     ]
 }

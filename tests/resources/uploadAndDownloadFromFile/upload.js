@@ -19,12 +19,13 @@ fs.writeFileSync(
 );
 
 let inputs = {
+    command: 'Upload',
     specSource: 'file',
     file: specPath,
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
-    symlinks: false
+    preserveSymlinks: false
 };
 
-testUtils.runArtifactoryTask(testUtils.upload, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

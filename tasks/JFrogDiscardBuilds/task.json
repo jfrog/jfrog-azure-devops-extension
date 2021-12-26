@@ -1,0 +1,93 @@
+{
+    "id": "625ba5b8-a30b-4103-8400-8ec94e2aef16",
+    "name": "JFrogDiscardBuilds",
+    "friendlyName": "JFrog Discard Builds",
+    "description": "Discard old builds from Artifactory.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-DiscardingPublishedBuildsfromArtifactory)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "demands": [],
+    "version": {
+        "Major": "1",
+        "Minor": "0",
+        "Patch": "0"
+    },
+    "minimumAgentVersion": "1.83.0",
+    "instanceNameFormat": "JFrog Discard Builds",
+    "inputs": [
+        {
+            "name": "artifactoryConnection",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to use in the command."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "helpMarkDown": "Build name to discard builds from.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'."
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Artifactory project key."
+        },
+        {
+            "name": "maxDays",
+            "type": "string",
+            "label": "Max days",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The maximum number of days to keep builds in Artifactory."
+        },
+        {
+            "name": "maxBuilds",
+            "type": "string",
+            "label": "Max builds",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The maximum number of builds to store in Artifactory."
+        },
+        {
+            "name": "excludeBuilds",
+            "type": "string",
+            "label": "Exclude builds",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "List of build numbers in the form of \"value1,value2,...\", that should not be removed from Artifactory."
+        },
+        {
+            "name": "deleteArtifacts",
+            "type": "boolean",
+            "label": "Delete artifacts",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If set to true, automatically removes build artifacts stored in Artifactory."
+        },
+        {
+            "name": "async",
+            "type": "boolean",
+            "label": "Async",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "If set to true, build discard will run asynchronously and will not wait for response."
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "discardBuilds.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

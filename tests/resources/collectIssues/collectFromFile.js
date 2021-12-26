@@ -6,7 +6,6 @@ const configPath = path.join(testUtils.testDataDir, TEST_NAME, 'config.yaml');
 let inputs = {
     buildName: 'Collect issues from file',
     buildNumber: '4',
-    artifactoryService: 'mock-service',
     configSource: 'file',
     file: configPath
 };

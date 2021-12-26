@@ -1,7 +1,7 @@
 /// <reference types="./node_modules/node-tunnel/typings/basic-auth-parser" />
 import * as adoMockTest from 'azure-pipelines-task-lib/mock-test';
 import * as fs from 'fs-extra';
-import * as jfrogUtils from 'artifactory-tasks-utils';
+import * as jfrogUtils from '@jfrog/tasks-utils';
 import * as mocha from 'mocha';
 import * as path from 'path';
 import * as syncRequest from 'sync-request';
@@ -9,9 +9,7 @@ import * as TestUtils from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as assert from 'assert';
 import * as os from 'os';
-import * as tl from 'azure-pipelines-task-lib/task';
-import { execSync } from 'child_process';
-import conanUtils from '../tasks/ArtifactoryConan/conanUtils';
+import conanUtils from '../tasks/JFrogConan/conanUtils';
 import { Tunnel } from 'node-tunnel';
 
 let tasksOutput: string;
@@ -19,15 +17,12 @@ let tasksOutput: string;
 describe('JFrog Artifactory Extension Tests', (): void => {
     let repoKeys: any;
     before(function(): void {
-        this.timeout(120000); // 2 minute timer for the before hook only.
+        this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
-        assert.ok(TestUtils.artifactoryUrl, 'Tests are missing environment variable: ADO_ARTIFACTORY_URL');
-        assert.ok(TestUtils.artifactoryUsername, 'Tests are missing environment variable: ADO_ARTIFACTORY_USERNAME');
-        assert.ok(TestUtils.artifactoryPassword, 'Tests are missing environment variable: ADO_ARTIFACTORY_PASSWORD');
+        assert.ok(TestUtils.platformUrl, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_URL');
+        assert.ok(TestUtils.platformUsername, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_USERNAME');
+        assert.ok(TestUtils.platformPassword, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_PASSWORD');
 
-        if (!TestUtils.isSkipTest('distribution')) {
-            assert.ok(TestUtils.distributionUrl, 'Tests are missing environment variable: ADO_DISTRIBUTION_URL');
-        }
         TestUtils.initTests();
         repoKeys = TestUtils.getRepoKeys();
     });
@@ -37,7 +32,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
     });
 
     after(function(): void {
-        this.timeout(120000); // 2 minute timer for the after hook only.
+        this.timeout(120000); // 2 minutes timer for the after hook only.
         TestUtils.cleanUpAllTests();
     });
 
@@ -51,7 +46,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 let retVal: string = '';
                 try {
                     jfrogUtils.executeCliCommand(
-                        'jfrog rt del ' +
+                        'jf rt del ' +
                             repoKeys.repo1 +
                             '/' +
                             ' --url=' +
@@ -68,7 +63,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 }
                 assert.ok(retVal !== '', 'An exception should have been caught');
                 process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;
-                assert.ok(!retVal.includes('SUPER_SECRET'), 'Output contains password');
+                assert.ok(!retVal.toString().includes('SUPER_SECRET'), 'Output contains password');
             },
             TestUtils.isSkipTest('unit')
         );
@@ -102,11 +97,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Cli join',
             (): void => {
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u'), 'jfrog rt u');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog'), 'jfrog');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u', 'a/b/c', 'a/b/c'), 'jfrog rt u a/b/c a/b/c');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u', 'a\bc', 'a\bc'), 'jfrog rt u a\bc a\bc');
-                assert.strictEqual(jfrogUtils.cliJoin('jfrog', 'rt', 'u', 'a\\bc\\', 'a\\bc\\'), 'jfrog rt u a\\bc\\ a\\bc\\');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u'), 'jf rt u');
+                assert.strictEqual(jfrogUtils.cliJoin('jf'), 'jf');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a/b/c', 'a/b/c'), 'jf rt u a/b/c a/b/c');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\bc', 'a\bc'), 'jf rt u a\bc a\bc');
+                assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\\bc\\', 'a\\bc\\'), 'jf rt u a\\bc\\ a\\bc\\');
             },
             TestUtils.isSkipTest('unit')
         );
@@ -218,13 +213,12 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         /**
          * This test was created to ensure the equality of the build partials paths created by the CLI and the ones provided by
-         * getCliPartialsBuildDir method. Testing versions before and after the introduction of projects.
+         * getCliPartialsBuildDir method.
          */
         runSyncTest(
             'Conan Utils - Get Cli Partials Build Dir',
             (): void => {
-                const jfrogCliVersions: any = ['1.44.0', '1.45.2'];
-                jfrogCliVersions.forEach((version: string): void => testGetCliPartialsBuildDir(version));
+                testGetCliPartialsBuildDir();
             },
             TestUtils.isSkipTest('unit')
         );
@@ -234,7 +228,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'JFrog CLI Task Test',
             (): void => {
-                const testDir: string = 'genericCliTask';
+                const testDir: string = 'jfrogCliTask';
                 // Upload a.in. b.in and c.in
                 mockTask(testDir, 'upload');
                 // Delete a.in
@@ -256,13 +250,13 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 0);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 0, 'tool already exists in cache');
                 // Run tools installer to download CLI from a fresh repository
                 mockTask(testDir, 'toolsInstaller');
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool was not downloaded to cache');
                 // Run tools installer again to make sure the JFrog CLI downloaded from Artifactory remote cache
                 mockTask(testDir, 'toolsInstaller');
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool is missing from cache');
             },
             TestUtils.isSkipTest('installer')
         );
@@ -273,10 +267,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 0);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 0, 'tool already exists in cache');
                 // Run tools installer to download CLI from a fresh repository
                 mockTask(testDir, 'toolsInstallerCustomVersion');
-                assert.ok(toolLib.findLocalToolVersions('jfrog').length === 1);
+                assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool was not downloaded to cache');
             },
             TestUtils.isSkipTest('installer')
         );
@@ -347,6 +341,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
                 assertFiles(path.join(testDir, 'files'), testDir);
+                deleteBuild('downloadArtifactSourceBuild');
             },
             TestUtils.isSkipTest('generic')
         );
@@ -387,6 +382,21 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('generic')
         );
     });
+
+    describe('Move Copy Delete Tests', (): void => {
+        runSyncTest(
+            'Move Copy Delete',
+            (): void => {
+                const testDir: string = 'moveCopyDelete';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'move');
+                mockTask(testDir, 'copy');
+                mockTask(testDir, 'delete');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'expectedFiles'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );    });
 
     describe('Publish Build Info Tests', (): void => {
         runSyncTest(
@@ -546,9 +556,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
     describe('Npm Tests', (): void => {
         runSyncTest(
-            'Npm install and publish Ver 1 ',
+            'Npm install and publish',
             (): void => {
-                const testDir: string = 'npmVer1';
+                const testDir: string = 'npm';
                 mockTask(testDir, path.join('install', 'npmInstall'));
                 mockTask(testDir, path.join('install', 'installNpmPublish'));
                 mockTask(testDir, path.join('install', 'installDownload'));
@@ -560,37 +570,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('npm')
         );
         runSyncTest(
-            'Npm install and publish Ver 2',
+            'Npm ci and publish',
             (): void => {
-                const testDir: string = 'npmVer2';
-                mockTask(testDir, path.join('install', 'npmInstall'));
-                mockTask(testDir, path.join('install', 'installNpmPublish'));
-                mockTask(testDir, path.join('install', 'installDownload'));
-                mockTask(testDir, path.join('install', 'installPublish'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, '1'));
-                getAndAssertBuild('npm Test', '1');
-                deleteBuild('npm Test');
-            },
-            TestUtils.isSkipTest('npm')
-        );
-        runSyncTest(
-            'Npm ci and publish Ver 1',
-            (): void => {
-                const testDir: string = 'npmVer1';
-                mockTask(testDir, path.join('ci', 'npmCi'));
-                mockTask(testDir, path.join('ci', 'ciNpmPublish'));
-                mockTask(testDir, path.join('ci', 'ciDownload'));
-                mockTask(testDir, path.join('ci', 'ciPublish'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, '2'));
-                getAndAssertBuild('npm Test', '2');
-                deleteBuild('npm Test');
-            },
-            TestUtils.isSkipTest('npm')
-        );
-        runSyncTest(
-            'Npm ci and publish Ver 2',
-            (): void => {
-                const testDir: string = 'npmVer2';
+                const testDir: string = 'npm';
                 mockTask(testDir, path.join('ci', 'npmCi'));
                 mockTask(testDir, path.join('ci', 'ciNpmPublish'));
                 mockTask(testDir, path.join('ci', 'ciDownload'));
@@ -605,22 +587,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
     describe('Maven Tests', (): void => {
         runSyncTest(
-            'Maven Ver1',
+            'Maven',
             (): void => {
-                const testDir: string = 'mavenVer1';
-                mockTask(testDir, 'build');
-                mockTask(testDir, 'publish');
-                mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('Maven Test', '3');
-                deleteBuild('Maven Test');
-            },
-            TestUtils.isSkipTest('maven')
-        );
-        runSyncTest(
-            'Maven Ver2',
-            (): void => {
-                const testDir: string = 'mavenVer2';
+                const testDir: string = 'maven';
                 mockTask(testDir, 'build');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
@@ -638,7 +607,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('maven')
         );
     });
-
+    // todo get latest extractor
     describe('Gradle Tests', (): void => {
         runSyncTest(
             'Gradle',
@@ -687,20 +656,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
     describe('NuGet Tests', (): void => {
         runSyncTest(
-            'NuGet restore Ver1',
+            'NuGet restore',
             (): void => {
-                const testDir: string = 'nugetVer1';
-                mockTask(testDir, 'restore');
-                mockTask(testDir, 'publish');
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
-            },
-            !TestUtils.isWindows() || TestUtils.isSkipTest('nuget')
-        );
-        runSyncTest(
-            'NuGet restore Ver2',
-            (): void => {
-                const testDir: string = 'nugetVer2';
+                const testDir: string = 'nuget';
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
                 getAndAssertBuild('NuGet Test', '3');
@@ -709,22 +667,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('nuget')
         );
         runSyncTest(
-            'NuGet push Ver1',
+            'NuGet push',
             (): void => {
-                const testDir: string = 'nugetVer1';
-                mockTask(testDir, 'push');
-                mockTask(testDir, 'publish');
-                mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
-                getAndAssertBuild('NuGet Test', '3');
-                deleteBuild('NuGet Test');
-            },
-            !TestUtils.isWindows() || TestUtils.isSkipTest('nuget')
-        );
-        runSyncTest(
-            'NuGet push Ver2',
-            (): void => {
-                const testDir: string = 'nugetVer2';
+                const testDir: string = 'nuget';
                 mockTask(testDir, 'push');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
@@ -760,37 +705,6 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 deleteBuild('DotNET Test');
             },
             TestUtils.isSkipTest('dotnet')
-        );
-    });
-
-    describe('Docker Tests', (): void => {
-        runSyncTest(
-            'Docker push and pull',
-            (): void => {
-                assert.ok(TestUtils.artifactoryDockerDomain, 'Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_DOMAIN');
-                assert.ok(TestUtils.artifactoryDockerRepo, 'Tests are missing environment variable: ADO_ARTIFACTORY_DOCKER_REPO');
-
-                const testDir: string = 'docker';
-                const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
-                // Run docker build + tag
-                execSync(
-                    'docker build -t ' + TestUtils.artifactoryDockerDomain + '/docker-test:1 ' + path.join(__dirname, 'resources', testDir, filesDir)
-                );
-
-                // run docker push
-                mockTask(testDir, 'push');
-                mockTask(testDir, 'publishPush');
-                getAndAssertBuild('dockerTest', '1');
-
-                // Run docker pull
-                mockTask(testDir, 'pull');
-                mockTask(testDir, 'publishPull');
-                getAndAssertBuild('dockerTest', '2');
-
-                // Clean
-                deleteBuild('dockerTest');
-            },
-            TestUtils.isSkipTest('docker')
         );
     });
 
@@ -948,7 +862,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         let rbName: string;
         let rbVersion: string;
         before(function(): void {
-            this.timeout(180000); // 3 minute timer for the before hook only.
+            this.timeout(180000); // 3 minutes timer for the before hook only.
             if (!TestUtils.isSkipTest('distribution')) {
                 rbName = 'ado-test-rb';
                 rbVersion = '123';
@@ -978,7 +892,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
 
         after(function(): void {
-            this.timeout(180000); // 3 minute timer for the after hook only.
+            this.timeout(180000); // 3 minutes timer for the after hook only.
             distributionCleanUp(rbName, rbVersion);
         });
     });
@@ -996,7 +910,7 @@ function distributionCleanUp(rbName: string, rbVersion: string): void {
  *
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean, Optional) - True if should skip the test
+ * @param skip (Boolean, Optional) - True if test should be skipped
  */
 function runSyncTest(description: string, testFunc: () => void, skip?: boolean): void {
     if (skip) {
@@ -1011,11 +925,11 @@ function runSyncTest(description: string, testFunc: () => void, skip?: boolean):
 }
 
 /**
- * Run a async test using mocha suit.
+ * Run an async test using mocha suit.
  *
  * @param description (String) - Test description
  * @param testFunc (Function) - The test logic
- * @param skip (Boolean, Optional) - True if should skip the test
+ * @param skip (Boolean, Optional) - True if test should be skipped
  */
 
 function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void, skip?: boolean): void {
@@ -1038,7 +952,9 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  */
 function mockTask(testDir: string, taskName: string, isNegative?: boolean): void {
     const taskPath: string = path.join(__dirname, 'resources', testDir, taskName + '.js');
-    const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath);
+    // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
+    const taskJsonDummy: string = path.join(__dirname, 'resources', 'task.json');
+    const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
     mockRunner.run(); // Mock a test
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
     assert.ok(isNegative ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
@@ -1237,31 +1153,21 @@ function assertIssuesCollection(buildName: string, buildNumber: string): void {
     );
 }
 
-function testGetCliPartialsBuildDir(jfrogCliVersion: string): void {
-    console.debug('Testing getCliPartialsBuildDir() for CLI version: ' + jfrogCliVersion);
-    tl.setVariable(jfrogUtils.taskSelectedCliVersionEnv, jfrogCliVersion);
-
-    jfrogUtils
-        .downloadCli(undefined, undefined, jfrogCliVersion)
-        .then((): void => {
-            const testDTO: any = {
-                testBuildNumber: '777',
-                testsBuildNames: ['simpleJFrogTestNameExample', 'Some-Special-Chars+:#$%\\/dè<>']
-            };
-            // Cleanup old partials
-            testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bc', element, testDTO.testBuildNumber));
-            // Create new partials using "Build Collect Env" command
-            testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bce', element, testDTO.testBuildNumber));
-            // Assert the partials created at the generated by getCliPartialsBuildDir() path
-            testDTO.testsBuildNames.forEach((element: string): void =>
-                assertPathExists(conanUtils.getCliPartialsBuildDir(element, testDTO.testBuildNumber))
-            );
-            // Cleanup the created partials
-            testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bc', element, testDTO.testBuildNumber));
-        })
-        .catch((): string => 'downloading cli for test failed');
+function testGetCliPartialsBuildDir(): void {
+    const testDTO: any = {
+        testBuildNumber: '777',
+        testsBuildNames: ['simpleJFrogTestNameExample', 'Some-Special-Chars+:#$%\\/dè<>']
+    };
+    // Cleanup old partials
+    testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bc', element, testDTO.testBuildNumber));
+    // Create new partials using "Build Collect Env" command
+    testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bce', element, testDTO.testBuildNumber));
+    // Assert the partials created at the generated by getCliPartialsBuildDir() path
+    testDTO.testsBuildNames.forEach((element: string): void => assertPathExists(conanUtils.getCliPartialsBuildDir(element, testDTO.testBuildNumber)));
+    // Cleanup the created partials
+    testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bc', element, testDTO.testBuildNumber));
 }
 
 function runBuildCommand(command: string, buildName: string, buildNumber: string): void {
-    jfrogUtils.executeCliCommand('jfrog rt ' + command + ' "' + buildName + '" ' + buildNumber, TestUtils.testDataDir);
+    jfrogUtils.executeCliCommand('jf rt ' + command + ' "' + buildName + '" ' + buildNumber, TestUtils.testDataDir);
 }

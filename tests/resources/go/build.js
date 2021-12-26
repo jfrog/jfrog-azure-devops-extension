@@ -12,7 +12,6 @@ let variables = {
 let inputs = {
     buildName: BUILD_NAME,
     buildNumber: BUILD_NUMBER,
-    artifactoryService: 'mock-service',
     resolutionRepo: testUtils.getRepoKeys().goVirtualRepo,
     command: 'build',
     workingDirectory: TEST_NAME,

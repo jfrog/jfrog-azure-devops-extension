@@ -4,6 +4,7 @@ const path = require('path');
 const TEST_NAME = path.basename(__dirname);
 
 let inputs = {
+    command: 'Download',
     buildName: 'buildPublish',
     buildNumber: '3',
     module: 'myDownloadModule',
@@ -24,4 +25,4 @@ let inputs = {
     specSource: 'taskConfiguration'
 };
 
-testUtils.runArtifactoryTask(testUtils.download, {}, inputs);
+testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);
