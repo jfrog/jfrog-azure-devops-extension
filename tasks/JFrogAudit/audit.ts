@@ -16,7 +16,9 @@ function RunTaskCbk(cliPath: string): void {
         cliAuditCommand,
         '--format=table'
     );
-    utils.addServerIdOption(auditCommand, serverId);
+    auditCommand = utils.addServerIdOption(auditCommand, serverId);
+    auditCommand = utils.addBoolParam(auditCommand, 'allowFailBuild', 'fail');
+
     // Add watches source if provided.
     const watchesSource: string = tl.getInput('watchesSource', false) || '';
     if (watchesSource !== 'none') {
