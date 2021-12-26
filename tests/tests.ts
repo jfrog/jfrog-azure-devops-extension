@@ -137,8 +137,8 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     // Avoid double encoding
                     assert.strictEqual(jfrogUtils.encodePath('"dir 1"'), '"dir 1"');
                 } else {
-                    assert.strictEqual(jfrogUtils.encodePath('dir1/dir 2/dir 3'), 'dir1/"dir 2"/"dir 3"');
-                    assert.strictEqual(jfrogUtils.encodePath('dir 1/dir2/a b.txt'), '"dir 1"/dir2/"a b.txt"');
+                    assert.strictEqual(jfrogUtils.encodePath('dir1/dir 2/dir 3'), "dir1/'dir 2'/'dir 3'");
+                    assert.strictEqual(jfrogUtils.encodePath('dir 1/dir2/a b.txt'), "'dir 1'/dir2/'a b.txt'");
                     assert.strictEqual(jfrogUtils.encodePath('dir1/dir2/a.txt'), 'dir1/dir2/a.txt');
                     assert.strictEqual(jfrogUtils.encodePath('dir1/'), 'dir1/');
                     assert.strictEqual(jfrogUtils.encodePath('dir1'), 'dir1');

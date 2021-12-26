@@ -11,13 +11,12 @@ function RunTaskCbk(cliPath: string): void {
 
     serverId = utils.assembleUniqueServerId('xray_audit');
     if (!utils.configureDefaultJfrogServer(serverId, cliPath, defaultWorkDir)) {
-       // utils.configureDefaultXrayServer(serverId, cliPath, defaultWorkDir);
+        utils.configureDefaultXrayServer(serverId, cliPath, defaultWorkDir);
     }
 
     let auditCommand: string = utils.cliJoin(
         cliPath,
         cliAuditCommand,
-       // '--fail=true', (not released yet)
         '--format=table'
     );
     utils.addServerIdOption(auditCommand, serverId);

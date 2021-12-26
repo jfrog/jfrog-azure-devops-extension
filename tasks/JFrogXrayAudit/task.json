@@ -101,6 +101,14 @@
             "required": true,
             "visibleRule": "watchesSource=repo-path",
             "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
+        },
+        {
+            "name": "allowFailBuild",
+            "type": "boolean",
+            "label": "Allow fail build",
+            "defaultValue": "true",
+            "required": true,
+            "helpMarkDown": "Uncheck if you do not wish to fail the build if Xray scan matches a rule with 'Fail Build' action."
         }
     ],
     "execution": {

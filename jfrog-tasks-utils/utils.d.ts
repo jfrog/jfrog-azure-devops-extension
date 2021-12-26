@@ -34,6 +34,7 @@ declare module '@jfrog/tasks-utils' {
     export function addServerIdOption(cliCommand: string, serverId: string): string;
     export function assembleUniqueServerId(buildToolType: string): string;
     export function configureDefaultJfrogServer(serverId: string, cliPath: string, workDir: string): string;
+    export function configureDefaultXrayServer(serverId: string, cliPath: string, workDir: string): string;
     export function configureDefaultDistributionServer(serverId: string, cliPath: string, workDir: string): string;
     export { taskSelectedCliVersionEnv };
 }
