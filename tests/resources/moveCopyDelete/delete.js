@@ -3,7 +3,7 @@ const testUtils = require('../../testUtils');
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
-    command: 'Delete Artifacts',
+    command: 'Delete',
     fileSpec: JSON.stringify({
         files: [
             {
