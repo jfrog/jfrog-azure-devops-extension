@@ -70,7 +70,7 @@
     "contributions": [
         {
             "id": "jfrog-platform-service",
-            "description": "Service Endpoint type for JFrog Platform connections",
+            "description": "Service Endpoint type for JFrog Platform connections. Currently only used by the 'JFrog CLI V2' task.",
             "type": "ms.vss-endpoint.service-endpoint-type",
             "targets": [
                 "ms.vss-endpoint.endpoint-types"
@@ -609,13 +609,13 @@
             }
         },
         {
-            "id": "jfrog-xray-build-scan-task",
+            "id": "jfrog-build-scan-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "tasks/JFrogXrayBuildScan"
+                "name": "tasks/JFrogBuildScan"
             }
         },
         {
@@ -738,7 +738,7 @@
             "path": "tasks/JFrogConan"
         },
         {
-            "path": "tasks/JFrogXrayBuildScan"
+            "path": "tasks/JFrogBuildScan"
         },
         {
             "path": "tasks/JFrogDiscardBuilds"

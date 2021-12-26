@@ -5,7 +5,7 @@ const path = require('path');
 const cliUploadCommand = 'rt u';
 const cliDownloadCommand = 'rt dl';
 const cliSetPropertiesCommand = 'rt sp';
-const cliDeletePropertiesCommand = 'rt delete-props';
+const cliDeletePropertiesCommand = 'rt delp';
 const cliMoveCommand = 'rt mv';
 const cliCopyCommand = 'rt cp';
 const cliDeleteArtifactsCommand = 'rt del';
@@ -52,7 +52,7 @@ function RunTaskCbk(cliPath) {
         case 'Copy':
             handleGenericCopy(cliPath, workDir);
             break;
-        case 'Delete Artifacts':
+        case 'Delete':
             handleGenericDeleteArtifacts(cliPath, workDir);
             break;
         default:

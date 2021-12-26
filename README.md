@@ -29,21 +29,16 @@ The `vsix` file can be loaded into Azure DevOps and TFS.
 To run the tests, please make sure you are using node 14 or above.
 
 Use the following commands to run from terminal:
-1. Set the ADO_ARTIFACTORY_URL, ADO_ARTIFACTORY_USERNAME and ADO_ARTIFACTORY_PASSWORD environment variables with your Artifactory URL, username and password:
+1. Set the ADO_JFROG_PLATFORM_URL, ADO_JFROG_PLATFORM_USERNAME and ADO_JFROG_PLATFORM_PASSWORD environment variables with your JFrog Platform URL, username and password:
     ```
-    export ADO_ARTIFACTORY_URL='http://localhost:8081/artifactory'
-    export ADO_ARTIFACTORY_USERNAME=admin
-    export ADO_ARTIFACTORY_PASSWORD=password
-    ```
-
-2. If you'd like to run distribution tests, set the ADO_DISTRIBUTION_URL environment variable with Distribution URL:
-    ```
-    export ADO_DISTRIBUTION_URL='http://localhost:8081/distribution'
+    export ADO_JFROG_PLATFORM_URL='https://myrepo.jfrog.io/'
+    export ADO_JFROG_PLATFORM_USERNAME=admin
+    export ADO_JFROG_PLATFORM_PASSWORD=password
     ```
    
-3. Run the following commands:
+2. Run the following commands:
     ```
-    npm i -g jfrog-cli-go
+    npm i -g jfrog-cli-v2-jf
     npm t
     ```
 

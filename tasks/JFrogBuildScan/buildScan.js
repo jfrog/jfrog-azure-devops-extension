@@ -25,7 +25,8 @@ function RunTaskCbk(cliPath) {
     }
     cliCommand = utils.addBoolParam(cliCommand, 'vuln', 'vuln');
     cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
-    utils.addServerIdOption(cliCommand, serverId);
+    cliCommand = utils.addServerIdOption(cliCommand, serverId);
+    cliCommand = utils.addProjectOption(cliCommand)
 
     try {
         utils.executeCliCommand(cliCommand, process.cwd(), null);

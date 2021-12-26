@@ -38,7 +38,7 @@
                 "Delete Properties": "Delete Properties",
                 "Move": "Move",
                 "Copy": "Copy",
-                "Delete Artifacts": "Delete Artifacts"
+                "Delete": "Delete"
             },
             "required": true,
             "helpMarkDown": "The generic command to be run by this task."

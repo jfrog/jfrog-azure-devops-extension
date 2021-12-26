@@ -1,8 +1,8 @@
 {
     "id": "6344f8dc-e3e4-4658-84c6-bc26f7fd7de2",
-    "name": "JFrogXrayBuildScan",
-    "friendlyName": "JFrog Xray Build Scan",
-    "description": "Scan a build with JFrog Xray.\nThe scanned build must be published to Artifactory prior to scanning, using the 'Publish Build Info' task.",
+    "name": "JFrogBuildScan",
+    "friendlyName": "JFrog Build Scan",
+    "description": "Scan a build with JFrog Xray.\nThe scanned build must be published to Artifactory prior to scanning, using the 'JFrog Publish Build Info' task.",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ScanningPublishedBuildswithJFrogXray)",
     "category": "Utility",
@@ -17,7 +17,7 @@
         "Patch": "0"
     },
     "minimumAgentVersion": "1.83.0",
-    "instanceNameFormat": "JFrog Xray Build Scan",
+    "instanceNameFormat": "JFrog Build Scan",
     "inputs": [
         {
             "name": "xrayConnection",
