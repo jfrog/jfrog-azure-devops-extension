@@ -37,8 +37,8 @@ node("docker") {
                     '''
                 }
 
-                stage('Merge to master') {
-                    sh("git merge origin/dev")
+                stage('Merge to v2') {
+                    sh("git merge origin/dev-v2")
                 }
 
                 stage('Bump version') {
@@ -73,11 +73,11 @@ node("docker") {
                         sh("git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git --tags")
                     }
 
-                    stage('Merge to dev') {
+                    stage('Merge to dev-v2') {
                         sh '''#!/bin/bash
                         set -euxo pipefail
-                        git checkout dev
-                        git merge master
+                        git checkout dev-v2
+                        git merge v2
                         git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git
                         '''
                     }
