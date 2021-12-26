@@ -44,7 +44,7 @@ export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername 
 
 export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
 export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
-export const generic: string = path.join(__dirname, '..', 'tasks', 'JFrogGeneric', 'runGeneric.js');
+export const generic: string = path.join(__dirname, '..', 'tasks', 'JFrogGenericArtifacts', 'runGenericArtifacts.js');
 export const maven: string = path.join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
 export const npm: string = path.join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');
 export const nuget: string = path.join(__dirname, '..', 'tasks', 'JFrogNuget', 'nugetBuild.js');

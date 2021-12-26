@@ -1,11 +1,11 @@
 {
-    "name": "@jfrog/jfrog-generic",
+    "name": "@jfrog/jfrog-generic-artifacts",
     "version": "1.0.0",
     "author": "JFrog",
     "private": true,
     "license": "Apache-2.0",
     "description": "This task allows uploading, downloading, moving, copying, deleting, setting and deleting properties on artifacts in Artifactory.",
-    "main": "runGeneric.js",
+    "main": "runGenericArtifacts.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
