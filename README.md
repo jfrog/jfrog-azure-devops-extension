@@ -1,7 +1,6 @@
 |Branch|Status|
 |:---:|---|
-|master|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/master?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-azure-devops-extension/branch/master)
-|dev|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-azure-devops-extension/branch/dev)|
+|v2|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v2?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-azure-devops-extension/branch/v2)|
 
 # Overview
 JFrog provides tight integration with Azure DevOps through the **JFrog Extension**.
