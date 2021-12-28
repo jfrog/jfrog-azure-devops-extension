@@ -11,11 +11,7 @@ function RunTaskCbk(cliPath: string): void {
 
     serverId = utils.configureDefaultXrayServer('xray_audit', cliPath, defaultWorkDir);
 
-    let auditCommand: string = utils.cliJoin(
-        cliPath,
-        cliAuditCommand,
-        '--format=table'
-    );
+    let auditCommand: string = utils.cliJoin(cliPath, cliAuditCommand);
     auditCommand = utils.addServerIdOption(auditCommand, serverId);
     auditCommand = utils.addBoolParam(auditCommand, 'allowFailBuild', 'fail');
 

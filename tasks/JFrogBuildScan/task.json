@@ -49,7 +49,7 @@
             "label": "Project key",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Artifactory project key that contains the build info."
+            "helpMarkDown": "The JFrog project key."
         },
         {
             "name": "allowFailBuild",
@@ -57,7 +57,7 @@
             "label": "Allow fail build",
             "defaultValue": "true",
             "required": true,
-            "helpMarkDown": "Uncheck if you do not wish to fail the build if Xray scan matches a rule with 'Fail Build' action."
+            "helpMarkDown": "Uncheck if you do not wish to fail the build, following rules with 'Fail Build' actions."
         },
         {
             "name": "vuln",

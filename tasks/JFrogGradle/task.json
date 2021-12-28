@@ -186,7 +186,7 @@
             "defaultValue": "",
             "required": false,
             "visibleRule": "collectBuildInfo=true",
-            "helpMarkDown": "Artifactory project key."
+            "helpMarkDown": "JFrog project key."
         },
         {
             "name": "includeEnvVars",

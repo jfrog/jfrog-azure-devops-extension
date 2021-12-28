@@ -2,9 +2,9 @@
     "id": "d1d65fc8-c86f-4de9-81d2-16d5d20ec6c7",
     "name": "JFrogAudit",
     "friendlyName": "JFrog Audit",
-    "description": "Run 'jfrog audit'",
+    "description": "Audit the project for security vulnerabilities.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringPythonBuildsUsingPip)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Xray+Dependencies+Scan)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -48,9 +48,9 @@
             },
             "options": {
                 "none": "-",
-                "watches": "Watches List",
-                "project": "Project Key",
-                "repo-path": "Repository Path"
+                "watches": "Xray watches list",
+                "project": "JFrog Project Key",
+                "repo-path": "Artifactory Repository Path"
             }
         },
         {
@@ -65,16 +65,16 @@
         {
             "name": "project",
             "type": "string",
-            "label": "Artifactory Project key",
+            "label": "JFrog project key",
             "defaultValue": "",
             "required": true,
             "visibleRule": "watchesSource=project",
-            "helpMarkDown": "Artifactory project key that contains the build info."
+            "helpMarkDown": "The JFrog project key."
         },
         {
             "name": "repo-path",
             "type": "string",
-            "label": "Repository path",
+            "label": "Artifactory Repository Path",
             "defaultValue": "",
             "required": true,
             "visibleRule": "watchesSource=repo-path",
@@ -86,7 +86,7 @@
             "label": "Allow fail build",
             "defaultValue": "true",
             "required": true,
-            "helpMarkDown": "Uncheck if you do not wish to fail the build if Xray scan matches a rule with 'Fail Build' action."
+            "helpMarkDown": "Uncheck if you do not wish to fail the build, following rules with 'Fail Build' actions."
         }
     ],
     "execution": {
