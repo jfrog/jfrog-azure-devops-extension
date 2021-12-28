@@ -29,7 +29,7 @@ node("docker") {
         dir('artifactory-azure-devops-extension') {
 
             // If this variable is set to true, skip all git steps and move directly to release.
-            if(!params.SKIP_GIT_STEPS) {
+            if (!params.SKIP_GIT_STEPS) {
                 stage('Git config') {
                     sh '''#!/bin/bash
                         git config user.name "jfrog-ecosystem"
@@ -38,7 +38,7 @@ node("docker") {
                 }
 
                 stage('Merge to v2') {
-                    sh("git merge origin/dev-v2")
+                    sh("git merge origin/dev")
                 }
 
                 stage('Bump version') {
@@ -73,10 +73,10 @@ node("docker") {
                         sh("git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git --tags")
                     }
 
-                    stage('Merge to dev-v2') {
+                    stage('Merge to dev') {
                         sh '''#!/bin/bash
                         set -euxo pipefail
-                        git checkout dev-v2
+                        git checkout dev
                         git merge v2
                         git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git
                         '''
