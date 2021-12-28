@@ -41,7 +41,7 @@
             "label": "Project key",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Artifactory project key."
+            "helpMarkDown": "JFrog project key."
         },
         {
             "name": "maxDays",

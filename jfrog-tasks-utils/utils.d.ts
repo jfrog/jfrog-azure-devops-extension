@@ -33,6 +33,7 @@ declare module '@jfrog/tasks-utils' {
     export function addProjectOption(cliCommand: string): string;
     export function addServerIdOption(cliCommand: string, serverId: string): string;
     export function assembleUniqueServerId(usageType: string): string;
+    export function configureDefaultXrayServer(usageType: string, cliPath: string, workDir: string): string;
     export function configureDefaultDistributionServer(usageType: string, cliPath: string, workDir: string): string;
     export { taskSelectedCliVersionEnv };
 }
