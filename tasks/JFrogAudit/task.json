@@ -77,7 +77,7 @@
             "label": "Artifactory Repository Path",
             "defaultValue": "",
             "required": true,
-            "visibleRule": "watchesSource=repo-path",
+            "visibleRule": "watchesSource='repo-path'",
             "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
         },
         {
