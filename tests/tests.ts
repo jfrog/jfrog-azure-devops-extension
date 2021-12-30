@@ -604,7 +604,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('maven')
         );
     });
-    // todo get latest extractor
+
     describe('Gradle Tests', (): void => {
         runSyncTest(
             'Gradle',

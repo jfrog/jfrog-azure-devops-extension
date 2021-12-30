@@ -68,8 +68,7 @@ export function initTests(): void {
     tl.setVariable('Agent.TempDirectory', testDataDir);
     tl.setVariable('Agent.ToolsDirectory', testDataDir);
 
-    // TODO uncomment when eco is back to normal
-    // cleanUpOldRepositories();
+    cleanUpOldRepositories();
     recreateTestDataDir();
     createTestRepositories();
 }
