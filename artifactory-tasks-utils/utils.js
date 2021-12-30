@@ -231,7 +231,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
+    return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
 /**
@@ -333,7 +333,7 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    return '"' + str + '"';
+    return "'" + str + "'";
 }
 
 function addServiceConnectionCredentials(cliCommand, serviceConnection) {
@@ -596,7 +596,12 @@ function encodePath(str) {
             continue;
         }
         count++;
-        if (section.indexOf(' ') > 0 && !section.startsWith('"') && !section.endsWith('"')) {
+        if (
+            section.indexOf(' ') > 0 && // contains space
+            !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
+            !(section.startsWith('"') && section.endsWith('"'))    // not already quoted with double quotation mark
+
+        ) {
             section = quote(section);
         }
         encodedPath += section + path.sep;
