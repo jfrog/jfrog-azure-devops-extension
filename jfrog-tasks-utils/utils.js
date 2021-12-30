@@ -590,9 +590,9 @@ function encodePath(str) {
         if (
             section.indexOf(' ') > 0 && // contains space
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
-            !(section.startsWith('"') && section.endsWith('"'))
+            !(section.startsWith('"') && section.endsWith('"'))    // not already quoted with double quotation mark
+
         ) {
-            // not already quoted with double quotation mark
             section = quote(section);
         }
         encodedPath += section + path.sep;
