@@ -29,8 +29,7 @@ function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): v
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
-    }
-    finally {
+    } finally {
         utils.deleteCliServers(cliPath, buildDir, [serverId]);
     }
 }
