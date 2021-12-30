@@ -10,11 +10,11 @@ import { TaskMockRunner } from 'azure-pipelines-task-lib/mock-run';
 
 const testDataDir: string = path.join(__dirname, 'testData');
 const repoKeysPath: string = path.join(testDataDir, 'configuration', 'repoKeys');
-const platformUrl: string = process.env.ADO_JFROG_PLATFORM_URL || 'https://ecosysjfrog.jfrog.io/';
-const platformUsername: string = process.env.ADO_JFROG_PLATFORM_USERNAME || 'michaelsv';
-const platformPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD || 'Ms6626965';
+const platformUrl: string = process.env.ADO_JFROG_PLATFORM_URL || '';
+const platformUsername: string = process.env.ADO_JFROG_PLATFORM_USERNAME || '';
+const platformPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD || '';
 const platformAccessToken: string = process.env.ADO_JFROG_PLATFORM_ACCESS_TOKEN || '';
-const skipTests: string[] = process.env.ADO_SKIP_TESTS ? process.env.ADO_SKIP_TESTS.split('Conan,') : [];
+const skipTests: string[] = process.env.ADO_SKIP_TESTS ? process.env.ADO_SKIP_TESTS.split(',') : [];
 
 const testReposPrefix: string = 'ado-extension-test';
 const repoKeys: any = {
