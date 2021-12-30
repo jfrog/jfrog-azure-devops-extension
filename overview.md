@@ -3,7 +3,7 @@ The **JFrog Platform** is a leading universal end-to-end DevOps platform for aut
 
 [Learn more](https://jfrog.com/)
 
-**JFrog Artifactory** provides tight integration with Azure DevOps through the **JFrog Extension.** 
+**JFrog Platform** provides tight integration with Azure DevOps through the **JFrog Extension.** 
 In addition to managing efficient deployment of your artifacts to Artifactory, 
 the extension lets you capture information about your build's resolved dependencies and deployed artifacts. 
 Gain full traceability for your builds as the environment data associated with your build is automatically collected.
@@ -84,7 +84,7 @@ If issues or vulnerabilities are found, you may choose to fail the build.
 ![BuildScan](images/marketplace/build-scan.png)
 ![Table](images/marketplace/violations-table.png)
 
-## Audit local projects for vulnerabilities
+## Auditing projects for security vulnerabilities
 Using the **JFrog Audit** task, you can trigger a scan on your local project. The task will automatically detect the used package-manager to perform audit with integration with JFrog Xray.
 By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based of a Xray watches source of your preference.
 If any violation or vulnerabilities are found, you may choose to fail the build.
@@ -92,7 +92,7 @@ If any violation or vulnerabilities are found, you may choose to fail the build.
 ![Audit](images/marketplace/audit.png)
 
 ## Recording tracked issues
-Being able to look at the build which was published to Artifactory, and see all the tracked issues (from JIRA for example) associated with it, is one of the most powerful capabilities of Artifactory when it comes to managing metadata about builds. The **JFrog Collect Issues** tasks can automatically identify the issues handled in the current build, and record them as part of the build-info. Read more about this unique capability [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-CollectingBuildIssues).
+Being able to look at the build which was published to Artifactory, and see all the tracked issues (from JIRA for example) associated with it, is one of the most powerful capabilities of Artifactory when it comes to managing metadata about builds. The **JFrog Collect Issues** task can automatically identify the issues handled in the current build, and record them as part of the build-info. Read more about this unique capability [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-CollectingBuildIssues).
 
 ## Publishing build-info
 Build-info captured in preceding tasks can be published to Artifactory using the **JFrog Publish Build-Info** task.
@@ -117,7 +117,7 @@ Builds are discarded according to the retention parameters configured in the tas
 ## Executing JFrog CLI commands
 The **JFrog CLI V2** task allows executing [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) commands, while using the pre-configured connection details of JFrog Platform, stored in Azure DevOps.
 
-## Accessing the Build-Info and the Xray scan report
+## Accessing the Build-Info
 You can access the build-info from the Build Results in Azure DevOps, if your build pipeline has published the build-info to Artifactory.
 
 ![BuildResults](images/marketplace/build-results.png)
@@ -129,7 +129,7 @@ you can select a published build, to make its artifacts available for the releas
 
 ![ArtifactsSource](images/marketplace/artifacts-source.png)
 
-## Handling Distribution
+## Managing binaries distribution
 The **JFrog Distribution** task allows managing release bundles.
 The task provides the capability to create, update, sign, distribute or delete release bundles from JFrog Distribution.
 
