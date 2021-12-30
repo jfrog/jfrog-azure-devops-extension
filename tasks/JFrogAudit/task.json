@@ -50,7 +50,7 @@
                 "none": "-",
                 "watches": "Xray watches list",
                 "project": "JFrog Project Key",
-                "repoPath": "Artifactory Repository Path"
+                "repo-path": "Artifactory Repository Path"
             }
         },
         {
@@ -72,12 +72,12 @@
             "helpMarkDown": "The JFrog project key."
         },
         {
-            "name": "repoPath",
+            "name": "repo-path",
             "type": "string",
             "label": "Artifactory Repository Path",
             "defaultValue": "",
             "required": true,
-            "visibleRule": "watchesSource=repoPath",
+            "visibleRule": "watchesSource='repo-path'",
             "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
         },
         {
