@@ -221,7 +221,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  */
 function maskSecrets(str) {
     if (isWindows()) {
-        str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
+       return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
     }
     return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
