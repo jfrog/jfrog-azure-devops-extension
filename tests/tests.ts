@@ -11,6 +11,7 @@ import * as assert from 'assert';
 import * as os from 'os';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
 import { Tunnel } from 'node-tunnel';
+import {isWindows} from "./testUtils";
 
 let tasksOutput: string;
 
@@ -54,7 +55,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             ' --user=' +
                             jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME || '') +
                             ' --password=' +
-                            jfrogUtils.quote('SUPER_SECRET'),
+                            jfrogUtils.quote("SUPER_SECRET"),
                         TestUtils.testDataDir,
                         ['']
                     );
@@ -63,7 +64,8 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 }
                 assert.ok(retVal !== '', 'An exception should have been caught');
                 process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;
-                assert.ok(!retVal.toString().includes('SUPER_SECRET'), 'Output contains password');
+                console.log(isWindows() + "#######"+ retVal);
+                assert.ok(!retVal.toString().includes("SUPER_SECRET"), 'Output contains password');
             },
             TestUtils.isSkipTest('unit')
         );
