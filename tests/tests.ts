@@ -54,7 +54,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             ' --user=' +
                             jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME || '') +
                             ' --password=' +
-                            jfrogUtils.quote('SUPER_SECRET'),
+                            jfrogUtils.quote("SUPER_SECRET"),
                         TestUtils.testDataDir,
                         ['']
                     );
@@ -63,7 +63,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 }
                 assert.ok(retVal !== '', 'An exception should have been caught');
                 process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;
-                assert.ok(!retVal.toString().includes('SUPER_SECRET'), 'Output contains password');
+                assert.ok(!retVal.toString().includes("SUPER_SECRET"), 'Output contains password');
             },
             TestUtils.isSkipTest('unit')
         );
@@ -124,19 +124,20 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             'Encode paths',
             (): void => {
                 if (TestUtils.isWindows()) {
-                    assert.strictEqual(jfrogUtils.encodePath('dir1\\dir 2\\dir 3'), "dir1\\'dir 2'\\'dir 3'");
-                    assert.strictEqual(jfrogUtils.encodePath('dir 1\\dir2\\a b.txt'), "dir 1'\\dir2\\'a b.txt'");
+                    assert.strictEqual(jfrogUtils.encodePath('dir1\\dir 2\\dir 3'), 'dir1\\"dir 2"\\"dir 3"');
+                    assert.strictEqual(jfrogUtils.encodePath('dir 1\\dir2\\a b.txt'), '"dir 1"\\dir2\\"a b.txt"');
                     assert.strictEqual(jfrogUtils.encodePath('dir1\\dir2\\a.txt'), 'dir1\\dir2\\a.txt');
                     assert.strictEqual(jfrogUtils.encodePath('dir1\\'), 'dir1\\');
+                    assert.strictEqual(jfrogUtils.encodePath('dir 1'), '"dir 1"');
                 } else {
                     assert.strictEqual(jfrogUtils.encodePath('dir1/dir 2/dir 3'), "dir1/'dir 2'/'dir 3'");
                     assert.strictEqual(jfrogUtils.encodePath('dir 1/dir2/a b.txt'), "'dir 1'/dir2/'a b.txt'");
                     assert.strictEqual(jfrogUtils.encodePath('dir1/dir2/a.txt'), 'dir1/dir2/a.txt');
                     assert.strictEqual(jfrogUtils.encodePath('dir1/'), 'dir1/');
                     assert.strictEqual(jfrogUtils.encodePath('/dir1'), '/dir1');
+                    assert.strictEqual(jfrogUtils.encodePath('dir 1'), "'dir 1'");
                 }
                 assert.strictEqual(jfrogUtils.encodePath('dir1'), 'dir1');
-                assert.strictEqual(jfrogUtils.encodePath('dir 1'), "'dir 1'");
                 // Avoid double encoding
                 assert.strictEqual(jfrogUtils.encodePath('"dir 1"'), '"dir 1"');
                 assert.strictEqual(jfrogUtils.encodePath("'dir 1'"), "'dir 1'");
