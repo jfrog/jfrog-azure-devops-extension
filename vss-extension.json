@@ -19,7 +19,7 @@
         "vso.build_execute"
     ],
     "categories": [
-        "Build and release"
+        "Azure Pipelines"
     ],
     "tags": [
         "JFrog",
