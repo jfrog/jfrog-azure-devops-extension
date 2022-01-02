@@ -49,16 +49,6 @@ node("docker") {
                     '''
                 }
 
-                stage('Create extension') {
-                    sh '''#!/bin/bash
-                        set -euxo pipefail
-                        npm i --unsafe-perm
-                        npm run create
-                        # Verify vsix file is larger than 15M
-                        find . -iname "JFrog.jfrog-azure-devops-extension*" -size +15M | grep .
-                    '''
-                }
-
                 stage('Commit release version') {
                     sh("git commit -am '[artifactory-release] Release version ${ADO_ARTIFACTORY_VERSION}'")
                 }
@@ -79,9 +69,20 @@ node("docker") {
                         git checkout dev
                         git merge v2
                         git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git
+                        git checkout v2
                         '''
                     }
                 }
+            }
+
+            stage('Create extension') {
+                sh '''#!/bin/bash
+                    set -euxo pipefail
+                    npm i --unsafe-perm
+                    npm run create
+                    # Verify vsix file is larger than 15M
+                    find . -iname "JFrog.jfrog-azure-devops-extension*" -size +15M | grep .
+                '''
             }
 
             stage('Publish extension') {
