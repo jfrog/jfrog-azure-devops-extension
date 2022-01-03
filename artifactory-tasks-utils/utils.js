@@ -231,6 +231,9 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
+    if (isWindows()) {
+        return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
+    }
     return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
@@ -333,6 +336,9 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
+    if (isWindows()){
+        return '"' + str + '"';
+    }
     return "'" + str + "'";
 }
 
