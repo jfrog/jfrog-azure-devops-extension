@@ -20,12 +20,12 @@ node("docker") {
         sh '''#!/bin/bash
             set -euxo pipefail
             echo "Downloading npm..."
-            wget https://nodejs.org/dist/v${NPM_VERSION}/node-v${NPM_VERSION}-linux-x64.tar.xz
-            tar -xvf node-v${NPM_VERSION}-linux-x64.tar.xz
+            wget https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz
+            tar -xvf node-v${NODE_VERSION}-linux-x64.tar.xz
         '''
     }
 
-    withEnv(["PATH+=${WORKSPACE}/node-v${NPM_VERSION}-linux-x64/bin"]) {
+    withEnv(["PATH+=${WORKSPACE}/node-v${NODE_VERSION}-linux-x64/bin"]) {
         dir('artifactory-azure-devops-extension') {
 
             // If this variable is set to true, skip all git steps and move directly to release.
@@ -49,16 +49,6 @@ node("docker") {
                     '''
                 }
 
-                stage('Create extension') {
-                    sh '''#!/bin/bash
-                        set -euxo pipefail
-                        npm i --unsafe-perm
-                        npm run create
-                        # Verify vsix file is larger than 15M
-                        find . -iname "JFrog.jfrog-artifactory-vsts-extension*" -size +15M | grep .
-                    '''
-                }
-
                 stage('Commit release version') {
                     sh("git commit -am '[artifactory-release] Release version ${ADO_ARTIFACTORY_VERSION}'")
                 }
@@ -79,9 +69,20 @@ node("docker") {
                         git checkout dev-v1
                         git merge v1
                         git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git
+                        git checkout v1
                         '''
                     }
                 }
+            }
+
+            stage('Create extension') {
+                sh '''#!/bin/bash
+                    set -euxo pipefail
+                    npm i --unsafe-perm
+                    npm run create
+                    # Verify vsix file is larger than 15M
+                    find . -iname "JFrog.jfrog-artifactory-vsts-extension*" -size +15M | grep .
+                '''
             }
 
             stage('Publish extension') {
