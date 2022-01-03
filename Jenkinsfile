@@ -20,12 +20,12 @@ node("docker") {
         sh '''#!/bin/bash
             set -euxo pipefail
             echo "Downloading npm..."
-            wget https://nodejs.org/dist/v${NPM_VERSION}/node-v${NPM_VERSION}-linux-x64.tar.xz
-            tar -xvf node-v${NPM_VERSION}-linux-x64.tar.xz
+            wget https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz
+            tar -xvf node-v${NODE_VERSION}-linux-x64.tar.xz
         '''
     }
 
-    withEnv(["PATH+=${WORKSPACE}/node-v${NPM_VERSION}-linux-x64/bin"]) {
+    withEnv(["PATH+=${WORKSPACE}/node-v${NODE_VERSION}-linux-x64/bin"]) {
         dir('artifactory-azure-devops-extension') {
 
             // If this variable is set to true, skip all git steps and move directly to release.
