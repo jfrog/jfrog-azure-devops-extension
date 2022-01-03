@@ -55,9 +55,10 @@
             "name": "artifactoryConnection",
             "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service connection",
+            "visibleRule": "conanCommand = Add Remote",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to use in the command."
+            "helpMarkDown": "Artifactory service used by this remote configuration."
         },
         {
             "name": "conanRepo",
