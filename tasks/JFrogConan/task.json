@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Conan",
     "description": "This task runs a Conan command.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringConanBuilds)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-TriggeringConanBuilds)",
     "category": "Utility",
     "visibility": [
         "Build",
