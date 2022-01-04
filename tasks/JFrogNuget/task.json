@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Nuget",
     "description": "Restore and push NuGet packages from and to Artifactory while allowing to collect build-info. The collected build-info can be later published to Artifactory by the \"JFrog Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringNugetand.NETCoreBuilds)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-TriggeringNugetand.NETCoreBuilds)",
     "category": "Utility",
     "visibility": [
         "Build",

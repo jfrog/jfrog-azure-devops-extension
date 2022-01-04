@@ -44,10 +44,10 @@
     },
     "links": {
         "getstarted": {
-            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Artifactory"
+            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Documentation"
         },
         "learn": {
-            "uri": "https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension"
+            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension"
         },
         "support": {
             "uri": "https://www.jfrog.com/support"

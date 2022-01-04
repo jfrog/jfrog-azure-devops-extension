@@ -26,7 +26,7 @@ The extension supports triggering a scan on a published build in Artifactory, or
 The **JFrog Extension** also allows managing Release Bundles and their distribution processes, including release content, and target destinations. 
 
 ## Documentation and source code
-The full extension documentation is available [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
+The full extension documentation is available [here](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension).
 <br>
 See the source code is on [GitHub](https://github.com/jfrog/artifactory-azure-devops-extension).
 
@@ -92,7 +92,7 @@ If any violation or vulnerabilities are found, you may choose to fail the build.
 ![Audit](images/marketplace/audit.png)
 
 ## Recording tracked issues
-Being able to look at the build which was published to Artifactory, and see all the tracked issues (from JIRA for example) associated with it, is one of the most powerful capabilities of Artifactory when it comes to managing metadata about builds. The **JFrog Collect Issues** task can automatically identify the issues handled in the current build, and record them as part of the build-info. Read more about this unique capability [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-CollectingBuildIssues).
+Being able to look at the build which was published to Artifactory, and see all the tracked issues (from JIRA for example) associated with it, is one of the most powerful capabilities of Artifactory when it comes to managing metadata about builds. The **JFrog Collect Issues** task can automatically identify the issues handled in the current build, and record them as part of the build-info. Read more about this unique capability [here](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-CollectingBuildIssues).
 
 ## Publishing build-info
 Build-info captured in preceding tasks can be published to Artifactory using the **JFrog Publish Build-Info** task.
