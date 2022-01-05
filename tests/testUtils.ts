@@ -415,13 +415,17 @@ export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string
 }
 
 export function deleteReleaseBundle(bundleName: string, bundleVersion: string): void {
-    syncRequest.default('POST', stripTrailingSlash(platformUrl) + '/distribution/api/v1/distribution/' + bundleName + '/' + bundleVersion + '/delete', {
-        headers: {
-            Authorization: getAuthorizationHeaderValue(),
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ dry_run: false, distribution_rules: [{ site_name: '*' }], on_success: 'delete' })
-    });
+    syncRequest.default(
+        'POST',
+        stripTrailingSlash(platformUrl) + '/distribution/api/v1/distribution/' + bundleName + '/' + bundleVersion + '/delete',
+        {
+            headers: {
+                Authorization: getAuthorizationHeaderValue(),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ dry_run: false, distribution_rules: [{ site_name: '*' }], on_success: 'delete' })
+        }
+    );
 }
 
 export function getAuthorizationHeaderValue(): string {

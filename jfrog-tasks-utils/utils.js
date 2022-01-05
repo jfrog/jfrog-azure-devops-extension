@@ -221,7 +221,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  */
 function maskSecrets(str) {
     if (isWindows()) {
-       return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
+        return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
     }
     return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
@@ -377,7 +377,7 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    if (isWindows()){
+    if (isWindows()) {
         return '"' + str + '"';
     }
     return "'" + str + "'";
@@ -596,8 +596,7 @@ function encodePath(str) {
         if (
             section.indexOf(' ') > 0 && // contains space
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
-            !(section.startsWith('"') && section.endsWith('"'))    // not already quoted with double quotation mark
-
+            !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
         ) {
             section = quote(section);
         }

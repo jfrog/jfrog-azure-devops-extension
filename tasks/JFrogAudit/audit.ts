@@ -18,7 +18,7 @@ function RunTaskCbk(cliPath: string): void {
     // Add watches source if provided.
     const watchesSource: string = tl.getInput('watchesSource', false) || '';
     switch (watchesSource) {
-        // Having a '-' in a param name is failing verification on Azure Server (TFS).
+        // Having a dash (-) in a param name in a visible rule is failing verification on Azure Server (TFS).
         case 'repoPath':
             auditCommand = utils.addStringParam(auditCommand, 'repoPath', 'repo-path', true);
             break;
