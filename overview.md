@@ -1,3 +1,51 @@
+## We Created a New Extension
+### General
+We have recently released a new extension for Azure DevOps - the [JFrog Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension). The new extension can be installed and used side by side with this extension. 
+If you're already using the Artifactory Azure DevOps Extension, we recommend also installing the new [JFrog Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension), and gradually migrating your tasks from the old extension to the new one. 
+The old extension will continue to be supported, however new functionality will most likely make it into the new extension only.
+
+### Why?
+We want to make sure new functionality and improvements are added to the extension. 
+However, our primary goal is making sure your pipelines and releases continue to function as expected by maintaining backward compatibility. 
+As more changes were added however, we were approaching the extension size limit. 
+In addition, following the need to start utilizing JFrog CLI v2, which includes breaking changes compared to v1, it seemed like the right time to create a new extension, that can run together with the old one, and allow you to gradually migrate when the time is right for you.
+
+### What's changed in the new extension?
+- The new extension utilizes [JFrog CLI v2](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI#JFrogCLI-JFrogCLIv2)
+- The old extension's **Artifactory Generic Upload**, **Artifactory Generic Download** and **Artifactory Properties** tasks are replaced in the new extension with the **JFrog Generic Artifacts** task
+- In addition to the above, the new **JFrog Generic Artifacts** task also supports copying, moving and deleting artifacts on Artifactory
+- The new **JFrog Audit** task added to the new extension allows auditing your projects for security vulnerabilities with JFrog Xray
+- The new **JFrog CLI V2** task can execute any JFrog CLI command, compared to the old **JFrog CLI task**, which can run only command starting with **jfrog rt**.
+
+### Still missing in the new extension
+The **Artifactory Docker** task hasn't yet been migrated to the new extension. This is because we're currently working on further improving JFrog CLI's integration with the docker client, and would like to expose the new docker functionally to the new extension once that effort is completed. As the old extension is here to stay, you can continue using its **Artifactory Docker** task.
+
+### New vs. old tasks
+To help you migrate your tasks from the old Artifactory Extension to the new JFrog Extension, we listed the old vs. new tasks names for you.
+
+|  **Artifactory Extension Task**  |   **JFrog Extension Task**   |
+|:--------------------------------:|:----------------------------:|
+|   Artifactory Tools Installer    |    JFrog Tools Installer     |
+|    Artifactory Generic Upload    |   JFrog Generic Artifacts    |
+|   Artifactory Generic Download   |   JFrog Generic Artifacts    |
+|      Artifactory Properties      |   JFrog Generic Artifacts    |
+|        Artifactory Maven         |         JFrog Maven          |
+|        Artifactory Gradle        |         JFrog Gradle         |
+|         Artifactory Npm          |          JFrog Npm           |
+|        Artifactory Nuget         |         JFrog Nuget          |
+|      Artifactory .NET Core       |       JFrog .NET Core        |
+|         Artifactory Pip          |          JFrog Pip           |
+|        Artifactory Conan         |         JFrog Conan          |
+|          Artifactory Go          |           JFrog Go           |
+| Artifactory Collect Build Issues |  JFrog Collect Build Issues  |
+|  Artifactory Publish Build Info  |   JFrog Publish Build Info   |
+|   Artifactory Build Promotion    |    JFrog Build Promotion     |
+|      Artifactory Xray Scan       |       JFrog Build Scan       |
+|    Artifactory Discard Builds    |     JFrog Discard Builds     |
+|           Distribution           |      JFrog Distribution      |
+|            JFrog CLI             |         JFrog CLI V2         |
+
+
 ## Overview
 **JFrog Artifactory** is a Universal Repository Manager supporting all major packaging formats and build tools.
 
