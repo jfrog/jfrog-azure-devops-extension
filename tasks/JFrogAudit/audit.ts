@@ -17,8 +17,15 @@ function RunTaskCbk(cliPath: string): void {
 
     // Add watches source if provided.
     const watchesSource: string = tl.getInput('watchesSource', false) || '';
-    if (watchesSource !== 'none') {
-        auditCommand = utils.addStringParam(auditCommand, watchesSource, watchesSource, true);
+    switch (watchesSource) {
+        // Having a '-' in a param name is failing verification on Azure Server (TFS).
+        case 'repoPath':
+            auditCommand = utils.addStringParam(auditCommand, 'repoPath', 'repo-path', true);
+            break;
+        case 'watches':
+        case 'project':
+            auditCommand = utils.addStringParam(auditCommand, watchesSource, watchesSource, true);
+            break;
     }
     executeCliCommand(auditCommand, sourcePath, cliPath);
 }
