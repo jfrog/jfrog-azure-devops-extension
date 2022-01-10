@@ -7,9 +7,9 @@ let inputs = {
     fileSpec: JSON.stringify({
         files: [
             {
-                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + "*${action}*",
-                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + "new${action}.in",
-                flat: "true"
+                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + '*${action}*',
+                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + 'new${action}.in',
+                flat: 'true'
             }
         ]
     }),
