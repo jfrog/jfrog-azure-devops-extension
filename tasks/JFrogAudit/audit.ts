@@ -19,6 +19,7 @@ function RunTaskCbk(cliPath: string): void {
     const watchesSource: string = tl.getInput('watchesSource', false) || '';
     switch (watchesSource) {
         // Having a dash (-) in a param name in a visible rule is failing verification on Azure Server (TFS).
+        // For that reason we do not use a dash in repo-path, and handle this param separately (not passing the option blindly to the CLI).
         case 'repoPath':
             auditCommand = utils.addStringParam(auditCommand, 'repoPath', 'repo-path', true);
             break;
