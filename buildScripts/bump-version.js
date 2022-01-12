@@ -43,7 +43,7 @@ function assertVersion() {
         ((oldExtensionVersionSplit[1] < requestedVersionSplit[1]) && (requestedVersionSplit[2] === 0)) || // Minor release
         ((oldExtensionVersionSplit[1] === requestedVersionSplit[1]) && (oldExtensionVersionSplit[2] < requestedVersionSplit[2])), // Patch release
         'Input version must be bigger than current version')
-    // assert.strictEqual(oldExtensionVersionSplit[0], requestedVersionSplit[0], 'Upgrading Major version using this script is forbidden'); // todo uncomment
+    assert.strictEqual(oldExtensionVersionSplit[0], requestedVersionSplit[0], 'Upgrading Major version using this script is forbidden');
 }
 
 /**
