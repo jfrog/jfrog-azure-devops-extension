@@ -25,7 +25,7 @@ if (commandLineArgsOptions.help || !commandLineArgsOptions.version) {
     console.log(usage);
     process.exit(commandLineArgsOptions.help ? 0 : 1);
 }
-const splitVersion = commandLineArgsOptions.version.split('.');
+const requestedVersionSplit = commandLineArgsOptions.version.split('.');
 
 assertVersion();
 updateTasksVersion();
@@ -35,16 +35,15 @@ updateExtensionVersion();
  * Validate the format of the new version and also that it is larger than the existing version.
  */
 function assertVersion() {
-    assert.strictEqual(splitVersion.length, 3, 'Version have a format of X.Y.Z');
+    assert.strictEqual(requestedVersionSplit.length, 3, 'Version have a format of X.Y.Z');
     let vssExtension = fs.readFileSync('vss-extension.json', 'utf8');
     let vssExtensionJson = JSON.parse(vssExtension);
-    assert.strictEqual(
-        compareVersions(commandLineArgsOptions.version, vssExtensionJson.version),
-        1,
-        'Input version must be bigger than current version'
-    );
-    let oldVersionSplit = vssExtensionJson.version.split('.');
-    assert.strictEqual(oldVersionSplit[0], splitVersion[0], 'Upgrading Major version using this script is forbidden');
+    let oldExtensionVersionSplit = vssExtensionJson.version.split('.');
+    assert.ok(
+        ((oldExtensionVersionSplit[1] < requestedVersionSplit[1]) && (requestedVersionSplit[2] === 0)) || // Minor release
+        ((oldExtensionVersionSplit[1] === requestedVersionSplit[1]) && (oldExtensionVersionSplit[2] < requestedVersionSplit[2])), // Patch release
+        'Input version must be bigger than current version')
+    // assert.strictEqual(oldExtensionVersionSplit[0], requestedVersionSplit[0], 'Upgrading Major version using this script is forbidden'); // todo uncomment
 }
 
 /**
@@ -57,7 +56,7 @@ function updateTasksVersion() {
         let taskDir = path.join('tasks', taskName);
         let taskJsonPath = path.join(taskDir, 'task.json');
         if (fs.existsSync(taskJsonPath)) {
-            console.log('Updating version of task ' + taskName + ' to X.' + splitVersion[1] + '.' + splitVersion[2]);
+            console.log('Updating version of task ' + taskName + ' to X.' + requestedVersionSplit[1] + '.' + requestedVersionSplit[2]);
             updateTaskJsonWithNewVersion(taskJsonPath);
         } else {
             fs.readdir(taskDir, (err, taskVersionDirs) => {
@@ -65,7 +64,7 @@ function updateTasksVersion() {
                     let taskVersionDirJson = path.join(taskDir, versToBuild, 'task.json');
                     if (fs.existsSync(taskVersionDirJson)) {
                         console.log(
-                            'Updating version of task ' + taskName + ', version: ' + versToBuild + ' to X.' + splitVersion[1] + '.' + splitVersion[2]
+                            'Updating version of task ' + taskName + ', version: ' + versToBuild + ' to X.' + requestedVersionSplit[1] + '.' + requestedVersionSplit[2]
                         );
                         updateTaskJsonWithNewVersion(taskVersionDirJson);
                     }
@@ -80,8 +79,8 @@ function updateTaskJsonWithNewVersion(taskJsonPath) {
     let curMajorVersion = taskJson.get('version.Major');
     taskJson.set('version', {
         Major: curMajorVersion,
-        Minor: splitVersion[1],
-        Patch: splitVersion[2]
+        Minor: requestedVersionSplit[1],
+        Patch: requestedVersionSplit[2]
     });
 }
 
