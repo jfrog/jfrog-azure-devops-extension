@@ -89,6 +89,7 @@ function exec(cliPath, nugetCommand) {
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(pathToNupkg), utils.quote(targetPath));
         const deployerServerId = utils.configureDefaultArtifactoryServer('nuget_deployer', cliPath, buildDir);
         nugetCommandCli = utils.addServerIdOption(nugetCommandCli, deployerServerId);
+        nugetCommandCli = utils.cliJoin(nugetCommandCli, '--flat=' + utils.quote('true'));
         runNuGet(nugetCommandCli, buildDir, cliPath, [deployerServerId]);
     }
 }
