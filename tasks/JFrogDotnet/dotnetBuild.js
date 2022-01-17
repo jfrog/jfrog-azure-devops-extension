@@ -50,6 +50,7 @@ function performDotnetNugetPush(cliPath) {
     let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), utils.quote(targetPath));
     let serverId = utils.configureDefaultArtifactoryServer('dotnet_nuget_push', cliPath, buildDir);
     uploadCommand = utils.addServerIdOption(uploadCommand, serverId);
+    uploadCommand = utils.cliJoin(uploadCommand, '--flat=' + utils.quote('true'));
     executeCliCommand(uploadCommand, buildDir, cliPath, [serverId]);
 }
 
