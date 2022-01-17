@@ -2,8 +2,8 @@ node("docker") {
     cleanWs()
 
     stage('Clone and Checkout V2') {
-        sh 'git clone https://github.com/jfrog/artifactory-azure-devops-extension.git'
-        dir("artifactory-azure-devops-extension") {
+        sh 'git clone https://github.com/jfrog/jfrog-azure-devops-extension.git'
+        dir("jfrog-azure-devops-extension") {
             sh 'git checkout v2'
         }
     }
@@ -26,7 +26,7 @@ node("docker") {
     }
 
     withEnv(["PATH+=${WORKSPACE}/node-v${NODE_VERSION}-linux-x64/bin"]) {
-        dir('artifactory-azure-devops-extension') {
+        dir('jfrog-azure-devops-extension') {
 
             // If this variable is set to true, skip all git steps and move directly to release.
             if (!params.SKIP_GIT_STEPS) {
@@ -55,12 +55,12 @@ node("docker") {
 
                 wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: 'GITHUB_API_KEY', var: 'SECRET']]]) {
                     stage('Push changes') {
-                        sh("git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git")
+                        sh("git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/jfrog-azure-devops-extension.git")
                     }
 
                     stage('Create tag') {
                         sh("git tag '${ADO_ARTIFACTORY_VERSION}'")
-                        sh("git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git --tags")
+                        sh("git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/jfrog-azure-devops-extension.git --tags")
                     }
 
                     stage('Merge to dev') {
@@ -68,7 +68,7 @@ node("docker") {
                         set -euxo pipefail
                         git checkout dev
                         git merge v2
-                        git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/artifactory-azure-devops-extension.git
+                        git push https://${GITHUB_USERNAME}:${GITHUB_API_KEY}@github.com/jfrog/jfrog-azure-devops-extension.git
                         git checkout v2
                         '''
                     }

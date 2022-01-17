@@ -28,7 +28,7 @@ The **JFrog Extension** also allows managing Release Bundles and their distribut
 ## Documentation and source code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension).
 <br>
-See the source code is on [GitHub](https://github.com/jfrog/artifactory-azure-devops-extension).
+See the source code is on [GitHub](https://github.com/jfrog/jfrog-azure-devops-extension).
 
 ## Generic artifacts handling
 The **JFrog Generic Artifacts** task allows performing generic actions on artifacts, such as:
