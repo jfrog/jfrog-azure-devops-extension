@@ -68,7 +68,7 @@ The **JFrog Artifactory Extension** also allows managing Release Bundles and the
 ## Documentation and source code
 The full extension documentation is available [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
 <br>
-See the source code is on [GitHub](https://github.com/jfrog/artifactory-azure-devops-extension).
+See the source code is on [GitHub](https://github.com/jfrog/jfrog-azure-devops-extension).
 
 ## Downloading generic build dependencies from Artifactory
 The **Artifactory Generic Download** task supports downloading your build dependencies from Artifactory to the build agent. 
