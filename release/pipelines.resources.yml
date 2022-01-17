@@ -1,0 +1,18 @@
+resources:
+  - name: azureDevopsSnapshotGit
+    type: GitRepo
+    configuration:
+      path: jfrog/jfrog-azure-devops-extension
+      gitProvider: il_automation
+      branches:
+        include: dev
+
+  - name: azureDevopsReleaseGit
+    type: GitRepo
+    configuration:
+      path: jfrog/jfrog-azure-devops-extension
+      gitProvider: il_automation
+      buildOn:
+        commit: false
+      branches:
+        include: master
