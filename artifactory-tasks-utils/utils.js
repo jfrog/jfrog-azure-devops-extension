@@ -12,7 +12,7 @@ const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirector
 const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder') || '', '_jfrog'));
 const defaultJfrogCliVersion = '1.52.0';
 const minCustomCliVersion = '1.37.1';
-const pluginVersion = '1.13.3';
+const pluginVersion = '1.13.4';
 const buildAgent = 'artifactory-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
@@ -336,7 +336,7 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    if (isWindows()){
+    if (isWindows()) {
         return '"' + str + '"';
     }
     return "'" + str + "'";
@@ -605,8 +605,7 @@ function encodePath(str) {
         if (
             section.indexOf(' ') > 0 && // contains space
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
-            !(section.startsWith('"') && section.endsWith('"'))    // not already quoted with double quotation mark
-
+            !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
         ) {
             section = quote(section);
         }
