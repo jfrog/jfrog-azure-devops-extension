@@ -217,7 +217,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        tl.debug('Executing cliCommand: ' + maskSecrets(cliCommand));
+        console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand))
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
@@ -231,10 +231,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    if (isWindows()) {
-        return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
-    }
-    return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
+    return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
 }
 
 /**
@@ -336,10 +333,7 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    if (isWindows()) {
-        return '"' + str + '"';
-    }
-    return "'" + str + "'";
+    return '"' + str + '"';
 }
 
 function addServiceConnectionCredentials(cliCommand, serviceConnection) {
