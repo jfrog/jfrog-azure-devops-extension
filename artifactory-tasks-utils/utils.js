@@ -361,11 +361,12 @@ function addServiceConnectionCredentials(cliCommand, serviceConnection) {
         user = 'anonymous';
         return cliJoin(cliCommand, '--user=' + quote(user));
     }
-    if (isWindows()){
-        return cliJoin(cliCommand, '--user=' + quote(user), '--password=' + quote(password));
-    }
-    return cliJoin(cliCommand, '--user=' + singleQuote(user), '--password=' + singleQuote(password));
 
+    return cliJoin(
+        cliCommand,
+        '--user=' + (isWindows() ? quote(user) : singleQuote(user)),
+        '--password=' + (isWindows() ? quote(password) : singleQuote(password))
+    );
 }
 
 function addStringParam(cliCommand, inputParam, cliParam, require) {
