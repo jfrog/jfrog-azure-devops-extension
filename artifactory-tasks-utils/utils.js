@@ -48,6 +48,7 @@ module.exports = {
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
+    singleQuote: singleQuote,
     isWindows: isWindows,
     addServiceConnectionCredentials: addServiceConnectionCredentials,
     addStringParam: addStringParam,
@@ -231,7 +232,8 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
+    let maskedStr = str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
+    return maskedStr.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
 /**
@@ -255,7 +257,11 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
         cliCommand = cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
     } else {
         // Add username and password.
-        cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
+        cliCommand = cliJoin(
+            cliCommand,
+            '--user=' + (isWindows() ? quote(artifactoryUser) : singleQuote(artifactoryUser)),
+            '--password=' + (isWindows() ? quote(artifactoryPassword) : singleQuote(artifactoryPassword))
+        );
     }
     return executeCliCommand(cliCommand, buildDir, null);
 }
@@ -336,6 +342,10 @@ function quote(str) {
     return '"' + str + '"';
 }
 
+function singleQuote(str) {
+    return "'" + str + "'";
+}
+
 function addServiceConnectionCredentials(cliCommand, serviceConnection) {
     let user = tl.getEndpointAuthorizationParameter(serviceConnection, 'username', true);
     let password = tl.getEndpointAuthorizationParameter(serviceConnection, 'password', true);
@@ -351,8 +361,11 @@ function addServiceConnectionCredentials(cliCommand, serviceConnection) {
         user = 'anonymous';
         return cliJoin(cliCommand, '--user=' + quote(user));
     }
+    if (isWindows()){
+        return cliJoin(cliCommand, '--user=' + quote(user), '--password=' + quote(password));
+    }
+    return cliJoin(cliCommand, '--user=' + singleQuote(user), '--password=' + singleQuote(password));
 
-    return cliJoin(cliCommand, '--user=' + quote(user), '--password=' + quote(password));
 }
 
 function addStringParam(cliCommand, inputParam, cliParam, require) {
