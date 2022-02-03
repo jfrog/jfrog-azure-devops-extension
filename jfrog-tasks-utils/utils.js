@@ -9,7 +9,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.11.0';
+const defaultJfrogCliVersion = '2.12.0';
 const minCustomCliVersion = '2.10.0';
 const pluginVersion = '2.0.3';
 const buildAgent = 'jfrog-azure-devops-extension';
@@ -39,6 +39,7 @@ module.exports = {
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
+    singleQuote: singleQuote,
     isWindows: isWindows,
     addStringParam: addStringParam,
     addBoolParam: addBoolParam,
@@ -202,7 +203,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        tl.debug('Executing cliCommand: ' + maskSecrets(cliCommand));
+        console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand))
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred - mask secrets in message.
@@ -220,10 +221,8 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    if (isWindows()) {
-        return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
-    }
-    return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
+    return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***')
+        .replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
 function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
@@ -253,7 +252,12 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
         cliCommand = cliJoin(cliCommand, '--access-token=' + quote(serviceAccessToken));
     } else {
         // Add username and password.
-        cliCommand = cliJoin(cliCommand, '--user=' + quote(serviceUser), '--password=' + quote(servicePassword), '--basic-auth-only');
+        cliCommand = cliJoin(
+            cliCommand,
+            '--user=' + (isWindows() ? quote(serviceUser) : singleQuote(serviceUser)),
+            '--password=' + (isWindows() ? quote(servicePassword) : singleQuote(servicePassword)),
+            '--basic-auth-only'
+        );
     }
     return executeCliCommand(cliCommand, buildDir, null);
 }
@@ -377,9 +381,10 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    if (isWindows()) {
-        return '"' + str + '"';
-    }
+    return '"' + str + '"';
+}
+
+function singleQuote(str) {
     return "'" + str + "'";
 }
 
