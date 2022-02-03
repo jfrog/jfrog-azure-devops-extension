@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Conan",
     "description": "This task runs a Conan command.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-TriggeringConanBuilds)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-TriggeringConanBuilds)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "3"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "Conan $(conanCommand)",
@@ -55,9 +55,10 @@
             "name": "artifactoryConnection",
             "type": "connectedService:jfrogArtifactoryService",
             "label": "Artifactory service connection",
+            "visibleRule": "conanCommand = Add Remote",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to use in the command."
+            "helpMarkDown": "Artifactory service used by this remote configuration."
         },
         {
             "name": "conanRepo",

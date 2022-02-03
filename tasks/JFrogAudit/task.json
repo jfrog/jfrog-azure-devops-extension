@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Audit",
     "description": "Audit the project for security vulnerabilities.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Xray+Dependencies+Scan)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-AuditProjectforSecurityVulnerabilitieswithJFrogXray)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -13,7 +13,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "3"
     },
     "demands": [],
     "minimumAgentVersion": "1.89.0",
@@ -50,7 +50,7 @@
                 "none": "-",
                 "watches": "Xray watches list",
                 "project": "JFrog Project Key",
-                "repo-path": "Artifactory Repository Path"
+                "repoPath": "Artifactory Repository Path"
             }
         },
         {
@@ -72,12 +72,12 @@
             "helpMarkDown": "The JFrog project key."
         },
         {
-            "name": "repo-path",
+            "name": "repoPath",
             "type": "string",
             "label": "Artifactory Repository Path",
             "defaultValue": "",
             "required": true,
-            "visibleRule": "watchesSource='repo-path'",
+            "visibleRule": "watchesSource=repoPath",
             "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
         },
         {

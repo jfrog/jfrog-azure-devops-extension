@@ -1,12 +1,13 @@
-|Branch|Status|
-|:---:|---|
-|v2|[![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v2?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/artifactory-azure-devops-extension/branch/v2)|
+| Branch | Status                                                                                                                                                                                             |
+|:------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|   v2   | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v2?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/v2)   |
+|  dev   | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/dev) |
 
 # Overview
 JFrog provides tight integration with Azure DevOps through the **JFrog Extension**.
 Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about artifacts deployed, dependencies resolved, environment data associated with the build runs and more, 
 that effectively facilitates fully traceable builds.
-See the full extension documentation at the [Artifactory Azure DevOps Extension User Guide](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension).
+See the full extension documentation at the [JFrog Azure DevOps Extension User Guide](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension).
 
 # Download and Installation [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version-short/JFrog.jfrog-azure-devops-extension.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
 The extension is available for installation on your Azure DevOps organization in the [Azure DevOps Marketplace](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension).
@@ -62,4 +63,4 @@ We welcome pull requests from the community!
 * Please run `npm run lint` and make sure no new tslint warnings were introduced.
 
 # Release Notes
-See the release notes [here](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-ReleaseNotes).
+See the release notes [here](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-ReleaseNotes).

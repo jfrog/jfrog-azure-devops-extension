@@ -21,8 +21,6 @@ fi
 export PUBLISHER=$ADO_ARTIFACTORY_DEVELOPER-private
 
 cp vss-extension.json vss-extension-private.json
-# Replaces the category in the temporary vss-extension file to a category supported by Azure DevOps
-sed -i '' 's/Build and release/Azure Pipelines/g' vss-extension-private.json
 # Replaces the version to a random version (required for azure to load the changes)
 sed -i '' "s/\"version\": \".*..*..*\"/\"version\": \"${RANDOM}.${RANDOM}.${RANDOM}\"/g" vss-extension-private.json
 

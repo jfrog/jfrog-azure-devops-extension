@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Publish Build Info",
     "description": "Publish the build-info collected in previous tasks to Artifactory.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-PublishingBuildInfotoArtifactory)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-PublishingBuildInfotoArtifactory)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "3"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "JFrog Publish Build Info",

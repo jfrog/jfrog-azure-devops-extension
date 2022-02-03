@@ -9,9 +9,9 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.9.0';
-const minCustomCliVersion = '2.9.0';
-const pluginVersion = '1.0.0';
+const defaultJfrogCliVersion = '2.11.0';
+const minCustomCliVersion = '2.10.0';
+const pluginVersion = '2.0.3';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
@@ -221,7 +221,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  */
 function maskSecrets(str) {
     if (isWindows()) {
-       return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
+        return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***');
     }
     return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
@@ -377,7 +377,7 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    if (isWindows()){
+    if (isWindows()) {
         return '"' + str + '"';
     }
     return "'" + str + "'";
@@ -596,8 +596,7 @@ function encodePath(str) {
         if (
             section.indexOf(' ') > 0 && // contains space
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
-            !(section.startsWith('"') && section.endsWith('"'))    // not already quoted with double quotation mark
-
+            !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
         ) {
             section = quote(section);
         }

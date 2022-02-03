@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "public": true,
     "id": "jfrog-azure-devops-extension",
-    "version": "1.0.0",
+    "version": "2.0.3",
     "name": "JFrog",
     "description": "Integrate your JFrog Platform with Visual Studio Team Services.",
     "publisher": "JFrog",
@@ -19,7 +19,7 @@
         "vso.build_execute"
     ],
     "categories": [
-        "Build and release"
+        "Azure Pipelines"
     ],
     "tags": [
         "JFrog",
@@ -44,16 +44,16 @@
     },
     "links": {
         "getstarted": {
-            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Artifactory"
+            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Documentation"
         },
         "learn": {
-            "uri": "https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension"
+            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension"
         },
         "support": {
             "uri": "https://www.jfrog.com/support"
         },
         "repository": {
-            "uri": "https://github.com/jfrog/artifactory-azure-devops-extension"
+            "uri": "https://github.com/jfrog/jfrog-azure-devops-extension"
         },
         "privacypolicy": {
             "uri": "https://jfrog.com/privacy-policy"
@@ -61,7 +61,7 @@
     },
     "repository": {
         "type": "git",
-        "uri": "https://github.com/jfrog/artifactory-azure-devops-extension"
+        "uri": "https://github.com/jfrog/jfrog-azure-devops-extension"
     },
     "branding": {
         "color": "ffffff",

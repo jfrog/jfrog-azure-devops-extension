@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Discard Builds",
     "description": "Discard old builds from Artifactory.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-DiscardingPublishedBuildsfromArtifactory)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-DiscardingPublishedBuildsfromArtifactory)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "3"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "JFrog Discard Builds",

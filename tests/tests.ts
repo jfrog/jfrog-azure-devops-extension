@@ -394,7 +394,8 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertFiles(path.join(testDir, 'expectedFiles'), testDir);
             },
             TestUtils.isSkipTest('generic')
-        );    });
+        );
+    });
 
     describe('Publish Build Info Tests', (): void => {
         runSyncTest(

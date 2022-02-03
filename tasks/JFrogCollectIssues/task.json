@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Collect Build Issues",
     "description": "Collect build issues from the git commit messages of the project and add them to the build-info.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension-CollectingBuildIssues)",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-CollectingBuildIssues)",
     "category": "Utility",
     "visibility": [
         "Build",
@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "0",
-        "Patch": "0"
+        "Patch": "3"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "JFrog Collect Build Issues",
@@ -33,7 +33,7 @@
             "label": "Config source",
             "required": true,
             "defaultValue": "taskConfiguration",
-            "helpMarkDown": "To collect build issues, you need to provide a config file. \nTo read more about the issues-collection yaml schema click <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension#ArtifactoryAzureDevOpsExtension\" target=\"_blank\">here</a>.",
+            "helpMarkDown": "To collect build issues, you need to provide a config file. \nTo read more about the issues-collection yaml schema click <a href=\"https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-CollectingBuildIssues\" target=\"_blank\">here</a>.",
             "options": {
                 "taskConfiguration": "Task Configuration",
                 "file": "File"
@@ -50,14 +50,14 @@
                 "rows": "10",
                 "maxLength": "10000"
             },
-            "helpMarkDown": "To specify the details required for the build issues collection, please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension\" target=\"_blank\">here."
+            "helpMarkDown": "To specify the details required for the build issues collection, please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-CollectingBuildIssues\" target=\"_blank\">here."
         },
         {
             "name": "file",
             "type": "filePath",
             "label": "File path",
             "visibleRule": "configSource=file",
-            "helpMarkDown": "Path to a file, with the details required for the build issues collection. Please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension\" target=\"_blank\">here."
+            "helpMarkDown": "Path to a file, with the details required for the build issues collection. Please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-CollectingBuildIssues\" target=\"_blank\">here."
         },
         {
             "name": "buildName",
