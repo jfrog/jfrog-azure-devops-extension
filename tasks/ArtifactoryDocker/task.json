@@ -13,7 +13,7 @@
     "version": {
         "Major": "1",
         "Minor": "13",
-        "Patch": "3"
+        "Patch": "4"
     },
     "minimumAgentVersion": "1.91.0",
     "instanceNameFormat": "Artifactory Docker $(command)",

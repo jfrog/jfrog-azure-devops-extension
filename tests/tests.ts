@@ -129,19 +129,19 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             'Encode paths',
             (): void => {
                 if (TestUtils.isWindows()) {
-                    assert.strictEqual(jfrogUtils.encodePath('dir1\\dir 2\\dir 3'), "dir1\\'dir 2'\\'dir 3'");
-                    assert.strictEqual(jfrogUtils.encodePath('dir 1\\dir2\\a b.txt'), "dir 1'\\dir2\\'a b.txt'");
+                    assert.strictEqual(jfrogUtils.encodePath('dir1\\dir 2\\dir 3'), 'dir1\\"dir 2"\\"dir 3"');
+                    assert.strictEqual(jfrogUtils.encodePath('dir 1\\dir2\\a b.txt'), '"dir 1"\\dir2\\"a b.txt"');
                     assert.strictEqual(jfrogUtils.encodePath('dir1\\dir2\\a.txt'), 'dir1\\dir2\\a.txt');
                     assert.strictEqual(jfrogUtils.encodePath('dir1\\'), 'dir1\\');
                 } else {
-                    assert.strictEqual(jfrogUtils.encodePath('dir1/dir 2/dir 3'), "dir1/'dir 2'/'dir 3'");
-                    assert.strictEqual(jfrogUtils.encodePath('dir 1/dir2/a b.txt'), "'dir 1'/dir2/'a b.txt'");
+                    assert.strictEqual(jfrogUtils.encodePath('dir1/dir 2/dir 3'), 'dir1/"dir 2"/"dir 3"');
+                    assert.strictEqual(jfrogUtils.encodePath('dir 1/dir2/a b.txt'), '"dir 1"/dir2/"a b.txt"');
                     assert.strictEqual(jfrogUtils.encodePath('dir1/dir2/a.txt'), 'dir1/dir2/a.txt');
                     assert.strictEqual(jfrogUtils.encodePath('dir1/'), 'dir1/');
                     assert.strictEqual(jfrogUtils.encodePath('/dir1'), '/dir1');
                 }
+                assert.strictEqual(jfrogUtils.encodePath('dir 1'), '"dir 1"');
                 assert.strictEqual(jfrogUtils.encodePath('dir1'), 'dir1');
-                assert.strictEqual(jfrogUtils.encodePath('dir 1'), "'dir 1'");
                 // Avoid double encoding
                 assert.strictEqual(jfrogUtils.encodePath('"dir 1"'), '"dir 1"');
                 assert.strictEqual(jfrogUtils.encodePath("'dir 1'"), "'dir 1'");
@@ -1035,7 +1035,9 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  */
 function mockTask(testDir: string, taskName: string, isNegative?: boolean): void {
     const taskPath: string = path.join(__dirname, 'resources', testDir, taskName + '.js');
-    const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath);
+    // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
+    const taskJsonDummy: string = path.join(__dirname, 'resources', 'task.json');
+    const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
     mockRunner.run(); // Mock a test
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
     assert.ok(isNegative ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results

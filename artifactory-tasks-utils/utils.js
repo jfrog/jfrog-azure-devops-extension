@@ -10,9 +10,9 @@ const toolName = 'jfrog';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jfrog'));
 const jfrogLegacyFolderPath = encodePath(path.join(tl.getVariable('Agent.WorkFolder') || '', '_jfrog'));
-const defaultJfrogCliVersion = '1.52.0';
+const defaultJfrogCliVersion = '1.53.1';
 const minCustomCliVersion = '1.37.1';
-const pluginVersion = '1.13.3';
+const pluginVersion = '1.13.4';
 const buildAgent = 'artifactory-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
@@ -48,6 +48,7 @@ module.exports = {
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
+    singleQuote: singleQuote,
     isWindows: isWindows,
     addServiceConnectionCredentials: addServiceConnectionCredentials,
     addStringParam: addStringParam,
@@ -217,7 +218,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        tl.debug('Executing cliCommand: ' + maskSecrets(cliCommand));
+        console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand))
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred
@@ -231,7 +232,8 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    return str.replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
+    return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***')
+        .replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
 /**
@@ -255,7 +257,11 @@ function configureCliServer(artifactory, serverId, cliPath, buildDir) {
         cliCommand = cliJoin(cliCommand, '--access-token=' + quote(artifactoryAccessToken));
     } else {
         // Add username and password.
-        cliCommand = cliJoin(cliCommand, '--user=' + quote(artifactoryUser), '--password=' + quote(artifactoryPassword));
+        cliCommand = cliJoin(
+            cliCommand,
+            '--user=' + (isWindows() ? quote(artifactoryUser) : singleQuote(artifactoryUser)),
+            '--password=' + (isWindows() ? quote(artifactoryPassword) : singleQuote(artifactoryPassword))
+        );
     }
     return executeCliCommand(cliCommand, buildDir, null);
 }
@@ -333,6 +339,10 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
+    return '"' + str + '"';
+}
+
+function singleQuote(str) {
     return "'" + str + "'";
 }
 
@@ -352,7 +362,11 @@ function addServiceConnectionCredentials(cliCommand, serviceConnection) {
         return cliJoin(cliCommand, '--user=' + quote(user));
     }
 
-    return cliJoin(cliCommand, '--user=' + quote(user), '--password=' + quote(password));
+    return cliJoin(
+        cliCommand,
+        '--user=' + (isWindows() ? quote(user) : singleQuote(user)),
+        '--password=' + (isWindows() ? quote(password) : singleQuote(password))
+    );
 }
 
 function addStringParam(cliCommand, inputParam, cliParam, require) {
@@ -599,8 +613,7 @@ function encodePath(str) {
         if (
             section.indexOf(' ') > 0 && // contains space
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
-            !(section.startsWith('"') && section.endsWith('"'))    // not already quoted with double quotation mark
-
+            !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
         ) {
             section = quote(section);
         }
