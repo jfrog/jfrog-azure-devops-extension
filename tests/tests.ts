@@ -339,7 +339,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Download artifact source',
             (): void => {
-                const testDir: string = 'downloadArtifactSource';
+                const testDir: string = 'downloadArtifactSource1';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');

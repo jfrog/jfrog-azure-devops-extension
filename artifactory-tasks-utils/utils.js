@@ -339,11 +339,11 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    return '"' + str + '"';
+    return str ? '"' + str + '"' : "";
 }
 
 function singleQuote(str) {
-    return "'" + str + "'";
+    return str ? "'" + str + "'" : "";
 }
 
 function addServiceConnectionCredentials(cliCommand, serviceConnection) {
