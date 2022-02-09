@@ -23,7 +23,7 @@ function RunTaskCbk(cliPath) {
         cliBuildPublishCommand,
         utils.quote(buildName),
         utils.quote(buildNumber),
-        '--env-exclude=' + utils.quote(excludeEnvVars)
+        excludeEnvVars ? '--env-exclude=' + utils.quote(excludeEnvVars) : ""
     );
     cliCommand = addBuildUrl(cliCommand);
     cliCommand = utils.addProjectOption(cliCommand);
@@ -59,11 +59,13 @@ function attachBuildInfoUrl(buildName, buildNumber, workDir) {
 function addBuildUrl(cliCommand) {
     let collectionUri = tl.getVariable('System.TeamFoundationCollectionUri');
     let projectName = tl.getVariable('System.TeamProject');
-    let buildId = tl.getVariable('Build.BuildId');
-    let releaseId = tl.getVariable('Release.ReleaseId');
+    if (collectionUri && projectName) {
+        let buildId = tl.getVariable('Build.BuildId');
+        let releaseId = tl.getVariable('Release.ReleaseId');
 
-    let buildUrl = collectionUri + projectName + '/_' + (releaseId ? 'release?releaseId=' + releaseId : 'build?buildId=' + buildId);
-    cliCommand = utils.cliJoin(cliCommand, '--build-url=' + utils.quote(buildUrl));
+        let buildUrl = collectionUri + projectName + '/_' + (releaseId ? 'release?releaseId=' + releaseId : 'build?buildId=' + buildId);
+        cliCommand = utils.cliJoin(cliCommand, '--build-url=' + utils.quote(buildUrl));
+    }
     return cliCommand;
 }
 
