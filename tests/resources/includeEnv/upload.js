@@ -9,6 +9,8 @@ let variables = {
     'Build.DefinitionName': BUILD_NAME,
     'Build.BuildNumber': BUILD_NUMBER,
     'Build.password': 'open-sesame',
+    'Build.token': 'open-sesame',
+    'Build.secret': 'open-sesame',
     'Build.undefined': 'undefined',
     'Build.null': 'null'
 };

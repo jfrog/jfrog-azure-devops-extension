@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
 
 let inputs = {
-    buildName: 'downloadArtifactSource',
+    buildName: 'downloadArtifactSource1',
     buildNumber: '5'
 };
 

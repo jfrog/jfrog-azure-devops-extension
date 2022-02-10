@@ -339,7 +339,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Download artifact source',
             (): void => {
-                const testDir: string = 'downloadArtifactSource';
+                const testDir: string = 'downloadArtifactSource1';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
@@ -378,7 +378,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertBuildEnv(build, 'buildInfo.env.BUILD_BUILDNUMBER', '3');
                 assertBuildEnv(build, 'buildInfo.env.BUILD_UNDEFINED', 'undefined');
                 assertBuildEnv(build, 'buildInfo.env.BUILD_NULL', 'null');
-                assertBuildEnv(build, 'buildInfo.env.BUILD_PASSWORD', 'open-sesame');
+                // Default excluded by CLI (*password*;*psw*;*secret*;*key*;*token*;*auth*):
+                assertBuildEnv(build, 'buildInfo.env.BUILD_PASSWORD', undefined);
+                assertBuildEnv(build, 'buildInfo.env.BUILD_TOKEN', undefined);
+                assertBuildEnv(build, 'buildInfo.env.BUILD_SECRET', undefined);
                 deleteBuild('includeEnv');
             },
             TestUtils.isSkipTest('generic')
@@ -413,7 +416,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertBuildEnv(build, 'buildInfo.env.BUILD_BUILDNUMBER', '3');
                 assertBuildEnv(build, 'buildInfo.env.BUILD_UNDEFINED', 'undefined');
                 assertBuildEnv(build, 'buildInfo.env.BUILD_NULL', 'null');
+                // Only *password* should be excluded
                 assertBuildEnv(build, 'buildInfo.env.BUILD_PASSWORD', undefined);
+                assertBuildEnv(build, 'buildInfo.env.BUILD_TOKEN', 'open-sesame');
+                assertBuildEnv(build, 'buildInfo.env.BUILD_SECRET', 'open-sesame');
                 deleteBuild('excludeEnv');
             },
             TestUtils.isSkipTest('generic')
