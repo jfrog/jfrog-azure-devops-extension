@@ -55,7 +55,7 @@
             "name": "excludeEnvVars",
             "type": "string",
             "label": "Exclude environment variables",
-            "defaultValue": "*password*;*secret*;*key*;*token*",
+            "defaultValue": "*password*;*psw*;*secret*;*key*;*token*;*auth*;",
             "required": false,
             "helpMarkDown": "List of case insensitive patterns in the form of value1;value2;.... Environment variables match those patterns will be excluded from the published build info."
         }
