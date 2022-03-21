@@ -87,9 +87,9 @@ function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
     cliCommand = utils.addStringParam(cliCommand, repoResolve, 'repo-resolve', true);
 
     if (isNugetProtocolSelectionSupported()) {
-        // Using Nuget protocol v2 by default.
+        // Using Nuget protocol v3 by default.
         let nugetProtocolVersion = tl.getInput('nugetProtocolVersion', false);
-        if (!nugetProtocolVersion || nugetProtocolVersion === 'v2') {
+        if (nugetProtocolVersion && nugetProtocolVersion === 'v2') {
             cliCommand = utils.cliJoin(cliCommand, '--nuget-v2');
         }
     }

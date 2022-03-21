@@ -193,7 +193,7 @@
             "type": "radio",
             "label": "NuGet protocol version",
             "required": false,
-            "defaultValue": "v2",
+            "defaultValue": "v3",
             "visibleRule": "command = restore",
             "options": {
                 "v2": "v2",
