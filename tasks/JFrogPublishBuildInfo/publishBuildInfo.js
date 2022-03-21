@@ -23,7 +23,7 @@ function RunTaskCbk(cliPath) {
         cliBuildPublishCommand,
         utils.quote(buildName),
         utils.quote(buildNumber),
-        excludeEnvVars ? '--env-exclude=' + utils.quote(excludeEnvVars) : ""
+        excludeEnvVars ? '--env-exclude=' + utils.quote(excludeEnvVars) : ''
     );
     cliCommand = addBuildUrl(cliCommand);
     cliCommand = utils.addProjectOption(cliCommand);

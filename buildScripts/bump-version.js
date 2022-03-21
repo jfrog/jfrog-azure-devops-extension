@@ -40,9 +40,10 @@ function assertVersion() {
     let vssExtensionJson = JSON.parse(vssExtension);
     let oldExtensionVersionSplit = vssExtensionJson.version.split('.');
     assert.ok(
-        ((oldExtensionVersionSplit[1] < requestedVersionSplit[1]) && (requestedVersionSplit[2] === 0)) || // Minor release
-        ((oldExtensionVersionSplit[1] === requestedVersionSplit[1]) && (oldExtensionVersionSplit[2] < requestedVersionSplit[2])), // Patch release
-        'Input version must be bigger than current version')
+        (oldExtensionVersionSplit[1] < requestedVersionSplit[1] && requestedVersionSplit[2] === 0) || // Minor release
+            (oldExtensionVersionSplit[1] === requestedVersionSplit[1] && oldExtensionVersionSplit[2] < requestedVersionSplit[2]), // Patch release
+        'Input version must be bigger than current version'
+    );
     assert.strictEqual(oldExtensionVersionSplit[0], requestedVersionSplit[0], 'Upgrading Major version using this script is forbidden');
 }
 
@@ -64,7 +65,14 @@ function updateTasksVersion() {
                     let taskVersionDirJson = path.join(taskDir, versToBuild, 'task.json');
                     if (fs.existsSync(taskVersionDirJson)) {
                         console.log(
-                            'Updating version of task ' + taskName + ', version: ' + versToBuild + ' to X.' + requestedVersionSplit[1] + '.' + requestedVersionSplit[2]
+                            'Updating version of task ' +
+                                taskName +
+                                ', version: ' +
+                                versToBuild +
+                                ' to X.' +
+                                requestedVersionSplit[1] +
+                                '.' +
+                                requestedVersionSplit[2]
                         );
                         updateTaskJsonWithNewVersion(taskVersionDirJson);
                     }

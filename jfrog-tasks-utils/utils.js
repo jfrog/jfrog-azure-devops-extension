@@ -203,7 +203,7 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         if (!stdio) {
             stdio = [0, 1, 2];
         }
-        console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand))
+        console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand));
         return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
     } catch (ex) {
         // Error occurred - mask secrets in message.
@@ -221,8 +221,11 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    return str.replace(/--password=".*?"/g, '--password=***').replace(/--access-token=".*?"/g, '--access-token=***')
-        .replace(/--password='.*?'/g, '--password=***').replace(/--access-token='.*?'/g, '--access-token=***');
+    return str
+        .replace(/--password=".*?"/g, '--password=***')
+        .replace(/--access-token=".*?"/g, '--access-token=***')
+        .replace(/--password='.*?'/g, '--password=***')
+        .replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
 function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
@@ -381,11 +384,11 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    return str ? '"' + str + '"' : "";
+    return str ? '"' + str + '"' : '';
 }
 
 function singleQuote(str) {
-    return str ? "'" + str + "'" : "";
+    return str ? "'" + str + "'" : '';
 }
 
 function addStringParam(cliCommand, inputParam, cliParam, require) {

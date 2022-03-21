@@ -54,7 +54,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             ' --user=' +
                             jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME || '') +
                             ' --password=' +
-                            jfrogUtils.quote("SUPER_SECRET"),
+                            jfrogUtils.quote('SUPER_SECRET'),
                         TestUtils.testDataDir,
                         ['']
                     );
@@ -63,7 +63,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 }
                 assert.ok(retVal !== '', 'An exception should have been caught');
                 process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;
-                assert.ok(!retVal.toString().includes("SUPER_SECRET"), 'Output contains password');
+                assert.ok(!retVal.toString().includes('SUPER_SECRET'), 'Output contains password');
             },
             TestUtils.isSkipTest('unit')
         );
