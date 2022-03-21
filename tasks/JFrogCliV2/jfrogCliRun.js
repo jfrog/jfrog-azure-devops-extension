@@ -1,5 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
+const fs = require('fs');
 
 let serverId;
 RunJfrogCliCommand(RunTaskCbk);
@@ -26,14 +27,22 @@ function RunJfrogCliCommand(RunTaskCbk) {
 }
 
 function RunTaskCbk(cliPath) {
-    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
-    if (!workDir) {
+    let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
+    if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
 
+    // Determine working directory for the cli.
+    let inputWorkingDirectory = tl.getInput('workingDirectory', false);
+    let requiredWorkDir = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
+    if (!fs.existsSync(requiredWorkDir) || !fs.lstatSync(requiredWorkDir).isDirectory()) {
+        tl.setResult(tl.TaskResult.Failed, "Provided 'Working Directory': " + requiredWorkDir + ' neither exists nor a directory.');
+        return;
+    }
+
     serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
-    utils.configureDefaultJfrogServer(serverId, cliPath, workDir);
+    utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
 
     let cliCommand = tl.getInput('command', true);
     if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {
@@ -49,11 +58,11 @@ function RunTaskCbk(cliPath) {
         cliCommand = utils.cliJoin(cliPath, cliCommand);
         cliCommand = utils.addServerIdOption(cliCommand, serverId);
         // Execute the cli command.
-        utils.executeCliCommand(cliCommand, workDir);
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
-        utils.deleteCliServers(cliPath, workDir, [serverId]);
+        utils.deleteCliServers(cliPath, requiredWorkDir, [serverId]);
     }
     tl.setResult(tl.TaskResult.Succeeded, 'Command Succeeded.', cliPath);
 }

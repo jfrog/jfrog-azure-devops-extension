@@ -55,6 +55,14 @@
                 "expression": "isMatch(value, '^jf ', 'IgnoreCase')",
                 "message": "The command must start with `jf `."
             }
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory.",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
         }
     ],
     "execution": {
