@@ -24,7 +24,7 @@ function RunTaskCbk(cliPath) {
         utils.quote(buildName),
         utils.quote(buildNumber),
         '--url=' + utils.quote(artifactoryUrl),
-        excludeEnvVars ? '--env-exclude=' + utils.quote(excludeEnvVars) : ""
+        excludeEnvVars ? '--env-exclude=' + utils.quote(excludeEnvVars) : ''
     );
     cliCommand = addBuildUrl(cliCommand);
     cliCommand = utils.addServiceConnectionCredentials(cliCommand, artifactoryService);
