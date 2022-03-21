@@ -1,4 +1,4 @@
 - [ ] All [tests](https://github.com/jfrog/jfrog-azure-devops-extension#testing) passed. If this feature is not already covered by the tests, I added new tests.
-- [ ] This pull request is on the dev branch.
+- [ ] This pull request is on the dev-v1 branch.
 - [ ] I used `npm run format` for formatting the code before submitting the pull request.
 -----
