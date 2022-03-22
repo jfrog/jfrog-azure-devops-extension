@@ -68,9 +68,9 @@ function handleGenericUpload(cliPath, workDir) {
     cliCommand = utils.addBoolParam(cliCommand, 'preserveSymlinks', 'symlinks');
     cliCommand = addDebParam(cliCommand);
 
-    let syncDeletes = tl.getBoolInput('syncDeletesRemote');
-    if (syncDeletes) {
-        cliCommand = utils.addStringParam(cliCommand, 'syncDeletesPathRemote', 'sync-deletes', false);
+    let syncDeletesPath = tl.getInput('syncDeletesPathRemote', false);
+    if (syncDeletesPath) {
+        cliCommand = utils.cliJoin(cliCommand, '--' + 'sync-deletes' + '=' + utils.quote(syncDeletesPath));
     }
     performGenericTask(cliCommand, cliPath, workDir);
 }
@@ -85,9 +85,9 @@ function handleGenericDownload(cliPath, workDir) {
 
     cliCommand = utils.addBoolParam(cliCommand, 'validateSymlinks', 'validate-symlinks');
 
-    let syncDeletes = tl.getBoolInput('syncDeletesLocal');
-    if (syncDeletes) {
-        cliCommand = utils.addStringParam(cliCommand, 'syncDeletesPathLocal', 'sync-deletes', false);
+    let syncDeletesPath = tl.getInput('syncDeletesPathLocal', false);
+    if (syncDeletesPath) {
+        cliCommand = utils.cliJoin(cliCommand, '--' + 'sync-deletes' + '=' + utils.quote(syncDeletesPath));
     }
     performGenericTask(cliCommand, cliPath, workDir);
 }
