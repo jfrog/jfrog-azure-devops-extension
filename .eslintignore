@@ -4,3 +4,12 @@
 **/*.d.ts
 coverage
 .eslintrc.js
+tests/resources/*
+scripts/build-info.js
+buildScripts/*
+
+# Ignore ts outputs
+distribution.js
+pipBuild.js
+tests.js
+testUtils.js
