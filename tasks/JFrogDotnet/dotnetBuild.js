@@ -31,10 +31,10 @@ function performDotnetRestore(cliPath) {
         } else {
             sourcePath = sourceFile;
         }
-        let configuredServerIdsArray = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
+        let resolverServerId = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
         let dotnetArguments = buildDotnetCliArgs();
         let dotnetCommand = utils.cliJoin(cliPath, cliDotnetCoreRestoreCommand, dotnetArguments);
-        executeCliCommand(dotnetCommand, sourcePath, cliPath, configuredServerIdsArray);
+        executeCliCommand(dotnetCommand, sourcePath, cliPath, [resolverServerId]);
     });
 }
 
@@ -76,7 +76,28 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) 
 
 // Create dotnet config
 function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
-    return utils.createBuildToolConfigFile(cliPath, 'dotnet', requiredWorkDir, dotnetConfigCommand, repoResolve, null);
+    let cliCommand = utils.cliJoin(cliPath, dotnetConfigCommand);
+
+    // Create serverId
+    const resolverServerId = utils.configureDefaultArtifactoryServer('dotnet_resolver', cliPath, requiredWorkDir);
+
+    // Add serverId and repo to config command
+    cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(resolverServerId));
+    cliCommand = utils.addStringParam(cliCommand, repoResolve, 'repo-resolve', true);
+
+    // Using Nuget protocol v3 by default.
+    let nugetProtocolVersion = tl.getInput('nugetProtocolVersion', false);
+    if (nugetProtocolVersion && nugetProtocolVersion === 'v2') {
+        cliCommand = utils.cliJoin(cliCommand, '--nuget-v2');
+    }
+
+    // Execute cli.
+    try {
+        utils.executeCliCommand(cliCommand, requiredWorkDir, null);
+        return resolverServerId;
+    } catch (ex) {
+        tl.setResult(tl.TaskResult.Failed, ex);
+    }
 }
 
 // Creates the .NET Core CLI arguments
