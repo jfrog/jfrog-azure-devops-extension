@@ -376,7 +376,7 @@
             "required": false,
             "groupName": "advanced",
             "visibleRule": "command=Upload",
-            "helpMarkDown": "If you'd like to sync dependencies after the upload, set a specific path in Artifactory. Leave empty otherwise.\nIf set, after the upload completes, this path will include only the artifacts uploaded during this upload operation. The other files under this path will be deleted."
+            "helpMarkDown": "If you'd like to sync artifacts after the upload, set a specific path in Artifactory. Leave empty otherwise.\nIf set, after the upload completes, this path will include only the artifacts uploaded during this upload operation. The other files under this path will be deleted."
         }
     ],
     "execution": {
