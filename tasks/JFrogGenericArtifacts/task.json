@@ -20,7 +20,19 @@
     "instanceNameFormat": "JFrog Generic Artifacts $(command)",
     "groups": [
         {
-            "name": "advanced",
+            "name": "advancedDownload",
+            "displayName": "Download Settings",
+            "isExpanded": false,
+            "visibleRule": "command = Download"
+        },
+        {
+            "name": "advancedUpload",
+            "displayName": "Upload Settings",
+            "isExpanded": false,
+            "visibleRule": "command = Upload"
+        },
+        {
+            "name": "advancedCommon",
             "displayName": "Advanced",
             "isExpanded": false
         }
@@ -195,7 +207,7 @@
             "label": "Skip TLS certificates verification",
             "defaultValue": "false",
             "required": false,
-            "groupName": "advanced"
+            "groupName": "advancedCommon"
         },
         {
             "name": "threads",
@@ -203,7 +215,7 @@
             "label": "# of threads",
             "defaultValue": "3",
             "required": false,
-            "groupName": "advanced",
+            "groupName": "advancedCommon",
             "helpMarkDown": "The number of parallel threads that should be used.",
             "options": {
                 "1": "1",
@@ -234,7 +246,7 @@
             "label": "# of retries",
             "defaultValue": "3",
             "required": false,
-            "groupName": "advanced",
+            "groupName": "advancedCommon",
             "helpMarkDown": "Retries.\nNumber of HTTP retries.",
             "options": {
                 "0": "0",
@@ -258,8 +270,7 @@
             "label": "# of splits",
             "defaultValue": "3",
             "required": false,
-            "groupName": "advanced",
-            "visibleRule": "command=Download",
+            "groupName": "advancedDownload",
             "helpMarkDown": "The number of segments into which each file should be split for download (provided the artifact is over the \"min split\" in size).\nTo download each file in a single thread, set to 0.",
             "options": {
                 "0": "0",
@@ -298,7 +309,7 @@
             "defaultValue": "5120",
             "required": false,
             "visibleRule": "splitCount!=0",
-            "groupName": "advanced",
+            "groupName": "advancedDownload",
             "helpMarkDown": "Files larger than the specified number will be split into equally sized \"# of splits\" segments.\nAny files smaller than the specified number will be downloaded in a single thread. If set to -1, files are not split.\nThe default value is 5120"
         },
         {
@@ -307,8 +318,7 @@
             "label": "Validate symlinks are pointing to existing and unchanged files",
             "defaultValue": "false",
             "required": false,
-            "groupName": "advanced",
-            "visibleRule": "command=Download",
+            "groupName": "advancedDownload",
             "helpMarkDown": "Validation is done by comparing file's sha1.\nApplicable to files and not directories."
         },
         {
@@ -317,8 +327,7 @@
             "label": "Path to sync and delete files from in the local file system",
             "defaultValue": "",
             "required": false,
-            "groupName": "advanced",
-            "visibleRule": "command=Download",
+            "groupName": "advancedDownload",
             "helpMarkDown": "If you'd like to sync dependencies after the download, set a specific local file system path. Leave empty otherwise.\nIf set, after the download completes, this path will include only the dependencies downloaded during this download operation. The other files under this path will be deleted."
         },
         {
@@ -327,8 +336,7 @@
             "label": "Preserve soft links structure in Artifactory",
             "defaultValue": "false",
             "required": false,
-            "groupName": "advanced",
-            "visibleRule": "command=Upload",
+            "groupName": "advancedUpload",
             "helpMarkDown": "Select if you'd like that Symlink file representation will contain the symbolic link and checksum properties."
         },
         {
@@ -337,8 +345,7 @@
             "label": "Set Debian properties",
             "defaultValue": "false",
             "required": false,
-            "groupName": "advanced",
-            "visibleRule": "command=Upload",
+            "groupName": "advancedUpload",
             "helpMarkDown": "Select if you'd like to Specify the distribution/component/architecture of the package.\nUsed for Debian packages only."
         },
         {
@@ -347,7 +354,7 @@
             "label": "Distribution",
             "defaultValue": "",
             "required": true,
-            "groupName": "advanced",
+            "groupName": "advancedUpload",
             "visibleRule": "setDebianProps=true"
         },
         {
@@ -356,7 +363,7 @@
             "label": "Component",
             "defaultValue": "",
             "required": true,
-            "groupName": "advanced",
+            "groupName": "advancedUpload",
             "visibleRule": "setDebianProps=true"
         },
         {
@@ -365,7 +372,7 @@
             "label": "Architecture",
             "defaultValue": "",
             "required": true,
-            "groupName": "advanced",
+            "groupName": "advancedUpload",
             "visibleRule": "setDebianProps=true"
         },
         {
@@ -374,8 +381,7 @@
             "label": "Path to sync and delete files from in Artifactory",
             "defaultValue": "",
             "required": false,
-            "groupName": "advanced",
-            "visibleRule": "command=Upload",
+            "groupName": "advancedUpload",
             "helpMarkDown": "If you'd like to sync artifacts after the upload, set a specific path in Artifactory. Leave empty otherwise.\nIf set, after the upload completes, this path will include only the artifacts uploaded during this upload operation. The other files under this path will be deleted."
         }
     ],
