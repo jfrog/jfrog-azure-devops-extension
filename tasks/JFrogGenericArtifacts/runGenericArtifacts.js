@@ -132,7 +132,7 @@ function performGenericTask(cliCommand, cliPath, workDir) {
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
-        utils.deleteCliServers(cliPath, workDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, workDir, [serverId]);
         // Remove created fileSpec from file system.
         try {
             tl.rmRF(specPath);
@@ -189,7 +189,7 @@ function performArtifactSourceDownload(cliPath, workDir) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, workDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, workDir, [serverId]);
     }
 }
 

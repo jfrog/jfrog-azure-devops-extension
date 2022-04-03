@@ -100,7 +100,7 @@ function executeGoCliCommand(cliCommand, cliPath, requiredWorkDir) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerIdsArray);
+        utils.taskDefaultCleanup(cliPath, requiredWorkDir, configuredServerIdsArray);
     }
     // Ignored if the build's result was previously set to 'Failed'.
     tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');

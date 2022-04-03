@@ -34,7 +34,7 @@ function RunTaskCbk(cliPath) {
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, workDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, workDir, [serverId]);
     }
 }
 

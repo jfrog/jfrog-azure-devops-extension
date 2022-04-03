@@ -1,7 +1,5 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
-const fs = require('fs-extra');
-const path = require('path');
 const execSync = require('child_process').execSync;
 
 const cliMavenCommand = 'mvn';
@@ -110,16 +108,11 @@ function createMavenConfigFile(cliPath, buildDir) {
 
 function cleanup(cliPath, workDir) {
     // Delete servers.
-    utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
+    utils.taskDefaultCleanup(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
     // Remove extractor variables.
     try {
         utils.removeExtractorsDownloadVariables(cliPath, workDir);
-        tl.debug('Removing JFrog CLI Maven configuration');
-        const configPath = path.join(workDir, '.jfrog', 'projects');
-        if (fs.pathExistsSync(configPath)) {
-            fs.removeSync(configPath);
-        }
-    } catch (cleanupException) {
-        tl.setResult(tl.TaskResult.Failed, cleanupException);
+    } catch (removeVariablesException) {
+        tl.setResult(tl.TaskResult.Failed, removeVariablesException);
     }
 }
