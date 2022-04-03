@@ -114,7 +114,7 @@ function cleanup(cliPath, workDir) {
     // Remove extractor variables.
     try {
         utils.removeExtractorsDownloadVariables(cliPath, workDir);
-        tl.debug("Removing JFrog CLI Maven configuration")
+        tl.debug('Removing JFrog CLI Maven configuration');
         const configPath = path.join(workDir, '.jfrog', 'projects');
         if (fs.pathExistsSync(configPath)) {
             fs.removeSync(configPath);
