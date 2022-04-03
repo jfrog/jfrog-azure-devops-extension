@@ -1,5 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
+const path = require("path");
+const fs = require('fs-extra');
 
 const cliGradleCommand = 'gradle';
 const gradleConfigCommand = 'gradlec';
@@ -105,7 +107,12 @@ function cleanup(cliPath, workDir) {
     // Remove extractor variables.
     try {
         utils.removeExtractorsDownloadVariables(cliPath, workDir);
-    } catch (removeVariablesException) {
-        tl.setResult(tl.TaskResult.Failed, removeVariablesException);
+        tl.debug("Removing JFrog CLI Gradle configuration")
+        const configPath = path.join(workDir, '.jfrog', 'projects');
+        if (fs.pathExistsSync(configPath)) {
+            fs.removeSync(configPath);
+        }
+    } catch (cleanupException) {
+        tl.setResult(tl.TaskResult.Failed, cleanupException);
     }
 }
