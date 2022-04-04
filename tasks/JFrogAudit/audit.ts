@@ -38,7 +38,7 @@ function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): v
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
     } finally {
-        utils.deleteCliServers(cliPath, buildDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, buildDir, [serverId]);
     }
 }
 

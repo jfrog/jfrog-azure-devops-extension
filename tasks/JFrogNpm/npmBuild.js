@@ -76,7 +76,7 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        utils.deleteCliServers(cliPath, requiredWorkDir, configuredServerIdsArray);
+        utils.taskDefaultCleanup(cliPath, requiredWorkDir, configuredServerIdsArray);
     }
 }
 

@@ -123,7 +123,7 @@ function execCli(cliPath: string, workDir: string, cliCommand: string, allowDryR
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
     } finally {
-        utils.deleteCliServers(cliPath, workDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, workDir, [serverId]);
     }
 }
 

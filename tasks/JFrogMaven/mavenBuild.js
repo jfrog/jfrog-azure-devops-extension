@@ -108,7 +108,7 @@ function createMavenConfigFile(cliPath, buildDir) {
 
 function cleanup(cliPath, workDir) {
     // Delete servers.
-    utils.deleteCliServers(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
+    utils.taskDefaultCleanup(cliPath, workDir, [serverIdDeployer, serverIdResolver]);
     // Remove extractor variables.
     try {
         utils.removeExtractorsDownloadVariables(cliPath, workDir);

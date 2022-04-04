@@ -46,8 +46,6 @@ function RunTaskCbk(cliPath) {
         serverId = utils.configureDefaultArtifactoryServer('extractors_resolver', cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
-        utils.deleteCliServers(cliPath, workDir, [serverId]);
-
         return;
     }
 

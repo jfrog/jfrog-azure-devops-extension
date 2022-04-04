@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
@@ -51,7 +51,7 @@ module.exports = {
     isToolExists: isToolExists,
     buildCliArtifactoryDownloadUrl: buildCliArtifactoryDownloadUrl,
     createAuthHandlers: createAuthHandlers,
-    deleteCliServers: deleteCliServers,
+    taskDefaultCleanup: taskDefaultCleanup,
     writeSpecContentToSpecPath: writeSpecContentToSpecPath,
     stripTrailingSlash: stripTrailingSlash,
     determineCliWorkDir: determineCliWorkDir,
@@ -335,11 +335,15 @@ function useCliServer(serverId, cliPath, buildDir) {
 }
 
 /**
- * Remove servers from the cli config.
- * @returns (Buffer|string) CLI execution output.
- * @throws In CLI execution failure.
+ * Remove servers from the JFrog CLI config.
+ * @param cliPath - Path to JFrog CLI
+ * @param buildDir - Build / Working directory
+ * @param serverIdArray - Array of server IDs to remove
  */
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
+    if (!serverIdArray) {
+        return;
+    }
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
         try {
             if (serverIdArray[i]) {
@@ -779,4 +783,24 @@ function addProjectOption(cliCommand) {
 
 function addServerIdOption(cliCommand, serverId) {
     return cliJoin(cliCommand, '--server-id=' + quote(serverId));
+}
+
+/**
+ * Default cleanup of a task - removes JFrog CLI server and build tool configurations.
+ * @param cliPath - Path to JFrog CLI
+ * @param workDir - Working Directory
+ * @param serverIdsArray - Array of server IDs to be removed.
+ */
+function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
+    // Delete servers if exist.
+    deleteCliServers(cliPath, workDir, serverIdsArray);
+    try {
+        const configPath = path.join(workDir, '.jfrog', 'projects');
+        if (fs.pathExistsSync(configPath)) {
+            tl.debug('Removing JFrog CLI build tool configuration...');
+            fs.removeSync(configPath);
+        }
+    } catch (cleanupException) {
+        tl.setResult(tl.TaskResult.Failed, cleanupException);
+    }
 }

@@ -44,7 +44,7 @@ function RunTaskCbk(cliPath) {
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
-        utils.deleteCliServers(cliPath, defaultWorkDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, defaultWorkDir, [serverId]);
         // Remove created config file from file system.
         try {
             tl.rmRF(configPath);

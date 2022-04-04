@@ -68,9 +68,7 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) 
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {
-        if (configuredServerIdsArray) {
-            utils.deleteCliServers(cliPath, buildDir, configuredServerIdsArray);
-        }
+        utils.taskDefaultCleanup(cliPath, buildDir, configuredServerIdsArray);
     }
 }
 

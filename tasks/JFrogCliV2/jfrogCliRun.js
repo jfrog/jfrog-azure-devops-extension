@@ -50,6 +50,7 @@ function RunTaskCbk(cliPath) {
             tl.TaskResult.Failed,
             "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf '. The command received is: " + cliCommand
         );
+        utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
         return;
     }
     try {
@@ -62,7 +63,7 @@ function RunTaskCbk(cliPath) {
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
-        utils.deleteCliServers(cliPath, requiredWorkDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
     }
     tl.setResult(tl.TaskResult.Succeeded, 'Command Succeeded.', cliPath);
 }
