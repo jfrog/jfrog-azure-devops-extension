@@ -43,7 +43,7 @@ function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): v
         tl.setResult(tl.TaskResult.Failed, ex as string);
     } finally {
         if (configuredServerIds) {
-            utils.deleteCliServers(cliPath, buildDir, configuredServerIds);
+            utils.taskDefaultCleanup(cliPath, buildDir, configuredServerIds);
         }
     }
 }
