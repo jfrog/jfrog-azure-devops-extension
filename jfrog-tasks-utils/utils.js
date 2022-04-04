@@ -335,9 +335,10 @@ function useCliServer(serverId, cliPath, buildDir) {
 }
 
 /**
- * Remove servers from the cli config.
- * @returns (Buffer|string) CLI execution output.
- * @throws In CLI execution failure.
+ * Remove servers from the JFrog CLI config.
+ * @param cliPath - Path to JFrog CLI
+ * @param buildDir - Build / Working directory
+ * @param serverIdArray - Array of server IDs to remove
  */
 function deleteCliServers(cliPath, buildDir, serverIdArray) {
     if (!serverIdArray) {
