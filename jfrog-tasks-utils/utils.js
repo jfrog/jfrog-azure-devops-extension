@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task');
 const path = require('path');
 const execSync = require('child_process').execSync;
@@ -796,9 +796,9 @@ function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
     deleteCliServers(cliPath, workDir, serverIdsArray);
     try {
         const configPath = path.join(workDir, '.jfrog', 'projects');
-        if (fs.pathExistsSync(configPath)) {
+        if (fs.existsSync(configPath)) {
             tl.debug('Removing JFrog CLI build tool configuration...');
-            fs.removeSync(configPath);
+            tl.rmRF(configPath);
         }
     } catch (cleanupException) {
         tl.setResult(tl.TaskResult.Failed, cleanupException);
