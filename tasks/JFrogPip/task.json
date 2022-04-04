@@ -65,7 +65,10 @@
             "defaultValue": "",
             "required": true,
             "visibleRule": "command = install",
-            "helpMarkDown": "Sets the resolution repository."
+            "helpMarkDown": "Sets the resolution repository.",
+            "properties": {
+                "EditableOptions": "True"
+            }
         },
         {
             "name": "collectBuildInfo",
