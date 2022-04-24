@@ -30,8 +30,12 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     try {
-        utils.executeCliCommand(cliCommand, workDir);
-        attachBuildInfoUrl(buildName, buildNumber, workDir);
+        let taskRes = utils.executeCliCommand(cliCommand, workDir, 'pipe');
+        let resJson = JSON.parse(taskRes);
+        let buildInfoUrl = resJson['buildInfoUiUrl'];
+        if (buildInfoUrl) {
+            attachBuildInfoUrl(buildInfoUrl, workDir);
+        }
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -40,14 +44,10 @@ function RunTaskCbk(cliPath) {
     }
 }
 
-function attachBuildInfoUrl(buildName, buildNumber, workDir) {
-    let artifactoryService = tl.getInput('artifactoryConnection', true);
-    let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
+function attachBuildInfoUrl(buildInfoUrl, workDir) {
     let artifactoryUrlFile = path.join(workDir, 'artifactoryUrlFile');
     let buildDetails = {
-        artifactoryUrl: artifactoryUrl,
-        buildName: buildName,
-        buildNumber: buildNumber
+        buildInfoUiUrl: buildInfoUrl
     };
 
     tl.writeFile(artifactoryUrlFile, JSON.stringify(buildDetails));

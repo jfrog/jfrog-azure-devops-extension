@@ -55,8 +55,13 @@ define(['TFS/DistributedTask/TaskRestClient'], taskRestClient => {
 
         buildInfoIcon.src = 'images/artifactory-build-info.png';
         buildInfoUrlDiv.classList.add('build-info-url');
-        buildInfoUrlDiv.href =
-            stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        if (buildDetails.buildInfoUiUrl) {
+            buildInfoUrlDiv.href = buildDetails.buildInfoUiUrl;
+        } else {
+            // Backward compatibility.
+            buildInfoUrlDiv.href =
+                stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        }
         buildInfoUrlDiv.text = 'Artifactory Build Info';
         buildInfoUrlDiv.target = '_blank';
         buildInfoDiv.append(buildInfoIcon);
