@@ -561,6 +561,8 @@ function getArchitecture() {
     switch (process.arch) {
         case 'amd64':
             return 'linux-amd64';
+        case 'x64':
+            return 'linux-amd64';
         case 'arm64':
             return 'linux-arm64';
         case 'arm':
