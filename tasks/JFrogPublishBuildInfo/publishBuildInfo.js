@@ -30,8 +30,13 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     try {
-        utils.executeCliCommand(cliCommand, workDir);
-        attachBuildInfoUrl(buildName, buildNumber, workDir);
+        let taskRes = utils.executeCliCommand(cliCommand, workDir, 'pipe');
+        let buildInfoUrl = '';
+        if (taskRes && taskRes.length) {
+            let resJson = JSON.parse(taskRes);
+            buildInfoUrl = resJson['buildInfoUiUrl'];
+        }
+        attachBuildInfoUrl(buildInfoUrl, buildName, buildNumber, workDir);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -40,11 +45,14 @@ function RunTaskCbk(cliPath) {
     }
 }
 
-function attachBuildInfoUrl(buildName, buildNumber, workDir) {
+function attachBuildInfoUrl(buildInfoUrl, buildName, buildNumber, workDir) {
     let artifactoryService = tl.getInput('artifactoryConnection', true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let artifactoryUrlFile = path.join(workDir, 'artifactoryUrlFile');
     let buildDetails = {
+        buildInfoUiUrl: buildInfoUrl,
+        // Set the following fields for backward compatibility,
+        // in case the JFrog CLI version used does not support the build-publish command output (>=2.17.0)
         artifactoryUrl: artifactoryUrl,
         buildName: buildName,
         buildNumber: buildNumber

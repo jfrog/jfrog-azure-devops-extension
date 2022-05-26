@@ -55,8 +55,15 @@ define(['TFS/DistributedTask/TaskRestClient'], taskRestClient => {
 
         buildInfoIcon.src = 'images/artifactory-build-info.png';
         buildInfoUrlDiv.classList.add('build-info-url');
-        buildInfoUrlDiv.href =
-            stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        // Supported since JFrog CLI version 2.17.0.
+        if (buildDetails.buildInfoUiUrl) {
+            buildInfoUrlDiv.href = buildDetails.buildInfoUiUrl;
+        } else {
+            // Backward compatibility - if a lower JFrog CLI version is used,
+            // or for tasks that completed before the above functionality was introduced.
+            buildInfoUrlDiv.href =
+                stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
+        }
         buildInfoUrlDiv.text = 'Artifactory Build Info';
         buildInfoUrlDiv.target = '_blank';
         buildInfoDiv.append(buildInfoIcon);
