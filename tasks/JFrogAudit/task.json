@@ -80,6 +80,15 @@
             "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
         },
         {
+            "name": "licenses",
+            "type": "boolean",
+            "label": "Show licenses",
+            "defaultValue": "false",
+            "required": true,
+            "visibleRule": "watchesSource=none",
+            "helpMarkDown": "Set to true if you'd like to receive licenses from Xray scanning."
+        },
+        {
             "name": "allowFailBuild",
             "type": "boolean",
             "label": "Allow fail build",

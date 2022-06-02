@@ -20,22 +20,10 @@
     "instanceNameFormat": "JFrog Docker $(command)",
     "groups": [
         {
-            "name": "push",
-            "displayName": "Push Settings",
+            "name": "advanced",
+            "displayName": "Advanced",
             "isExpanded": false,
-            "visibleRule": "command = Push"
-        },
-        {
-            "name": "pull",
-            "displayName": "Pull Settings",
-            "isExpanded": false,
-            "visibleRule": "command = Pull"
-        },
-        {
-            "name": "scan",
-            "displayName": "Scan Settings",
-            "isExpanded": false,
-            "visibleRule": "command = Scan"
+            "visibleRule": "command != Custom"
         }
     ],
     "inputs": [
@@ -47,10 +35,20 @@
             "options": {
                 "Pull": "Pull",
                 "Push": "Push",
-                "Scan": "Scan"
+                "Scan": "Scan",
+                "Custom": "Custom"
             },
             "required": true,
             "helpMarkDown": "The docker command to be run by this task."
+        },
+        {
+            "name": "customCommandAndArgs",
+            "type": "string",
+            "label": "Command and arguments to execute",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "command=Custom",
+            "helpMarkDown": "Custom docker command to execute with JFrog CLI."
         },
         {
             "name": "xrayConnection",
@@ -68,7 +66,7 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Artifactory service to use in the command.",
-            "visibleRule": "command != Scan"
+            "visibleRule": "command != Scan && command != Custom"
         },
         {
             "name": "imageName",
@@ -76,6 +74,7 @@
             "label": "Image name",
             "defaultValue": "",
             "required": true,
+            "visibleRule": "command != Custom",
             "helpMarkDown": "The docker image to push [DOMAIN]/[NAME]:[TAG]."
         },
         {
@@ -124,6 +123,15 @@
             "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
         },
         {
+            "name": "licenses",
+            "type": "boolean",
+            "label": "Show licenses",
+            "defaultValue": "false",
+            "required": true,
+            "visibleRule": "watchesSource=none",
+            "helpMarkDown": "Select if you'd like to receive licenses from Xray scanning."
+        },
+        {
             "name": "allowFailBuild",
             "type": "boolean",
             "label": "Allow fail build",
@@ -138,7 +146,7 @@
             "label": "Collect build info",
             "defaultValue": "false",
             "required": false,
-            "visibleRule": "command != Scan",
+            "visibleRule": "command != Scan && command != Custom",
             "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"JFrog Publish Build Info\" task."
         },
         {
@@ -176,6 +184,46 @@
             "required": false,
             "visibleRule": "collectBuildInfo=true",
             "helpMarkDown": "JFrog project key."
+        },
+        {
+            "name": "threads",
+            "type": "pickList",
+            "label": "# of threads",
+            "defaultValue": "3",
+            "required": true,
+            "visibleRule": "command != Custom && command != Pull",
+            "options": {
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7",
+                "8": "8",
+                "9": "9",
+                "10": "10",
+                "11": "11",
+                "12": "12",
+                "13": "13",
+                "14": "14",
+                "15": "15",
+                "16": "16",
+                "17": "17",
+                "18": "18",
+                "19": "19",
+                "20": "20"
+            },
+            "helpMarkDown": "The number of parallel threads that should be used."
+        },
+        {
+            "name": "skipLogin",
+            "type": "boolean",
+            "label": "Skip Login",
+            "defaultValue": "false",
+            "required": true,
+            "groupName": "advanced",
+            "helpMarkDown": "Select if you'd like the command to skip performing docker login."
         }
     ],
     "execution": {

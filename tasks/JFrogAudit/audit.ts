@@ -27,6 +27,9 @@ function RunTaskCbk(cliPath: string): void {
         case 'project':
             auditCommand = utils.addStringParam(auditCommand, watchesSource, watchesSource, true);
             break;
+        case 'none':
+            auditCommand = utils.addBoolParam(auditCommand, 'licenses', 'licenses');
+            break;
     }
     executeCliCommand(auditCommand, sourcePath, cliPath);
 }
