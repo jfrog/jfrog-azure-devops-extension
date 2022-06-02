@@ -43,7 +43,7 @@ function executeConanTask(commandArgs) {
 
         /*
          * Set Conan Environment Variable
-         * Conan User Home is set as a variable in the phase scope so it will be
+         * Conan User Home is set as a variable in the phase scope, so it will be
          * available to every task running after this one
          */
         if (!conanUserHome) {
@@ -130,7 +130,7 @@ function getDefaultConanUserHome() {
  * Artifactory by Conan.
  *
  * If the file is already present with content related to the specific buildName and
- * and buildNumber arguments, this file generation is skiped and the current file
+ * buildNumber arguments, this file generation is skipped and the current file
  * will be used.
  *
  * If the file is present with content related to a different buildName and buildNumber
@@ -359,7 +359,7 @@ function purgeConanRemotes() {
 
     /*
      * Set Conan Environment Variable
-     * Conan User Home is set as a variable in the phase scope so it will be
+     * Conan User Home is set as a variable in the phase scope, so it will be
      * available to every task running after this one
      */
     if (!conanUserHome) {

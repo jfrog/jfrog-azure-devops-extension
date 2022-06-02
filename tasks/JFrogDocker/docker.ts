@@ -9,20 +9,19 @@ function RunTaskCbk(cliPath: string): void {
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || process.cwd();
     const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
 
-    const imageName: string = tl.getInput('imageName', true) || "";
-    const command: string = tl.getInput('command', true) || "";
+    const imageName: string = tl.getInput('imageName', true) || '';
+    const command: string = tl.getInput('command', true) || '';
 
     let cliCommand: string = utils.cliJoin(cliPath, cliDockerCommand, command.toLowerCase(), utils.quote(imageName));
     switch (command) {
         case 'Push':
         case 'Pull':
-            serverId = utils.configureDefaultArtifactoryServer('docker_'+command, cliPath, defaultWorkDir);
-            cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand)
+            serverId = utils.configureDefaultArtifactoryServer('docker_' + command, cliPath, defaultWorkDir);
+            cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
             break;
         case 'Scan': {
             serverId = utils.configureDefaultXrayServer('xray_docker_scan', cliPath, defaultWorkDir);
             cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
-
             // Add watches source if provided.
             const watchesSource: string = tl.getInput('watchesSource', false) || '';
             switch (watchesSource) {
