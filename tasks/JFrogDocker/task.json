@@ -22,8 +22,7 @@
         {
             "name": "advanced",
             "displayName": "Advanced",
-            "isExpanded": false,
-            "visibleRule": "command != Custom"
+            "isExpanded": false
         }
     ],
     "inputs": [
@@ -35,20 +34,10 @@
             "options": {
                 "Pull": "Pull",
                 "Push": "Push",
-                "Scan": "Scan",
-                "Custom": "Custom"
+                "Scan": "Scan"
             },
             "required": true,
             "helpMarkDown": "The docker command to be run by this task."
-        },
-        {
-            "name": "customCommandAndArgs",
-            "type": "string",
-            "label": "Command and arguments to execute",
-            "defaultValue": "",
-            "required": true,
-            "visibleRule": "command=Custom",
-            "helpMarkDown": "Custom docker command to execute with JFrog CLI."
         },
         {
             "name": "xrayConnection",
@@ -66,7 +55,7 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Artifactory service to use in the command.",
-            "visibleRule": "command != Scan && command != Custom"
+            "visibleRule": "command != Scan"
         },
         {
             "name": "imageName",
@@ -74,7 +63,6 @@
             "label": "Image name",
             "defaultValue": "",
             "required": true,
-            "visibleRule": "command != Custom",
             "helpMarkDown": "The docker image to push [DOMAIN]/[NAME]:[TAG]."
         },
         {
@@ -146,7 +134,7 @@
             "label": "Collect build info",
             "defaultValue": "false",
             "required": false,
-            "visibleRule": "command != Scan && command != Custom",
+            "visibleRule": "command != Scan",
             "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"JFrog Publish Build Info\" task."
         },
         {
@@ -191,7 +179,7 @@
             "label": "# of threads",
             "defaultValue": "3",
             "required": true,
-            "visibleRule": "command != Custom && command != Pull",
+            "visibleRule": "command != Pull",
             "options": {
                 "1": "1",
                 "2": "2",

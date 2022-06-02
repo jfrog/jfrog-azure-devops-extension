@@ -16,21 +16,18 @@ function RunTaskCbk(cliPath: string): void {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
-    let cliCommand: string = utils.cliJoin(cliPath, cliDockerCommand);
+    const imageName: string = tl.getInput('imageName', true) || '';
     const command: string = tl.getInput('command', true) || '';
+    let cliCommand: string = utils.cliJoin(cliPath, cliDockerCommand, command.toLowerCase(), utils.quote(imageName));
     switch (command) {
         case 'Push':
         case 'Pull': {
             serverId = utils.configureDefaultArtifactoryServer('docker_' + command, cliPath, defaultWorkDir);
-            const imageName: string = tl.getInput('imageName', true) || '';
-            cliCommand = utils.cliJoin(cliCommand, command.toLowerCase(), utils.quote(imageName));
             cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
             break;
         }
         case 'Scan': {
             serverId = utils.configureDefaultXrayServer('xray_docker_scan', cliPath, defaultWorkDir);
-            const imageName: string = tl.getInput('imageName', true) || '';
-            cliCommand = utils.cliJoin(cliCommand, 'scan', utils.quote(imageName));
             cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
             // Add watches source if provided.
             const watchesSource: string = tl.getInput('watchesSource', false) || '';
@@ -51,18 +48,12 @@ function RunTaskCbk(cliPath: string): void {
             cliCommand = utils.addBoolParam(cliCommand, 'skipLogin', 'skip-login');
             break;
         }
-        case 'Custom': {
-            let customCommandAndArgs: string = tl.getInput('customCommandAndArgs', true) || '';
-            cliCommand = utils.cliJoin(cliCommand, customCommandAndArgs);
-            break;
-        }
         default:
             tl.setResult(tl.TaskResult.Failed, 'Command not supported: ' + command);
     }
-    if (command != 'Custom') {
-        cliCommand = utils.addServerIdOption(cliCommand, serverId);
-        cliCommand = utils.addBoolParam(cliCommand, 'skipLogin', 'skip-login');
-    }
+
+    cliCommand = utils.addServerIdOption(cliCommand, serverId);
+    cliCommand = utils.addBoolParam(cliCommand, 'skipLogin', 'skip-login');
 
     try {
         utils.executeCliCommand(cliCommand, defaultWorkDir);
