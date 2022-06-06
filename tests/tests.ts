@@ -11,6 +11,8 @@ import * as assert from 'assert';
 import * as os from 'os';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
 import { Tunnel } from 'node-tunnel';
+import {execSync} from "child_process";
+import {platformDockerDomain} from "./testUtils";
 
 let tasksOutput: string;
 
@@ -20,8 +22,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
         assert.ok(TestUtils.platformUrl, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_URL');
-        assert.ok(TestUtils.platformUsername, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_USERNAME');
-        assert.ok(TestUtils.platformPassword, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_PASSWORD');
+        if (TestUtils.platformAccessToken == "") {
+            assert.ok(TestUtils.platformUsername, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_USERNAME');
+            assert.ok(TestUtils.platformPassword, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_PASSWORD');
+        }
 
         TestUtils.initTests();
         repoKeys = TestUtils.getRepoKeys();
@@ -709,6 +713,38 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 deleteBuild('DotNET Test');
             },
             TestUtils.isSkipTest('dotnet')
+        );
+    });
+
+    describe('Docker Tests', (): void => {
+        runSyncTest(
+            'Docker push, pull and scan',
+            (): void => {
+                assert.ok(TestUtils.platformDockerDomain, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_DOCKER_DOMAIN');
+
+                const testDir: string = 'docker';
+                const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
+
+                // Run docker build + tag
+                execSync(`docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${path.join(__dirname, 'resources', testDir, filesDir)}`);
+
+                // run docker push
+                mockTask(testDir, 'push');
+                mockTask(testDir, 'publishPush');
+                getAndAssertBuild('dockerTest', '1');
+
+                // Run docker pull
+                mockTask(testDir, 'pull');
+                mockTask(testDir, 'publishPull');
+                getAndAssertBuild('dockerTest', '2');
+
+                // Run docker scan
+                mockTask(testDir, 'scan');
+
+                // Clean
+                deleteBuild('dockerTest');
+            },
+            TestUtils.isSkipTest('docker')
         );
     });
 

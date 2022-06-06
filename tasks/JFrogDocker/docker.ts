@@ -28,7 +28,9 @@ function RunTaskCbk(cliPath: string): void {
         }
         case 'Scan': {
             serverId = utils.configureDefaultXrayServer('xray_docker_scan', cliPath, defaultWorkDir);
-            cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
+            if (tl.getBoolInput('allowFailBuild', false)) {
+                cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
+            }
             // Add watches source if provided.
             const watchesSource: string = tl.getInput('watchesSource', false) || '';
             switch (watchesSource) {
@@ -42,10 +44,11 @@ function RunTaskCbk(cliPath: string): void {
                     cliCommand = utils.addStringParam(cliCommand, watchesSource, watchesSource, true);
                     break;
                 case 'none':
-                    cliCommand = utils.addBoolParam(cliCommand, 'licenses', 'licenses');
+                    if (tl.getBoolInput('licenses', false)) {
+                        cliCommand = utils.addBoolParam(cliCommand, 'licenses', 'licenses');
+                    }
                     break;
             }
-            cliCommand = utils.addBoolParam(cliCommand, 'skipLogin', 'skip-login');
             break;
         }
         default:
@@ -53,7 +56,9 @@ function RunTaskCbk(cliPath: string): void {
     }
 
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
-    cliCommand = utils.addBoolParam(cliCommand, 'skipLogin', 'skip-login');
+    if (tl.getBoolInput('skipLogin', false)) {
+        cliCommand = utils.addBoolParam(cliCommand, 'skipLogin', 'skip-login');
+    }
 
     try {
         utils.executeCliCommand(cliCommand, defaultWorkDir);

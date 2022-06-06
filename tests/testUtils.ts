@@ -14,6 +14,7 @@ const platformUrl: string = process.env.ADO_JFROG_PLATFORM_URL || '';
 const platformUsername: string = process.env.ADO_JFROG_PLATFORM_USERNAME || '';
 const platformPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD || '';
 const platformAccessToken: string = process.env.ADO_JFROG_PLATFORM_ACCESS_TOKEN || '';
+const platformDockerDomain: string = process.env.ADO_JFROG_PLATFORM_DOCKER_DOMAIN || '';
 const skipTests: string[] = process.env.ADO_SKIP_TESTS ? process.env.ADO_SKIP_TESTS.split(',') : [];
 
 const testReposPrefix: string = 'ado-extension-test';
@@ -40,10 +41,11 @@ const repoKeys: any = {
     releaseBundlesRepo: 'rb-repo'
 };
 
-export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername };
+export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername, platformAccessToken ,platformDockerDomain};
 
 export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
 export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
+export const docker: string = path.join(__dirname, '..', 'tasks', 'JFrogDocker', 'docker.js');
 export const generic: string = path.join(__dirname, '..', 'tasks', 'JFrogGenericArtifacts', 'runGenericArtifacts.js');
 export const maven: string = path.join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
 export const npm: string = path.join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');
