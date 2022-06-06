@@ -45,7 +45,7 @@
             "label": "Xray service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Xray service to use in the command.",
+            "helpMarkDown": "Xray service to be used by this task. Used by the 'Scan' command only",
             "visibleRule": "command = Scan"
         },
         {
@@ -54,7 +54,7 @@
             "label": "Artifactory service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to use in the command.",
+            "helpMarkDown": "Artifactory service to be used by this task. Used by the 'Pull' and 'Push' commands only.",
             "visibleRule": "command != Scan"
         },
         {
@@ -117,7 +117,7 @@
             "defaultValue": "false",
             "required": true,
             "visibleRule": "watchesSource=none",
-            "helpMarkDown": "Select if you'd like to receive licenses from Xray scanning."
+            "helpMarkDown": "Select if you'd also like to show licenses information for the project dependencies."
         },
         {
             "name": "allowFailBuild",

@@ -25,7 +25,7 @@
             "label": "Xray service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Xray service to use in the command."
+            "helpMarkDown": "Xray service to be used by this task."
         },
         {
             "name": "workingDirectory",
@@ -86,7 +86,7 @@
             "defaultValue": "false",
             "required": true,
             "visibleRule": "watchesSource=none",
-            "helpMarkDown": "Set to true if you'd like to receive licenses from Xray scanning."
+            "helpMarkDown": "Select if you'd also like to show licenses information for the project dependencies."
         },
         {
             "name": "allowFailBuild",
