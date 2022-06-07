@@ -97,8 +97,8 @@ The task can also be configured to capture build-info for the build. The capture
 
 ![Docker](images/marketplace/docker-pull.png)
 
-## Scan docker images
-The **JFrog Docker** task allows scanning docker images using JFrog Xray.
+## Scan local docker images
+The **JFrog Docker** task allows scanning local docker images using JFrog Xray.
 By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based on the Xray watches source of your preference.
 If any violation or vulnerabilities are found, you may choose to fail the build.
 
