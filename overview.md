@@ -17,9 +17,6 @@ In addition, following the need to start utilizing JFrog CLI v2, which includes 
 - The new **JFrog Audit** task added to the new extension allows auditing your projects for security vulnerabilities with JFrog Xray
 - The new **JFrog CLI V2** task can execute any JFrog CLI command, compared to the old **JFrog CLI task**, which can run only command starting with **jfrog rt**.
 
-### Still missing in the new extension
-The **Artifactory Docker** task hasn't yet been migrated to the new extension. This is because we're currently working on further improving JFrog CLI's integration with the docker client, and would like to expose the new docker functionally to the new extension once that effort is completed. As the old extension is here to stay, you can continue using its **Artifactory Docker** task.
-
 ### New vs. old tasks
 To help you migrate your tasks from the old Artifactory Extension to the new JFrog Extension, we listed the old vs. new tasks names for you.
 
