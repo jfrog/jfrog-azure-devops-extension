@@ -1,0 +1,223 @@
+{
+    "id": "1a9ec20c-e108-11ec-9d64-0242ac120002",
+    "name": "JFrogDocker",
+    "friendlyName": "JFrog Docker",
+    "description": "Pull and push docker images from and to Artifactory (while allowing to collect build-info) or scan local docker images with JFrog Xray.",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-PushingandPullingDockerImagestoandfromArtifactory)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "1",
+        "Patch": "1"
+    },
+    "demands": [],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "JFrog Docker $(command)",
+    "groups": [
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "command",
+            "type": "pickList",
+            "label": "Command",
+            "defaultValue": "",
+            "options": {
+                "Pull": "Pull",
+                "Push": "Push",
+                "Scan": "Scan"
+            },
+            "required": true,
+            "helpMarkDown": "The docker command to be run by this task."
+        },
+        {
+            "name": "xrayConnection",
+            "type": "connectedService:jfrogXrayService",
+            "label": "Xray service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Xray service to be used by this task. Used by the 'Scan' command only",
+            "visibleRule": "command = Scan"
+        },
+        {
+            "name": "artifactoryConnection",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Artifactory service to be used by this task. Used by the 'Pull' and 'Push' commands only.",
+            "visibleRule": "command != Scan"
+        },
+        {
+            "name": "imageName",
+            "type": "string",
+            "label": "Image name",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The docker image to push [DOMAIN]/[NAME]:[TAG]."
+        },
+        {
+            "name": "watchesSource",
+            "type": "pickList",
+            "label": "Xray Watches Source",
+            "defaultValue": "none",
+            "helpMarkDown": "Choose the source to obtain Xray watches, to determine Xray's violations creation.",
+            "required": true,
+            "visibleRule": "command = Scan",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "none": "-",
+                "watches": "Xray watches list",
+                "project": "JFrog Project Key",
+                "repoPath": "Artifactory Repository Path"
+            }
+        },
+        {
+            "name": "watches",
+            "type": "string",
+            "label": "Xray watches list",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "watchesSource=watches",
+            "helpMarkDown": "A comma separated list of Xray watches, to determine Xray's violations creation."
+        },
+        {
+            "name": "project",
+            "type": "string",
+            "label": "JFrog project key",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "watchesSource=project",
+            "helpMarkDown": "The JFrog project key."
+        },
+        {
+            "name": "repoPath",
+            "type": "string",
+            "label": "Artifactory Repository Path",
+            "defaultValue": "",
+            "required": true,
+            "visibleRule": "watchesSource=repoPath",
+            "helpMarkDown": "Target repo path, to enable Xray to determine watches accordingly."
+        },
+        {
+            "name": "licenses",
+            "type": "boolean",
+            "label": "Show licenses",
+            "defaultValue": "false",
+            "required": true,
+            "visibleRule": "watchesSource=none",
+            "helpMarkDown": "Select if you'd also like to show licenses information for the project dependencies."
+        },
+        {
+            "name": "allowFailBuild",
+            "type": "boolean",
+            "label": "Allow fail build",
+            "defaultValue": "true",
+            "required": true,
+            "helpMarkDown": "Uncheck if you do not wish to fail the build, following rules with 'Fail Build' actions.",
+            "visibleRule": "command = Scan"
+        },
+        {
+            "name": "collectBuildInfo",
+            "type": "boolean",
+            "label": "Collect build info",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "command != Scan",
+            "helpMarkDown": "Select to collect build info and store it locally.\nThe build info can be later published to Artifactory using the \"JFrog Publish Build Info\" task."
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": true,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "module",
+            "type": "string",
+            "label": "Module name",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Module name.\nOptional module name for the build-info.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "JFrog project key."
+        },
+        {
+            "name": "threads",
+            "type": "pickList",
+            "label": "# of threads",
+            "defaultValue": "3",
+            "required": true,
+            "visibleRule": "command != Pull",
+            "options": {
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7",
+                "8": "8",
+                "9": "9",
+                "10": "10",
+                "11": "11",
+                "12": "12",
+                "13": "13",
+                "14": "14",
+                "15": "15",
+                "16": "16",
+                "17": "17",
+                "18": "18",
+                "19": "19",
+                "20": "20"
+            },
+            "helpMarkDown": "The number of parallel threads that should be used."
+        },
+        {
+            "name": "skipLogin",
+            "type": "boolean",
+            "label": "Skip Login",
+            "defaultValue": "false",
+            "required": true,
+            "groupName": "advanced",
+            "helpMarkDown": "Select if you'd like the command to skip performing docker login."
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "docker.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}

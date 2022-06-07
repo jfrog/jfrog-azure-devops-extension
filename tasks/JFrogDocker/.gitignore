@@ -1,0 +1,4 @@
+# Ignore ts outputs
+docker.js.map
+docker.d.ts
+docker.js

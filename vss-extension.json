@@ -629,6 +629,16 @@
             }
         },
         {
+            "id": "jfrog-docker-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/JFrogDocker"
+            }
+        },
+        {
             "id": "jfrog-discard-builds-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -752,6 +762,9 @@
         },
         {
             "path": "tasks/JFrogAudit"
+        },
+        {
+            "path": "tasks/JFrogDocker"
         },
         {
             "path": "tasks/JFrogDiscardBuilds"

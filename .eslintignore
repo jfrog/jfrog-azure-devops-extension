@@ -13,3 +13,4 @@ distribution.js
 pipBuild.js
 tests.js
 testUtils.js
+docker.js

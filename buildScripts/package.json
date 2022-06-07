@@ -12,6 +12,6 @@
         "compare-versions": "^3.4.0",
         "edit-json-file": "^1.1.0",
         "fs-extra": "^7.0.0",
-        "rimraf": "^2.6.2"
+        "rimraf": "^3.0.0"
     }
 }
