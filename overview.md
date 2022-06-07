@@ -86,7 +86,7 @@ If issues or vulnerabilities are found, you may choose to fail the build.
 
 ## Auditing projects for security vulnerabilities
 Using the **JFrog Audit** task, you can trigger a scan on your local project. The task will automatically detect the used package-manager to perform audit with integration with JFrog Xray.
-By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based of a Xray watches source of your preference.
+By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based on the Xray watches source of your preference.
 If any violation or vulnerabilities are found, you may choose to fail the build.
 
 ![Audit](images/marketplace/audit.png)
@@ -99,7 +99,7 @@ The task can also be configured to capture build-info for the build. The capture
 
 ## Scan docker images
 The **JFrog Docker** task allows scanning docker images using JFrog Xray.
-By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based of a Xray watches source of your preference.
+By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based on the Xray watches source of your preference.
 If any violation or vulnerabilities are found, you may choose to fail the build.
 
 ![Docker](images/marketplace/docker-scan.png)
