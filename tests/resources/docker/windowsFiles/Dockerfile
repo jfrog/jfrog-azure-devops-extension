@@ -2,4 +2,4 @@
 # base docker file for windows
 #
 
-From microsoft/nanoserver
+From mcr.microsoft.com/powershell
