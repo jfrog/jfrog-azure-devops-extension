@@ -91,6 +91,19 @@ If any violation or vulnerabilities are found, you may choose to fail the build.
 
 ![Audit](images/marketplace/audit.png)
 
+## Pushing and pulling docker images
+The **JFrog Docker** task allows pushing and pulling docker images to and from Artifactory.
+The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **JFrog Publish Build-Info** task.
+
+![Docker](images/marketplace/docker-pull.png)
+
+## Scan docker images
+The **JFrog Docker** task allows scanning docker images using JFrog Xray.
+By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based of a Xray watches source of your preference.
+If any violation or vulnerabilities are found, you may choose to fail the build.
+
+![Docker](images/marketplace/docker-scan.png)
+
 ## Recording tracked issues
 Being able to look at the build which was published to Artifactory, and see all the tracked issues (from JIRA for example) associated with it, is one of the most powerful capabilities of Artifactory when it comes to managing metadata about builds. The **JFrog Collect Issues** task can automatically identify the issues handled in the current build, and record them as part of the build-info. Read more about this unique capability [here](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-CollectingBuildIssues).
 
