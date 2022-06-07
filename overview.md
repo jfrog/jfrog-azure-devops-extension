@@ -94,6 +94,7 @@ If any violation or vulnerabilities are found, you may choose to fail the build.
 ## Pushing and pulling docker images
 The **JFrog Docker** task allows pushing and pulling docker images to and from Artifactory.
 The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **JFrog Publish Build-Info** task.
+(The minimum supported Artifactory version for the docker Pull/Push tasks is 7.33.3)
 
 ![Docker](images/marketplace/docker-pull.png)
 
