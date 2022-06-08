@@ -16,7 +16,7 @@ environment:
   ADO_ARTIFACTORY_PASSWORD:
     secure: Um8o75MQIieSavIemF4ySA==
   ADO_ARTIFACTORY_DOCKER_DOMAIN:
-    secure: ppjr6mrLIKXVptLX8WPOlffTwOLtRIoaIpsVEvmje/9mDtLojTqpwI9OIC5VZnx1
+    secure: oOPxY+b3ZWv1drMTurzQdp/6Y/InLTCOiQu9wz1Uso1zyluPhTX3t79OlfhyKjkS
   ADO_ARTIFACTORY_DOCKER_REPO:
     secure: UjixvF6E1Bp1p8zgPRLCVA==
   ADO_DISTRIBUTION_URL:
