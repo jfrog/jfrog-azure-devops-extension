@@ -34,6 +34,7 @@ To help you migrate your tasks from the old Artifactory Extension to the new JFr
 |         Artifactory Pip          |          JFrog Pip           |
 |        Artifactory Conan         |         JFrog Conan          |
 |          Artifactory Go          |           JFrog Go           |
+|        Artifactory Docker        |         JFrog Docker         |
 | Artifactory Collect Build Issues |  JFrog Collect Build Issues  |
 |  Artifactory Publish Build Info  |   JFrog Publish Build Info   |
 |   Artifactory Build Promotion    |    JFrog Build Promotion     |
