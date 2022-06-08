@@ -54,7 +54,7 @@
             "label": "Artifactory service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Artifactory service to be used by this task. Used by the 'Pull' and 'Push' commands only. (The minimum supported Artifactory version for the docker Pull/Push tasks is 7.33.3)",
+            "helpMarkDown": "Artifactory service to be used by this task. Used by the 'Pull' and 'Push' commands only. (This functionality requires version 7.33.3 or above of Artifactory)",
             "visibleRule": "command != Scan"
         },
         {
