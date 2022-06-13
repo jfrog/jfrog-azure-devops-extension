@@ -45,7 +45,7 @@
             "label": "Xray service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Xray service to be used by this task. Used by the 'Scan' command only",
+            "helpMarkDown": "Xray service to be used by this task. Used by the 'Scan' command only. (This functionality requires version 3.40.0 or above of JFrog Xray)",
             "visibleRule": "command = Scan"
         },
         {

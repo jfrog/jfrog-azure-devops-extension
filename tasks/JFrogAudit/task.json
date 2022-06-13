@@ -25,7 +25,7 @@
             "label": "Xray service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Xray service to be used by this task."
+            "helpMarkDown": "Xray service to be used by this task. (This functionality requires version 3.29.0 or above of JFrog Xray)"
         },
         {
             "name": "workingDirectory",
