@@ -81,21 +81,12 @@ These tasks can also be configured to capture build-info for the build. The capt
 The JFrog Extension integrates with JFrog Xray, allowing you to have build artifacts scanned for vulnerabilities and other issues using the **JFrog Build Scan** task.
 If issues or vulnerabilities are found, you may choose to fail the build.
 
-This functionality requires version 3.37.0 or above of JFrog Xray.
-
 ![BuildScan](images/marketplace/build-scan.png)
 ![Table](images/marketplace/violations-table.png)
 
 ## Auditing projects for security vulnerabilities
 Using the **JFrog Audit** task, you can trigger a scan on your local project. The task will automatically detect the used package-manager to perform audit with integration with JFrog Xray.
-By default, the result will include all vulnerabilities found. You may however configure the task to show only violations configured in Xray.
-You do this by configuring the task to use:
-
-1. Your JFrog Project. If there are Xray Watches associated with this Project, these Watches will be used.
-2. Xray Watch or a list of Watches.
-3. Repository path in Artifactory which has Xray Watches associated with it.
-
-This functionality requires version 3.29.0 or above of JFrog Xray.
+By default, the results will include all vulnerabilities found. You may however configure the task to show only violations configured in Xray.
 
 ![Audit](images/marketplace/audit.png)
 
@@ -103,23 +94,12 @@ This functionality requires version 3.29.0 or above of JFrog Xray.
 The **JFrog Docker** task allows pushing and pulling docker images to and from a docker repository in Artifactory.
 The task can be also configured to capture build-info for the pushed or pulled image.
 In addition to details about the build and the build environment, the build info includes the image layers as build dependencies and build artifacts.
-The task stores build info locally on the build agent.
-The stored build-info can be later published to Artifactory using the **JFrog Publish Build-Info** Info task.
-
-This functionality requires version 7.33.3 or above of Artifactory.
 
 ![Docker](images/marketplace/docker-pull.png)
 
 ## Scanning Local Docker Images with JFrog Xray
-The **JFrog Docker** task allows scanning local docker images using JFrog Xray. The scan results is displayed in the build log.
-By default, the result will include all vulnerabilities found. You may however configure the task to show only violations configured in Xray.
-You do this by configuring the task to use:
-
-1. Your JFrog Project. If there are Xray Watches associated with this Project, these Watches will be used.
-2. Xray Watch or a list of Watches.
-3. Repository path in Artifactory which has Xray Watches associated with it.
-
-This functionality requires version 3.40.0 or above of JFrog Xray.
+The **JFrog Docker** task allows scanning local docker images using JFrog Xray. The scan results are displayed in the build log.
+By default, the results will include all vulnerabilities found. You may however configure the task to show only violations configured in Xray.
 
 ![Docker](images/marketplace/docker-scan.png)
 
