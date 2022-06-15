@@ -23,6 +23,8 @@ environment:
     secure: YEB5Wiv9a2vNpUhy+MfL+A==
   ADO_JFROG_PLATFORM_PASSWORD:
     secure: Um8o75MQIieSavIemF4ySA==
+  ADO_JFROG_PLATFORM_DOCKER_DOMAIN:
+    secure: oOPxY+b3ZWv1drMTurzQdtA9rVrIq/4Xu1m4OD0FJdI=
 
 install:
   - cmd: set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%
