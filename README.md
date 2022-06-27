@@ -4,8 +4,8 @@
 
 # JFrog Azure DevOps Extension
 
-![Artifactory Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-artifactory-vsts-extension?label=Artifactory%20Extension%20Installs&style=for-the-badge)
-![JFrog Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-azure-devops-extension?label=New%20JFrog%20Extension%20Installs&style=for-the-badge)
+![Artifactory Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-artifactory-vsts-extension?label=Artifactory%20Extension%20Installs&color=blue&style=for-the-badge)
+![JFrog Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-azure-devops-extension?label=New%20JFrog%20Extension%20Installs&color=blue&style=for-the-badge)
 
 
 [![Visual Studio Marketplace](https://vsmarketplacebadge.apphb.com/version-short/JFrog.jfrog-azure-devops-extension.svg)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension) [![](https://img.shields.io/badge/Docs-%F0%9F%93%96-blue)](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension)
