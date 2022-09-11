@@ -175,7 +175,6 @@ function performArtifactSourceDownload(cliPath, workDir) {
         utils.quote('*'),
         utils.quote(downloadPath),
         '--build=' + utils.quote(buildName + '/' + buildNumber),
-        '--flat',
         '--fail-no-op'
     );
 
@@ -183,6 +182,7 @@ function performArtifactSourceDownload(cliPath, workDir) {
     cliCommand = utils.addProjectOption(cliCommand);
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
     cliCommand = utils.addIntParam(cliCommand, 'threads', 'threads');
+    cliCommand = utils.addBoolParam(cliCommand, 'flat', 'flat');
 
     try {
         utils.executeCliCommand(cliCommand, workDir, null);

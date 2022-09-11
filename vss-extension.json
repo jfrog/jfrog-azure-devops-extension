@@ -440,6 +440,19 @@
                         }
                     },
                     {
+                        "id": "flat",
+                        "name": "Flat",
+                        "inputMode": "checkBox",
+                        "isConfidential": false,
+                        "description": "Select if you do not wish to have the Artifactory repository path structure created locally for your downloaded files",
+                        "validation": {
+                            "dataType": "boolean"
+                        },
+                        "values": {
+                            "defaultValue": "True"
+                        }
+                    },
+                    {
                         "id": "threads",
                         "name": "# of threads",
                         "inputMode": "Combo",
