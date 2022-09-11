@@ -182,6 +182,7 @@ function performArtifactSourceDownload(cliPath, workDir) {
     // Add project flag if provided
     cliCommand = utils.addProjectOption(cliCommand);
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
+    cliCommand = utils.addIntParam(cliCommand, 'threads', 'threads');
 
     try {
         utils.executeCliCommand(cliCommand, workDir, null);
