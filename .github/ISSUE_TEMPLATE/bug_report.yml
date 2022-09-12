@@ -44,10 +44,9 @@ body:
   - type: input
     id: jfrog-azure-version
     attributes:
-      label: Azure DevOps extension and Version
+      label: Azure DevOps extension name and version
       description: |
-        Please describe if you are using the [Artifactory Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension) or the [New JFrog Azure Devops Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension),
-        and provide the extension version
+        Please provide the name and version of your extension ([Artifactory Azure DevOps Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension) / [New JFrog Azure Devops Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension))
     validations:
       required: true
 
