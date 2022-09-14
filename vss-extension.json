@@ -440,16 +440,16 @@
                         }
                     },
                     {
-                        "id": "flat",
-                        "name": "Flat",
-                        "inputMode": "checkBox",
+                        "id": "noFlat",
+                        "name": "Keep artifact path structure",
+                        "inputMode": "checkbox",
                         "isConfidential": false,
-                        "description": "Select if you do not wish to have the Artifactory repository path structure created locally for your downloaded files",
+                        "description": "Select if you wish to have the Artifactory repository path structure created locally for your downloaded files",
                         "validation": {
-                            "dataType": "boolean"
+                            "isRequired": false
                         },
                         "values": {
-                            "defaultValue": "True"
+                            "defaultValue": false
                         }
                     },
                     {

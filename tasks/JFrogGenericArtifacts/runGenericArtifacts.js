@@ -182,7 +182,10 @@ function performArtifactSourceDownload(cliPath, workDir) {
     cliCommand = utils.addProjectOption(cliCommand);
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
     cliCommand = utils.addIntParam(cliCommand, 'threads', 'threads');
-    cliCommand = utils.addBoolParam(cliCommand, 'flat', 'flat');
+    // If noFlat is false or undefined add --flat=true flag.
+    if (!tl.getInput('noFlat', false)) {
+        cliCommand = utils.cliJoin(cliCommand, '--flat=' + utils.quote('true'));
+    }
 
     try {
         utils.executeCliCommand(cliCommand, workDir, null);
