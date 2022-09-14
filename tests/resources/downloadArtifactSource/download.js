@@ -7,7 +7,7 @@ let inputs = {
     definition: 'downloadArtifactSourceBuild',
     version: '5',
     downloadPath: testUtils.getLocalTestDir(TEST_NAME),
-    noFlat: true,
+    noFlat: false,
     threads: 4
 };
 
