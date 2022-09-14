@@ -1,5 +1,5 @@
 build: off
-stack: node 14, python 3.9, jdk 8, go 1.17
+stack: node 14, python 3.9, jdk 8, go 1.18
 skip_tags: true
 environment:
   matrix:
@@ -10,7 +10,7 @@ environment:
   nodejs_version: "14"
 
   GOPATH: c:\gopath
-  GOVERSION: 1.17.4
+  GOVERSION: 1.18.5
   GOROOT: c:\Program Files\Go
   # Added in order to prevent fetching the outdated dependencies versions from go cache.
   GOPROXY: direct
@@ -23,6 +23,8 @@ environment:
     secure: YEB5Wiv9a2vNpUhy+MfL+A==
   ADO_JFROG_PLATFORM_PASSWORD:
     secure: Um8o75MQIieSavIemF4ySA==
+  ADO_JFROG_PLATFORM_DOCKER_DOMAIN:
+    secure: oOPxY+b3ZWv1drMTurzQdtA9rVrIq/4Xu1m4OD0FJdI=
 
 install:
   - cmd: set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%

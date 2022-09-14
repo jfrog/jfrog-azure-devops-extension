@@ -86,21 +86,20 @@ If issues or vulnerabilities are found, you may choose to fail the build.
 
 ## Auditing projects for security vulnerabilities
 Using the **JFrog Audit** task, you can trigger a scan on your local project. The task will automatically detect the used package-manager to perform audit with integration with JFrog Xray.
-By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based on the Xray watches source of your preference.
-If any violation or vulnerabilities are found, you may choose to fail the build.
+By default, the results will include all vulnerabilities found. You may however configure the task to show only violations configured in Xray.
 
 ![Audit](images/marketplace/audit.png)
 
-## Pushing and pulling docker images
-The **JFrog Docker** task allows pushing and pulling docker images to and from Artifactory.
-The task can also be configured to capture build-info for the build. The captured build-info can be later published to Artifactory using the **JFrog Publish Build-Info** task.
+## Pushing and Pulling Docker Images to and from Artifactory
+The **JFrog Docker** task allows pushing and pulling docker images to and from a docker repository in Artifactory.
+The task can be also configured to capture build-info for the pushed or pulled image.
+In addition to details about the build and the build environment, the build info includes the image layers as build dependencies and build artifacts.
 
 ![Docker](images/marketplace/docker-pull.png)
 
-## Scan docker images
-The **JFrog Docker** task allows scanning docker images using JFrog Xray.
-By default, the task will print a table of all vulnerabilities found to the logs. You may configure the task to only show violations, based on the Xray watches source of your preference.
-If any violation or vulnerabilities are found, you may choose to fail the build.
+## Scanning Local Docker Images with JFrog Xray
+The **JFrog Docker** task allows scanning local docker images using JFrog Xray. The scan results are displayed in the build log.
+By default, the results will include all vulnerabilities found. You may however configure the task to show only violations configured in Xray.
 
 ![Docker](images/marketplace/docker-scan.png)
 
