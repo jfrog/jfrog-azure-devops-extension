@@ -1,5 +1,5 @@
 const testUtils = require('../../testUtils');
-const {platformDockerDomain} = require("../../testUtils");
+const { platformDockerDomain } = require('../../testUtils');
 
 let inputs = {
     buildName: 'dockerTest',

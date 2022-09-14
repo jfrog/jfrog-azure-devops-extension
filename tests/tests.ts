@@ -11,8 +11,8 @@ import * as assert from 'assert';
 import * as os from 'os';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
 import { Tunnel } from 'node-tunnel';
-import {execSync} from "child_process";
-import {platformDockerDomain} from "./testUtils";
+import { execSync } from 'child_process';
+import { platformDockerDomain } from './testUtils';
 
 let tasksOutput: string;
 
@@ -22,7 +22,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
         assert.ok(TestUtils.platformUrl, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_URL');
-        if (TestUtils.platformAccessToken == "") {
+        if (TestUtils.platformAccessToken == '') {
             assert.ok(TestUtils.platformUsername, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_USERNAME');
             assert.ok(TestUtils.platformPassword, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_PASSWORD');
         }
@@ -726,7 +726,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
 
                 // Run docker build + tag
-                execSync(`docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${path.join(__dirname, 'resources', testDir, filesDir)}`);
+                execSync(
+                    `docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${path.join(__dirname, 'resources', testDir, filesDir)}`
+                );
 
                 // run docker push
                 mockTask(testDir, 'push');

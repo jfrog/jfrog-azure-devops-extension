@@ -41,7 +41,7 @@ const repoKeys: any = {
     releaseBundlesRepo: 'rb-repo'
 };
 
-export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername, platformAccessToken ,platformDockerDomain};
+export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername, platformAccessToken, platformDockerDomain };
 
 export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
 export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
