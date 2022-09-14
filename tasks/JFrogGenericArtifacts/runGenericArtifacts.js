@@ -175,13 +175,17 @@ function performArtifactSourceDownload(cliPath, workDir) {
         utils.quote('*'),
         utils.quote(downloadPath),
         '--build=' + utils.quote(buildName + '/' + buildNumber),
-        '--flat',
         '--fail-no-op'
     );
 
     // Add project flag if provided
     cliCommand = utils.addProjectOption(cliCommand);
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
+    cliCommand = utils.addIntParam(cliCommand, 'threads', 'threads');
+    // If noFlat is false or undefined add --flat=true flag.
+    if (!tl.getInput('noFlat', false)) {
+        cliCommand = utils.cliJoin(cliCommand, '--flat=' + utils.quote('true'));
+    }
 
     try {
         utils.executeCliCommand(cliCommand, workDir, null);
