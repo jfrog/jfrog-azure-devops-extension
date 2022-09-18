@@ -194,6 +194,24 @@
             "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe collected build-info should be published to Artifactory using the 'JFrog Publish Build Info' task."
         },
         {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "JFrog project key."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        },
+        {
             "name": "conanUserHome",
             "type": "string",
             "label": "Conan User Home",

@@ -185,6 +185,15 @@
             "label": "Include environment variables",
             "defaultValue": "false",
             "required": false,
+            "visibleRule": "collectBuildInfo=true",
+            "helpMarkDown": "Select to include environment variables in the published build info."
+        },
+        {
+            "name": "includeEnvVars",
+            "type": "boolean",
+            "label": "Include environment variables",
+            "defaultValue": "false",
+            "required": false,
             "visibleRule": "collectBuildInfo == true",
             "helpMarkDown": "Select to include environment variables in the published build info."
         },
