@@ -1,0 +1,4 @@
+# Ignore ts outputs
+mavenBuild.js.map
+mavenBuild.d.ts
+mavenBuild.js

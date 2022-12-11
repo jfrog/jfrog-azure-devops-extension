@@ -10,6 +10,7 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "@jfrog/tasks-utils": "file:../../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz"
+        "@jfrog/tasks-utils": "file:../../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz",
+        "azure-pipelines-tasks-java-common": "~2.201.0"
     }
 }
