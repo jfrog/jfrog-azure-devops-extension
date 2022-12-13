@@ -6,18 +6,13 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-TriggeringMavenBuilds)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "3",
         "Patch": "0"
     },
-    "demands": [
-        "maven"
-    ],
+    "demands": ["maven"],
     "minimumAgentVersion": "1.89.0",
     "instanceNameFormat": "JFrog Maven",
     "groups": [
@@ -30,14 +25,17 @@
             "name": "deployer",
             "displayName": "Deploy artifacts to Artifactory",
             "isExpanded": true
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
         }
     ],
     "inputs": [
         {
             "name": "mavenPOMFile",
-            "aliases": [
-                "mavenPomFile"
-            ],
+            "aliases": ["mavenPomFile"],
             "type": "filePath",
             "label": "Maven POM file",
             "defaultValue": "pom.xml",
@@ -200,6 +198,67 @@
             "required": false,
             "visibleRule": "collectBuildInfo == true",
             "helpMarkDown": "Select to include environment variables in the published build info."
+        },
+        {
+            "name": "javaHomeSelection",
+            "aliases": ["javaHomeOption"],
+            "type": "radio",
+            "label": "Set JAVA_HOME by",
+            "required": true,
+            "groupName": "advanced",
+            "defaultValue": "JDKVersion",
+            "helpMarkDown": "Sets JAVA_HOME either by selecting a JDK version that will be discovered during builds or by manually entering a JDK path.",
+            "options": {
+                "JDKVersion": "JDK Version",
+                "Path": "Path"
+            }
+        },
+        {
+            "name": "jdkVersion",
+            "aliases": ["jdkVersionOption"],
+            "type": "pickList",
+            "label": "JDK version",
+            "required": false,
+            "groupName": "advanced",
+            "defaultValue": "default",
+            "helpMarkDown": "Will attempt to discover the path to the selected JDK version and set JAVA_HOME accordingly.",
+            "visibleRule": "javaHomeSelection = JDKVersion",
+            "options": {
+                "default": "default",
+                "1.17": "JDK 17",
+                "1.11": "JDK 11",
+                "1.10": "JDK 10 (out of support)",
+                "1.9": "JDK 9 (out of support)",
+                "1.8": "JDK 8",
+                "1.7": "JDK 7",
+                "1.6": "JDK 6 (out of support)"
+            }
+        },
+        {
+            "name": "jdkUserInputPath",
+            "aliases": ["jdkDirectory"],
+            "type": "string",
+            "label": "JDK path",
+            "required": true,
+            "groupName": "advanced",
+            "defaultValue": "",
+            "helpMarkDown": "Sets JAVA_HOME to the given path.",
+            "visibleRule": "javaHomeSelection = Path"
+        },
+        {
+            "name": "jdkArchitecture",
+            "aliases": ["jdkArchitectureOption"],
+            "type": "pickList",
+            "label": "JDK architecture",
+            "defaultValue": "x64",
+            "required": false,
+            "helpMarkDown": "Optionally supply the architecture (x86, x64) of the JDK.",
+            "visibleRule": "jdkVersion != default",
+            "groupName": "advanced",
+            "options": {
+                "x86": "x86",
+                "x64": "x64"
+            }
         }
     ],
     "dataSourceBindings": [

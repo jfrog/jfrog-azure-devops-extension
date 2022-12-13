@@ -38,5 +38,7 @@ declare module '@jfrog/tasks-utils' {
     export function taskDefaultCleanup(cliPath: string, workDir: string, serverIdsArray: string[]): string;
     export function appendBuildFlagsToCliCommand(cliCommand: string): string;
     export function isToolExists(tool: string): boolean;
+    export function removeExtractorsDownloadVariables(cliPath: string, workDir: string);
+    export function configureArtifactoryCliServer(artifactoryService: string, serverId: string, cliPath: string, buildDir: string);
     export { taskSelectedCliVersionEnv };
 }
