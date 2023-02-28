@@ -10,3 +10,4 @@ jfrog-tasks-utils-*.tgz
 *testData
 .taskkey
 *.log
+.jfrog

@@ -1,0 +1,28 @@
+pipelines:
+  - name: create_azure_devops_extension_staging
+    configuration:
+      runtime:
+        type: image
+        image:
+          auto:
+            language: node
+            versions:
+              - "12"
+
+    steps:
+      - name: Snapshot
+        type: Bash
+        configuration:
+          inputResources:
+            - name: azureDevopsSnapshotGit
+          integrations:
+            - name: azure_devops
+        execution:
+          onExecute:
+            - cd $res_azureDevopsSnapshotGit_resourcePath
+
+            - >
+              env -i PATH=$PATH HOME=$HOME
+              ADO_ARTIFACTORY_DEVELOPER=ecosystem-staging
+              ADO_ARTIFACTORY_API_KEY=$int_azure_devops_token
+              npm run publish-private

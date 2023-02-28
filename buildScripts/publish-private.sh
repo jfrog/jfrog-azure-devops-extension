@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -eu
 
 # This script publishes JFrog Artifactory extension privately for sanity tests.
 # Currently it will work only on Unix and Linux.
@@ -19,17 +19,15 @@ if [ -z "$ADO_ARTIFACTORY_API_KEY" ]; then
 fi
 
 export PUBLISHER=$ADO_ARTIFACTORY_DEVELOPER-private
+export GIT_HEAD=`git rev-parse --short HEAD`
 
 cp vss-extension.json vss-extension-private.json
-# Replaces the version to a random version (required for azure to load the changes)
-sed -i '' "s/\"version\": \".*..*..*\"/\"version\": \"${RANDOM}.${RANDOM}.${RANDOM}\"/g" vss-extension-private.json
 
-
-tfx extension unshare -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER --unshare-with $ADO_ARTIFACTORY_DEVELOPER 2>/dev/null
-tfx extension unpublish -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER
-tfx extension create --manifest-globs vss-extension-private.json --publisher $PUBLISHER
-tfx extension publish -t $ADO_ARTIFACTORY_API_KEY --publisher $PUBLISHER --manifests vss-extension-private.json --override "{\"public\": false}" --share-with $ADO_ARTIFACTORY_DEVELOPER
-tfx extension install --publisher $PUBLISHER --extension-id jfrog-azure-devops-extension --service-url https://$ADO_ARTIFACTORY_DEVELOPER.visualstudio.com -t $ADO_ARTIFACTORY_API_KEY
+npx tfx extension unshare -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER --unshare-with $ADO_ARTIFACTORY_DEVELOPER 2>/dev/null
+npx tfx extension unpublish -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER
+npx tfx extension create --manifest-globs vss-extension-private.json --publisher $PUBLISHER
+npx tfx extension publish -t $ADO_ARTIFACTORY_API_KEY --publisher $PUBLISHER --manifests vss-extension-private.json --override "{\"public\": false, \"version\": \"$RANDOM.$RANDOM.$RANDOM\", \"description\": \"Commit SHA: $GIT_HEAD\"}" --share-with $ADO_ARTIFACTORY_DEVELOPER
+npx tfx extension install --publisher $PUBLISHER --extension-id jfrog-azure-devops-extension --service-url https://$ADO_ARTIFACTORY_DEVELOPER.visualstudio.com -t $ADO_ARTIFACTORY_API_KEY
 
 rm *.vsix
 rm vss-extension-private.json

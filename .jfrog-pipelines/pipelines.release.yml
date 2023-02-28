@@ -1,0 +1,80 @@
+pipelines:
+  - name: release_azure_devops_extension
+    configuration:
+      runtime:
+        type: image
+        image:
+          auto:
+            language: node
+            versions:
+              - "12"
+      environmentVariables:
+        readOnly:
+          NEXT_VERSION: 2.0.0
+
+    steps:
+      - name: Release
+        type: Bash
+        configuration:
+          inputResources:
+            - name: azureDevopsReleaseGit
+          integrations:
+            - name: il_automation
+            - name: entplus_deployer
+            - name: azure_devops
+        execution:
+          onExecute:
+            - cd $res_azureDevopsReleaseGit_resourcePath
+
+            # Set env
+            - export CI=true
+            - export JFROG_BUILD_STATUS=PASS
+            - export JFROG_CLI_BUILD_NAME=ecosystem-azure-devops-extension-release
+            - export JFROG_CLI_BUILD_NUMBER=$run_number
+            - export JFROG_CLI_BUILD_PROJECT=ecosys
+
+            # Configure git
+            - git checkout v2
+            - git remote set-url origin https://$int_il_automation_token@github.com/jfrog/jfrog-azure-devops-extension.git
+
+            # Make sure versions provided
+            - echo "Checking variables"
+            - test -n "$NEXT_VERSION" -a "$NEXT_VERSION" != "2.0.0"
+
+            # Configure JFrog CLI
+            - curl -fL https://install-cli.jfrog.io | sh
+            - jf c rm --quiet
+            - jf c add internal --url=$int_entplus_deployer_url --user=$int_entplus_deployer_user --password=$int_entplus_deployer_apikey
+
+            # Sync changes with dev
+            - git merge origin/dev
+
+            # Update version
+            - npm i --unsafe-perm --prefix=buildScripts
+            - env -i PATH=$PATH HOME=$HOME node buildScripts/bump-version.js -v $NEXT_VERSION
+            - git commit -am '[jfrog-release] Release version $NEXT_VERSION'
+            - git tag $NEXT_VERSION
+
+            # Run install and create
+            - jf audit --fail=false
+            - npm run create
+            # Verify vsix file is larger than 15M
+            - find . -iname JFrog.jfrog-azure-devops-extension-$NEXT_VERSION.vsix -size +15M | grep .
+
+            # Upload and publish
+            - jf rt u JFrog.jfrog-azure-devops-extension-$NEXT_VERSION.vsix ecosys-jfrog-azure-devops-extension/
+            - jf rt bag && jf rt bce
+            - jf rt bp
+            - npx tfx extension publish -t $int_azure_devops_token
+
+            # Push to v2
+            - git push
+            - git push --tags
+
+            # Merge and push to dev
+            - git checkout dev
+            - git merge origin/v2
+            - git push
+
+          onComplete:
+            - jf c rm --quiet
