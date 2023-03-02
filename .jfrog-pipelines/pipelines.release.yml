@@ -55,9 +55,11 @@ pipelines:
             - git commit -am '[jfrog-release] Release version $NEXT_VERSION'
             - git tag $NEXT_VERSION
 
-            # Run install and create
+            # Run install, audit and create
+            - npm i --unsafe-perm
             - jf audit --fail=false
             - npm run create
+
             # Verify vsix file is larger than 15M
             - find . -iname JFrog.jfrog-azure-devops-extension-$NEXT_VERSION.vsix -size +15M | grep .
 
