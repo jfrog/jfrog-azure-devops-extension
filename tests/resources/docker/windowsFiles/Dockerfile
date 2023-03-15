@@ -2,5 +2,5 @@
 # base docker file for windows
 #
 
-FROM nanoserver/iis
+FROM mcr.microsoft.com/windows/nanoserver:2022
 
