@@ -57,7 +57,7 @@
             "label": "Allow fail build",
             "defaultValue": "true",
             "required": true,
-            "helpMarkDown": "Uncheck if you do not wish to fail the build, following rules with 'Fail Build' actions."
+            "helpMarkDown": "Uncheck if you do not wish the command to return exit code 3, even if found a security violation that matches an Xray policy with 'Fail Build' rule."
         },
         {
             "name": "vuln",
