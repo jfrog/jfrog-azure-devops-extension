@@ -59,8 +59,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME || '') +
                             ' --password=' +
                             jfrogUtils.quote('SUPER_SECRET'),
-                        TestUtils.testDataDir,
-                        ['']
+                        TestUtils.testDataDir
                     );
                 } catch (ex) {
                     retVal = ex as string;
@@ -725,26 +724,52 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'docker';
                 const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
 
+                console.log("building docker image");
+
                 // Run docker build + tag
                 execSync(
                     `docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${path.join(__dirname, 'resources', testDir, filesDir)}`
                 );
+
+                console.log("pushing docker image");
 
                 // run docker push
                 mockTask(testDir, 'push');
                 mockTask(testDir, 'publishPush');
                 getAndAssertBuild('dockerTest', '1');
 
+                console.log("pulling docker image");
+
                 // Run docker pull
                 mockTask(testDir, 'pull');
                 mockTask(testDir, 'publishPull');
                 getAndAssertBuild('dockerTest', '2');
 
-                // Run docker scan
-                mockTask(testDir, 'scan');
-
                 // Clean
                 deleteBuild('dockerTest');
+            },
+            TestUtils.isSkipTest('docker')
+        );
+
+        runSyncTest(
+            'Docker push, pull and scan',
+            (): void => {
+                assert.ok(TestUtils.platformDockerDomain, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_DOCKER_DOMAIN');
+
+                const testDir: string = 'docker';
+                const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
+
+                console.log("building docker image");
+
+                // Run docker build + tag
+                execSync(
+                    `docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${path.join(__dirname, 'resources', testDir, filesDir)}`
+                );
+
+                console.log("scanning docker image");
+
+                // Run docker scan
+                mockTask(testDir, 'scan');
             },
             TestUtils.isSkipTest('docker')
         );
