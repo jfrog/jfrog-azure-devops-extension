@@ -63,7 +63,7 @@
             "label": "Image name",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The docker image to push [DOMAIN]/[NAME]:[TAG]."
+            "helpMarkDown": "The docker image to $(command) - [DOMAIN]/[DOCKER_REPO]/[IMAGE_NAME]:[TAG]. Example: myjfrog.jfrog.io/my-docker-repo/myimage:latest"
         },
         {
             "name": "watchesSource",
@@ -95,7 +95,7 @@
         {
             "name": "project",
             "type": "string",
-            "label": "JFrog project key",
+            "label": "JFrog Project key",
             "defaultValue": "",
             "required": true,
             "visibleRule": "watchesSource=project",
