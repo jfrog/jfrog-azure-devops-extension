@@ -1,5 +1,5 @@
 #
 # base docker file for windows
 #
-FROM nanoserver/iis
+FROM microsoft/aspnet
 
