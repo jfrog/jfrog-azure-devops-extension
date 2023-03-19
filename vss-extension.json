@@ -421,7 +421,7 @@
                             "isRequired": false,
                             "dataType": "string"
                         },
-                        "description": "JFrog project key."
+                        "description": "JFrog Project key."
                     },
                     {
                         "id": "definition",
