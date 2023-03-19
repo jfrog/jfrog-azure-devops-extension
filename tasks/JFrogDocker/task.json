@@ -42,10 +42,10 @@
         {
             "name": "xrayConnection",
             "type": "connectedService:jfrogXrayService",
-            "label": "Xray service connection",
+            "label": "JFrog Xray service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Xray service to be used by this task. Used by the 'Scan' command only. (This functionality requires version 3.40.0 or above of JFrog Xray)",
+            "helpMarkDown": "JFrog Xray service to be used by this task. Used by the 'Scan' command only. (This functionality requires version 3.40.0 or above of JFrog Xray)",
             "visibleRule": "command = Scan"
         },
         {
@@ -63,7 +63,7 @@
             "label": "Image name",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "The docker image to push [DOMAIN]/[NAME]:[TAG]."
+            "helpMarkDown": "The full docker image name - [DOMAIN]/[DOCKER_REPO]/[IMAGE_NAME]:[TAG]. Example: 'myjfrog.jfrog.io/my-docker-repo/myimage:latest'"
         },
         {
             "name": "watchesSource",
@@ -95,11 +95,11 @@
         {
             "name": "project",
             "type": "string",
-            "label": "JFrog project key",
+            "label": "JFrog Project key",
             "defaultValue": "",
             "required": true,
             "visibleRule": "watchesSource=project",
-            "helpMarkDown": "The JFrog project key."
+            "helpMarkDown": "The JFrog Project key."
         },
         {
             "name": "repoPath",
@@ -125,8 +125,8 @@
             "label": "Allow fail build",
             "defaultValue": "true",
             "required": true,
-            "helpMarkDown": "Uncheck if you do not wish to fail the build, following rules with 'Fail Build' actions.",
-            "visibleRule": "command = Scan"
+            "helpMarkDown": "Unset if you don't wish the audit process to exit with code 3, if a violation matching an Xray policy is found, and the policy includes a 'Fail Build' rule.",
+            "visibleRule": "command = Scan && watchesSource!=none"
         },
         {
             "name": "collectBuildInfo",
@@ -171,7 +171,7 @@
             "defaultValue": "",
             "required": false,
             "visibleRule": "collectBuildInfo=true",
-            "helpMarkDown": "JFrog project key."
+            "helpMarkDown": "JFrog Project key."
         },
         {
             "name": "includeEnvVars",

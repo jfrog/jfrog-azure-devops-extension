@@ -49,7 +49,7 @@
             "label": "Project key",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "JFrog project key."
+            "helpMarkDown": "JFrog Project key."
         },
         {
             "name": "targetRepo",

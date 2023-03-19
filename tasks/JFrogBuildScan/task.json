@@ -22,10 +22,10 @@
         {
             "name": "xrayConnection",
             "type": "connectedService:jfrogXrayService",
-            "label": "Xray service connection",
+            "label": "JFrog Xray service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Xray service to be used by this task. (This functionality requires version 3.37.0 or above of JFrog Xray)"
+            "helpMarkDown": "JFrog Xray service to be used by this task. (This functionality requires version 3.37.0 or above of JFrog Xray)"
         },
         {
             "name": "buildName",
@@ -49,7 +49,7 @@
             "label": "Project key",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "The JFrog project key."
+            "helpMarkDown": "The JFrog Project key."
         },
         {
             "name": "allowFailBuild",
@@ -57,7 +57,7 @@
             "label": "Allow fail build",
             "defaultValue": "true",
             "required": true,
-            "helpMarkDown": "Uncheck if you do not wish to fail the build, following rules with 'Fail Build' actions."
+            "helpMarkDown": "Unset if you don't wish the audit process to exit with code 3, if a violation matching an Xray policy is found, and the policy includes a 'Fail Build' rule."
         },
         {
             "name": "vuln",
@@ -65,7 +65,7 @@
             "label": "Show all vulnerabilities",
             "defaultValue": "false",
             "required": true,
-            "helpMarkDown": "Set to true if you'd like to receive all vulnerabilities, regardless of the policy configured in Xray. (This functionality requires version 3.40.0 or above of JFrog Xray)"
+            "helpMarkDown": "Set to true if you'd like to see an additional view with all vulnerabilities, regardless of the policy configured in Xray. (This functionality requires version 3.40.0 or above of JFrog Xray)"
         }
     ],
     "execution": {

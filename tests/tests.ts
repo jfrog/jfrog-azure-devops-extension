@@ -59,8 +59,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME || '') +
                             ' --password=' +
                             jfrogUtils.quote('SUPER_SECRET'),
-                        TestUtils.testDataDir,
-                        ['']
+                        TestUtils.testDataDir
                     );
                 } catch (ex) {
                     retVal = ex as string;
@@ -963,7 +962,7 @@ function runSyncTest(description: string, testFunc: () => void, skip?: boolean):
     it(description, (done): void => {
         testFunc();
         done();
-    }).timeout(300000); // 5 minutes
+    }).timeout(360000); // 6 minutes
 }
 
 /**

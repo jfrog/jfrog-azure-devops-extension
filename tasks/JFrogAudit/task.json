@@ -2,7 +2,7 @@
     "id": "d1d65fc8-c86f-4de9-81d2-16d5d20ec6c7",
     "name": "JFrogAudit",
     "friendlyName": "JFrog Audit",
-    "description": "Audit the project for security vulnerabilities.",
+    "description": "Audit your local project's dependencies by generating a dependency tree and scanning it with Xray.",
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-AuditProjectforSecurityVulnerabilitieswithJFrogXray)",
     "category": "Utility",
@@ -22,15 +22,15 @@
         {
             "name": "xrayConnection",
             "type": "connectedService:jfrogXrayService",
-            "label": "Xray service connection",
+            "label": "JFrog Xray service connection",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Xray service to be used by this task. (This functionality requires version 3.29.0 or above of JFrog Xray)"
+            "helpMarkDown": "JFrog Xray service to be used by this task. (This functionality requires version 3.29.0 or above of JFrog Xray)"
         },
         {
             "name": "workingDirectory",
             "type": "filePath",
-            "label": "Working Directory.",
+            "label": "Working Directory",
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
@@ -64,11 +64,11 @@
         {
             "name": "project",
             "type": "string",
-            "label": "JFrog project key",
+            "label": "JFrog Project key",
             "defaultValue": "",
             "required": true,
             "visibleRule": "watchesSource=project",
-            "helpMarkDown": "The JFrog project key."
+            "helpMarkDown": "The JFrog Project key."
         },
         {
             "name": "repoPath",
@@ -94,7 +94,8 @@
             "label": "Allow fail build",
             "defaultValue": "true",
             "required": true,
-            "helpMarkDown": "Uncheck if you do not wish to fail the build, following rules with 'Fail Build' actions."
+            "visibleRule": "watchesSource!=none",
+            "helpMarkDown": "Unset if you don't wish the audit process to exit with code 3, if a violation matching an Xray policy is found, and the policy includes a 'Fail Build' rule."
         }
     ],
     "execution": {
