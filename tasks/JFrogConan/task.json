@@ -205,7 +205,7 @@
         {
             "name": "workingDirectory",
             "type": "filePath",
-            "label": "Working Directory.",
+            "label": "Working Directory",
             "defaultValue": "",
             "required": false,
             "groupName": "advanced"
