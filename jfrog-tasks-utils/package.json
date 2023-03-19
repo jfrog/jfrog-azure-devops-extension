@@ -8,9 +8,9 @@
     "main": "utils",
     "typings": "utils.d.ts",
     "dependencies": {
-        "azure-pipelines-task-lib": "^3.1.10",
-        "azure-pipelines-tool-lib": "^1.1.0",
-        "typed-rest-client": "^1.8.3"
+        "azure-pipelines-task-lib": "^3.3.1",
+        "azure-pipelines-tool-lib": "^1.3.2",
+        "typed-rest-client": "^1.8.9"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
