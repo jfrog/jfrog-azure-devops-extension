@@ -6,11 +6,14 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-TriggeringGradleBuilds)",
     "category": "Utility",
-    "visibility": ["Build", "Release"],
+    "visibility": [
+        "Build",
+        "Release"
+    ],
     "version": {
         "Major": "1",
         "Minor": "4",
-        "Patch": "1"
+        "Patch": "2"
     },
     "demands": [],
     "minimumAgentVersion": "1.89.0",
