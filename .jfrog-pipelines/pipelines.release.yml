@@ -52,7 +52,7 @@ pipelines:
             # Update version
             - npm i --unsafe-perm --prefix=buildScripts
             - env -i PATH=$PATH HOME=$HOME node buildScripts/bump-version.js -v $NEXT_VERSION
-            - git commit -am '[jfrog-release] Release version $NEXT_VERSION'
+            - git commit -am "[jfrog-release] Release version $NEXT_VERSION"
             - git tag $NEXT_VERSION
 
             # Run install, audit and create
