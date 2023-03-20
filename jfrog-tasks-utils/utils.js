@@ -22,6 +22,8 @@ const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-
 const pipelineRequestedCliVersionEnv = 'JFROG_CLI_PIPELINE_REQUESTED_VERSION_AZURE';
 // The actual JFrog CLI version used in a task.
 const taskSelectedCliVersionEnv = 'JFROG_CLI_TASK_SELECTED_VERSION_AZURE';
+// Jfrog CLI version string to get latest version.
+const jfrogCliReleaseVersionString = '[RELEASE]';
 
 // Maven/Gradle Extractors Env:
 const extractorsRemoteEnv = 'JFROG_CLI_EXTRACTORS_REMOTE';
@@ -94,8 +96,10 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     process.env.CI = true;
 
     if (!cliVersion) {
+        // Convert 'latest' to '[RELEASE]' to get latest jfrog cli version
+        let costumeVersion = convertLatestVersionToReleaseIfNeeded(tl.getVariable(pipelineRequestedCliVersionEnv))
         // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
-        cliVersion = tl.getVariable(pipelineRequestedCliVersionEnv) || defaultJfrogCliVersion;
+        cliVersion = costumeVersion || defaultJfrogCliVersion;
     }
     // If unspecified, download from 'releases.jfrog.io' by default.
     if (!cliDownloadUrl) {
@@ -458,6 +462,11 @@ function addCommonGenericParams(cliCommand, specPath) {
 function logCliVersionAndSetSelected(cliPath) {
     try {
         let detectedVersion = getCliVersion(cliPath);
+        // If the min version allowed is higher than the requested version we will fail the task.
+        if (compareVersions(minCustomCliVersion, detectedVersion) > 0) {
+            tl.setResult(tl.TaskResult.Failed, 'Custom JFrog CLI Version must be at least ' + minCustomCliVersion);
+            return;
+        }
         console.log('JFrog CLI version: ' + detectedVersion);
         tl.setVariable(taskSelectedCliVersionEnv, detectedVersion);
     } catch (ex) {
@@ -803,4 +812,12 @@ function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
     } catch (cleanupException) {
         tl.setResult(tl.TaskResult.Failed, cleanupException);
     }
+}
+
+// Convert latest to "[RELEASE]" to get latest jfrog cli version
+function convertLatestVersionToReleaseIfNeeded(version) {
+    if (version && version.toLowerCase().localeCompare("latest")){
+        return jfrogCliReleaseVersionString
+    }
+    return version
 }
