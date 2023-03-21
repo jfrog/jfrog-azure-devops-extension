@@ -96,11 +96,13 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     process.env.CI = true;
 
     if (!cliVersion) {
-        // Convert 'latest' to '[RELEASE]' to get latest jfrog cli version
-        let customVersion = convertLatestVersionToReleaseIfNeeded(tl.getVariable(pipelineRequestedCliVersionEnv))
         // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
-        cliVersion = customVersion || defaultJfrogCliVersion;
+        cliVersion = tl.getVariable(pipelineRequestedCliVersionEnv) || defaultJfrogCliVersion;
     }
+
+    // Convert 'latest' to '[RELEASE]' to get latest jfrog cli version
+    cliVersion = convertLatestVersionToReleaseIfNeeded(cliVersion)
+
     // If unspecified, download from 'releases.jfrog.io' by default.
     if (!cliDownloadUrl) {
         cliDownloadUrl = buildReleasesDownloadUrl(cliVersion);
