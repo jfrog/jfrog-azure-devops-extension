@@ -180,11 +180,11 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
     let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl + '. ';
     if (downloadUrl === buildReleasesDownloadUrl(cliVersion)) {
         errMsg +=
-            "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
+            "\nIf this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
             buildReleasesDownloadUrl(cliVersion) +
-            '. You ';
+            '.\nYou ';
     } else {
-        errMsg += 'If the chosen Artifactory Service cannot access the internet, you ';
+        errMsg += '\nIf the chosen Artifactory Service cannot access the internet, \nyou ';
     }
     errMsg += 'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + customCliPath;
     return errMsg;
@@ -507,6 +507,13 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
         toolLib
             .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
             .then(downloadPath => {
+                // If cliVersion is not a semver ("[RELEASE]" for example), use the executable to get the downloaded version
+                if (!isSemverVersion(cliVersion)){
+                    if (!isWindows()) {
+                        fs.chmodSync(downloadPath, 0o555);
+                    }
+                    cliVersion = getCliVersion(downloadPath)
+                }
                 toolLib.cacheFile(downloadPath, fileName, jfrogCliToolName, cliVersion).then(cliDir => {
                     let cliPath = path.join(cliDir, fileName);
                     if (!isWindows()) {
@@ -520,6 +527,10 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
                 reject(err);
             });
     });
+}
+
+function isSemverVersion(version) {
+    return version && version.split(".").length === 2
 }
 
 // Compares two versions.
