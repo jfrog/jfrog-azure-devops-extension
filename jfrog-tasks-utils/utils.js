@@ -818,7 +818,7 @@ function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
 
 // Convert latest to "[RELEASE]" to get latest jfrog cli version
 function convertLatestVersionToReleaseIfNeeded(version) {
-    if (version && version.toLowerCase().localeCompare("latest")){
+    if (version && version.toLowerCase().localeCompare("latest") === 0){
         return jfrogCliReleaseVersionString
     }
     return version
