@@ -22,7 +22,7 @@ const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-
 const pipelineRequestedCliVersionEnv = 'JFROG_CLI_PIPELINE_REQUESTED_VERSION_AZURE';
 // The actual JFrog CLI version used in a task.
 const taskSelectedCliVersionEnv = 'JFROG_CLI_TASK_SELECTED_VERSION_AZURE';
-// Jfrog CLI version string to get latest version.
+// JFrog CLI version string to get the latest version.
 const jfrogCliReleaseVersionString = '[RELEASE]';
 
 // Maven/Gradle Extractors Env:
@@ -101,7 +101,7 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     }
 
     // Convert 'latest' to '[RELEASE]' to get latest jfrog cli version
-    cliVersion = convertLatestVersionToReleaseIfNeeded(cliVersion)
+    cliVersion = convertLatestVersionToReleaseIfNeeded(cliVersion);
 
     // If unspecified, download from 'releases.jfrog.io' by default.
     if (!cliDownloadUrl) {
@@ -181,7 +181,7 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
     if (downloadUrl === buildReleasesDownloadUrl(cliVersion)) {
         errMsg +=
             "\nIf this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
-            buildReleasesDownloadUrl(cliVersion) +
+            jfrogCliReleasesUrl +
             '.\nYou ';
     } else {
         errMsg += '\nIf the chosen Artifactory Service cannot access the internet, \nyou ';
@@ -508,11 +508,11 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
             .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
             .then(downloadPath => {
                 // If cliVersion is not a semver ("[RELEASE]" for example), use the executable to get the downloaded version
-                if (!isSemverVersion(cliVersion)){
+                if (!isSemverVersion(cliVersion)) {
                     if (!isWindows()) {
                         fs.chmodSync(downloadPath, 0o555);
                     }
-                    cliVersion = getCliVersion(downloadPath)
+                    cliVersion = getCliVersion(downloadPath);
                 }
                 toolLib.cacheFile(downloadPath, fileName, jfrogCliToolName, cliVersion).then(cliDir => {
                     let cliPath = path.join(cliDir, fileName);
@@ -530,7 +530,7 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
 }
 
 function isSemverVersion(version) {
-    return version && version.split(".").length === 2
+    return version && version.split('.').length === 2;
 }
 
 // Compares two versions.
@@ -829,8 +829,8 @@ function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
 
 // Convert latest to "[RELEASE]" to get latest jfrog cli version
 function convertLatestVersionToReleaseIfNeeded(version) {
-    if (version && version.toLowerCase().localeCompare("latest") === 0){
-        return jfrogCliReleaseVersionString
+    if (version && version.toLowerCase().localeCompare('latest') === 0) {
+        return jfrogCliReleaseVersionString;
     }
-    return version
+    return version;
 }
