@@ -42,7 +42,7 @@
             "defaultValue": "$(jfrogCliVersion)",
             "required": true,
             "visibleRule": "useCustomVersion = true",
-            "helpMarkDown": "Specify the version of JFrog CLI to use.\nYou can also set $(jfrogCliVersion)."
+            "helpMarkDown": "Specify the version of JFrog CLI to use.\nYou can also set '$(jfrogCliVersion)' or 'latest'."
         },
         {
             "name": "command",
