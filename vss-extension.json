@@ -107,8 +107,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "JFrog username with deploy permissions.",
+                                "description": "JFrog Platform username with deploy permissions.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": false,
                                     "dataType": "string"
@@ -191,8 +192,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "Artifactory username with deploy permissions.",
+                                "description": "JFrog Artifactory username with deploy permissions.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": false,
                                     "dataType": "string"
@@ -201,7 +203,7 @@
                             {
                                 "id": "password",
                                 "name": "Password",
-                                "description": "Password or API key of an Artifactory user with deploy permissions.",
+                                "description": "Password or API key of an JFrog Artifactory user with deploy permissions.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -265,8 +267,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "Distribution username.",
+                                "description": "JFrog Distribution username.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": true,
                                     "dataType": "string"
@@ -339,8 +342,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "Xray username.",
+                                "description": "JFrog Xray username.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": true,
                                     "dataType": "string"
