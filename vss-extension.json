@@ -203,7 +203,7 @@
                             {
                                 "id": "password",
                                 "name": "Password",
-                                "description": "Password or API key of an JFrog Artifactory user with deploy permissions.",
+                                "description": "Password or API key of an Artifactory user with deploy permissions.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
