@@ -107,8 +107,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "JFrog username with deploy permissions.",
+                                "description": "JFrog Platform username with permissions.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": false,
                                     "dataType": "string"
@@ -117,7 +118,7 @@
                             {
                                 "id": "password",
                                 "name": "Password",
-                                "description": "Password or API key of an JFrog user with deploy permissions.",
+                                "description": "Password or API key of an JFrog user with permissions.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -139,7 +140,7 @@
                             {
                                 "id": "apitoken",
                                 "name": "Access Token",
-                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "description": "Access Token with permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -191,8 +192,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "Artifactory username with deploy permissions.",
+                                "description": "JFrog username with Artifactory deploy permissions.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": false,
                                     "dataType": "string"
@@ -201,7 +203,7 @@
                             {
                                 "id": "password",
                                 "name": "Password",
-                                "description": "Password or API key of an Artifactory user with deploy permissions.",
+                                "description": "Password or API key of the JFrog user",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -223,7 +225,7 @@
                             {
                                 "id": "apitoken",
                                 "name": "Access Token",
-                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "description": "Access Token with Artifactory deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -265,8 +267,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "Distribution username.",
+                                "description": "JFrog username with Distribution permissions.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": true,
                                     "dataType": "string"
@@ -275,7 +278,7 @@
                             {
                                 "id": "password",
                                 "name": "Password",
-                                "description": "Password or API key of an Distribution user.",
+                                "description": "Password or API key of the JFrog user.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -297,7 +300,7 @@
                             {
                                 "id": "apitoken",
                                 "name": "Access Token",
-                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "description": "Access Token with Distribution permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -339,8 +342,9 @@
                             {
                                 "id": "username",
                                 "name": "Username",
-                                "description": "Xray username.",
+                                "description": "JFrog username with Xray permissions.",
                                 "inputMode": "textbox",
+                                "isConfidential": false,
                                 "validation": {
                                     "isRequired": true,
                                     "dataType": "string"
@@ -349,7 +353,7 @@
                             {
                                 "id": "password",
                                 "name": "Password",
-                                "description": "Password or API key of an Xray user.",
+                                "description": "Password or API key of the JFrog user.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
@@ -371,7 +375,7 @@
                             {
                                 "id": "apitoken",
                                 "name": "Access Token",
-                                "description": "Access Token with deploy permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
+                                "description": "Access Token with Xray permissions. Click <a href=\"https://www.jfrog.com/confluence/display/ACC/Access+Tokens\" target=\"_blank\">here</a> for information on how to generate Access Tokens.",
                                 "inputMode": "passwordbox",
                                 "isConfidential": true,
                                 "validation": {
