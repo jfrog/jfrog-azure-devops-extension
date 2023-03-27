@@ -104,7 +104,7 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerIdsArray) 
         nugetCommandCli = utils.addProjectOption(nugetCommandCli);
     }
     try {
-        utils.executeCliCommand(nugetCommandCli, buildDir, null);
+        utils.executeCliCommand(nugetCommandCli, buildDir);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -132,7 +132,7 @@ function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
 
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir, null);
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
         return resolverServerId;
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);

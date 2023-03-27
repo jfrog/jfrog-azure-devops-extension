@@ -77,7 +77,7 @@ function executeGradleConfig(cliPath, workDir) {
     cliCommand = utils.addStringParam(cliCommand, 'ivyArtifactsPattern', 'ivy-artifacts-pattern');
 
     // Execute cli.
-    utils.executeCliCommand(cliCommand, workDir, null);
+    utils.executeCliCommand(cliCommand, workDir);
 }
 
 /**
@@ -96,7 +96,7 @@ function executeGradle(cliPath, workDir) {
     gradleCommand = utils.appendBuildFlagsToCliCommand(gradleCommand);
 
     // Execute cli.
-    utils.executeCliCommand(gradleCommand, workDir, null);
+    utils.executeCliCommand(gradleCommand, workDir);
 }
 
 function cleanup(cliPath, workDir) {

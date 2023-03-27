@@ -63,7 +63,7 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) 
         cliCmd = utils.addProjectOption(cliCmd);
     }
     try {
-        utils.executeCliCommand(cliCmd, buildDir, null);
+        utils.executeCliCommand(cliCmd, buildDir);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -91,7 +91,7 @@ function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
 
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir, null);
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
         return resolverServerId;
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);

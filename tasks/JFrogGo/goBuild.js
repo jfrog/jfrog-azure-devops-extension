@@ -96,7 +96,7 @@ function executeGoCliCommand(cliCommand, cliPath, requiredWorkDir) {
 
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir, null);
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {

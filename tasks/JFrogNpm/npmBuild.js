@@ -71,7 +71,7 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
 
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, requiredWorkDir, null);
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
