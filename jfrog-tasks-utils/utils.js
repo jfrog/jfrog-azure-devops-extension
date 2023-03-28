@@ -189,11 +189,15 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
  * Execute provided CLI command in a child process. In order to receive execution's stdout, pass stdio=null.
  * @param {string} cliCommand
  * @param {string} runningDir
- * @param {string|Array} stdinSecret - secret to be provided vi stdin.
+ * @param {object} options - secret to be provided vi stdin.
+ * @param {{
+ *   stdinSecret?: string;
+ *   withOutput?: boolean
+ *   }} [options]
  * @returns {Buffer|string} - execSync output.
  * @throws In CLI execution failure.
  */
-function executeCliCommand(cliCommand, runningDir, stdinSecret = undefined) {
+function executeCliCommand(cliCommand, runningDir, options = {}) {
     if (!fs.existsSync(runningDir)) {
         throw "JFrog CLI execution path doesn't exist: " + runningDir;
     }
@@ -201,9 +205,11 @@ function executeCliCommand(cliCommand, runningDir, stdinSecret = undefined) {
         throw 'Cannot execute empty Cli command.';
     }
     try {
-        let stdio = [stdinSecret ? 'pipe' : 0, 1, 2];
+        const stdin = options.stdinSecret ? 'pipe' : 0
+        const stdout = options.withOutput ? 'pipe' : 1
+        const stderr = 2
         console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand));
-        return execSync(cliCommand, { cwd: runningDir, stdio: stdio, input: stdinSecret });
+        return execSync(cliCommand, {cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret});
     } catch (ex) {
         // Error occurred - mask secrets in message.
         if (ex.message) {
@@ -254,18 +260,18 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     if (serviceAccessToken) {
         // Add access-token if required.
         cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));
-        stdinSecret = serviceAccessToken;
+        stdinSecret = secretInStdinSupported ? serviceAccessToken : undefined;
     } else {
         // Add username and password.
-        stdinSecret = servicePassword;
         cliCommand = cliJoin(
             cliCommand,
             '--user=' + (isWindows() ? quote(serviceUser) : singleQuote(serviceUser)),
             '--basic-auth-only',
             secretInStdinSupported ? '--password-stdin' : '--password=' + (isWindows() ? quote(servicePassword) : singleQuote(servicePassword))
         );
+        stdinSecret = secretInStdinSupported ? servicePassword : undefined;
     }
-    return executeCliCommand(cliCommand, buildDir, secretInStdinSupported ? stdinSecret : undefined);
+    return executeCliCommand(cliCommand, buildDir, {stdinSecret});
 }
 
 /**
