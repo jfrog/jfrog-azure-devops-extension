@@ -44,7 +44,7 @@
     },
     "links": {
         "getstarted": {
-            "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Documentation"
+            "uri": "https://jfrog.com/help/r/get-started-with-the-jfrog-platform/get-started"
         },
         "learn": {
             "uri": "https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension"
