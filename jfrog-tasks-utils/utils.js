@@ -9,7 +9,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.35.0';
+const defaultJfrogCliVersion = '2.36.0';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const pluginVersion = '2.4.2';
@@ -205,9 +205,9 @@ function executeCliCommand(cliCommand, runningDir, options = {}) {
         throw 'Cannot execute empty Cli command.';
     }
     try {
-        const stdin = options.stdinSecret ? 'pipe' : 0
-        const stdout = options.withOutput ? 'pipe' : 1
-        const stderr = 2
+        const stdin = options.stdinSecret ? 'pipe' : 0;
+        const stdout = options.withOutput ? 'pipe' : 1;
+        const stderr = 2;
         console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand));
         return execSync(cliCommand, {cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret});
     } catch (ex) {

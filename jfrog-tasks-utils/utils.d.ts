@@ -16,9 +16,7 @@ declare module '@jfrog/tasks-utils' {
     export function getArchitecture(): string;
     export function determineCliWorkDir(defaultPath: string, providedPath: string): string;
     export function compareVersions(version1: string, version2: string): number;
-
     export function executeCliCommand(cliCommand: string, runningDir: string, options?: {}): string;
-
     export function handleSpecFile(cliCommand: string, specPath: string): string;
     export function addBoolParam(cliCommand: string, inputParam: string, cliParam: string): string;
     export function addStringParam(cliCommand: string, inputParam: string, cliParam: string, require: boolean): string;
