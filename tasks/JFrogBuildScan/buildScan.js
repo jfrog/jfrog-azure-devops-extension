@@ -23,7 +23,7 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addProjectOption(cliCommand);
 
     try {
-        utils.executeCliCommand(cliCommand, process.cwd(), null);
+        utils.executeCliCommand(cliCommand, process.cwd());
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
     } finally {

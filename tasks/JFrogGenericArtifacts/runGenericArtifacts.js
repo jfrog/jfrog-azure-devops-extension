@@ -128,7 +128,7 @@ function performGenericTask(cliCommand, cliPath, workDir) {
     try {
         cliCommand = utils.addCommonGenericParams(cliCommand, specPath);
         // Execute the cli command.
-        utils.executeCliCommand(cliCommand, workDir, null);
+        utils.executeCliCommand(cliCommand, workDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
@@ -188,7 +188,7 @@ function performArtifactSourceDownload(cliPath, workDir) {
     }
 
     try {
-        utils.executeCliCommand(cliCommand, workDir, null);
+        utils.executeCliCommand(cliCommand, workDir);
         tl.setResult(tl.TaskResult.Succeeded, 'Download Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);

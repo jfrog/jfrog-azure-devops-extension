@@ -9,9 +9,10 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.35.0';
+const defaultJfrogCliVersion = '2.36.0';
 const minCustomCliVersion = '2.10.0';
-const pluginVersion = '2.4.2';
+const minSupportedStdinSecretCliVersion = '2.36.0';
+const pluginVersion = '2.5.0';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
@@ -171,14 +172,14 @@ function createAuthHandlers(serviceConnection) {
 }
 
 function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
-    let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl + '. ';
+    let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl;
     if (downloadUrl === buildReleasesDownloadUrl(cliVersion)) {
         errMsg +=
-            "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
+            "\nIf this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, \nwhich proxies " +
             buildReleasesDownloadUrl(cliVersion) +
-            '. You ';
+            '\nYou ';
     } else {
-        errMsg += 'If the chosen Artifactory Service cannot access the internet, you ';
+        errMsg += '\nIf the chosen Artifactory Service cannot access the internet, you ';
     }
     errMsg += 'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + customCliPath;
     return errMsg;
@@ -188,11 +189,15 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
  * Execute provided CLI command in a child process. In order to receive execution's stdout, pass stdio=null.
  * @param {string} cliCommand
  * @param {string} runningDir
- * @param {string|Array} stdio - stdio to use for CLI execution.
+ * @param {object} options - secret to be provided vi stdin.
+ * @param {{
+ *   stdinSecret?: string;
+ *   withOutput?: boolean
+ *   }} [options]
  * @returns {Buffer|string} - execSync output.
  * @throws In CLI execution failure.
  */
-function executeCliCommand(cliCommand, runningDir, stdio) {
+function executeCliCommand(cliCommand, runningDir, options = {}) {
     if (!fs.existsSync(runningDir)) {
         throw "JFrog CLI execution path doesn't exist: " + runningDir;
     }
@@ -200,11 +205,11 @@ function executeCliCommand(cliCommand, runningDir, stdio) {
         throw 'Cannot execute empty Cli command.';
     }
     try {
-        if (!stdio) {
-            stdio = [0, 1, 2];
-        }
-        console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand));
-        return execSync(cliCommand, { cwd: runningDir, stdio: stdio });
+        const stdin = options.stdinSecret ? 'pipe' : 0;
+        const stdout = options.withOutput ? 'pipe' : 1;
+        const stderr = 2;
+        console.log('Executing JFrog CLI Command:\n' + maskSecrets(cliCommand));
+        return execSync(cliCommand, {cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret});
     } catch (ex) {
         // Error occurred - mask secrets in message.
         if (ex.message) {
@@ -250,19 +255,23 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     let servicePassword = tl.getEndpointAuthorizationParameter(service, 'password', true);
     let serviceAccessToken = tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
     let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
+    let stdinSecret;
+    let secretInStdinSupported = compareVersions(tl.getVariable(taskSelectedCliVersionEnv), minSupportedStdinSecretCliVersion) >= 0;
     if (serviceAccessToken) {
         // Add access-token if required.
-        cliCommand = cliJoin(cliCommand, '--access-token=' + quote(serviceAccessToken));
+        cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));
+        stdinSecret = secretInStdinSupported ? serviceAccessToken : undefined;
     } else {
         // Add username and password.
         cliCommand = cliJoin(
             cliCommand,
             '--user=' + (isWindows() ? quote(serviceUser) : singleQuote(serviceUser)),
-            '--password=' + (isWindows() ? quote(servicePassword) : singleQuote(servicePassword)),
-            '--basic-auth-only'
+            '--basic-auth-only',
+            secretInStdinSupported ? '--password-stdin' : '--password=' + (isWindows() ? quote(servicePassword) : singleQuote(servicePassword))
         );
+        stdinSecret = secretInStdinSupported ? servicePassword : undefined;
     }
-    return executeCliCommand(cliCommand, buildDir, null);
+    return executeCliCommand(cliCommand, buildDir, {stdinSecret});
 }
 
 /**
@@ -331,7 +340,7 @@ function configureDefaultXrayServer(usageType, cliPath, workDir) {
  */
 function useCliServer(serverId, cliPath, buildDir) {
     const cliCommand = cliJoin(cliPath, jfrogCliConfigUseCommand, quote(serverId));
-    return executeCliCommand(cliCommand, buildDir, null);
+    return executeCliCommand(cliCommand, buildDir);
 }
 
 /**
@@ -349,7 +358,7 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
             if (serverIdArray[i]) {
                 const deleteServerIDCommand = cliJoin(cliPath, jfrogCliConfigRmCommand, quote(serverIdArray[i]), '--quiet');
                 // This operation throws an exception in case of failure.
-                executeCliCommand(deleteServerIDCommand, buildDir, null);
+                executeCliCommand(deleteServerIDCommand, buildDir);
             }
         } catch (deleteServersException) {
             tl.setResult(tl.TaskResult.Failed, `Could not delete server id ${serverIdArray[i]} error: ${deleteServersException}`);
@@ -475,7 +484,7 @@ function getCliVersion(cliPath) {
 }
 
 function runCbk(cliPath) {
-    console.log('Running jfrog-cli from ' + cliPath + '.');
+    console.log('Running jfrog-cli from ' + cliPath);
     logCliVersionAndSetSelected(cliPath);
     runTaskCbk(cliPath);
 }
@@ -652,7 +661,7 @@ function collectEnvVars(cliPath) {
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     let cliEnvVarsCommand = cliJoin(cliPath, 'rt bce', quote(buildName), quote(buildNumber));
     cliEnvVarsCommand = addProjectOption(cliEnvVarsCommand);
-    executeCliCommand(cliEnvVarsCommand, workDir, null);
+    executeCliCommand(cliEnvVarsCommand, workDir);
 }
 
 function isWindows() {
@@ -724,7 +733,7 @@ function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand,
     }
     // Execute cli.
     try {
-        executeCliCommand(cliCommand, requiredWorkDir, null);
+        executeCliCommand(cliCommand, requiredWorkDir);
         return [serverIdResolve, serverIdDeploy];
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
