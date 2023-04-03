@@ -39,7 +39,7 @@ function RunTaskCbk(cliPath: string): void {
     let mavenCommand: string = utils.cliJoin(cliPath, cliMavenCommand, goalsAndOptions);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
     try {
-        utils.executeCliCommand(mavenCommand, workDir, undefined);
+        utils.executeCliCommand(mavenCommand, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
     } finally {
@@ -66,7 +66,7 @@ function setJdkHome(): void {
         javaHome = tl.getPathInput('jdkUserInputPath', true, true);
     }
 
-    // Set JAVA_HOME as determined above (if different than default)
+    // Set JAVA_HOME as determined above (if different from default)
     if (javaHome) {
         console.log('The Java home location: ' + javaHome);
         tl.setVariable('JAVA_HOME', javaHome);
@@ -123,7 +123,7 @@ function createMavenConfigFile(cliPath: string, buildDir: string) {
     }
     // Execute cli.
     try {
-        utils.executeCliCommand(cliCommand, buildDir, undefined);
+        utils.executeCliCommand(cliCommand, buildDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
     }
