@@ -18,11 +18,6 @@ function RunJfrogCliCommand(RunTaskCbk) {
     }
 
     let cliVersion = tl.getInput('cliVersion', true);
-    // If the min version allowed is higher than the requested version we will fail the task.
-    if (utils.compareVersions(utils.minCustomCliVersion, cliVersion) > 0) {
-        tl.setResult(tl.TaskResult.Failed, 'Custom JFrog CLI Version must be at least ' + utils.minCustomCliVersion);
-        return;
-    }
     utils.executeCliTask(RunTaskCbk, cliVersion);
 }
 
