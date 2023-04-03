@@ -172,14 +172,14 @@ function createAuthHandlers(serviceConnection) {
 }
 
 function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
-    let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl + '. ';
+    let errMsg = 'Failed while attempting to download JFrog CLI from ' + downloadUrl;
     if (downloadUrl === buildReleasesDownloadUrl(cliVersion)) {
         errMsg +=
-            "If this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, which proxies " +
+            "\nIf this build agent cannot access the internet, you may use the 'Artifactory Tools Installer' task, to download JFrog CLI through an Artifactory repository, \nwhich proxies " +
             buildReleasesDownloadUrl(cliVersion) +
-            '. You ';
+            '\nYou ';
     } else {
-        errMsg += 'If the chosen Artifactory Service cannot access the internet, you ';
+        errMsg += '\nIf the chosen Artifactory Service cannot access the internet, you ';
     }
     errMsg += 'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + customCliPath;
     return errMsg;
@@ -208,7 +208,7 @@ function executeCliCommand(cliCommand, runningDir, options = {}) {
         const stdin = options.stdinSecret ? 'pipe' : 0;
         const stdout = options.withOutput ? 'pipe' : 1;
         const stderr = 2;
-        console.log('Executing JFrog CLI Command: ' + maskSecrets(cliCommand));
+        console.log('Executing JFrog CLI Command:\n' + maskSecrets(cliCommand));
         return execSync(cliCommand, {cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret});
     } catch (ex) {
         // Error occurred - mask secrets in message.
