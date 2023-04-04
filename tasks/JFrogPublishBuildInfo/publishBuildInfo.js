@@ -30,7 +30,7 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     try {
-        let taskRes = utils.executeCliCommand(cliCommand, workDir, {withOutput: true});
+        let taskRes = utils.executeCliCommand(cliCommand, workDir, { withOutput: true });
         let buildInfoUrl = '';
         if (taskRes && taskRes.length) {
             let resJson = JSON.parse(taskRes);

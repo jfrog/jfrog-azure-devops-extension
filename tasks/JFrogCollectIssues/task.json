@@ -60,6 +60,14 @@
             "helpMarkDown": "Path to a file, with the details required for the build issues collection. Please create a yaml configuration as described <a href=\"https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-CollectingBuildIssues\" target=\"_blank\">here."
         },
         {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
+        },
+        {
             "name": "buildName",
             "type": "string",
             "label": "Build name",
