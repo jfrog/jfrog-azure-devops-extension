@@ -12,9 +12,9 @@ const cliDeleteArtifactsCommand = 'rt del';
 let serverId;
 
 function RunTaskCbk(cliPath) {
-    let workDir = tl.getVariable('System.DefaultWorkingDirectory');
+    let workDir = tl.getPathInput('workingDirectory') ?? tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
-        tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
+        tl.setResult(tl.TaskResult.Failed, 'Failed getting working directory.');
         return;
     }
 

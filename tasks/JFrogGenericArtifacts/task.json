@@ -379,10 +379,17 @@
             "name": "syncDeletesPathRemote",
             "type": "string",
             "label": "Path to sync and delete files from in Artifactory",
-            "defaultValue": "",
             "required": false,
             "groupName": "advancedUpload",
             "helpMarkDown": "If you'd like to sync artifacts after the upload, set a specific path in Artifactory. Leave empty otherwise.\nIf set, after the upload completes, this path will include only the artifacts uploaded during this upload operation. The other files under this path will be deleted."
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Current working directory to use. Empty is the root of the repo (build) or artifacts (release), which is $(System.DefaultWorkingDirectory)"
         }
     ],
     "execution": {
