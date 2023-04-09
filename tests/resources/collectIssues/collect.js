@@ -1,7 +1,8 @@
 const testUtils = require('../../testUtils');
 const yaml = require('js-yaml');
-
+const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
+const CUSTOM_WORKING_DIR = "customDir"
 
 const configYaml = {
     version: 1,
@@ -21,9 +22,11 @@ let inputs = {
     buildName: 'Collect issues',
     buildNumber: '3',
     configSource: 'taskConfiguration',
-    taskConfig: configString
+    taskConfig: configString,
+    // Relative working directory
+    workingDirectory: CUSTOM_WORKING_DIR
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'collectIssues_.git_suffix', '.git');
+testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'collectIssues_.git_suffix', path.join(CUSTOM_WORKING_DIR, '.git'));
 testUtils.runArtifactoryTask(testUtils.collectIssues, {}, inputs);
