@@ -9,8 +9,7 @@ let inputs = {
     buildNumber: '4',
     configSource: 'file',
     file: configPath,
-    // Absolute working directory
-    workingDirectory: path.join(testUtils.testDataDir, TEST_NAME, CUSTOM_WORKING_DIR)
+    workingDirectory: CUSTOM_WORKING_DIR
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

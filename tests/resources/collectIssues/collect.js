@@ -23,7 +23,6 @@ let inputs = {
     buildNumber: '3',
     configSource: 'taskConfiguration',
     taskConfig: configString,
-    // Relative working directory
     workingDirectory: CUSTOM_WORKING_DIR
 };
 
