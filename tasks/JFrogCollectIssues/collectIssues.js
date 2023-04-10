@@ -13,13 +13,21 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
+    // Determine working directory for the cli.
+    let inputWorkingDirectory = tl.getInput('workingDirectory', false);
+    let requiredWorkDir = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
+    if (!fs.existsSync(requiredWorkDir) || !fs.lstatSync(requiredWorkDir).isDirectory()) {
+        tl.setResult(tl.TaskResult.Failed, "Provided 'Working Directory': " + requiredWorkDir + ' neither exists nor a directory.');
+        return;
+    }
+
     // Get input parameters.
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
     let configSource = tl.getInput('configSource', false);
 
     // Create config yaml.
-    let configPath = path.join(defaultWorkDir, 'issuesConfig_' + Date.now() + '.yaml');
+    let configPath = path.join(requiredWorkDir, 'issuesConfig_' + Date.now() + '.yaml');
     try {
         writeConfigFile(configSource, configPath);
     } catch (ex) {
@@ -27,7 +35,7 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    serverId = utils.configureDefaultArtifactoryServer('collect_issues', cliPath, defaultWorkDir);
+    serverId = utils.configureDefaultArtifactoryServer('collect_issues', cliPath, requiredWorkDir);
 
     let cliCommand = utils.cliJoin(
         cliPath,
@@ -40,11 +48,11 @@ function RunTaskCbk(cliPath) {
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
 
     try {
-        utils.executeCliCommand(cliCommand, defaultWorkDir);
+        utils.executeCliCommand(cliCommand, requiredWorkDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
-        utils.taskDefaultCleanup(cliPath, defaultWorkDir, [serverId]);
+        utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
         // Remove created config file from file system.
         try {
             tl.rmRF(configPath);

@@ -9,7 +9,7 @@ function RunTaskCbk(cliPath: string): void {
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || process.cwd();
     const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
 
-    serverId = utils.configureDefaultXrayServer('xray_audit', cliPath, defaultWorkDir);
+    serverId = utils.configureDefaultXrayServer('xray_audit', cliPath, sourcePath);
 
     let auditCommand: string = utils.cliJoin(cliPath, cliAuditCommand);
     auditCommand = utils.addServerIdOption(auditCommand, serverId);
