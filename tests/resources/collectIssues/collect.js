@@ -2,7 +2,7 @@ const testUtils = require('../../testUtils');
 const yaml = require('js-yaml');
 const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
-const CUSTOM_WORKING_DIR = "customDir"
+const CUSTOM_WORKING_DIR = 'customDir';
 
 const configYaml = {
     version: 1,

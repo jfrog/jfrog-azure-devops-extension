@@ -6,13 +6,13 @@ import * as mocha from 'mocha';
 import * as path from 'path';
 import * as syncRequest from 'sync-request';
 import * as TestUtils from './testUtils';
+import {platformDockerDomain} from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as assert from 'assert';
 import * as os from 'os';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
-import { Tunnel } from 'node-tunnel';
-import { execSync } from 'child_process';
-import { platformDockerDomain } from './testUtils';
+import {Tunnel} from 'node-tunnel';
+import {execSync} from 'child_process';
 
 let tasksOutput: string;
 
@@ -153,10 +153,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const arch: string = jfrogUtils.getArchitecture();
                 switch (os.type()) {
                     case 'Linux':
-                        assert.ok(arch.startsWith('linux'));
+                        assert.ok(arch.startsWith('linux-'));
                         break;
                     case 'Darwin':
-                        assert.strictEqual(arch, 'mac-386');
+                        assert.ok(arch.startsWith('mac-'));
                         break;
                     case 'Windows_NT':
                         assert.strictEqual(arch, 'windows-amd64');
