@@ -560,14 +560,19 @@ function compareVersionTokens(version1Token, version2Token) {
 }
 
 function getArchitecture() {
-    let platform = process.platform;
+    const platform = process.platform;
     if (platform.startsWith('win')) {
+        // Windows architecture:
         return 'windows-amd64';
     }
+    const arch = process.arch;
     if (platform.includes('darwin')) {
-        return 'mac-386';
+        // macOS architecture:
+        return arch === 'arm64' ? 'mac-arm64' : 'mac-386';
     }
-    switch (process.arch) {
+
+    // linux architecture:
+    switch (arch) {
         case 'x64':
             return 'linux-amd64';
         case 'arm64':
@@ -576,8 +581,11 @@ function getArchitecture() {
             return 'linux-arm';
         case 's390x':
             return 'linux-s390x';
+        case 'ppc64':
+            return 'linux-ppc64';
+        default:
+            return 'linux-386';
     }
-    return 'linux-386';
 }
 
 function getCliExecutableName() {

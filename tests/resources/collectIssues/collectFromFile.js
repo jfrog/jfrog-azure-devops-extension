@@ -2,7 +2,7 @@ const testUtils = require('../../testUtils');
 const path = require('path');
 const TEST_NAME = testUtils.getTestName(__dirname);
 const configPath = path.join(testUtils.testDataDir, TEST_NAME, 'config.yaml');
-const CUSTOM_WORKING_DIR = "customDir"
+const CUSTOM_WORKING_DIR = 'customDir';
 
 let inputs = {
     buildName: 'Collect issues from file',
