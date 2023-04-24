@@ -12,6 +12,7 @@ const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirector
 const defaultJfrogCliVersion = '2.36.0';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
+const minSupportedServerIdEnvCliVersion = '2.37.0';
 const pluginVersion = '2.5.0';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
@@ -78,7 +79,8 @@ module.exports = {
     pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
     taskSelectedCliVersionEnv: taskSelectedCliVersionEnv,
     extractorsRemoteEnv: extractorsRemoteEnv,
-    jfrogCliToolName: jfrogCliToolName
+    jfrogCliToolName: jfrogCliToolName,
+    isServerIdEnvSupported: isServerIdEnvSupported()
 };
 
 /**
@@ -256,7 +258,7 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     let serviceAccessToken = tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
     let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
     let stdinSecret;
-    let secretInStdinSupported = compareVersions(tl.getVariable(taskSelectedCliVersionEnv), minSupportedStdinSecretCliVersion) >= 0;
+    let secretInStdinSupported = isStdinSecretSupported();
     if (serviceAccessToken) {
         // Add access-token if required.
         cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));
@@ -820,4 +822,12 @@ function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
     } catch (cleanupException) {
         tl.setResult(tl.TaskResult.Failed, cleanupException);
     }
+}
+
+function isStdinSecretSupported() {
+    return compareVersions(tl.getVariable(taskSelectedCliVersionEnv), minSupportedStdinSecretCliVersion) >= 0;
+}
+
+function isServerIdEnvSupported() {
+    return compareVersions(tl.getVariable(taskSelectedCliVersionEnv), minSupportedServerIdEnvCliVersion) >= 0;
 }
