@@ -80,7 +80,7 @@ module.exports = {
     taskSelectedCliVersionEnv: taskSelectedCliVersionEnv,
     extractorsRemoteEnv: extractorsRemoteEnv,
     jfrogCliToolName: jfrogCliToolName,
-    isServerIdEnvSupported: isServerIdEnvSupported()
+    isServerIdEnvSupported: isServerIdEnvSupported
 };
 
 /**
