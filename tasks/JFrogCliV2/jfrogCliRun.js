@@ -11,13 +11,14 @@ function RunJfrogCliCommand(RunTaskCbk) {
         utils.executeCliTask(RunTaskCbk);
         return;
     }
+    let cliVersion = tl.getInput('cliVersion', true);
+
     // Custom version selected, but placeholder provided.
-    if (tl.getInput('cliVersion', true).localeCompare('$(jfrogCliVersion)') === 0) {
+    if (cliVersion.localeCompare('$(jfrogCliVersion)') === 0) {
         utils.executeCliTask(RunTaskCbk);
         return;
     }
 
-    let cliVersion = tl.getInput('cliVersion', true);
     // If the min version allowed is higher than the requested version we will fail the task.
     if (utils.compareVersions(utils.minCustomCliVersion, cliVersion) > 0) {
         tl.setResult(tl.TaskResult.Failed, 'Custom JFrog CLI Version must be at least ' + utils.minCustomCliVersion);
@@ -57,7 +58,13 @@ function RunTaskCbk(cliPath) {
         // Remove 'jf' and space from the beginning of the command string, so we can use the CLI's path
         cliCommand = cliCommand.slice(utils.jfrogCliToolName.length + 1);
         cliCommand = utils.cliJoin(cliPath, cliCommand);
-        cliCommand = utils.addServerIdOption(cliCommand, serverId);
+        if (utils.isServerIdEnvSupported()) {
+            // Provide Server ID to JFrog CLI via environment variable
+            process.env.JFROG_CLI_SERVER_ID = serverId;
+        } else {
+            // Provide Server ID to JFrog CLI via --server-id flag
+            cliCommand = utils.addServerIdOption(cliCommand, serverId);
+        }
         // Execute the cli command.
         utils.executeCliCommand(cliCommand, requiredWorkDir);
     } catch (executionException) {
