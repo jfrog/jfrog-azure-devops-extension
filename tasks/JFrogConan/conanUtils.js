@@ -144,7 +144,7 @@ function getDefaultConanUserHome() {
 function setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, buildTimestamp) {
     let conanArtifactsPropertiesPath = getConanArtifactsPropertiesLocation(conanUserHome);
 
-    //Check if existing content is related to current buildInfo information
+    // Check if existing content is related to current buildInfo information
     if (fs.existsSync(conanArtifactsPropertiesPath)) {
         let existingContent = fs.readFileSync(conanArtifactsPropertiesPath);
         let propertiesMap = convertConanPropertiesToMap(existingContent.toString());
