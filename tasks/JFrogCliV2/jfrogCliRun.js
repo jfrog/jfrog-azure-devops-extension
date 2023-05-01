@@ -49,8 +49,7 @@ function RunTaskCbk(cliPath) {
     serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
     utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
 
-    let cliCommands = tl.getInput('command', true);
-    let cliCommandsList = cliCommands.split('\n');
+    let cliCommandsList = tl.getInput('command', true).split('\n');
     try {
         for (let cliCommand of cliCommandsList) {
             if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {
