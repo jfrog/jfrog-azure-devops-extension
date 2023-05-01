@@ -15,9 +15,6 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    // Get input parameters.
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
-
     // Determine working directory for the cli.
     let inputWorkingFolder = tl.getInput('workingFolder', false);
     let requiredWorkDir = utils.determineCliWorkDir(defaultWorkDir, inputWorkingFolder);
@@ -31,30 +28,30 @@ function RunTaskCbk(cliPath) {
     switch (inputCommand) {
         case 'install': {
             performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
-            performNpmCommand(npmInstallCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
+            performNpmCommand(npmInstallCommand, true, cliPath, requiredWorkDir);
             break;
         }
         case 'ci': {
             performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
-            performNpmCommand(npmCiCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
+            performNpmCommand(npmCiCommand, true, cliPath, requiredWorkDir);
             break;
         }
         case 'custom': {
             let customCommandAndArgs = tl.getInput('customCommandAndArgs', true);
             let npmCustomCommand = 'npm ' + customCommandAndArgs;
             performNpmConfigCommand(cliPath, requiredWorkDir, 'sourceRepo', null);
-            performNpmCommand(npmCustomCommand, true, cliPath, collectBuildInfo, requiredWorkDir);
+            performNpmCommand(npmCustomCommand, true, cliPath, requiredWorkDir);
             break;
         }
         case 'pack and publish': {
             performNpmConfigCommand(cliPath, requiredWorkDir, null, 'targetRepo');
-            performNpmCommand(npmPublishCommand, false, cliPath, collectBuildInfo, requiredWorkDir);
+            performNpmCommand(npmPublishCommand, false, cliPath, requiredWorkDir);
             break;
         }
     }
 }
 
-function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo, requiredWorkDir) {
+function performNpmCommand(cliNpmCommand, addThreads, cliPath, requiredWorkDir) {
     // Build the cli command.
     let cliCommand = utils.cliJoin(cliPath, cliNpmCommand);
 
@@ -65,8 +62,11 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
     }
 
     // Add build info collection.
-    if (collectBuildInfo) {
-        cliCommand = utils.cliJoin(cliCommand, getCollectBuildInfoFlags(addThreads));
+    cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
+
+    // Check if need to add threads.
+    if (addThreads) {
+        cliCommand = utils.addIntParam(cliCommand, 'threads', 'threads');
     }
 
     // Execute cli.
@@ -82,22 +82,6 @@ function performNpmCommand(cliNpmCommand, addThreads, cliPath, collectBuildInfo,
 
 function performNpmConfigCommand(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
     configuredServerIdsArray = utils.createBuildToolConfigFile(cliPath, 'npm', requiredWorkDir, npmConfigCommand, repoResolve, repoDeploy);
-}
-
-function getCollectBuildInfoFlags(addThreads) {
-    // Construct the build-info collection flags.
-    let buildName = tl.getInput('buildName', true);
-    let buildNumber = tl.getInput('buildNumber', true);
-    let commandAddition = utils.cliJoin('--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
-    commandAddition = utils.addProjectOption(commandAddition);
-
-    // Check if need to add threads.
-    if (addThreads) {
-        let buildInfoThreads = tl.getInput('threads');
-        commandAddition = utils.cliJoin(commandAddition, '--threads=' + utils.quote(buildInfoThreads));
-    }
-
-    return commandAddition;
 }
 
 utils.executeCliTask(RunTaskCbk);

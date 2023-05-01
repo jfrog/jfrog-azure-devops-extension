@@ -18,7 +18,7 @@ let tasksOutput: string;
 
 describe('JFrog Artifactory Extension Tests', (): void => {
     let repoKeys: any;
-    before(function(): void {
+    before(function (): void {
         this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
         assert.ok(TestUtils.platformUrl, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_URL');

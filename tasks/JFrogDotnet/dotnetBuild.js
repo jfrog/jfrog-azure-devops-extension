@@ -55,13 +55,7 @@ function performDotnetNugetPush(cliPath) {
 }
 
 function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) {
-    let collectBuildInfo = tl.getBoolInput('collectBuildInfo');
-    if (collectBuildInfo) {
-        let buildName = tl.getInput('buildName', true);
-        let buildNumber = tl.getInput('buildNumber', true);
-        cliCmd = utils.cliJoin(cliCmd, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
-        cliCmd = utils.addProjectOption(cliCmd);
-    }
+    cliCmd = utils.appendBuildFlagsToCliCommand(cliCmd);
     try {
         utils.executeCliCommand(cliCmd, buildDir);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
