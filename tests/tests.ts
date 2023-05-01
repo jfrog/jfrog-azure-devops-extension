@@ -6,13 +6,13 @@ import * as mocha from 'mocha';
 import * as path from 'path';
 import * as syncRequest from 'sync-request';
 import * as TestUtils from './testUtils';
-import {platformDockerDomain} from './testUtils';
+import { platformDockerDomain } from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as assert from 'assert';
 import * as os from 'os';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
-import {Tunnel} from 'node-tunnel';
-import {execSync} from 'child_process';
+import { Tunnel } from 'node-tunnel';
+import { execSync } from 'child_process';
 
 let tasksOutput: string;
 
