@@ -389,7 +389,7 @@
             "label": "Working Directory",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Current working directory to use. Empty is the root of the repo (build) or artifacts (release), which is $(System.DefaultWorkingDirectory)"
+            "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
         }
     ],
     "execution": {
