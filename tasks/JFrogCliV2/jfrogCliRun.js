@@ -52,6 +52,7 @@ function RunTaskCbk(cliPath) {
     let cliCommandsList = tl.getInput('command', true).split('\n');
     try {
         for (let cliCommand of cliCommandsList) {
+            cliCommand = cliCommand.trim();
             if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {
                 tl.setResult(
                     tl.TaskResult.Failed,
