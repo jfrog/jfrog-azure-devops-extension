@@ -84,9 +84,14 @@ function checkAndSetMavenHome(): void {
         let mvnCommand: string = 'mvn --version';
         let res: string = execSync(mvnCommand, { encoding: 'utf-8' } as ExecSyncOptionsWithStringEncoding);
         let mavenHomeLine: string = res.split('\n')[1].trim();
-        let mavenHome: string = mavenHomeLine.split(' ')[2];
-        console.log('The Maven home location: ' + mavenHome);
-        process.env['M2_HOME'] = mavenHome;
+        let regexMatch: RegExpMatchArray | null = mavenHomeLine.match('^Maven\\shome:\\s(.+)');
+        if (regexMatch) {
+            let mavenHomePath: string = regexMatch[1];
+            console.log('The Maven home location: ' + mavenHomePath);
+            process.env['M2_HOME'] = mavenHomePath;
+        } else {
+            console.log('Couldn\'t retrieve Maven home path using "mvn --version" command. Received output: ' + res);
+        }
     }
 }
 
