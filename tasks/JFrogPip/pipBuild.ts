@@ -29,13 +29,7 @@ function performPipInstall(cliPath: string): void {
 
 function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): void {
     const configuredServerIds: string[] = performPipConfig(cliPath, buildDir);
-    const collectBuildInfo: boolean = tl.getBoolInput('collectBuildInfo');
-    if (collectBuildInfo) {
-        const buildName: string = tl.getInput('buildName', true) || '';
-        const buildNumber: string = tl.getInput('buildNumber', true) || '';
-        cliCmd = utils.cliJoin(cliCmd, '--build-name=' + utils.quote(buildName), '--build-number=' + utils.quote(buildNumber));
-        cliCmd = utils.addProjectOption(cliCmd);
-    }
+    cliCmd = utils.appendBuildFlagsToCliCommand(cliCmd);
     try {
         utils.executeCliCommand(cliCmd, buildDir);
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');

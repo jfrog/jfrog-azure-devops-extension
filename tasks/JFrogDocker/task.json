@@ -125,7 +125,7 @@
             "label": "Allow fail build",
             "defaultValue": "true",
             "required": true,
-            "helpMarkDown": "Unset if you don't wish the audit process to exit with code 3, if a violation matching an Xray policy is found, and the policy includes a 'Fail Build' rule.",
+            "helpMarkDown": "Unset if you don't wish the scan process to exit with code 3, if a violation matching an Xray policy is found, and the policy includes a 'Fail Build' rule.",
             "visibleRule": "command = Scan && watchesSource!=none"
         },
         {
