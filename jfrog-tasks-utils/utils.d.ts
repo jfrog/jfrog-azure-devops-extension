@@ -20,9 +20,7 @@ declare module '@jfrog/tasks-utils' {
     export function handleSpecFile(cliCommand: string, specPath: string): string;
     export function addBoolParam(cliCommand: string, inputParam: string, cliParam: string): string;
     export function addStringParam(cliCommand: string, inputParam: string, cliParam: string, require: boolean): string;
-
     export function addIntParam(cliCommand: string, inputParam: string, cliParam: string): string;
-
     export function createBuildToolConfigFile(
         cliPath: string,
         cmd: string,
