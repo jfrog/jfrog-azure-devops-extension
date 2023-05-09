@@ -9,7 +9,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.36.0';
+const defaultJfrogCliVersion = '2.37.1';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
@@ -211,7 +211,7 @@ function executeCliCommand(cliCommand, runningDir, options = {}) {
         const stdout = options.withOutput ? 'pipe' : 1;
         const stderr = 2;
         console.log('Executing JFrog CLI Command:\n' + maskSecrets(cliCommand));
-        return execSync(cliCommand, {cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret});
+        return execSync(cliCommand, { cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret });
     } catch (ex) {
         // Error occurred - mask secrets in message.
         if (ex.message) {
@@ -273,7 +273,7 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
         );
         stdinSecret = secretInStdinSupported ? servicePassword : undefined;
     }
-    return executeCliCommand(cliCommand, buildDir, {stdinSecret});
+    return executeCliCommand(cliCommand, buildDir, { stdinSecret });
 }
 
 /**

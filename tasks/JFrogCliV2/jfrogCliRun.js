@@ -42,31 +42,38 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
+    // Set default build name and number environment variables
+    process.env.JFROG_CLI_BUILD_NAME = tl.getVariable('Build.DefinitionName');
+    process.env.JFROG_CLI_BUILD_NUMBER = tl.getVariable('Build.BuildNumber');
+
     serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
     utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
 
-    let cliCommand = tl.getInput('command', true);
-    if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {
-        tl.setResult(
-            tl.TaskResult.Failed,
-            "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf '. The command received is: " + cliCommand
-        );
-        utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
-        return;
-    }
+    let cliCommandsList = tl.getInput('command', true).split('\n');
     try {
-        // Remove 'jf' and space from the beginning of the command string, so we can use the CLI's path
-        cliCommand = cliCommand.slice(utils.jfrogCliToolName.length + 1);
-        cliCommand = utils.cliJoin(cliPath, cliCommand);
-        if (utils.isServerIdEnvSupported()) {
-            // Provide Server ID to JFrog CLI via environment variable
-            process.env.JFROG_CLI_SERVER_ID = serverId;
-        } else {
-            // Provide Server ID to JFrog CLI via --server-id flag
-            cliCommand = utils.addServerIdOption(cliCommand, serverId);
+        for (let cliCommand of cliCommandsList) {
+            cliCommand = cliCommand.trim();
+            if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {
+                tl.setResult(
+                    tl.TaskResult.Failed,
+                    "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf '. The command received is: " + cliCommand
+                );
+                utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
+                return;
+            }
+            // Remove 'jf' and space from the beginning of the command string, so we can use the CLI's path
+            cliCommand = cliCommand.slice(utils.jfrogCliToolName.length + 1);
+            cliCommand = utils.cliJoin(cliPath, cliCommand);
+            if (utils.isServerIdEnvSupported()) {
+                // Provide Server ID to JFrog CLI via environment variable
+                process.env.JFROG_CLI_SERVER_ID = serverId;
+            } else {
+                // Provide Server ID to JFrog CLI via --server-id flag
+                cliCommand = utils.addServerIdOption(cliCommand, serverId);
+            }
+            // Execute the cli command.
+            utils.executeCliCommand(cliCommand, requiredWorkDir);
         }
-        // Execute the cli command.
-        utils.executeCliCommand(cliCommand, requiredWorkDir);
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
