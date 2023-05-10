@@ -54,9 +54,6 @@ function RunTaskCbk(cliPath: string): void {
         default:
             tl.setResult(tl.TaskResult.Failed, 'Command not supported: ' + command);
     }
-    if (tl.getInput('threads', false)) {
-        cliCommand = utils.addIntParam(cliCommand, 'threads', 'threads');
-    }
 
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
     if (tl.getBoolInput('skipLogin', false)) {
