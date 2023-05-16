@@ -402,7 +402,7 @@ YAML Example:
 
 # Build tools Tasks
 
-## JFrog Maven Task
+### JFrog Maven Task
 <details>
   <summary>More info...</summary>
 ![mvn.png](images/marketplace/mvn.png)
@@ -446,9 +446,9 @@ For more information about Maven repositories,
 see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-documentation/maven-repository)
 </details>
 
-## JFrog Gradle Task
+### JFrog Gradle Task
 <details>
-  <summary>JFrog Gradle Task</summary>
+   <summary>More info...</summary>
 
 ![gradle.png](images/marketplace/gradle.png)
 
