@@ -9,7 +9,7 @@
 | [![JFrog Extension Marketplace](https://img.shields.io/static/v1?label=%20&color=blue&style=for-the-badge&logo=azuredevops&message=JFrog%20(New))](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension) | [![JFrog Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-azure-devops-extension?label=Total&color=blue&style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)               |    [![](https://img.shields.io/badge/Docs-%F0%9F%93%96-blue)](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension)    | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v2?svg=true&passingText=v2%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/v2) |     [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true&passingText=dev%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/dev)      |
 |  [![JFrog Extension Marketplace](https://img.shields.io/static/v1?label=%20&color=blue&style=for-the-badge&logo=azuredevops&message=Artifactory)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)  | [![Artifactory Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-artifactory-vsts-extension?label=Total&color=blue&style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension) | [![](https://img.shields.io/badge/Docs-%F0%9F%93%96-blue)](https://www.jfrog.com/confluence/display/JFROG/Artifactory+Azure+DevOps+Extension) | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v1?svg=true&passingText=v1%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/v1) | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev-v1?svg=true&passingText=dev-v1%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/dev-v1) |
 
-</div>
+
 
 # Overview
 
@@ -29,6 +29,8 @@ The **JFrog** extension for Azure DevOps supports:
 * Managing your binaries lifecycle with JFrog Artifactory
 * Auditing your projects and scanning your builds with JFrog Xray
 * Distributing your artifacts with JFrog Distribution.
+
+</div>
 
 ## Table of contents
 
@@ -73,12 +75,12 @@ To install the JFrog extension, execute the following steps:
 * Go to
   the [Visual Studio Marketplace Jfrog Extension Page](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
   and sign in to your account.
-  ![extension-install.png](images/extension-install.png)
+    <img width="200px" src="./images/extension-install.png">
 * Click on **Get It Free**.
-  ![get-it-free.png](images/get-it-free.png)
+  <img width="200px" src="./images/get-it-free.png">
 * Select the account to which you want to apply the extension and confirm installation.
-* In the JFrog Extension page, click **Install**.
-  ![organization-install.png](images/organization-install.png)
+  * In the JFrog Extension page, click **Install**.
+  <img width="200px" src="./images/organization-install.png">
 
 ### Installing the Build Agent
 
@@ -217,12 +219,12 @@ To upgrade Node.JS on the build agent:
 To allow the JFrog tasks to work with your JFrog environment, you'll need to configure the following service connections
 in Azure DevOps.
 
-|                        Service connection                         | Used by tasks                                                                                                                                                                                                                                                                     |                
-|:-----------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|      <img width="100px" src="./images/service-platform.png">      | JFrog CLI V2                                                                                                                                                                                                                                                                      | 
-|    <img width="100px" src="./images/service-artifactory.png">     | JFrog Tools Installer<br>JFrog Generic Artifacts<br>JFrog Nuget<br>JFrog .NET Core<br>JFrog npm<br>JFrog Pip<br>JFrog Maven<br>JFrog Gradle<br>JFrog Go<br>JFrog Conan<br>JFrog Collect Build Issues<br>JFrog Discard Builds<br>JFrog Build Promotion<br>JFrog Publish Build Info |   
-|        <img width="100px" src="./images/service-xray.png">        | JFrog Audit<br>JFrog Build Scan                                                                                                                                                                                                                                                   | 
-|    <img width="100px" src="./images/service-distribution.png">    | JFrog Distribution                                                                                                                                                                                                                                                                | 
+|                     Service connection                      | Used by tasks                                                                                                                                                                                                                                                                     |                
+|:-----------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|   <img width="200px" src="./images/service-platform.png">   | JFrog CLI V2                                                                                                                                                                                                                                                                      | 
+| <img width="200px" src="./images/service-artifactory.png">  | JFrog Tools Installer<br>JFrog Generic Artifacts<br>JFrog Nuget<br>JFrog .NET Core<br>JFrog npm<br>JFrog Pip<br>JFrog Maven<br>JFrog Gradle<br>JFrog Go<br>JFrog Conan<br>JFrog Collect Build Issues<br>JFrog Discard Builds<br>JFrog Build Promotion<br>JFrog Publish Build Info |   
+|     <img width="200px" src="./images/service-xray.png">     | JFrog Audit<br>JFrog Build Scan                                                                                                                                                                                                                                                   | 
+| <img width="200px" src="./images/service-distribution.png"> | JFrog Distribution                                                                                                                                                                                                                                                                | 
 
 <details>
   <summary>Not Using a Public CA (Certificate Authority)?</summary>
@@ -254,11 +256,11 @@ To enable TLS 1.2 on TFS:
 
 </details>
 
-<div align="center">
+
 <br>
 
 ## Executing JFrog CLI Commands
-</div>
+
 <details>
   <summary> JFrog CLI V2 Task</summary>
 
@@ -302,11 +304,11 @@ Multiple commands example:
 
 </details>
 
-<div align="center">
+
 <br>
 
 ## Managing Generic Artifacts
-</div>
+
 <details>
   <summary>JFrog Generic Artifacts task</summary>
 
@@ -405,11 +407,11 @@ YAML Example:
 
 </details>
 
-<div align="center">
+
 <br>
 
 ## Build tools Tasks
-</div>
+
 
 ### JFrog Maven Task
 <details>
@@ -655,7 +657,7 @@ The task can be also configured to capture build-info and store the downloaded a
 dependencies and artifact.
 The captured build-info can be later published to Artifactory using the **JFrog Publish Build-Info** task.
 
-![go.png](images/marketplace/go-task.png)
+![go.png](images/go-task.png)
 
 ```YAML
 - task: JFrogGo@1
@@ -674,11 +676,11 @@ For more information about Go repositories,
 see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/go-registry)
 </details>
 
-<div align="center">
+
 <br>
 
 ## Build Tasks
-</div>
+
 
 
 ### JFrog Collect Build Issues
@@ -878,11 +880,11 @@ Run these steps to configure the task.
 </details>
 
 
-<div align="center">
+
 <br>
 
 ## JFrog Xray tasks
-</div>
+
 
 ### Audit project's dependencies for Security Vulnerabilities
 <details>
@@ -946,11 +948,11 @@ build-info report.
 
 </details>
 
-<div align="center">
+
 <br>
 
 ## JFrog Docker tasks
-</div>
+
 
 ### Pushing and Pulling Docker Images to and from Artifactory
 <details>
@@ -1021,11 +1023,11 @@ This functionality requires version 3.40.0 or above of JFrog Xray.
 
 </details>
 
-<div align="center">
+
 <br>
 
 ## Using Published Artifacts in a Release
-</div>
+
 
 Artifacts which were published to Artifactory can be made available for a Release Pipeline.
 There are two ways to achieve this:
@@ -1068,11 +1070,11 @@ Follow these steps to add Artifactory as an artifact source to a Release.
 
 </details>
 
-<div align="center">
+
 <br>
 
 ## Managing and Distributing Release Bundles
-</div>
+
 
 ### JFrog Distribution V2 Task
 <details>
@@ -1157,11 +1159,11 @@ The Distribution Rules format also supports wildcards. For example:
 
 </details>
 
-<div align="center">
+
 <br>
 
 ## Contribution
-</div>
+
 
 We welcome pull requests from the community!
 
