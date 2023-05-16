@@ -930,10 +930,9 @@ build-info report.
 
 # JFrog Docker tasks
 
-<details hidden="until-found">
-    <summary hidden="until-found">Pushing and Pulling Docker Images to/from Artifactory</summary>
-
-#### Pushing and Pulling Docker Images to and from Artifactory
+### Pushing and Pulling Docker Images to and from Artifactory
+<details>
+  <summary>Expand...</summary>
 
 The **JFrog Docker** task allows pushing and pulling docker images to and from a docker repository in Artifactory.
 The task can be also configured to capture build-info for the pushed or pulled image.
@@ -964,10 +963,9 @@ see [Artifactory Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-doc
 </details>
 
 
+### Scanning Local Docker Images with JFrog Xray
 <details>
-    <summary>Scanning Local Docker Images with JFrog Xray</summary>
-
-#### Scanning Local Docker Images with JFrog Xray
+  <summary>Expand...</summary>
 
 The **JFrog Docker** task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
 build log.
@@ -1046,10 +1044,10 @@ Follow these steps to add Artifactory as an artifact source to a Release.
 
 # Managing and Distributing Release Bundles
 
-<details>
-    <summary>JFrog Distribution V2 Task</summary>
 
-## JFrog Distribution V2 Task
+### JFrog Distribution V2 Task
+<details>
+  <summary>Expand...</summary>
 
 [JFrog Distribution](https://jfrog.com/help/r/jfrog-distribution-documentation) is a centralized platform that lets you
 provision software release distribution.
