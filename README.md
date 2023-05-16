@@ -13,20 +13,19 @@
 
 # Overview
 
-JFrog provides tight integration with [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)*
-Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about
+[JFrog](https://jfrog.com/) provides tight integration with [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)*
+Beyond managing efficient deployment of your artifacts to [JFrog Artifactory](https://jfrog.com/artifactory), the extension lets you capture information about
 artifacts deployed, dependencies resolved, environment data associated with the build runs and more,
 that effectively facilitates fully traceable builds.
 JFrog brings continuous integration to [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *JFrog* extension.
 
-The *JFrog* extension for Azure DevOps supports:
+The *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)* for Azure DevOps supports:
 
-* Running your builds while using JFrog Artifactory as the binary repository manager
-* Gaining full traceability of your builds by capturing your build-info from your builds and publishing it to JFrog
-  Artifactory
-* Managing your binaries lifecycle with JFrog Artifactory
-* Auditing your projects and scanning your builds with JFrog Xray
-* Distributing your artifacts with JFrog Distribution.
+* Running your builds while using [JFrog Artifactory](https://jfrog.com/artifactory) as the binary repository manager.
+* Gaining full traceability of your builds by capturing your build-info from your builds and publishing it to [JFrog Artifactory](https://jfrog.com/artifactory).
+* Managing your binaries lifecycle with [JFrog Artifactory](https://jfrog.com/artifactory).
+* Auditing your projects and scanning your builds with [JFrog Xray](https://jfrog.com/xray).
+* Distributing your artifacts with [JFrog Distribution](https://jfrog.com/distribution/).
 
 
 ## Table of contents
@@ -67,7 +66,7 @@ The *JFrog* extension for Azure DevOps supports:
 
 ### Installing the Extension
 
-To install the JFrog extension, execute the following steps:
+To install the *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)*, execute the following steps:
 
 * Go to
   the [Visual Studio Marketplace Jfrog Extension Page](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
@@ -92,9 +91,9 @@ To install the JFrog extension, execute the following steps:
 To run the JFrog tasks, the build agents use three tools:
 
 * JFrog CLI: Runs all the JFrog tasks.
-* Maven Extractor (Used by the *JFrog Maven* task)
-* Gradle Extractor (Used by the *JFrog Gradle* task)
-* Conan client (Used by the *JFrog Conan* task)
+* Maven Extractor (Used by the [JFrog Maven](#jfrog-maven-task) task)
+* Gradle Extractor (Used by the [JFrog Gradle](#jfrog-gradle-Task) task)
+* Conan client (Used by the [JFrog Conan](#jfrog-conan-task) task)
 
 <details>
   <summary>Automatic Installation</summary>
@@ -116,11 +115,11 @@ configured to proxy the download repositories.
 * Create a remote repository in Artifactory for downloading the *Maven and Gradle Extractors*. Name the URL *extractors* and set its URL
   to: [https://releases.jfrog.io/artifactory/oss-release-local/](https://releases.jfrog.io/artifactory/oss-release-local/)
 * Make sure to configure the Artifactory server with the *jfrog-cli-remote* and *extractors* repositories in as a
-  service connection in Azure DevOps of type *JFrog Artifactory V2*.
+  [service connection](#Configuring-the-Service-Connections) in Azure DevOps of type *JFrog Artifactory V2*.
 * Add the *JFrog Tools Installer* task to your build or release pipeline.
 * Select the Artifactory service you configured.
 * Select *jfrog-cli-remote* as the target repository to download the JFrog CLI.
-* If your pipeline uses the *JFrog Maven* or *JFrog Gradle* tasks, select *extractors* as the repository to
+* If your pipeline uses the [JFrog Maven](#jfrog-maven-task) or [JFrog Gradle](#jfrog-Gradle-task) tasks, select *extractors* as the repository to
   download the Maven Extractor.
 
 ![tool-installer.png](images/tool-installer.png)
@@ -158,7 +157,7 @@ To install JFrog CLI on an agent with no internet access:
 
 ##### Installing the Maven Extractor
 
-When triggering the *JFrog Maven* task, JFrog CLI automatically downloads the Maven Extractor jar to the build agent
+When triggering the [JFrog Maven](#jfrog-maven-task) task, JFrog CLI automatically downloads the Maven Extractor jar to the build agent
 the first time it's required.
 However, if your build agent does not have access to the internet, the build will fail when attempting to download the
 file.
@@ -174,7 +173,7 @@ To install the Maven Extractor jar on an agent with no internet access:
 
 ##### Installing the Gradle Extractor
 
-When triggering the *JFrog Gradle* task, JFrog CLI automatically downloads the Gradle Extractor jar to the build
+When triggering the [JFrog Gradle](#jfrog-gradle-task) task, JFrog CLI automatically downloads the Gradle Extractor jar to the build
 agent the first time it's required.
 However, if your build agent does not have access to the internet, the build will fail when attempting to download the
 file. You'll therefore need to download and install it manually.
@@ -195,11 +194,8 @@ For the build agent to be able to run conan builds, do the following:
 2. Confirm that the conan executable is available in the Path environment variable of the user which runs the build on
    the agent.
 
-Running Artifactory Conan tasks
-Any structure on your agent's_file._The JFrog Conan task uses the Conan client. The Conan client cannot be installed
-using the Automatic Installation or the JFrog Tools Installer but is required to be manually installed.
-To install Conan on an agent, read the "Install Conan" section under [Manual Installation](#Manual-Installation)
-The tools can be installed on the build agents using one of the following methods.
+> The JFrog Conan task uses the Conan client. The Conan client cannot be installed
+> using the Automatic Installation or the JFrog Tools Installer but is required to be manually installed.
 
 ##### Using TFS 2015
 
@@ -208,13 +204,13 @@ Node.JS version 8 and above.
 The build agent requires using Node.JS version 8 and above. To check which version of Node.JS is running on the build
 agent:
 
-1. Navigate to the_Worker\\Handlers\\Node_folder located under theAgent home.
+1. Navigate to the `Worker\Handlers\Node` folder located under the Agent home.
 2. From the terminal, run *node -v*
 
 To upgrade Node.JS on the build agent:
 
 * Replace the existing node.exe file on the agent with the node.exe file with the required version located in
-  the_Worker\\Handlers\\Node_folder under the agent home.
+  the `Worker\Handlers\Node` folder under the agent home.
 
 </details>
 
@@ -834,7 +830,7 @@ To help you achieve this, follow these steps for creating a release which includ
    ![promotion.png](images/promotion3.png)
 7. If you wish to promote the latest build number, select specify a specific build number as the *Default version*
    and then select *any* build number. Then, click on the *Variables* tab and add
-   the *ARTIFACTORY\_RELEASE\_BUILD\_NUMBER* pipeline variable with *LATEST* as the value.
+   the *ARTIFACTORY_RELEASE_BUILD_NUMBER* pipeline variable with *LATEST* as the value.
    ![promotion.png](images/promotion4.png)
 8. Configure the *Artifactory Build Promotion* task as one of your release pipeline tasks.
    The task uses a build number which will be selected later on, upon creating a release.
@@ -864,7 +860,7 @@ Run these steps to configure the task.
 
 5. Optionally set of build runs in the form of 10,11,12,... to keep and not to discard.
 
-6. Check the_Delete artifacts_checkbox, to also delete the build artifacts and not only the build meta-data.
+6. Check the Delete artifacts checkbox, to also delete the build artifacts and not only the build meta-data.
 
 7. Check the Async checkbox, to make the action asynchronous. In this case, the pipeline will not wait for the action to
    finish, but the pipeline will not be notified in case of a failure.
