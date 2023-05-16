@@ -260,7 +260,7 @@ To enable TLS 1.2 on TFS:
 <details>
   <summary> JFrog CLI V2 Task</summary>
 
-The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named**JFrog CLI V2**,
+The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named **JFrog CLI V2**,
 which allows executing **[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)** commands.
 The command will use the connection details provided by the selected **JFrog Platform** service connection configured in
 Azure DevOps,
@@ -402,11 +402,9 @@ YAML Example:
 
 # Build tools Tasks
 
-<details>
-  <summary>JFrog Maven Task</summary>
-
 ## JFrog Maven Task
-
+<details>
+  <summary>More info...</summary>
 ![mvn.png](images/marketplace/mvn.png)
 
 The **JFrog Maven** task allows triggering Maven builds, while resolving dependencies and deploying artifacts from and
@@ -414,8 +412,7 @@ to Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
 The task can also be configured to capture build-info and store the downloaded and uploaded artifacts as build
 dependencies and build artifacts.
-The captured build-info can be later published to Artifactory using the *
-*[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
 
 ![mvn.png](images/maven-task.png)
 
@@ -449,10 +446,9 @@ For more information about Maven repositories,
 see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-documentation/maven-repository)
 </details>
 
+## JFrog Gradle Task
 <details>
   <summary>JFrog Gradle Task</summary>
-
-## JFrog Gradle Task
 
 ![gradle.png](images/marketplace/gradle.png)
 
@@ -462,8 +458,7 @@ The task uses the configured **JFrog Artifactory V2** service connection.
 
 The task can also be configured to capture build-info and store the downloaded and uploaded artifacts as build
 dependencies and build artifacts.
-The captured build-info can be later published to Artifactory using the *
-*[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
 
 Behind the scenes, the **JFrog Gradle ** task uses
 the [Gradle Artifactory Plugin](https://jfrog.com/help/r/jfrog-integrations-documentation/gradle-artifactory-plugin) to
@@ -503,8 +498,7 @@ and to Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
 
 The task can be also configured to capture build-info and store the uploaded files as artifacts in it.
-The captured build-info can be later published to Artifactory using the *
-*[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
 
 ![npm.png](images/npm-task.png)
 
@@ -538,8 +532,7 @@ These tasks also allow publishing NuGet packages to Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
 The tasks can be configured to capture build-info.
 The build-info stores the restored packages as build dependencies and uploaded packages as build artifacts.
-The captured build-info can be later published to Artifactory using the *
-*[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
 
 ![nuget.png](images/nuget-task.png)
 
