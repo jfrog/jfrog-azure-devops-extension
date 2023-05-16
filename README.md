@@ -30,7 +30,7 @@ The **JFrog** extension for Azure DevOps supports:
 * Auditing your projects and scanning your builds with JFrog Xray
 * Distributing your artifacts with JFrog Distribution.
 
-# Table of contents
+## Table of contents
 
 - [Table of contents](#Table-of-contents)
     - [Overview](#Overview)
@@ -64,9 +64,9 @@ The **JFrog** extension for Azure DevOps supports:
         - [JFrog Distribution Task](#JFrog-Distribution-V2-Task)
     - [Contributions](#Contribution)
 
-# Download and Installation
+## Download and Installation
 
-## Installing the Extension
+### Installing the Extension
 
 To install the JFrog extension, execute the following steps:
 
@@ -80,7 +80,7 @@ To install the JFrog extension, execute the following steps:
 * In the JFrog Extension page, click **Install**.
   ![organization-install.png](images/organization-install.png)
 
-## Installing the Build Agent
+### Installing the Build Agent
 
 To run the JFrog tasks, the build agents use three tools:
 
@@ -116,7 +116,6 @@ configured to proxy the download repositories.
 * Select **jfrog-cli-remote ** as the target repository to download the JFrog CLI.
 * If your pipeline uses the **JFrog Maven** or **JFrog Gradle** tasks, select **extractors** as the repository to
   download the Maven Extractor.
-*
 
 ![tool-installer.png](images/tool-installer.png)
 
@@ -255,7 +254,7 @@ To enable TLS 1.2 on TFS:
 
 </details>
 
-# Executing JFrog CLI Commands
+## Executing JFrog CLI Commands
 
 <details>
   <summary> JFrog CLI V2 Task</summary>
@@ -300,7 +299,7 @@ Multiple commands example:
 
 </details>
 
-# Managing Generic Artifacts
+## Managing Generic Artifacts
 
 <details>
   <summary>JFrog Generic Artifacts task</summary>
@@ -332,7 +331,7 @@ When configuring the task, do the following:
 
 5. Check the **Advanced** section for additional options.
 
-## Generic artifacts handling
+### Generic artifacts handling
 
 The **JFrog Generic Artifacts** task allows performing generic actions on artifacts, such as:
 
@@ -400,7 +399,7 @@ YAML Example:
 
 </details>
 
-# Build tools Tasks
+## Build tools Tasks
 
 ### JFrog Maven Task
 <details>
@@ -665,7 +664,7 @@ For more information about Go repositories,
 see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/go-registry)
 </details>
 
-# Build Tasks
+## Build Tasks
 
 
 ### JFrog Collect Build Issues
@@ -864,7 +863,7 @@ Run these steps to configure the task.
 
 </details>
 
-# JFrog Xray tasks
+## JFrog Xray tasks
 
 ### Audit project's dependencies for Security Vulnerabilities
 <details>
@@ -928,7 +927,7 @@ build-info report.
 
 </details>
 
-# JFrog Docker tasks
+## JFrog Docker tasks
 
 ### Pushing and Pulling Docker Images to and from Artifactory
 <details>
@@ -999,7 +998,7 @@ This functionality requires version 3.40.0 or above of JFrog Xray.
 
 </details>
 
-# Using Published Artifacts in a Release
+## Using Published Artifacts in a Release
 
 Artifacts which were published to Artifactory can be made available for a Release Pipeline.
 There are two ways to achieve this:
@@ -1042,7 +1041,7 @@ Follow these steps to add Artifactory as an artifact source to a Release.
 
 </details>
 
-# Managing and Distributing Release Bundles
+## Managing and Distributing Release Bundles
 
 
 ### JFrog Distribution V2 Task
@@ -1128,14 +1127,14 @@ The Distribution Rules format also supports wildcards. For example:
 
 </details>
 
-# Contribution
+## Contribution
 
 We welcome pull requests from the community!
 
 <details>
     <summary>Building</summary>
 
-## Building
+### Building
 
 To build and run the extension sources, please follow these steps:
 
@@ -1154,7 +1153,7 @@ The `vsix` file can be loaded into Azure DevOps and TFS.
 <details>
     <summary>Testing</summary>
 
-## Testing
+### Testing
 
 To run the tests, please make sure you are using node 14 or above.
 
@@ -1177,7 +1176,7 @@ Use the following commands to run from terminal:
 Note: If you are running tests via your IDE, make sure you are registering tests with
 ts-node: `mocha -r ts-node/register tests.ts -t 600000`.
 
-### Skipping Tests
+#### Skipping Tests
 
 In order to skip tests, set the ADO_SKIP_TESTS environment variable with the tests you wish to skip, separated by
 commas.
