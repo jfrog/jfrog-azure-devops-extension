@@ -449,7 +449,7 @@ see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-do
 
 ### JFrog Gradle Task
 <details>
-   <summary>More info...</summary>
+   <summary>Expand...</summary>
 
 ![gradle.png](images/marketplace/gradle.png)
 
@@ -1201,3 +1201,8 @@ export ADO_SKIP_TESTS=nuget,dotnet
 * Please run `npm run lint` and make sure no new tslint warnings were introduced.
 
 </details>
+
+## Reporting issues
+
+Please help us improve jfrog-azure-devops-extension by [reporting issues](https://github.com/jfrog/jfrog-azure-devops-extension/issues/new/choose) you encounter.
+
