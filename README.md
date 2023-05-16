@@ -13,15 +13,13 @@
 
 # Overview
 
-JFrog provides tight integration with [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *
-*[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)**
+JFrog provides tight integration with [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)*
 Beyond managing efficient deployment of your artifacts to Artifactory, the extension lets you capture information about
 artifacts deployed, dependencies resolved, environment data associated with the build runs and more,
 that effectively facilitates fully traceable builds.
-JFrog brings continuous integration to [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *
-*JFrog** extension.
+JFrog brings continuous integration to [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *JFrog* extension.
 
-The **JFrog** extension for Azure DevOps supports:
+The *JFrog* extension for Azure DevOps supports:
 
 * Running your builds while using JFrog Artifactory as the binary repository manager
 * Gaining full traceability of your builds by capturing your build-info from your builds and publishing it to JFrog
@@ -76,10 +74,10 @@ To install the JFrog extension, execute the following steps:
   the [Visual Studio Marketplace Jfrog Extension Page](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
   and sign in to your account.
     <img width="200px" src="./images/extension-install.png">
-* Click on **Get It Free**.
+* Click on *Get It Free*.
   <img width="200px" src="./images/get-it-free.png">
 * Select the account to which you want to apply the extension and confirm installation.
-  * In the JFrog Extension page, click **Install**.
+  * In the JFrog Extension page, click *Install*.
   <img width="200px" src="./images/organization-install.png">
 
 ### Installing the Build Agent
@@ -87,9 +85,9 @@ To install the JFrog extension, execute the following steps:
 To run the JFrog tasks, the build agents use three tools:
 
 * JFrog CLI: Runs all the JFrog tasks.
-* Maven Extractor (Used by the **JFrog Maven** task)
-* Gradle Extractor (Used by the **JFrog Gradle** task)
-* Conan client (Used by the **JFrog Conan** task)
+* Maven Extractor (Used by the *JFrog Maven* task)
+* Gradle Extractor (Used by the *JFrog Gradle* task)
+* Conan client (Used by the *JFrog Conan* task)
 
 <details>
   <summary>Automatic Installation</summary>
@@ -105,18 +103,17 @@ You can configure the pipeline to download JFrog CLI and the Maven Extractor fro
 configured to proxy the download repositories.
 
 * Create two remote repositories in Artifactory:
-* Create a remote repository in Artifactory for downloading **JFrog CLI**. Name the repository **jfrog-cli-remote** and
+* Create a remote repository in Artifactory for downloading *JFrog CLI*. Name the repository *jfrog-cli-remote* and
   set its URL
   to [https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/](https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/)
-* Create a remote repository in Artifactory for downloading the **Maven and Gradle Extractors**. Name the URL *
-  *extractors** and set its URL
+* Create a remote repository in Artifactory for downloading the *Maven and Gradle Extractors*. Name the URL *extractors* and set its URL
   to: [https://releases.jfrog.io/artifactory/oss-release-local/](https://releases.jfrog.io/artifactory/oss-release-local/)
-* Make sure to configure the Artifactory server with the **jfrog-cli-remote ** and **extractors** repositories in as a
-  service connection in Azure DevOps of type **JFrog Artifactory V2**.
-* Add the **JFrog Tools Installer** task to your build or release pipeline.
+* Make sure to configure the Artifactory server with the *jfrog-cli-remote* and *extractors* repositories in as a
+  service connection in Azure DevOps of type *JFrog Artifactory V2*.
+* Add the *JFrog Tools Installer* task to your build or release pipeline.
 * Select the Artifactory service you configured.
-* Select **jfrog-cli-remote ** as the target repository to download the JFrog CLI.
-* If your pipeline uses the **JFrog Maven** or **JFrog Gradle** tasks, select **extractors** as the repository to
+* Select *jfrog-cli-remote* as the target repository to download the JFrog CLI.
+* If your pipeline uses the *JFrog Maven* or *JFrog Gradle* tasks, select *extractors* as the repository to
   download the Maven Extractor.
 
 ![tool-installer.png](images/tool-installer.png)
@@ -148,13 +145,13 @@ To install JFrog CLI on an agent with no internet access:
 
 1. Create the directory structure on your agent's `file-system: $(Agent.ToolsDirectory)/_jf/current/`
 2. Download the latest JFrog CLI version from [here](https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/).
-3. Please make sure to download the executable matching your agent's operating system. Make sure to download the **jf**
-   executable of JFrog CLI and not the legacy **jfrog** executable.
-4. Copy the downloaded **jf** executable to the ** current **directory you created.
+3. Please make sure to download the executable matching your agent's operating system. Make sure to download the *jf*
+   executable of JFrog CLI and not the legacy *jfrog* executable.
+4. Copy the downloaded *jf* executable to the *current* directory you created.
 
 ##### Installing the Maven Extractor
 
-When triggering the **JFrog Maven** task, JFrog CLI automatically downloads the Maven Extractor jar to the build agent
+When triggering the *JFrog Maven* task, JFrog CLI automatically downloads the Maven Extractor jar to the build agent
 the first time it's required.
 However, if your build agent does not have access to the internet, the build will fail when attempting to download the
 file.
@@ -163,14 +160,14 @@ You'll therefore need to download and install it manually.
 To install the Maven Extractor jar on an agent with no internet access:
 
 1. Create the directory structure on your agent's
-   file-system: `$(Agent.ToolsDirectory)/_jf/.jfrog/dependencies/maven/2.39.9`
+   file-system: `$(Agent.ToolsDirectory)/_jf/.jfrog/dependencies/maven/2.x.x`
 2. Download
-   the [build-info-extractor-maven3-2.39.9-uber.jar](https://releases.jfrog.io/artifactory/oss-release-local/org/jfrog/buildinfo/build-info-extractor-maven3/2.39.9/build-info-extractor-maven3-2.39.9-uber.jar)
+   the latest [build-info-extractor-maven3-2.x.x-uber.jar](https://search.maven.org/artifact/org.jfrog.buildinfo/build-info-extractor)
    and place it inside the "maven" directory you created.
 
 ##### Installing the Gradle Extractor
 
-When triggering the **JFrog Gradle ** task, JFrog CLI automatically downloads the Gradle Extractor jar to the build
+When triggering the *JFrog Gradle* task, JFrog CLI automatically downloads the Gradle Extractor jar to the build
 agent the first time it's required.
 However, if your build agent does not have access to the internet, the build will fail when attempting to download the
 file. You'll therefore need to download and install it manually.
@@ -178,9 +175,9 @@ file. You'll therefore need to download and install it manually.
 To install the Gradle Extractor jar on an agent with no internet access:
 
 1. Create the directory structure on your agent's
-   file-system: `$(Agent.ToolsDirectory)/_jf/.jfrog/dependencies/gradle/4.31.9`
+   file-system: `$(Agent.ToolsDirectory)/_jf/.jfrog/dependencies/gradle/4.x.x`
 2. Download
-   the [build-info-extractor-gradle-4.31.9-uber.jar](https://releases.jfrog.io/ui/native/oss-release-local/org/jfrog/buildinfo/build-info-extractor-gradle/4.31.9/build-info-extractor-gradle-4.31.9-uber.jar)
+   the latest [build-info-extractor-gradle-4.x.x-uber.jar](https://plugins.gradle.org/plugin/com.jfrog.artifactory)
    and place it inside the "gradle" directory you created.
 
 ##### Installing Conan
@@ -205,7 +202,7 @@ The build agent requires using Node.JS version 8 and above. To check which versi
 agent:
 
 1. Navigate to the_Worker\\Handlers\\Node_folder located under theAgent home.
-2. From the terminal, run **node -v**
+2. From the terminal, run *node -v*
 
 To upgrade Node.JS on the build agent:
 
@@ -264,9 +261,9 @@ To enable TLS 1.2 on TFS:
 <details>
   <summary> JFrog CLI V2 Task</summary>
 
-The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named **JFrog CLI V2**,
-which allows executing **[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)** commands.
-The command will use the connection details provided by the selected **JFrog Platform** service connection configured in
+The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named *JFrog CLI V2*,
+which allows executing *[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)* commands.
+The command will use the connection details provided by the selected *JFrog Platform* service connection configured in
 Azure DevOps,
 so there's no need to provide the connection details as command options.
 
@@ -312,7 +309,7 @@ Multiple commands example:
 <details>
   <summary>JFrog Generic Artifacts task</summary>
 
-The **JFrog Generic Artifacts** task supports following operations with JFrog Artifactory:
+The *JFrog Generic Artifacts* task supports following operations with JFrog Artifactory:
 
 * Uploading artifacts to Artifactory
 * Downloading artifacts from Artifactory
@@ -325,11 +322,11 @@ The **JFrog Generic Artifacts** task supports following operations with JFrog Ar
 The task triggers [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) to perform these actions
 using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs).
 When the task is used for uploading and downloading artifacts, it can also be configured to capture the build-info,
-which can be later published to Artifactory using the **JFrog Publish Build Info** task.
+which can be later published to Artifactory using the *JFrog Publish Build Info* task.
 
 When configuring the task, do the following:
 
-1. Select your configured **JFrog Artifactory V2** service connection.
+1. Select your configured *JFrog Artifactory V2* service connection.
 
 2. Specify whether you'd like define the File Spec through the task UI or have the task read the spec from a file.
 
@@ -337,11 +334,11 @@ When configuring the task, do the following:
 
 4. Set the other task options.
 
-5. Check the **Advanced** section for additional options.
+5. Check the *Advanced* section for additional options.
 
 ### Generic artifacts handling
 
-The **JFrog Generic Artifacts** task allows performing generic actions on artifacts, such as:
+The *JFrog Generic Artifacts* task allows performing generic actions on artifacts, such as:
 
 1. Downloading and uploading from/to Artifactory
 2. Setting or deleting properties on artifacts in Artifactory
@@ -354,7 +351,7 @@ The downloaded dependencies are defined
 using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs)
 and can be also configured to capture the build-info.
 It will store the downloaded files as dependencies in the build-info which can later be published to Artifactory using
-the **JFrog Publish Build-Info** task.
+the *JFrog Publish Build-Info* task.
 
 ![GenericDownload](images/marketplace/generic-download.png)
 
@@ -364,7 +361,7 @@ The task also supports uploading your generated build artifacts from the build a
 The artifacts are defined
 using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs).
 The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The
-captured build-info can be later published to Artifactory using the **JFrog Publish Build-Info** task.
+captured build-info can be later published to Artifactory using the *JFrog Publish Build-Info* task.
 
 ![GenericUpload](images/marketplace/generic-upload.png)
 
@@ -419,12 +416,12 @@ YAML Example:
 
 ![mvn.png](images/marketplace/mvn.png)
 
-The **JFrog Maven** task allows triggering Maven builds, while resolving dependencies and deploying artifacts from and
+The *JFrog Maven* task allows triggering Maven builds, while resolving dependencies and deploying artifacts from and
 to Artifactory.
-The task uses the configured **JFrog Artifactory V2** service connection.
+The task uses the configured *JFrog Artifactory V2* service connection.
 The task can also be configured to capture build-info and store the downloaded and uploaded artifacts as build
 dependencies and build artifacts.
-The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
 
 ![mvn.png](images/maven-task.png)
 
@@ -464,23 +461,23 @@ see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-do
 
 ![gradle.png](images/marketplace/gradle.png)
 
-The **JFrog Gradle** task allows triggering Gradle builds, while resolving dependencies and deploying artifacts from and
+The *JFrog Gradle* task allows triggering Gradle builds, while resolving dependencies and deploying artifacts from and
 to Artifactory.
-The task uses the configured **JFrog Artifactory V2** service connection.
+The task uses the configured *JFrog Artifactory V2* service connection.
 
 The task can also be configured to capture build-info and store the downloaded and uploaded artifacts as build
 dependencies and build artifacts.
-The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
 
-Behind the scenes, the **JFrog Gradle ** task uses
+Behind the scenes, the *JFrog Gradle* task uses
 the [Gradle Artifactory Plugin](https://jfrog.com/help/r/jfrog-integrations-documentation/gradle-artifactory-plugin) to
 integrate with the Gradle build.
 In case your Gradle script already applies
 the [Gradle Artifactory Plugin](https://jfrog.com/help/r/jfrog-integrations-documentation/gradle-artifactory-plugin),
-set the **Use Artifactory Plugin** option, to let the task know that it shouldn't apply the plugin in the Gradle script.
+set the *Use Artifactory Plugin* option, to let the task know that it shouldn't apply the plugin in the Gradle script.
 
-You should set **artifactoryPublish** as one of the Gradle tasks in the ** task(s) fields**.
-**artifactoryPublish** is a task that is exposed by the Gradle Artifactory Plugin, and is used for deploying artifacts
+You should set *artifactoryPublish* as one of the Gradle tasks in the task(s) fields.
+*artifactoryPublish* is a task that is exposed by the Gradle Artifactory Plugin, and is used for deploying artifacts
 as well as publishing build-info to Artifactory.
 
 ![gradle.png](images/gradle-task.png)
@@ -504,12 +501,12 @@ as well as publishing build-info to Artifactory.
 
 ![npm.png](images/marketplace/npm.png)
 
-The **JFrog Npm** task allows triggering npm builds, while resolving npm dependencies and deploying npm packages from
+The *JFrog Npm* task allows triggering npm builds, while resolving npm dependencies and deploying npm packages from
 and to Artifactory.
-The task uses the configured **JFrog Artifactory V2** service connection.
+The task uses the configured *JFrog Artifactory V2* service connection.
 
 The task can be also configured to capture build-info and store the uploaded files as artifacts in it.
-The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
 
 ![npm.png](images/npm-task.png)
 
@@ -538,12 +535,12 @@ see [Artifactory npm Registry](https://jfrog.com/help/r/jfrog-artifactory-docume
 
 ![nuget.png](images/marketplace/nuget.png)
 
-The **JFrog Nuget** and **JFrog .NET Core** tasks allow restoring NuGet packages from Artifactory.
+The *JFrog Nuget* and *JFrog .NET Core* tasks allow restoring NuGet packages from Artifactory.
 These tasks also allow publishing NuGet packages to Artifactory.
-The task uses the configured **JFrog Artifactory V2** service connection.
+The task uses the configured *JFrog Artifactory V2* service connection.
 The tasks can be configured to capture build-info.
 The build-info stores the restored packages as build dependencies and uploaded packages as build artifacts.
-The captured build-info can be later published to Artifactory using the **[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
 
 ![nuget.png](images/nuget-task.png)
 
@@ -553,7 +550,7 @@ The captured build-info can be later published to Artifactory using the **[JFrog
     command: 'restore'
     artifactoryConnection: 'jfrog artifactory'
     targetResolveRepo: 'nuget-virtual'
-    rootPath: '**/*.sln'
+    rootPath: '*/*.sln'
     collectBuildInfo: true
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
@@ -570,8 +567,8 @@ see [Artifactory NuGet Repositories](https://jfrog.com/help/r/jfrog-artifactory-
 
 ![pip.png](images/marketplace/pip.png)
 
-The **JFrog Pip** task allows installing Pip packages from Artifactory.
-The task uses the configured **JFrog Artifactory V2** service connection.
+The *JFrog Pip* task allows installing Pip packages from Artifactory.
+The task uses the configured *JFrog Artifactory V2* service connection.
 The tasks can also be configured to capture build-info. The build-info stores the installed packages as build
 dependencies.
 The captured build-info can be later published to Artifactory using
@@ -590,17 +587,17 @@ the [Publishing Build Info to Artifactory](http://www.jfrog.com#PublishingBuildI
     buildNumber: '$(Build.BuildNumber)'
 ```
 
-**Recording all dependencies as part of the build-info**
-When running the **JFrog Pip** task inside a Python environment, which already has some of the packages installed, the
+*Recording all dependencies as part of the build-info*
+When running the *JFrog Pip* task inside a Python environment, which already has some of the packages installed, the
 installed packages will not be included as part of the build-info, if they were not originally installed from
 Artifactory. A warning message will be added to the build log in this case.
 
-**How to include all packages in the build-info?**
-Running the task for the first time with the **Disable local pip cache ** option checked,
+*How to include all packages in the build-info?*
+Running the task for the first time with the *Disable local pip cache* option checked,
 should re-download and install these packages, and they will therefore be included in the build-info.
 It is also recommended to run the command from inside
 a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
-The **Virtual environment setup command** field allows this.
+The *Virtual environment setup command* field allows this.
 
 ![pip-advanced.png](images/pip-advanced.png)
 
@@ -618,17 +615,16 @@ included in the build-info, even if they are already cached locally.
 
 [Conan](https://conan.io/) is a package manager for C and C++.
 
-The **JFrog Conan** task allows triggering a conan build while resolving conan dependencies from a conan repository in
+The *JFrog Conan* task allows triggering a conan build while resolving conan dependencies from a conan repository in
 Artifactory.
-The task uses the configured **JFrog Artifactory V2** service connection.
+The task uses the configured *JFrog Artifactory V2* service connection.
 It also allows publishing conan packages to an Artifactory conan repository.
 The task can be also configured to capture build-info and store the downloaded and uploaded packages as build
 dependencies and artifact.
-The captured build-info can be later published to Artifactory using the *
-*[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
+The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
 
-The task supports the **config install** , **add remote** , **create** and **upload** conan commands.
-In addition, it supports a **custom** option, allowing to configure the task to execute any conan command.
+The task supports the *config install* , *add remote* , *create* and *upload* conan commands.
+In addition, it supports a *custom* option, allowing to configure the task to execute any conan command.
 The full documentation of Conan is available at the [conan website](https://docs.conan.io/en/latest/).
 
 ![conan.png](images/conan-task.png)
@@ -650,12 +646,12 @@ see [Artifactory Conan Repositories](https://jfrog.com/help/r/jfrog-artifactory-
 <details>
   <summary>...</summary>
 
-The **JFrog Go** task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
-The task uses the configured **JFrog Artifactory V2** service connection.
+The *JFrog Go* task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
+The task uses the configured *JFrog Artifactory V2* service connection.
 It also allows publishing go packages to an Artifactory go repository.
 The task can be also configured to capture build-info and store the downloaded and uploaded packages as build
 dependencies and artifact.
-The captured build-info can be later published to Artifactory using the **JFrog Publish Build-Info** task.
+The captured build-info can be later published to Artifactory using the *JFrog Publish Build-Info* task.
 
 ![go.png](images/go-task.png)
 
@@ -690,9 +686,9 @@ see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-doc
 Being able to look at the build which was published to Artifactory, and see all JIRA issues associated with it, is one
 of the most powerful capabilities of Artifactory when it comes to managing metadata about artifacts builds.
 
-The **JFrog Collect Build Issues** task collects the list of tracked project issues (for example, issues stored in JIRA,
+The *JFrog Collect Build Issues* task collects the list of tracked project issues (for example, issues stored in JIRA,
 GitHub or any other bug tracking systems, and adds these issues to the build-info.
-The task uses the configured **JFrog Artifactory V2** service connection. The issues are collected by reading the git
+The task uses the configured *JFrog Artifactory V2* service connection. The issues are collected by reading the git
 commit messages from the local git log.
 Each commit message is matched against a pre-configured regular expression, which retrieves the issue ID and issue
 summary.
@@ -717,20 +713,20 @@ issues:
 
 ##### Configuration properties
 
-| Property name     | Description                                                                                                                                                                                                                                                                                                             |   |   |   |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|---|---|
-| Version           | The schema version is intended for internal use. Do not change!                                                                                                                                                                                                                                                         |   |   |   |
-| trackerName       | The name (type) of the issue tracking system. For example, JIRA. This property can take any value.                                                                                                                                                                                                                      |   |   |   |
-| regexp            | A regular expression used for matching the git commit messages. The expression should include two capturing groups - for the issue key (ID) and the issue summary. In the example above, the regular expression matches the commit messages as displayed in the following example:<br>HAP-1007 - This is a sample issue |   |   |   |
-| keyGroupIndex     | The capturing group index in the regular expression used for retrieving the issue key. In the example above, setting the index to "1" retrieves HAP-1007 from this commit message:<br>HAP-1007 - This is a sample issue                                                                                                 |   |   |   |
-| summaryGroupIndex | The capturing group index in the regular expression for retrieving the issue summary. In the example above, setting the index to "2" retrieves the sample issue from this commit message:<br>HAP-1007 - This is a sample issue                                                                                          |   |   |   |
-| trackerUrl        | The issue tracking URL. This value is used for constructing a direct link to the issues in the Artifactory build UI.                                                                                                                                                                                                    |   |   |   |
-| aggregate         | Set to true, if you wish all builds to include issues from previous builds.                                                                                                                                                                                                                                             |   |   |   |
-| aggregationStatus | If aggregate is set to true, this property indicates how far in time should the issues be aggregated. In the above example, issues will be aggregated from previous builds, until a build with a RELEASE status is found. Build statuses are set when a build is promoted using the jfrog rt build-promote command.     |   |   |   |
+| Property name     | Description                                                                                                                                                                                                                                                                                                             |
+|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Version           | The schema version is intended for internal use. Do not change!                                                                                                                                                                                                                                                         |
+| trackerName       | The name (type) of the issue tracking system. For example, JIRA. This property can take any value.                                                                                                                                                                                                                      |
+| regexp            | A regular expression used for matching the git commit messages. The expression should include two capturing groups - for the issue key (ID) and the issue summary. In the example above, the regular expression matches the commit messages as displayed in the following example:<br>HAP-1007 - This is a sample issue |
+| keyGroupIndex     | The capturing group index in the regular expression used for retrieving the issue key. In the example above, setting the index to "1" retrieves HAP-1007 from this commit message:<br>HAP-1007 - This is a sample issue                                                                                                 |
+| summaryGroupIndex | The capturing group index in the regular expression for retrieving the issue summary. In the example above, setting the index to "2" retrieves the sample issue from this commit message:<br>HAP-1007 - This is a sample issue                                                                                          |
+| trackerUrl        | The issue tracking URL. This value is used for constructing a direct link to the issues in the Artifactory build UI.                                                                                                                                                                                                    |
+| aggregate         | Set to true, if you wish all builds to include issues from previous builds.                                                                                                                                                                                                                                             |
+| aggregationStatus | If aggregate is set to true, this property indicates how far in time should the issues be aggregated. In the above example, issues will be aggregated from previous builds, until a build with a RELEASE status is found. Build statuses are set when a build is promoted using the jfrog rt build-promote command.     |
 
-The yaml configuration can be either be stored as text as part of the task configuration, or stored in a file. The file
-can be saved in the source control, and fetched, together with the rest of the sources to the build agent. It can then
-be accesses and used by this task.
+The yaml configuration can be either be stored as text as part of the task configuration, or stored in a file.
+The file can be saved in the source control, and fetched, together with the rest of the sources to the build agent.
+It can then be accesses and used by this task.
 
 </details>
 
@@ -739,8 +735,8 @@ be accesses and used by this task.
   <summary>...</summary>
 
 Most of the JFrog tasks can be configured to collect and store build-info locally.
-The task uses the configured **JFrog Artifactory V2** service connection.
-The collected build info can be then published to Artifactory using the **JFrog Publish Build Info** task.
+The task uses the configured *JFrog Artifactory V2* service connection.
+The collected build info can be then published to Artifactory using the *JFrog Publish Build Info* task.
 
 For more information about Build Info,
 see [Artifactory Build Integration](https://jfrog.com/help/r/jfrog-cli/build-integration)
@@ -758,7 +754,7 @@ collect environment variables from the agent and add them to the build-info.
     excludeEnvVars: '*password*;*psw*;*secret*;*key*;*token*;*auth*;'
 ```
 
-After the build-info is published to Artifactory, it can be accessed from the **Artifactory** tab in the Build Results.
+After the build-info is published to Artifactory, it can be accessed from the *Artifactory* tab in the Build Results.
 
 ![build-results.png](images/marketplace/build-results.png)
 ![bi-in-artifactory.png](images/marketplace/bi-in-artifactory.png)
@@ -771,28 +767,28 @@ After the build-info is published to Artifactory, it can be accessed from the **
 
 To support the artifacts life-cycle, Artifactory supports promoting published builds from one repository to another.
 
-The **JFrog Build Promotion** task promotes a build, by either copying or moving the build artifacts and/or dependencies
+The *JFrog Build Promotion* task promotes a build, by either copying or moving the build artifacts and/or dependencies
 to a target repository.
 
 This task can be added as part of a Build or Release pipeline.
 
-Run these steps to configure the **JFrog Build Promotion** task:
+Run these steps to configure the *JFrog Build Promotion* task:
 
-1. Select the configured **JFrog Artifactory V2** service connection, to which the build has been published.
+1. Select the configured *JFrog Artifactory V2* service connection, to which the build has been published.
 
-2. Specify the name of a** target repository** to which the build should be promoted.
+2. Specify the name of a* target repository* to which the build should be promoted.
 
-3. Set the **status** of the build and optionally add a **Comment**. These details will be visible as part of the Build
+3. Set the *status* of the build and optionally add a *Comment*. These details will be visible as part of the Build
    History in the Artifactory UI.
 
-4. (Optional) Set a **source repository** for the promotion.
+4. (Optional) Set a *source repository* for the promotion.
 
-5. Select the **include build dependencies** if you want the build dependencies to be promoted.
+5. Select the *include build dependencies* if you want the build dependencies to be promoted.
 
-6. To copy and not to move the artifacts to the target repository, select the **Use copy** option to copy the artifacts
+6. To copy and not to move the artifacts to the target repository, select the *Use copy* option to copy the artifacts
    to the target repository.
 
-7. Select **Dry run** to test the promotion prior to running the build promotion.
+7. Select *Dry run* to test the promotion prior to running the build promotion.
 
 ![build-promotion.png](images/marketplace/build-promotion.png)
 
@@ -815,24 +811,24 @@ Run these steps to configure the **JFrog Build Promotion** task:
 
 You can control the life cycle of your artifacts by promoting them from one Artifactory repository to another.
 Build Promotion can come in handy when embedding it as part of release pipeline in Azure DevOps.
-To help you achieve this, follow these steps for creating a release which includes the **JFrog Build Promotion** task.
+To help you achieve this, follow these steps for creating a release which includes the *JFrog Build Promotion* task.
 
 1. Create a new Release.
    ![promotion.png](images/promotion1.png)
-2. Click **environment** and select a template for the release.
+2. Click *environment* and select a template for the release.
    ![promotion.png](images/promotion2.png)
-3. Click **Artifact** and select** Build** as the source type.
+3. Click *Artifact* and select *Build* as the source type.
 4. Fill out the rest of the form details.
-5. If you'd like this release to always use the latest build from Artifactory, select **specify a specific build number
-   ** as the **Default version** and select one of the available build number i the **Build number** list box.
-6. If you'd like to promote a specific build number during the release, select** specify at the time of release
-   creation**as the **Default version**:
+5. If you'd like this release to always use the latest build from Artifactory, select specify a specific build number
+   as the *Default version* and select one of the available build number i the *Build number* list box.
+6. If you'd like to promote a specific build number during the release, select specify at the time of release
+   creation as the *Default version*:
    ![promotion.png](images/promotion3.png)
-7. If you wish to promote the latest build number, select** specify a specific build number**as the **Default version**
-   and then select**any**build number. Then, click on the **Variables** tab and add
-   the **ARTIFACTORY\_RELEASE\_BUILD\_NUMBER**pipeline variable with**LATEST**as the value.
+7. If you wish to promote the latest build number, select specify a specific build number as the *Default version*
+   and then select *any* build number. Then, click on the *Variables* tab and add
+   the *ARTIFACTORY\_RELEASE\_BUILD\_NUMBER* pipeline variable with *LATEST* as the value.
    ![promotion.png](images/promotion4.png)
-8. Configure the **Artifactory Build Promotion** task as one of your release pipeline tasks.
+8. Configure the *Artifactory Build Promotion* task as one of your release pipeline tasks.
    The task uses a build number which will be selected later on, upon creating a release.
    ![promotion.png](images/promotion5.png)
 9. That's it, you're done!
@@ -846,11 +842,11 @@ To help you achieve this, follow these steps for creating a release which includ
 <details>
   <summary>...</summary>
 
-To discard old runs of a build from Artifactory, add the **JFrog Discard Builds** task to the pipeline.
+To discard old runs of a build from Artifactory, add the *JFrog Discard Builds* task to the pipeline.
 
 Run these steps to configure the task.
 
-1. Select the configured **JFrog Artifactory V2** service connection, on which you'd like the builds to be discarded.
+1. Select the configured *JFrog Artifactory V2* service connection, on which you'd like the builds to be discarded.
 
 2. Type the name of the build.
 
@@ -879,8 +875,6 @@ Run these steps to configure the task.
 
 </details>
 
-
-
 <br>
 
 ## JFrog Xray tasks
@@ -891,13 +885,13 @@ Run these steps to configure the task.
   <summary>...</summary>
 
 
-The **JFrog Audit** task triggers an audit of your project dependencies for security vulnerabilities with JFrog Xray.
-The task uses the configured **JFrog Xray V2** service connection.
+The *JFrog Audit* task triggers an audit of your project dependencies for security vulnerabilities with JFrog Xray.
+The task uses the configured *JFrog Xray V2* service connection.
 The scan is synchronous, meaning the tasks waits for the scan to finish.
 To determine the policy for identifying the vulnerabilities, you can either set a list for Xray Watches or select a
 JFrog Project or path in Artifactory associated with the policy.
 
-This functionality requires version 3.29.0 or above of JFrog Xray.
+> This functionality requires version 3.29.0 or above of JFrog Xray.
 
 ![audit.png](images/marketplace/audit.png)
 ![violations-table.png](images/marketplace/violations-table.png)
@@ -917,16 +911,15 @@ This functionality requires version 3.29.0 or above of JFrog Xray.
 <details>
   <summary>...</summary>
 
-The **JFrog Build Scan** task allows triggering a build scan with JFrog Xray.
-For the build to be scanned, it first needs to be published to Artifactory using the *
-*[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)** task.
-The task uses the configured **JFrog Xray V2** service connection.
+The *JFrog Build Scan* task allows triggering a build scan with JFrog Xray.
+For the build to be scanned, it first needs to be published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
+The task uses the configured *JFrog Xray V2* service connection.
 When the scan is triggered, Xray starts scanning the build artifacts and dependencies.
 The scan is synchronous, meaning the tasks waits for the scan to finish.
-If the **Allow fail build** task option is set and Xray is configured to fail the build, the build pipeline will fail,
+If the *Allow fail build* task option is set and Xray is configured to fail the build, the build pipeline will fail,
 if vulnerabilities are found.
 
-This functionality requires version 3.37.0 or above of JFrog Xray.
+> This functionality requires version 3.37.0 or above of JFrog Xray.
 
 ![build-scan.png](images/marketplace/build-scan.png)
 
@@ -958,14 +951,14 @@ build-info report.
 <details>
   <summary>...</summary>
 
-The **JFrog Docker** task allows pushing and pulling docker images to and from a docker repository in Artifactory.
+The *JFrog Docker* task allows pushing and pulling docker images to and from a docker repository in Artifactory.
 The task can be also configured to capture build-info for the pushed or pulled image.
 In addition to details about the build and the build environment, the build info includes the image layers as build
 dependencies and build artifacts.
 The task stores build info locally on the build agent.
-The stored build-info can be later published to Artifactory using the **JFrog Publish Build Info** task.
+The stored build-info can be later published to Artifactory using the *JFrog Publish Build Info* task.
 
-This functionality requires version 7.33.3 or above of Artifactory.
+> This functionality requires version 7.33.3 or above of Artifactory.
 
 For more information about Docker and Artifactory,
 see [Artifactory Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-documentation/docker-registry)
@@ -991,7 +984,7 @@ see [Artifactory Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-doc
 <details>
   <summary>...</summary>
 
-The **JFrog Docker** task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
+The *JFrog Docker* task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
 build log.
 
 By default, the result will include all vulnerabilities found. You may however configure the task to show only
@@ -1005,7 +998,7 @@ You do this by configuring the task to use:
 
 3. Repository path in Artifactory which has Xray Watches associated with it.
 
-This functionality requires version 3.40.0 or above of JFrog Xray.
+> This functionality requires version 3.40.0 or above of JFrog Xray.
 
 ![docker-scan.png](images/marketplace/docker-scan.png)
 
@@ -1051,11 +1044,11 @@ Info to Artifactory section.
 
 Follow these steps to add Artifactory as an artifact source to a Release.
 
-1. Create a new Release and click on **Artifacts Add**
+1. Create a new Release and click on *Artifacts Add*
 
    ![release1.png](images/release1.png)
 
-2. Select the **Artifactory** source type.
+2. Select the *Artifactory* source type.
 
    ![release2.png](images/release2.png)
 
@@ -1092,10 +1085,10 @@ As part of the release flow, release bundles are verified by the target destinat
 correctly and safe to use.
 JFrog DistributionDistributing Release Bundles
 
-The **JFrog Distribution** task allows creating, updating, signing and deleting release bundles.
+The *JFrog Distribution* task allows creating, updating, signing and deleting release bundles.
 It also allows distributing the release to the edge nodes.
 
-* The task requires configuring your **JFrog Distribution V2** instance as a service connection in Azure DevOps.
+* The task requires configuring your *JFrog Distribution V2* instance as a service connection in Azure DevOps.
 * You can then set the instance you configured as the Distribution service value in the task.
 * The task triggers [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) to execute the distribution actions.
 * When creating or updating a release bundle, you need to
@@ -1104,7 +1097,7 @@ It also allows distributing the release to the edge nodes.
 * When distributing a release bundle, you can control the distribution destinations by defining rules distribution rules
   in a JSON format.
 
-**Distribution Rules JSON structure ** Here's an example:
+*Distribution Rules JSON structure* Here's an example:
 
 ```JSON
    {
@@ -1216,8 +1209,8 @@ ts-node: `mocha -r ts-node/register tests.ts -t 600000`.
 
 In order to skip tests, set the ADO_SKIP_TESTS environment variable with the tests you wish to skip, separated by
 commas.
-The supported values are: **maven**, **gradle **, **npm**, **go**, **nuget**, **dotnet**, **conan**, **pip**, **proxy**,
-**distribution**, **unit**, **installer** and **generic**.
+The supported values are: *maven*, *gradle*, *npm*, *go*, *nuget*, *dotnet*, *conan*, *pip*, *proxy*,
+*distribution*, *unit*, *installer* and *generic*.
 
 For example, for skipping the nuget and dotnet tests:
 
