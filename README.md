@@ -72,12 +72,19 @@ To install the JFrog extension, execute the following steps:
 * Go to
   the [Visual Studio Marketplace Jfrog Extension Page](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
   and sign in to your account.
-    <img width="300px" src="./images/extension-install.png">
-* Click on *Get It Free*.
-  <img width="300px" src="./images/get-it-free.png">
+
+  <img src="./images/extension-install.png" alt=""/>
+  
+* Click on *Get It Free*
+
+  <img src="./images/get-it-free.png" alt="">
+  
 * Select the account to which you want to apply the extension and confirm installation.
-  * In the JFrog Extension page, click *Install*.
-  <img width="300px" src="./images/organization-install.png">
+
+* In the JFrog Extension page, click *Install*.
+
+<img src="./images/organization-install.png" alt="">
+
 
 ### Installing the Build Agent
 
