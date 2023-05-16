@@ -1,4 +1,4 @@
-<div style="text-align: center;">
+<div align="center">
 
 [![](images/introduction.png)](https://github.com/jfrog/jfrog-azure-devops-extension)
 
