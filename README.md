@@ -254,8 +254,11 @@ To enable TLS 1.2 on TFS:
 
 </details>
 
-## Executing JFrog CLI Commands
+<p align="center">
+<br>
 
+## Executing JFrog CLI Commands
+</p>
 <details>
   <summary> JFrog CLI V2 Task</summary>
 
@@ -299,8 +302,11 @@ Multiple commands example:
 
 </details>
 
-## Managing Generic Artifacts
+<p align="center">
+<br>
 
+## Managing Generic Artifacts
+</p>
 <details>
   <summary>JFrog Generic Artifacts task</summary>
 
@@ -399,11 +405,15 @@ YAML Example:
 
 </details>
 
+<p align="center">
+<br>
+
 ## Build tools Tasks
+</p>
 
 ### JFrog Maven Task
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 ![mvn.png](images/marketplace/mvn.png)
 
@@ -448,7 +458,7 @@ see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-do
 
 ### JFrog Gradle Task
 <details>
-   <summary>Expand...</summary>
+   <summary>...</summary>
 
 ![gradle.png](images/marketplace/gradle.png)
 
@@ -488,7 +498,7 @@ as well as publishing build-info to Artifactory.
 
 ### JFrog Npm Task
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 ![npm.png](images/marketplace/npm.png)
 
@@ -522,7 +532,7 @@ see [Artifactory npm Registry](https://jfrog.com/help/r/jfrog-artifactory-docume
 
 ### JFrog Nuget and .NET Core Task
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 ![nuget.png](images/marketplace/nuget.png)
 
@@ -554,7 +564,7 @@ see [Artifactory NuGet Repositories](https://jfrog.com/help/r/jfrog-artifactory-
 
 ### JFrog pip Task
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 ![pip.png](images/marketplace/pip.png)
 
@@ -600,7 +610,7 @@ included in the build-info, even if they are already cached locally.
 
 ### JFrog Conan Task
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 ![conan.png](images/marketplace/conan.png)
 
@@ -636,7 +646,7 @@ see [Artifactory Conan Repositories](https://jfrog.com/help/r/jfrog-artifactory-
 
 ### JFrog Go Task
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 The **JFrog Go** task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
@@ -664,12 +674,16 @@ For more information about Go repositories,
 see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/go-registry)
 </details>
 
+<p align="center">
+<br>
+
 ## Build Tasks
+</p>
 
 
 ### JFrog Collect Build Issues
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 Being able to look at the build which was published to Artifactory, and see all JIRA issues associated with it, is one
 of the most powerful capabilities of Artifactory when it comes to managing metadata about artifacts builds.
@@ -720,7 +734,7 @@ be accesses and used by this task.
 
 ### JFrog Publish Build Info
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 Most of the JFrog tasks can be configured to collect and store build-info locally.
 The task uses the configured **JFrog Artifactory V2** service connection.
@@ -751,7 +765,7 @@ After the build-info is published to Artifactory, it can be accessed from the **
 
 ### JFrog Build Promotion
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 To support the artifacts life-cycle, Artifactory supports promoting published builds from one repository to another.
 
@@ -828,7 +842,7 @@ To help you achieve this, follow these steps for creating a release which includ
 
 ### Discarding Published Builds from Artifactory
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 To discard old runs of a build from Artifactory, add the **JFrog Discard Builds** task to the pipeline.
 
@@ -863,11 +877,16 @@ Run these steps to configure the task.
 
 </details>
 
+
+<p align="center">
+<br>
+
 ## JFrog Xray tasks
+</p>
 
 ### Audit project's dependencies for Security Vulnerabilities
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 
 The **JFrog Audit** task triggers an audit of your project dependencies for security vulnerabilities with JFrog Xray.
@@ -894,7 +913,7 @@ This functionality requires version 3.29.0 or above of JFrog Xray.
 
 ### Scanning Published Builds for Security Vulnerabilities
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 The **JFrog Build Scan** task allows triggering a build scan with JFrog Xray.
 For the build to be scanned, it first needs to be published to Artifactory using the *
@@ -927,11 +946,15 @@ build-info report.
 
 </details>
 
+<p align="center">
+<br>
+
 ## JFrog Docker tasks
+</p>
 
 ### Pushing and Pulling Docker Images to and from Artifactory
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 The **JFrog Docker** task allows pushing and pulling docker images to and from a docker repository in Artifactory.
 The task can be also configured to capture build-info for the pushed or pulled image.
@@ -964,7 +987,7 @@ see [Artifactory Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-doc
 
 ### Scanning Local Docker Images with JFrog Xray
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 The **JFrog Docker** task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
 build log.
@@ -998,7 +1021,11 @@ This functionality requires version 3.40.0 or above of JFrog Xray.
 
 </details>
 
+<p align="center">
+<br>
+
 ## Using Published Artifacts in a Release
+</p>
 
 Artifacts which were published to Artifactory can be made available for a Release Pipeline.
 There are two ways to achieve this:
@@ -1041,12 +1068,15 @@ Follow these steps to add Artifactory as an artifact source to a Release.
 
 </details>
 
-## Managing and Distributing Release Bundles
+<p align="center">
+<br>
 
+## Managing and Distributing Release Bundles
+</p>
 
 ### JFrog Distribution V2 Task
 <details>
-  <summary>Expand...</summary>
+  <summary>...</summary>
 
 [JFrog Distribution](https://jfrog.com/help/r/jfrog-distribution-documentation) is a centralized platform that lets you
 provision software release distribution.
@@ -1127,7 +1157,11 @@ The Distribution Rules format also supports wildcards. For example:
 
 </details>
 
+<p align="center">
+<br>
+
 ## Contribution
+</p>
 
 We welcome pull requests from the community!
 
