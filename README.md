@@ -77,13 +77,14 @@ To install the JFrog extension, execute the following steps:
   
 * Click on *Get It Free*
 
-  <img src="./images/get-it-free.png" alt="">
+  <img width="400px" src="./images/get-it-free.png" alt="">
   
 * Select the account to which you want to apply the extension and confirm installation.
 
 * In the JFrog Extension page, click *Install*.
 
-<img src="./images/organization-install.png" alt="">
+  <img width="400px" src="./images/organization-install.png" alt="">
+
 
 
 ### Installing the Build Agent
