@@ -392,7 +392,9 @@ YAML Example:
   <summary>JFrog Maven Task</summary>
 
 ## JFrog Maven Task
+
 ![mvn.png](images/marketplace/mvn.png)
+
 The **JFrog Maven** task allows triggering Maven builds, while resolving dependencies and deploying artifacts from and
 to Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
@@ -436,7 +438,9 @@ see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-do
   <summary>JFrog Gradle Task</summary>
 
 ## JFrog Gradle Task
+
 ![gradle.png](images/marketplace/gradle.png)
+
 The **JFrog Gradle** task allows triggering Gradle builds, while resolving dependencies and deploying artifacts from and
 to Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
@@ -474,7 +478,9 @@ as well as publishing build-info to Artifactory.
   <summary>JFrog Npm Task</summary>
 
 ## JFrog Npm Task
+
 ![npm.png](images/marketplace/npm.png)
+
 The **JFrog Npm** task allows triggering npm builds, while resolving npm dependencies and deploying npm packages from
 and to Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
@@ -507,7 +513,9 @@ see [Artifactory npm Registry](https://jfrog.com/help/r/jfrog-artifactory-docume
  <summary>JFrog Nuget/.NET Core Task</summary>
 
 ## JFrog Nuget and .NET Core Task
+
 ![nuget.png](images/marketplace/nuget.png)
+
 The **JFrog Nuget** and **JFrog .NET Core** tasks allow restoring NuGet packages from Artifactory.
 These tasks also allow publishing NuGet packages to Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
@@ -539,7 +547,9 @@ see [Artifactory NuGet Repositories](https://jfrog.com/help/r/jfrog-artifactory-
  <summary>JFrog Pip Task</summary>
 
 ## JFrog Pip Task
+
 ![pip.png](images/marketplace/pip.png)
+
 The **JFrog Pip** task allows installing Pip packages from Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
 The tasks can also be configured to capture build-info. The build-info stores the installed packages as build
@@ -586,6 +596,7 @@ included in the build-info, even if they are already cached locally.
 ## JFrog Conan Task
 
 ![conan.png](images/marketplace/conan.png)
+
 [Conan](https://conan.io/) is a package manager for C and C++.
 
 The **JFrog Conan** task allows triggering a conan build while resolving conan dependencies from a conan repository in
@@ -621,6 +632,7 @@ For more information about Conan repositories, see [Artifactory Conan Repositori
 ## JFrog Go Task
 
 ![go.png](images/marketplace/go.png)
+
 The **JFrog Go** task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
 The task uses the configured **JFrog Artifactory V2** service connection.
 It also allows publishing go packages to an Artifactory go repository.
