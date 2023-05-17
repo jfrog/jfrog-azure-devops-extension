@@ -245,7 +245,7 @@ To make the certificates available for JFrog CLI, you'll need to place them insi
 is under JFrog CLI's home directory.
 The home directory default location is `$(Agent.ToolsDirectory)/_jf/`
 
-Read more about this in the [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI).
+Read more about this in the [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli).
 </details>
 
 <details>
@@ -332,8 +332,8 @@ The *JFrog Generic Artifacts* task supports following operations with JFrog Arti
 * Setting properties on artifacts in Artifactory
 * Deleting properties from artifacts in Artifactory
 
-The task triggers [JFrog CLI](https://www.jfrog.com/confluence/display/CLI/JFrog+CLI) to perform these actions
-using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs).
+The task triggers [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) to perform these actions
+using [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs).
 When the task is used for uploading and downloading artifacts, it can also be configured to capture the build-info,
 which can be later published to Artifactory using the *JFrog Publish Build Info* task.
 
@@ -361,7 +361,7 @@ The *JFrog Generic Artifacts* task allows performing generic actions on artifact
 
 The task supports downloading your build dependencies from Artifactory to the build agent.
 The downloaded dependencies are defined
-using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs)
+using [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs)
 and can be also configured to capture the build-info.
 It will store the downloaded files as dependencies in the build-info which can later be published to Artifactory using
 the *JFrog Publish Build-Info* task.
@@ -372,7 +372,7 @@ the *JFrog Publish Build-Info* task.
 
 The task also supports uploading your generated build artifacts from the build agent's local file system to Artifactory.
 The artifacts are defined
-using [File Specs](https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-UsingFileSpecs).
+using [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs).
 The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The
 captured build-info can be later published to Artifactory using the *JFrog Publish Build-Info* task.
 

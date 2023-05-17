@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Audit",
     "description": "Audit your local project's dependencies by generating a dependency tree and scanning it with Xray.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-AuditProjectforSecurityVulnerabilitieswithJFrogXray)",
+    "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#Audit-projects-dependencies-for-Security-Vulnerabilities)",
     "category": "Utility",
     "visibility": [
         "Build",

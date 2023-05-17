@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Docker",
     "description": "Pull and push docker images from and to Artifactory (while allowing to collect build-info) or scan local docker images with JFrog Xray.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-PushingandPullingDockerImagestoandfromArtifactory)",
+    "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#Pushing-and-Pulling-Docker-Images-to-and-from-Artifactory)",
     "category": "Utility",
     "visibility": [
         "Build",

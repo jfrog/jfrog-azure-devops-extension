@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Tools Installer",
     "description": "Installs tools necessary for JFrog integration tasks.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-JFrogToolsInstaller)",
+    "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#custom-tools-installation)",
     "category": "Tool",
     "visibility": [
         "Build",
