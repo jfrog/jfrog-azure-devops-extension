@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Pip",
     "description": "Run 'pip install' while resolving the Python dependencies from Artifactory. This task also allows collecting build-info. The collected build-info can be later published to Artifactory by the \"JFrog Publish Build Info\" task.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-TriggeringPythonBuildsUsingPip)",
+    "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#JFrog-Pip-Task)",
     "category": "Utility",
     "visibility": [
         "Build",

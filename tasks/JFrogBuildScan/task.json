@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Build Scan",
     "description": "Scan a build with JFrog Xray.\nThe scanned build must be published to Artifactory prior to scanning, using the 'JFrog Publish Build Info' task.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-ScanningPublishedBuildsforSecurityVulnerabilitieswithJFrogXray)",
+    "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#scanning-local-docker-images-with-jfrog-xray)",
     "category": "Utility",
     "visibility": [
         "Build",

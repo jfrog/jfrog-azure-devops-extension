@@ -4,7 +4,7 @@
     "friendlyName": "JFrog Build Promotion",
     "description": "Promote a published build in Artifactory.",
     "author": "JFrog",
-    "helpMarkDown": "[More Information](https://www.jfrog.com/confluence/display/JFROG/JFrog+Azure+DevOps+Extension#JFrogAzureDevOpsExtension-PromotingPublishedBuildsinArtifactory)",
+    "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#jfrog-build-promotion)",
     "category": "Utility",
     "visibility": [
         "Build",
