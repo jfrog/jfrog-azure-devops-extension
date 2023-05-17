@@ -138,8 +138,6 @@ configured to proxy the download repositories.
 <details>
   <summary>Manual Installation</summary><br>
 
-#### Manual Installation
-
 ##### Installing JFrog CLI
 
 The extension runs JFrog CLI in the background to run many of its operations.
@@ -413,10 +411,11 @@ YAML Example:
 ## Build tools Tasks
 
 
-### JFrog Maven Task
-
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### JFrog Maven Task
+</summary><br>
 
 ![mvn.png](images/marketplace/mvn.png)
 
@@ -459,9 +458,11 @@ For more information about Maven repositories,
 see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-documentation/maven-repository)
 </details>
 
-### JFrog Gradle Task
 <details>
-   <summary>...</summary><br>
+  <summary> 
+
+### JFrog Gradle Task
+</summary><br>
 
 ![gradle.png](images/marketplace/gradle.png)
 
@@ -499,9 +500,11 @@ as well as publishing build-info to Artifactory.
 
 </details>
 
-### JFrog Npm Task
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### JFrog Npm Task
+</summary><br>
 
 ![npm.png](images/marketplace/npm.png)
 
@@ -532,10 +535,12 @@ see [Artifactory npm Registry](https://jfrog.com/help/r/jfrog-artifactory-docume
 
 </details>
 
+<details>
+  <summary> 
 
 ### JFrog Nuget and .NET Core Task
-<details>
-  <summary>...</summary><br>
+</summary><br>
+
 
 ![nuget.png](images/marketplace/nuget.png)
 
@@ -568,7 +573,7 @@ see [Artifactory NuGet Repositories](https://jfrog.com/help/r/jfrog-artifactory-
 <details>
   <summary> 
 
-### JFrog pip Task
+### JFrog Pip Task
 </summary><br>
 
 ![pip.png](images/marketplace/pip.png)
@@ -613,9 +618,11 @@ included in the build-info, even if they are already cached locally.
 
 </details>
 
-### JFrog Conan Task
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### JFrog Conan Task
+</summary><br>
 
 ![conan.png](images/marketplace/conan.png)
 
@@ -648,9 +655,11 @@ For more information about Conan repositories,
 see [Artifactory Conan Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/conan-repositories)
 </details>
 
-### JFrog Go Task
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### JFrog Go Task
+</summary><br>
 
 The *JFrog Go* task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
 The task uses the configured *JFrog Artifactory V2* service connection.
@@ -684,10 +693,11 @@ see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-doc
 ## Build Tasks
 
 
+<details>
+  <summary> 
 
 ### JFrog Collect Build Issues
-<details>
-  <summary>...</summary><br>
+</summary><br>
 
 Being able to look at the build which was published to Artifactory, and see all JIRA issues associated with it, is one
 of the most powerful capabilities of Artifactory when it comes to managing metadata about artifacts builds.
@@ -736,9 +746,11 @@ It can then be accesses and used by this task.
 
 </details>
 
-### JFrog Publish Build Info
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### JFrog Publish Build Info
+</summary><br>
 
 Most of the JFrog tasks can be configured to collect and store build-info locally.
 The task uses the configured *JFrog Artifactory V2* service connection.
@@ -767,9 +779,12 @@ After the build-info is published to Artifactory, it can be accessed from the *A
 
 </details>
 
-### JFrog Build Promotion
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### JFrog Build Promotion
+</summary><br>
+
 
 To support the artifacts life-cycle, Artifactory supports promoting published builds from one repository to another.
 
@@ -844,9 +859,11 @@ To help you achieve this, follow these steps for creating a release which includ
 
 </details>
 
-### Discarding Published Builds from Artifactory
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### Discarding Published Builds from Artifactory
+</summary><br>
 
 To discard old runs of a build from Artifactory, add the *JFrog Discard Builds* task to the pipeline.
 
@@ -885,10 +902,11 @@ Run these steps to configure the task.
 
 ## JFrog Xray tasks
 
+<details>
+  <summary> 
 
 ### Audit project's dependencies for Security Vulnerabilities
-<details>
-  <summary>...</summary><br>
+</summary><br>
 
 
 The *JFrog Audit* task triggers an audit of your project dependencies for security vulnerabilities with JFrog Xray.
@@ -913,9 +931,11 @@ JFrog Project or path in Artifactory associated with the policy.
 
 </details>
 
-### Scanning Published Builds for Security Vulnerabilities
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### Scanning Published Builds for Security Vulnerabilities
+</summary><br>
 
 The *JFrog Build Scan* task allows triggering a build scan with JFrog Xray.
 For the build to be scanned, it first needs to be published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
@@ -952,10 +972,11 @@ build-info report.
 
 ## JFrog Docker tasks
 
+<details>
+  <summary> 
 
 ### Pushing and Pulling Docker Images to and from Artifactory
-<details>
-  <summary>...</summary><br>
+</summary><br>
 
 The *JFrog Docker* task allows pushing and pulling docker images to and from a docker repository in Artifactory.
 The task can be also configured to capture build-info for the pushed or pulled image.
@@ -986,9 +1007,11 @@ see [Artifactory Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-doc
 </details>
 
 
-### Scanning Local Docker Images with JFrog Xray
 <details>
-  <summary>...</summary><br>
+  <summary> 
+
+### Scanning Local Docker Images with JFrog Xray
+</summary><br>
 
 The *JFrog Docker* task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
 build log.
@@ -1074,10 +1097,11 @@ Follow these steps to add Artifactory as an artifact source to a Release.
 
 ## Managing and Distributing Release Bundles
 
+<details>
+  <summary> 
 
 ### JFrog Distribution V2 Task
-<details>
-  <summary>...</summary><br>
+</summary><br>
 
 [JFrog Distribution](https://jfrog.com/help/r/jfrog-distribution-documentation) is a centralized platform that lets you
 provision software release distribution.
