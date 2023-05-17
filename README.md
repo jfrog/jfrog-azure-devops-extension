@@ -96,14 +96,14 @@ To run the JFrog tasks, the build agents use three tools:
 * Conan client (Used by the [JFrog Conan](#jfrog-conan-task) task)
 
 <details>
-  <summary>Automatic Installation</summary><br>
+  <summary>Automatic Installation</summary>
 
 If the build agent has access to the internet, JFrog CLI along with the Maven and Gradle Extractors are downloaded and
 installed automatically on the agent, the first time they are required.
 </details>
 
 <details>
-  <summary>Custom tools Installation</summary><br>
+  <summary>Custom tools Installation</summary>
 
 You can configure the pipeline to download JFrog CLI and the Maven Extractor from a JFrog Artifactory instance, which is
 configured to proxy the download repositories.
@@ -136,7 +136,7 @@ configured to proxy the download repositories.
 </details>
 
 <details>
-  <summary>Manual Installation</summary><br>
+  <summary>Manual Installation</summary>
 
 ##### Installing JFrog CLI
 
@@ -225,7 +225,7 @@ in Azure DevOps.
 | <img width="200px" src="./images/service-distribution.png"> | JFrog Distribution                                                                                                                                                                                                                                                                | 
 
 <details>
-  <summary>Not Using a Public CA (Certificate Authority)?</summary><br>
+  <summary>Not Using a Public CA (Certificate Authority)?</summary>
 
 This section is relevant for you, if you're not using a public CA (Certificate Authority) to issue the SSL certificate
 used to connect to your JFrog instance domain.
@@ -240,7 +240,7 @@ Read more about this in the [JFrog CLI](https://www.jfrog.com/confluence/display
 </details>
 
 <details>
-  <summary>Can't Access your JFrog instance?</summary><br>
+  <summary>Can't Access your JFrog instance?</summary>
 
 For security reasons, the JFrog SaaS service supports only TLS 1.2. Since not all TFS versions support TLS 1.2, you may
 need to enable TLS 1.2 on TFS.
@@ -260,7 +260,7 @@ To enable TLS 1.2 on TFS:
 ## Executing JFrog CLI Commands
 
 <details>
-  <summary> JFrog CLI V2 Task</summary><br>
+  <summary> JFrog CLI V2 Task</summary>
 
 The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named *JFrog CLI V2*,
 which allows executing *[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)* commands.
@@ -308,7 +308,7 @@ Multiple commands example:
 ## Managing Generic Artifacts
 
 <details>
-  <summary>JFrog Generic Artifacts task</summary><br>
+  <summary>JFrog Generic Artifacts task</summary>
 
 The *JFrog Generic Artifacts* task supports following operations with JFrog Artifactory:
 
@@ -414,8 +414,8 @@ YAML Example:
 <details>
   <summary> 
 
-### JFrog Maven Task
-</summary><br>
+#### JFrog Maven Task
+</summary>
 
 ![mvn.png](images/marketplace/mvn.png)
 
@@ -461,8 +461,8 @@ see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-do
 <details>
   <summary> 
 
-### JFrog Gradle Task
-</summary><br>
+#### JFrog Gradle Task
+</summary>
 
 ![gradle.png](images/marketplace/gradle.png)
 
@@ -503,8 +503,8 @@ as well as publishing build-info to Artifactory.
 <details>
   <summary> 
 
-### JFrog Npm Task
-</summary><br>
+#### JFrog Npm Task
+</summary>
 
 ![npm.png](images/marketplace/npm.png)
 
@@ -538,8 +538,8 @@ see [Artifactory npm Registry](https://jfrog.com/help/r/jfrog-artifactory-docume
 <details>
   <summary> 
 
-### JFrog Nuget and .NET Core Task
-</summary><br>
+#### JFrog Nuget and .NET Core Task
+</summary>
 
 
 ![nuget.png](images/marketplace/nuget.png)
@@ -573,8 +573,8 @@ see [Artifactory NuGet Repositories](https://jfrog.com/help/r/jfrog-artifactory-
 <details>
   <summary> 
 
-### JFrog Pip Task
-</summary><br>
+#### JFrog Pip Task
+</summary>
 
 ![pip.png](images/marketplace/pip.png)
 
@@ -621,8 +621,8 @@ included in the build-info, even if they are already cached locally.
 <details>
   <summary> 
 
-### JFrog Conan Task
-</summary><br>
+#### JFrog Conan Task
+</summary>
 
 ![conan.png](images/marketplace/conan.png)
 
@@ -658,8 +658,8 @@ see [Artifactory Conan Repositories](https://jfrog.com/help/r/jfrog-artifactory-
 <details>
   <summary> 
 
-### JFrog Go Task
-</summary><br>
+#### JFrog Go Task
+</summary>
 
 The *JFrog Go* task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
 The task uses the configured *JFrog Artifactory V2* service connection.
@@ -696,8 +696,8 @@ see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-doc
 <details>
   <summary> 
 
-### JFrog Collect Build Issues
-</summary><br>
+#### JFrog Collect Build Issues
+</summary>
 
 Being able to look at the build which was published to Artifactory, and see all JIRA issues associated with it, is one
 of the most powerful capabilities of Artifactory when it comes to managing metadata about artifacts builds.
@@ -749,8 +749,8 @@ It can then be accesses and used by this task.
 <details>
   <summary> 
 
-### JFrog Publish Build Info
-</summary><br>
+#### JFrog Publish Build Info
+</summary>
 
 Most of the JFrog tasks can be configured to collect and store build-info locally.
 The task uses the configured *JFrog Artifactory V2* service connection.
@@ -782,8 +782,8 @@ After the build-info is published to Artifactory, it can be accessed from the *A
 <details>
   <summary> 
 
-### JFrog Build Promotion
-</summary><br>
+#### JFrog Build Promotion
+</summary>
 
 
 To support the artifacts life-cycle, Artifactory supports promoting published builds from one repository to another.
@@ -862,8 +862,8 @@ To help you achieve this, follow these steps for creating a release which includ
 <details>
   <summary> 
 
-### Discarding Published Builds from Artifactory
-</summary><br>
+#### Discarding Published Builds from Artifactory
+</summary>
 
 To discard old runs of a build from Artifactory, add the *JFrog Discard Builds* task to the pipeline.
 
@@ -905,8 +905,8 @@ Run these steps to configure the task.
 <details>
   <summary> 
 
-### Audit project's dependencies for Security Vulnerabilities
-</summary><br>
+#### Audit project's dependencies for Security Vulnerabilities
+</summary>
 
 
 The *JFrog Audit* task triggers an audit of your project dependencies for security vulnerabilities with JFrog Xray.
@@ -934,8 +934,8 @@ JFrog Project or path in Artifactory associated with the policy.
 <details>
   <summary> 
 
-### Scanning Published Builds for Security Vulnerabilities
-</summary><br>
+#### Scanning Published Builds for Security Vulnerabilities
+</summary>
 
 The *JFrog Build Scan* task allows triggering a build scan with JFrog Xray.
 For the build to be scanned, it first needs to be published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
@@ -975,8 +975,8 @@ build-info report.
 <details>
   <summary> 
 
-### Pushing and Pulling Docker Images to and from Artifactory
-</summary><br>
+#### Pushing and Pulling Docker Images to and from Artifactory
+</summary>
 
 The *JFrog Docker* task allows pushing and pulling docker images to and from a docker repository in Artifactory.
 The task can be also configured to capture build-info for the pushed or pulled image.
@@ -1010,8 +1010,8 @@ see [Artifactory Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-doc
 <details>
   <summary> 
 
-### Scanning Local Docker Images with JFrog Xray
-</summary><br>
+#### Scanning Local Docker Images with JFrog Xray
+</summary>
 
 The *JFrog Docker* task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
 build log.
@@ -1055,7 +1055,7 @@ Artifacts which were published to Artifactory can be made available for a Releas
 There are two ways to achieve this:
 
 <details>
-    <summary>Using JFrog Generic Artifacts task</summary><br>
+    <summary>Using JFrog Generic Artifacts task</summary>
 
 The first way is to use the [JFrog Generic Artifacts](#Managing-Generic-Artifacts) task to download the files during the
 release. Read more about this in
@@ -1064,7 +1064,7 @@ the Downloading Generic Dependencies from Artifactory section.
 </details>
 
 <details>
-    <summary>Using Azure Artifact source</summary><br>
+    <summary>Using Azure Artifact source</summary>
 
 You can also set Artifactory as an artifact source for the release.
 This allows downloading the artifacts for a build which was previously published to Artifactory.
@@ -1100,8 +1100,8 @@ Follow these steps to add Artifactory as an artifact source to a Release.
 <details>
   <summary> 
 
-### JFrog Distribution V2 Task
-</summary><br>
+#### JFrog Distribution V2 Task
+</summary>
 
 [JFrog Distribution](https://jfrog.com/help/r/jfrog-distribution-documentation) is a centralized platform that lets you
 provision software release distribution.
@@ -1191,7 +1191,7 @@ The Distribution Rules format also supports wildcards. For example:
 We welcome pull requests from the community!
 
 <details>
-    <summary>Building</summary><br>
+    <summary>Building</summary>
 
 ### Building
 
@@ -1210,7 +1210,7 @@ The `vsix` file can be loaded into Azure DevOps and TFS.
 </details>
 
 <details>
-    <summary>Testing</summary><br>
+    <summary>Testing</summary>
 
 ### Testing
 
@@ -1251,7 +1251,7 @@ export ADO_SKIP_TESTS=nuget,dotnet
 </details>
 
 <details>
-    <summary>Pull request guidelines</summary><br>
+    <summary>Pull request guidelines</summary>
 
 * Pull requests should be created on the *dev* branch.
 * Please make sure the code is covered by tests.
