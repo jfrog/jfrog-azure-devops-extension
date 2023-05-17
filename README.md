@@ -96,14 +96,20 @@ To run the JFrog tasks, the build agents use three tools:
 * Conan client (Used by the [JFrog Conan](#jfrog-conan-task) task)
 
 <details>
-  <summary>Automatic Installation</summary>
+    <summary>
+
+#### Automatic Installation
+</summary>
 
 If the build agent has access to the internet, JFrog CLI along with the Maven and Gradle Extractors are downloaded and
 installed automatically on the agent, the first time they are required.
 </details>
 
 <details>
-  <summary>Custom tools Installation</summary>
+    <summary>
+
+#### Custom tools Installation
+</summary>
 
 You can configure the pipeline to download JFrog CLI and the Maven Extractor from a JFrog Artifactory instance, which is
 configured to proxy the download repositories.
@@ -136,7 +142,10 @@ configured to proxy the download repositories.
 </details>
 
 <details>
-  <summary>Manual Installation</summary>
+    <summary>
+
+#### Manual Installation
+</summary>
 
 ##### Installing JFrog CLI
 
@@ -260,7 +269,10 @@ To enable TLS 1.2 on TFS:
 ## Executing JFrog CLI Commands
 
 <details>
-  <summary> JFrog CLI V2 Task</summary>
+    <summary>
+
+#### JFrog CLI V2 Task
+</summary>
 
 The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named *JFrog CLI V2*,
 which allows executing *[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)* commands.
@@ -1055,7 +1067,10 @@ Artifacts which were published to Artifactory can be made available for a Releas
 There are two ways to achieve this:
 
 <details>
-    <summary>Using JFrog Generic Artifacts task</summary>
+    <summary>
+
+#### Using JFrog Generic Artifacts task
+</summary>
 
 The first way is to use the [JFrog Generic Artifacts](#Managing-Generic-Artifacts) task to download the files during the
 release. Read more about this in
@@ -1064,7 +1079,10 @@ the Downloading Generic Dependencies from Artifactory section.
 </details>
 
 <details>
-    <summary>Using Azure Artifact source</summary>
+    <summary>
+
+#### Using Azure Artifact source
+</summary>
 
 You can also set Artifactory as an artifact source for the release.
 This allows downloading the artifacts for a build which was previously published to Artifactory.
