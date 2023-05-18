@@ -36,7 +36,7 @@
     ],
     "content": {
         "details": {
-            "path": "README.md"
+            "path": "overview.md"
         },
         "license": {
             "path": "LICENSE.md"
@@ -47,7 +47,7 @@
             "uri": "https://jfrog.com/help/r/get-started-with-the-jfrog-platform/get-started"
         },
         "learn": {
-            "uri": "https://github.com/jfrog/jfrog-azure-devops-extension/blob/v2/README.md"
+            "uri": "https://github.com/jfrog/jfrog-azure-devops-extension#readme"
         },
         "support": {
             "uri": "https://www.jfrog.com/support"
