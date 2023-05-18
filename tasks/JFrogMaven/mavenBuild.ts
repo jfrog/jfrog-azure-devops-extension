@@ -81,8 +81,7 @@ function checkAndSetMavenHome(): void {
         // Since Maven installation can be located in different locations,
         // depending on the installation type and the OS (for example: For Mac with brew install: /usr/local/Cellar/maven/{version}/libexec or Ubuntu with debian: /usr/share/maven),
         // we need to grab the location using the mvn --version command
-        let mvnCommand: string = 'mvn --version';
-        let res: string = execSync(mvnCommand, { encoding: 'utf-8' } as ExecSyncOptionsWithStringEncoding);
+        let res: string = execSync('mvn --version', { encoding: 'utf-8' } as ExecSyncOptionsWithStringEncoding);
         let mavenHomeLine: string = res.split('\n')[1].trim();
         let regexMatch: RegExpMatchArray | null = mavenHomeLine.match('^Maven\\shome:\\s(.+)');
         if (regexMatch) {
