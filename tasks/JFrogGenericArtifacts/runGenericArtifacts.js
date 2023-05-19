@@ -12,8 +12,15 @@ const cliDeleteArtifactsCommand = 'rt del';
 let serverId;
 
 function RunTaskCbk(cliPath) {
-    let workDir = tl.getPathInput('workingDirectory') ?? tl.getVariable('System.DefaultWorkingDirectory');
-    if (!workDir) {
+    let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
+    if (!defaultWorkDir) {
+        tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
+        return;
+    }
+
+    let inputWorkingDirectory = tl.getInput('workingDirectory', false);
+    let workDir = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
+    if (!fs.existsSync(workDir) || !fs.lstatSync(workDir).isDirectory()) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting working directory.');
         return;
     }
