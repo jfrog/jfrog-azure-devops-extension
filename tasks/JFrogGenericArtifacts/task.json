@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "6",
-        "Patch": "3"
+        "Patch": "4"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "JFrog Generic Artifacts $(command)",
@@ -379,10 +379,17 @@
             "name": "syncDeletesPathRemote",
             "type": "string",
             "label": "Path to sync and delete files from in Artifactory",
-            "defaultValue": "",
             "required": false,
             "groupName": "advancedUpload",
             "helpMarkDown": "If you'd like to sync artifacts after the upload, set a specific path in Artifactory. Leave empty otherwise.\nIf set, after the upload completes, this path will include only the artifacts uploaded during this upload operation. The other files under this path will be deleted."
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
         }
     ],
     "execution": {

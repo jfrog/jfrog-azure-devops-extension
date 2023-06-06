@@ -311,6 +311,17 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
 
         runSyncTest(
+            'Upload and download with working directory',
+            (): void => {
+                const testDir: string = 'uploadAndDownloadWithWorkingDirectory';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
             'Upload and dry-run download',
             (): void => {
                 const testDir: string = 'uploadAndDryRunDownload';
