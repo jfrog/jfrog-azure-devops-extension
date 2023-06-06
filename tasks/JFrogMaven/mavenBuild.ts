@@ -1,7 +1,6 @@
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as utils from '@jfrog/tasks-utils/utils.js';
 import * as javaCommons from 'azure-pipelines-tasks-java-common/java-common';
-import { execSync, ExecSyncOptionsWithStringEncoding } from 'child_process';
 
 const cliMavenCommand: string = 'mvn';
 const mavenConfigCommand: string = 'mvnc';
@@ -81,7 +80,13 @@ function checkAndSetMavenHome(): void {
         // Since Maven installation can be located in different locations,
         // depending on the installation type and the OS (for example: For Mac with brew install: /usr/local/Cellar/maven/{version}/libexec or Ubuntu with debian: /usr/share/maven),
         // we need to grab the location using the mvn --version command
-        let res: string = execSync('mvn --version', { encoding: 'utf-8' } as ExecSyncOptionsWithStringEncoding);
+        // Setup tool runner that executes Maven only to retrieve its version
+        let mvnExec: string = tl.which('mvn', true);
+        let res: string = tl
+            .tool(mvnExec)
+            .arg('-version')
+            .execSync()
+            .stdout.trim();
         let mavenHomeLine: string = res.split('\n')[1].trim();
         let regexMatch: RegExpMatchArray | null = mavenHomeLine.match('^Maven\\shome:\\s(.+)');
         if (regexMatch) {
