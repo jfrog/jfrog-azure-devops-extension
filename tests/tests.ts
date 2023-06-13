@@ -1000,16 +1000,16 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  *
  * @param testDir (String) - The test directory in resources
  * @param taskName (String) - The '.js' file
- * @param isNegative (Boolean, Optional) - True if the task supposed to fail
+ * @param shouldFail (Boolean, Optional) - True if the task supposed to fail
  */
-function mockTask(testDir: string, taskName: string, isNegative?: boolean): void {
+function mockTask(testDir: string, taskName: string, shouldFail?: boolean): void {
     const taskPath: string = path.join(__dirname, 'resources', testDir, taskName + '.js');
     // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
     const taskJsonDummy: string = path.join(__dirname, 'resources', 'task.json');
     const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
     mockRunner.run(); // Mock a test
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
-    assert.ok(isNegative ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
+    assert.ok(shouldFail ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
 }
 
 /**
