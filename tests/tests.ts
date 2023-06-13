@@ -54,9 +54,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             repoKeys.repo1 +
                             '/' +
                             ' --url=' +
-                            jfrogUtils.quote(process.env.ADO_PLATFORM_URL + "/artifactory" ) +
+                            jfrogUtils.quote(process.env.ADO_ARTIFACTORY_URL || '') +
                             ' --user=' +
-                            jfrogUtils.quote(process.env.ADO_PLATFORM_USERNAME || '') +
+                            jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME || '') +
                             ' --password=' +
                             jfrogUtils.quote('SUPER_SECRET'),
                         TestUtils.testDataDir
@@ -287,6 +287,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             },
             TestUtils.isSkipTest('generic')
         );
+
         runSyncTest(
             'Upload and download with Spec Vars',
             (): void => {
