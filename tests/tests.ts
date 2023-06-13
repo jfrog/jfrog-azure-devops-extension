@@ -283,7 +283,114 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'uploadAndDownload';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
-              //  assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(path.join(testDir, 'files'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+        runSyncTest(
+            'Upload and download with Spec Vars',
+            (): void => {
+                const testDir: string = 'uploadAndDownloadWithSpecVars';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Upload and download from file',
+            (): void => {
+                const testDir: string = 'uploadAndDownloadFromFile';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Upload and download with working directory',
+            (): void => {
+                const testDir: string = 'uploadAndDownloadWithWorkingDirectory';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Upload and dry-run download',
+            (): void => {
+                const testDir: string = 'uploadAndDryRunDownload';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'emptyDir'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Dry-run upload and download',
+            (): void => {
+                const testDir: string = 'dryRunUploadAndDownload';
+                mockTask(testDir, 'uploadDryRun');
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'expectedDir'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Download artifact source',
+            (): void => {
+                const testDir: string = 'downloadArtifactSource';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'publish');
+                mockTask(testDir, 'download');
+                assertFiles(path.join(testDir, 'files'), testDir);
+                deleteBuild('downloadArtifactSourceBuild');
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Upload fail-no-op',
+            (): void => {
+                const testDir: string = 'uploadFailNoOp';
+                mockTask(testDir, 'upload', true);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Download fail-no-op',
+            (): void => {
+                const testDir: string = 'downloadFailNoOp';
+                mockTask(testDir, 'download', true);
+                assertFiles(path.join(testDir, 'files'), testDir);
+            },
+            TestUtils.isSkipTest('generic')
+        );
+
+        runSyncTest(
+            'Include environment variables',
+            (): void => {
+                const testDir: string = 'includeEnv';
+                mockTask(testDir, 'upload');
+                mockTask(testDir, 'publish');
+                const build: syncRequest.Response = getAndAssertBuild('includeEnv', '3');
+                assertBuildEnv(build, 'buildInfo.env.BUILD_DEFINITIONNAME', 'includeEnv');
+                assertBuildEnv(build, 'buildInfo.env.BUILD_BUILDNUMBER', '3');
+                assertBuildEnv(build, 'buildInfo.env.BUILD_UNDEFINED', 'undefined');
+                assertBuildEnv(build, 'buildInfo.env.BUILD_NULL', 'null');
+                // Default excluded by CLI (*password*;*psw*;*secret*;*key*;*token*;*auth*):
+                assertBuildEnv(build, 'buildInfo.env.BUILD_PASSWORD', undefined);
+                assertBuildEnv(build, 'buildInfo.env.BUILD_TOKEN', undefined);
+                assertBuildEnv(build, 'buildInfo.env.BUILD_SECRET', undefined);
+                deleteBuild('includeEnv');
             },
             TestUtils.isSkipTest('generic')
         );
