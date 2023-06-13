@@ -1,6 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 const path = require('path');
+const fs = require('fs');
 
 const cliUploadCommand = 'rt u';
 const cliDownloadCommand = 'rt dl';
