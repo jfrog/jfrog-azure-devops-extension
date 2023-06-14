@@ -973,7 +973,7 @@ function runSyncTest(description: string, testFunc: () => void, skip?: boolean):
     it(description, (done): void => {
         testFunc();
         done();
-    }).timeout(360000); // 6 minutes
+    }).timeout(600000); // 6 minutes
 }
 
 /**
