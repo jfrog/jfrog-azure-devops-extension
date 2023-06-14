@@ -45,8 +45,8 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Mask password',
             (): void => {
-                const oldPassword: string = process.env.ADO_ARTIFACTORY_PASSWORD || '';
-                process.env.ADO_ARTIFACTORY_PASSWORD = 'SUPER_SECRET';
+                const oldPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD || '';
+                process.env.ADO_JFROG_PLATFORM_PASSWORD = 'SUPER_SECRET';
                 let retVal: string = '';
                 try {
                     jfrogUtils.executeCliCommand(
@@ -54,9 +54,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             repoKeys.repo1 +
                             '/' +
                             ' --url=' +
-                            jfrogUtils.quote(process.env.ADO_ARTIFACTORY_URL || '') +
+                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_URL + "artifactory") +
                             ' --user=' +
-                            jfrogUtils.quote(process.env.ADO_ARTIFACTORY_USERNAME || '') +
+                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_USERNAME || '') +
                             ' --password=' +
                             jfrogUtils.quote('SUPER_SECRET'),
                         TestUtils.testDataDir
@@ -65,7 +65,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     retVal = ex as string;
                 }
                 assert.ok(retVal !== '', 'An exception should have been caught');
-                process.env.ADO_ARTIFACTORY_PASSWORD = oldPassword;
+                process.env.ADO_JFROG_PLATFORM_PASSWORD = oldPassword;
                 assert.ok(!retVal.toString().includes('SUPER_SECRET'), 'Output contains password');
             },
             TestUtils.isSkipTest('unit')
