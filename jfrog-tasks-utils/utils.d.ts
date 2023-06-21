@@ -40,5 +40,7 @@ declare module '@jfrog/tasks-utils' {
     export function isToolExists(tool: string): boolean;
     export function removeExtractorsDownloadVariables(cliPath: string, workDir: string);
     export function configureArtifactoryCliServer(artifactoryService: string, serverId: string, cliPath: string, buildDir: string);
+    export function setJdkHomeForJavaTasks();
+
     export { taskSelectedCliVersionEnv };
 }

@@ -9,6 +9,7 @@ let serverIdResolver;
 utils.executeCliTask(RunTaskCbk);
 
 function RunTaskCbk(cliPath) {
+    utils.setJdkHomeForJavaTasks();
     let workDir = getWorkDir();
     try {
         if (!workDir) {

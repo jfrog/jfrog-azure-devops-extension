@@ -1,6 +1,5 @@
 import * as tl from 'azure-pipelines-task-lib/task';
 import * as utils from '@jfrog/tasks-utils/utils.js';
-import * as javaCommons from 'azure-pipelines-tasks-java-common/java-common';
 
 const cliMavenCommand: string = 'mvn';
 const mavenConfigCommand: string = 'mvnc';
@@ -10,7 +9,7 @@ let serverIdResolver: string;
 utils.executeCliTask(RunTaskCbk);
 
 function RunTaskCbk(cliPath: string): void {
-    setJdkHome();
+    utils.setJdkHomeForJavaTasks();
     checkAndSetMavenHome();
     let workDir: string | undefined = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
@@ -48,30 +47,6 @@ function RunTaskCbk(cliPath: string): void {
     tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
 }
 
-function setJdkHome(): void {
-    let javaHomeSelection: string | undefined = tl.getInput('javaHomeSelection', true);
-    let javaHome: string | undefined;
-    if (javaHomeSelection == 'JDKVersion') {
-        // Set JAVA_HOME to the specified JDK version (default, 1.7, 1.8, etc.)
-        tl.debug('Using the specified JDK version to find and set JAVA_HOME');
-        let jdkVersion: string = tl.getInput('jdkVersion') || '';
-        let jdkArchitecture: string = tl.getInput('jdkArchitecture') || '';
-        if (jdkVersion != 'default') {
-            javaHome = javaCommons.findJavaHome(jdkVersion, jdkArchitecture);
-        }
-    } else {
-        // Set JAVA_HOME to the path specified by the user
-        tl.debug('Setting JAVA_HOME to the path specified by user input');
-        javaHome = tl.getPathInput('jdkUserInputPath', true, true);
-    }
-
-    // Set JAVA_HOME as determined above (if different from default)
-    if (javaHome) {
-        console.log('The Java home location: ' + javaHome);
-        tl.setVariable('JAVA_HOME', javaHome);
-    }
-}
-
 function checkAndSetMavenHome(): void {
     let m2HomeEnvVar: string | undefined = tl.getVariable('M2_HOME');
     if (!m2HomeEnvVar) {
@@ -82,11 +57,7 @@ function checkAndSetMavenHome(): void {
         // we need to grab the location using the mvn --version command
         // Setup tool runner that executes Maven only to retrieve its version
         let mvnExec: string = tl.which('mvn', true);
-        let res: string = tl
-            .tool(mvnExec)
-            .arg('-version')
-            .execSync()
-            .stdout.trim();
+        let res: string = tl.tool(mvnExec).arg('-version').execSync().stdout.trim();
         let mavenHomeLine: string = res.split('\n')[1].trim();
         let regexMatch: RegExpMatchArray | null = mavenHomeLine.match('^Maven\\shome:\\s(.+)');
         if (regexMatch) {
