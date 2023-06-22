@@ -177,7 +177,7 @@ function createAuthHandlers(artifactoryService) {
     }
 
     // Check if Artifactory should be accessed anonymously.
-    if (artifactoryUser === '' || artifactoryUser === undefined) {
+    if (!artifactoryUser) {
         return [];
     }
 
