@@ -723,6 +723,16 @@
             }
         },
         {
+            "id": "jfrog-conan-build-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "tasks/JFrogConanV2"
+            }
+        },
+        {
             "id": "jfrog-build-scan-task",
             "type": "ms.vss-distributed-task.task",
             "targets": [
@@ -870,6 +880,9 @@
         },
         {
             "path": "tasks/JFrogConan"
+        },
+        {
+            "path": "tasks/JFrogConanV2"
         },
         {
             "path": "tasks/JFrogBuildScan"
