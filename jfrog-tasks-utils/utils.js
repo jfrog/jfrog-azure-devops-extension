@@ -165,7 +165,7 @@ function createAuthHandlers(serviceConnection) {
     }
 
     // Check if Artifactory should be accessed anonymously.
-    if (artifactoryUser === '') {
+    if (!artifactoryUser) {
         return [];
     }
 
