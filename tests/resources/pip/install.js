@@ -10,7 +10,7 @@ let inputs = {
     workingDirectory: path.join(testUtils.getLocalTestDir(TEST_NAME)),
     targetResolveRepo: testUtils.getRepoKeys().pipVirtualRepo,
     collectBuildInfo: true,
-    noPipCache: true
+    noPipCache: true,
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'install');

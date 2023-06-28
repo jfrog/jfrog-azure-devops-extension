@@ -7,12 +7,12 @@ let inputs = {
     fileSpec: JSON.stringify({
         files: [
             {
-                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
-            }
-        ]
+                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
+            },
+        ],
     }),
     specSource: 'taskConfiguration',
-    setProps: 'propKey1=propVal1;propKey2=propVal2'
+    setProps: 'propKey1=propVal1;propKey2=propVal2',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

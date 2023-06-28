@@ -55,7 +55,7 @@ function attachBuildInfoUrl(buildInfoUrl, buildName, buildNumber, workDir) {
         // in case the JFrog CLI version used does not support the build-publish command output (>=2.17.0)
         artifactoryUrl: artifactoryUrl,
         buildName: buildName,
-        buildNumber: buildNumber
+        buildNumber: buildNumber,
     };
 
     tl.writeFile(artifactoryUrlFile, JSON.stringify(buildDetails));

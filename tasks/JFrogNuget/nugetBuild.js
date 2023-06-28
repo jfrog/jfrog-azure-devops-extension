@@ -28,7 +28,7 @@ function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
  */
 function downloadAndRunNuget(cliPath, nugetCommand) {
     console.log('NuGet not found in Path. Downloading...');
-    toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe').then(downloadPath => {
+    toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe').then((downloadPath) => {
         fs.chmodSync(downloadPath, 0o555);
         toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
         addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
@@ -66,7 +66,7 @@ function exec(cliPath, nugetCommand) {
         // Perform restore command.
         let solutionPattern = tl.getInput('solutionPath');
         let filesList = solutionPathUtil.resolveFilterSpec(solutionPattern, tl.getVariable('System.DefaultWorkingDirectory') || process.cwd());
-        filesList.forEach(solutionFile => {
+        filesList.forEach((solutionFile) => {
             let solutionPath;
             if (!fs.lstatSync(solutionFile).isDirectory()) {
                 solutionPath = path.dirname(solutionFile);

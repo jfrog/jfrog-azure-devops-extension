@@ -9,7 +9,7 @@ let inputs = {
     comment: 'test comment',
     includeDependencies: 'true',
     copy: 'true',
-    dryRun: 'true'
+    dryRun: 'true',
 };
 
 testUtils.runArtifactoryTask(testUtils.promote, {}, inputs);

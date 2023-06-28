@@ -10,7 +10,7 @@ let inputs = {
     command: 'install',
     sourceRepo: testUtils.getRepoKeys().npmVirtualRepo,
     arguments: '',
-    threads: '1'
+    threads: '1',
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

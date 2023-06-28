@@ -38,7 +38,7 @@ const repoKeys: any = {
     pipLocalRepo: 'pip-local',
     pipRemoteRepo: 'pip-remote',
     pipVirtualRepo: 'pip-virtual',
-    releaseBundlesRepo: 'rb-repo'
+    releaseBundlesRepo: 'rb-repo',
 };
 
 export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername, platformAccessToken, platformDockerDomain };
@@ -121,16 +121,16 @@ export function recreateTestDataDir(): void {
 export function getBuild(buildName: string, buildNumber: string): syncRequest.Response {
     return syncRequest.default('GET', stripTrailingSlash(platformUrl) + '/artifactory/api/build/' + buildName + '/' + buildNumber, {
         headers: {
-            Authorization: getAuthorizationHeaderValue()
-        }
+            Authorization: getAuthorizationHeaderValue(),
+        },
     });
 }
 
 export function deleteBuild(buildName: string): void {
     syncRequest.default('DELETE', stripTrailingSlash(platformUrl) + '/artifactory/api/build/' + buildName + '?deleteAll=1&artifacts=1', {
         headers: {
-            Authorization: getAuthorizationHeaderValue()
-        }
+            Authorization: getAuthorizationHeaderValue(),
+        },
     });
 }
 
@@ -161,7 +161,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'remote',
             packageType: 'generic',
-            url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf'
+            url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf',
         })
     );
     createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
@@ -170,7 +170,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'remote',
             packageType: 'maven',
-            url: 'https://repo.maven.apache.org/maven2'
+            url: 'https://repo.maven.apache.org/maven2',
         })
     );
     createRepo(
@@ -178,7 +178,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'local',
             packageType: 'nuget',
-            repoLayoutRef: 'nuget-default'
+            repoLayoutRef: 'nuget-default',
         })
     );
     createRepo(
@@ -190,7 +190,7 @@ export function createTestRepositories(): void {
             downloadContextPath: 'api/v2/package',
             feedContextPath: 'api/v2',
             v3FeedUrl: 'https://api.nuget.org/v3/index.json',
-            url: 'https://www.nuget.org/'
+            url: 'https://www.nuget.org/',
         })
     );
     createRepo(
@@ -199,7 +199,7 @@ export function createTestRepositories(): void {
             rclass: 'virtual',
             packageType: 'nuget',
             repoLayoutRef: 'nuget-default',
-            repositories: [repoKeys.nugetRemoteRepo, repoKeys.nugetLocalRepo]
+            repositories: [repoKeys.nugetRemoteRepo, repoKeys.nugetLocalRepo],
         })
     );
     createRepo(
@@ -207,7 +207,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'local',
             packageType: 'npm',
-            repoLayoutRef: 'npm-default'
+            repoLayoutRef: 'npm-default',
         })
     );
     createRepo(
@@ -216,7 +216,7 @@ export function createTestRepositories(): void {
             rclass: 'remote',
             packageType: 'npm',
             repoLayoutRef: 'npm-default',
-            url: 'https://registry.npmjs.org'
+            url: 'https://registry.npmjs.org',
         })
     );
     createRepo(
@@ -225,7 +225,7 @@ export function createTestRepositories(): void {
             rclass: 'virtual',
             packageType: 'npm',
             repoLayoutRef: 'npm-default',
-            repositories: [repoKeys.npmLocalRepo, repoKeys.npmRemoteRepo]
+            repositories: [repoKeys.npmLocalRepo, repoKeys.npmRemoteRepo],
         })
     );
     createRepo(repoKeys.conanLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'conan' }));
@@ -234,7 +234,7 @@ export function createTestRepositories(): void {
         JSON.stringify({
             rclass: 'local',
             packageType: 'go',
-            repoLayoutRef: 'go-default'
+            repoLayoutRef: 'go-default',
         })
     );
     createRepo(
@@ -243,7 +243,7 @@ export function createTestRepositories(): void {
             rclass: 'remote',
             packageType: 'go',
             repoLayoutRef: 'go-default',
-            url: 'https://gocenter.io'
+            url: 'https://gocenter.io',
         })
     );
     createRepo(
@@ -252,7 +252,7 @@ export function createTestRepositories(): void {
             rclass: 'virtual',
             packageType: 'go',
             repoLayoutRef: 'go-default',
-            repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo]
+            repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo],
         })
     );
     createRepo(repoKeys.pipLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'pypi', repoLayoutRef: 'simple-default' }));
@@ -266,7 +266,7 @@ export function createTestRepositories(): void {
             rclass: 'virtual',
             packageType: 'pypi',
             repoLayoutRef: 'simple-default',
-            repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo]
+            repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo],
         })
     );
     if (!isSkipTest('distribution')) {
@@ -331,8 +331,8 @@ export function cleanUpOldRepositories(): void {
 export function getRepoListFromArtifactory(): string[] {
     const res: syncRequest.Response = syncRequest.default('GET', stripTrailingSlash(platformUrl) + '/artifactory/api/repositories/', {
         headers: {
-            Authorization: getAuthorizationHeaderValue()
-        }
+            Authorization: getAuthorizationHeaderValue(),
+        },
     });
     assert.ok(
         res.statusCode === 200 || res.statusCode === 201,
@@ -346,9 +346,9 @@ export function createRepo(repoKey: string, body: string): syncRequest.Response 
     const res: syncRequest.Response = syncRequest.default('PUT', stripTrailingSlash(platformUrl) + '/artifactory/api/repositories/' + repoKey, {
         headers: {
             Authorization: getAuthorizationHeaderValue(),
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body
+        body,
     });
     assert.ok(
         res.statusCode === 200 || res.statusCode === 201,
@@ -361,8 +361,8 @@ export function deleteRepo(repoKey: any): void {
     syncRequest.default('DELETE', stripTrailingSlash(platformUrl) + '/artifactory/api/repositories/' + repoKey, {
         headers: {
             Authorization: getAuthorizationHeaderValue(),
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+        },
     });
 }
 
@@ -372,8 +372,8 @@ export function getLocalReleaseBundle(bundleName: string, bundleVersion: string,
         stripTrailingSlash(platformUrl) + '/distribution/api/v1/release_bundle/' + bundleName + '/' + bundleVersion,
         {
             headers: {
-                Authorization: getAuthorizationHeaderValue()
-            }
+                Authorization: getAuthorizationHeaderValue(),
+            },
         }
     );
     if (!expectExist) {
@@ -410,8 +410,8 @@ export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string
         stripTrailingSlash(platformUrl) + '/distribution/api/v1/release_bundle/' + bundleName + '/' + bundleVersion + '/distribution',
         {
             headers: {
-                Authorization: getAuthorizationHeaderValue()
-            }
+                Authorization: getAuthorizationHeaderValue(),
+            },
         }
     );
 }
@@ -423,9 +423,9 @@ export function deleteReleaseBundle(bundleName: string, bundleVersion: string): 
         {
             headers: {
                 Authorization: getAuthorizationHeaderValue(),
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ dry_run: false, distribution_rules: [{ site_name: '*' }], on_success: 'delete' })
+            body: JSON.stringify({ dry_run: false, distribution_rules: [{ site_name: '*' }], on_success: 'delete' }),
         }
     );
 }

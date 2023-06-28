@@ -7,7 +7,7 @@ let inputs = {
     passphrase: '',
     useCustomRepo: true,
     customRepoName: testUtils.getRepoKeys().releaseBundlesRepo,
-    insecureTls: false
+    insecureTls: false,
 };
 
 testUtils.runDistributionTask(testUtils.distribution, {}, inputs);

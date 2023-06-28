@@ -10,15 +10,15 @@ let inputs = {
             {
                 pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
                 target: testUtils.getLocalTestDir(TEST_NAME),
-                flat: 'true'
-            }
-        ]
+                flat: 'true',
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: true,
     insecureTls: false,
     validateSymlinks: false,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

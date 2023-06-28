@@ -9,7 +9,7 @@ let inputs = {
         testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) +
         'b.in ' +
         testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) +
-        'd.in'
+        'd.in',
 };
 
 testUtils.runPlatformTask(testUtils.genericCli, {}, inputs);

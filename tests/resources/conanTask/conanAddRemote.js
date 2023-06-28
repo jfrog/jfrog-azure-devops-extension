@@ -10,7 +10,7 @@ let variables = {
     'System.DefinitionId': BUILD_NAME,
     'Build.BuildDirectory': '/tmp/' + BUILD_NAME,
     'Build.DefinitionName': BUILD_NAME,
-    'Build.BuildNumber': BUILD_NUMBER
+    'Build.BuildNumber': BUILD_NUMBER,
 };
 
 let inputs = {
@@ -20,7 +20,7 @@ let inputs = {
     artifactoryService: '40567017-861d-4e23-8ebf-c71c33a72224',
     conanCommand: 'Add Remote',
     conanRepo: testUtils.getRepoKeys().conanLocalRepo,
-    purgeExistingRemotes: false
+    purgeExistingRemotes: false,
 };
 
 testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

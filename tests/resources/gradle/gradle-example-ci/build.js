@@ -8,7 +8,7 @@ let BUILD_NUMBER = '3';
 
 let variables = {
     'Build.DefinitionName': BUILD_NAME,
-    'Build.BuildNumber': BUILD_NUMBER
+    'Build.BuildNumber': BUILD_NUMBER,
 };
 
 let inputs = {
@@ -25,7 +25,7 @@ let inputs = {
     deployIvyDesc: false,
     usesPlugin: false,
     useWrapper: true,
-    collectBuildInfo: true
+    collectBuildInfo: true,
 };
 
 testUtils.copyTestFilesToTestWorkDir('gradle', 'resources');

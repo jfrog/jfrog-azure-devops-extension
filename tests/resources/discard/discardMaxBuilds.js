@@ -6,7 +6,7 @@ let inputs = {
     maxDays: '',
     excludeBuilds: '',
     deleteArtifacts: false,
-    async: false
+    async: false,
 };
 
 testUtils.runArtifactoryTask(testUtils.discard, {}, inputs);

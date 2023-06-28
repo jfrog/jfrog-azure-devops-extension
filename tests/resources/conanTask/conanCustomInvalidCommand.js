@@ -10,13 +10,13 @@ let variables = {
     'System.DefinitionId': BUILD_NAME,
     'Build.BuildDirectory': '/tmp/' + BUILD_NAME,
     'Build.DefinitionName': BUILD_NAME,
-    'Build.BuildNumber': BUILD_NUMBER
+    'Build.BuildNumber': BUILD_NUMBER,
 };
 let inputs = {
     buildName: BUILD_NAME,
     buildNumber: BUILD_NUMBER,
     conanCommand: 'Custom',
-    customArguments: 'invalid'
+    customArguments: 'invalid',
 };
 
 testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

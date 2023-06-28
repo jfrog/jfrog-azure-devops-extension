@@ -10,16 +10,16 @@ let inputs = {
             {
                 pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
                 target: './subdir/',
-                flat: 'true'
-            }
-        ]
+                flat: 'true',
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     validateSymlinks: false,
     specSource: 'taskConfiguration',
-    workingDirectory: testUtils.getLocalTestDir(TEST_NAME)
+    workingDirectory: testUtils.getLocalTestDir(TEST_NAME),
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

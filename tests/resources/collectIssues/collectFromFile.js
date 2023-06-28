@@ -9,7 +9,7 @@ let inputs = {
     buildNumber: '4',
     configSource: 'file',
     file: configPath,
-    workingDirectory: CUSTOM_WORKING_DIR
+    workingDirectory: CUSTOM_WORKING_DIR,
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

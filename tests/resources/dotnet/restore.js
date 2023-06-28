@@ -10,7 +10,7 @@ let inputs = {
     targetResolveRepo: testUtils.getRepoKeys().nugetVirtualRepo,
     packagesDirectory: path.join(testUtils.getLocalTestDir(TEST_NAME), 'packages'),
     verbosityRestore: 'Minimal',
-    collectBuildInfo: true
+    collectBuildInfo: true,
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'restore');

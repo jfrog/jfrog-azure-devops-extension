@@ -18,7 +18,7 @@ let tasksOutput: string;
 
 describe('JFrog Artifactory Extension Tests', (): void => {
     let repoKeys: any;
-    before(function(): void {
+    before(function (): void {
         this.timeout(120000); // 2 minutes timer for the before hook only.
         // Validate environment variables exist for tests
         assert.ok(TestUtils.platformUrl, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_URL');
@@ -35,7 +35,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         tasksOutput = '';
     });
 
-    after(function(): void {
+    after(function (): void {
         this.timeout(120000); // 2 minutes timer for the after hook only.
         TestUtils.cleanUpAllTests();
     });
@@ -54,7 +54,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             repoKeys.repo1 +
                             '/' +
                             ' --url=' +
-                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_URL + "artifactory") +
+                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_URL + 'artifactory') +
                             ' --user=' +
                             jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_USERNAME || '') +
                             ' --password=' +
@@ -913,7 +913,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
     describe('Distribution Tests', (): void => {
         let rbName: string;
         let rbVersion: string;
-        before(function(): void {
+        before(function (): void {
             this.timeout(180000); // 3 minutes timer for the before hook only.
             if (!TestUtils.isSkipTest('distribution')) {
                 rbName = 'ado-test-rb';
@@ -943,7 +943,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             TestUtils.isSkipTest('distribution')
         );
 
-        after(function(): void {
+        after(function (): void {
             this.timeout(180000); // 3 minutes timer for the after hook only.
             distributionCleanUp(rbName, rbVersion);
         });
@@ -1208,7 +1208,7 @@ function assertIssuesCollection(buildName: string, buildNumber: string): void {
 function testGetCliPartialsBuildDir(): void {
     const testDTO: any = {
         testBuildNumber: '777',
-        testsBuildNames: ['simpleJFrogTestNameExample', 'Some-Special-Chars+:#$%\\/dè<>']
+        testsBuildNames: ['simpleJFrogTestNameExample', 'Some-Special-Chars+:#$%\\/dè<>'],
     };
     // Cleanup old partials
     testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bc', element, testDTO.testBuildNumber));

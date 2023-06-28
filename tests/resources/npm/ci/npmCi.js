@@ -10,7 +10,7 @@ let inputs = {
     command: 'ci',
     sourceRepo: testUtils.getRepoKeys().npmVirtualRepo,
     arguments: '',
-    threads: '4'
+    threads: '4',
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

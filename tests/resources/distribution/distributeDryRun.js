@@ -10,13 +10,13 @@ let inputs = {
             {
                 site_name: '*',
                 city_name: '*',
-                country_codes: ['*']
-            }
-        ]
+                country_codes: ['*'],
+            },
+        ],
     }),
     distSync: false,
     dryRun: true,
-    insecureTls: false
+    insecureTls: false,
 };
 
 testUtils.runDistributionTask(testUtils.distribution, {}, inputs);

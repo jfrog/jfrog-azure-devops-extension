@@ -8,15 +8,15 @@ let inputs = {
         files: [
             {
                 pattern: testUtils.getTestLocalFilesDir(__dirname) + 'a.in',
-                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
-            }
-        ]
+                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: true,
     insecureTls: false,
     preserveSymlinks: false,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

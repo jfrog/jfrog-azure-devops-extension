@@ -8,7 +8,7 @@ let inputs = {
     version: '5',
     downloadPath: testUtils.getLocalTestDir(TEST_NAME),
     noFlat: false,
-    threads: 4
+    threads: 4,
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

@@ -8,9 +8,9 @@ let inputs = {
     fileSpec: JSON.stringify({
         files: [
             {
-                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + '${key1}'
-            }
-        ]
+                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + '${key1}',
+            },
+        ],
     }),
     specSource: 'taskConfiguration',
     replaceSpecVars: true,
@@ -23,7 +23,7 @@ let inputs = {
     releaseNotesSyntax: 'plain_text',
     description: 'ADO DESC',
     dryRun: false,
-    insecureTls: false
+    insecureTls: false,
 };
 
 testUtils.runDistributionTask(testUtils.distribution, {}, inputs);

@@ -11,9 +11,9 @@ fs.writeFileSync(
         files: [
             {
                 pattern: testUtils.getTestLocalFilesDir(__dirname),
-                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
-            }
-        ]
+                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
+            },
+        ],
     }),
     'utf8'
 );
@@ -25,7 +25,7 @@ let inputs = {
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
-    preserveSymlinks: false
+    preserveSymlinks: false,
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

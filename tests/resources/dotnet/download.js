@@ -11,15 +11,15 @@ let inputs = {
                 pattern: testUtils.stripTrailingSlash(testUtils.getRepoKeys().nugetLocalRepo) + '/custom/path/',
                 target: path.join(testUtils.getLocalTestDir(TEST_NAME), 'files', '/'),
                 build: 'DotNET Test/7',
-                flat: 'true'
-            }
-        ]
+                flat: 'true',
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     validateSymlinks: false,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

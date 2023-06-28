@@ -7,9 +7,9 @@ let inputs = {
         files: [
             {
                 pattern: testUtils.getTestLocalFilesDir(__dirname) + '${patternVar}',
-                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
-            }
-        ]
+                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
@@ -17,7 +17,7 @@ let inputs = {
     preserveSymlinks: false,
     specSource: 'taskConfiguration',
     replaceSpecVars: true,
-    specVars: 'patternVar=a*.in'
+    specVars: 'patternVar=a*.in',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

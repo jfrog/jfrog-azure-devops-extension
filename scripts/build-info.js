@@ -1,39 +1,41 @@
 'use strict';
-define(['TFS/DistributedTask/TaskRestClient'], taskRestClient => {
+define(['TFS/DistributedTask/TaskRestClient'], (taskRestClient) => {
     let sharedConfig = VSS.getConfiguration();
     let vsoContext = VSS.getWebContext();
     if (sharedConfig) {
         // Register your extension with host through callback.
-        sharedConfig.onBuildChanged(build => {
+        sharedConfig.onBuildChanged((build) => {
             let taskClient = taskRestClient.getClient();
 
             // Create build-info div.
             // Get 'artifactoryType' attachments from build agent.
-            taskClient.getPlanAttachments(vsoContext.project.id, 'build', build.orchestrationPlan.planId, 'artifactoryType').then(taskAttachments => {
-                let buildInfoParentDiv = $('#artifactory-build-info-parent');
-                if (taskAttachments.length > 0) {
-                    let recId = taskAttachments[0].recordId;
-                    let timelineId = taskAttachments[0].timelineId;
-                    taskClient
-                        .getAttachmentContent(
-                            vsoContext.project.id,
-                            'build',
-                            build.orchestrationPlan.planId,
-                            timelineId,
-                            recId,
-                            'artifactoryType',
-                            'buildDetails'
-                        )
-                        .then(attachmentContent => {
-                            let buildDetails = JSON.parse(bufferToString(attachmentContent));
-                            let buildInfoDiv = createBuildInfoDiv(buildDetails);
-                            buildInfoParentDiv.append(buildInfoDiv);
-                        });
-                } else {
-                    let noBuildInfoDiv = createNoBuildInfoDiv();
-                    buildInfoParentDiv.append(noBuildInfoDiv);
-                }
-            });
+            taskClient
+                .getPlanAttachments(vsoContext.project.id, 'build', build.orchestrationPlan.planId, 'artifactoryType')
+                .then((taskAttachments) => {
+                    let buildInfoParentDiv = $('#artifactory-build-info-parent');
+                    if (taskAttachments.length > 0) {
+                        let recId = taskAttachments[0].recordId;
+                        let timelineId = taskAttachments[0].timelineId;
+                        taskClient
+                            .getAttachmentContent(
+                                vsoContext.project.id,
+                                'build',
+                                build.orchestrationPlan.planId,
+                                timelineId,
+                                recId,
+                                'artifactoryType',
+                                'buildDetails'
+                            )
+                            .then((attachmentContent) => {
+                                let buildDetails = JSON.parse(bufferToString(attachmentContent));
+                                let buildInfoDiv = createBuildInfoDiv(buildDetails);
+                                buildInfoParentDiv.append(buildInfoDiv);
+                            });
+                    } else {
+                        let noBuildInfoDiv = createNoBuildInfoDiv();
+                        buildInfoParentDiv.append(noBuildInfoDiv);
+                    }
+                });
 
             VSS.notifyLoadSucceeded();
         });
