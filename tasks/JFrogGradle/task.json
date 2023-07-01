@@ -28,6 +28,11 @@
             "name": "deployer",
             "displayName": "Deploy artifacts to Artifactory",
             "isExpanded": true
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
         }
     ],
     "inputs": [
