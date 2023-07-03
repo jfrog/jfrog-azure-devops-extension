@@ -7,7 +7,7 @@ pipelines:
           auto:
             language: node
             versions:
-              - "12"
+              - "16"
 
     steps:
       - name: Snapshot
