@@ -12,16 +12,16 @@ let inputs = {
                 pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
                 target: testUtils.getLocalTestDir(TEST_NAME),
                 flat: 'true',
-                props: 'propKey1=propVal1;propKey2=propVal2'
-            }
-        ]
+                props: 'propKey1=propVal1;propKey2=propVal2',
+            },
+        ],
     }),
     collectBuildInfo: false,
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     validateSymlinks: false,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

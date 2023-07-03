@@ -4,6 +4,7 @@ const path = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
+const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
 
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
@@ -80,7 +81,8 @@ module.exports = {
     taskSelectedCliVersionEnv: taskSelectedCliVersionEnv,
     extractorsRemoteEnv: extractorsRemoteEnv,
     jfrogCliToolName: jfrogCliToolName,
-    isServerIdEnvSupported: isServerIdEnvSupported
+    isServerIdEnvSupported: isServerIdEnvSupported,
+    setJdkHomeForJavaTasks: setJdkHomeForJavaTasks,
 };
 
 /**
@@ -94,7 +96,7 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
     process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
-    process.env.CI = true;
+    process.env.CI = 'true';
 
     if (!cliVersion) {
         // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
@@ -108,15 +110,15 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 
     runTaskCbk = runTaskFunc;
     getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion)
-        .then(cliPath => {
+        .then((cliPath) => {
             runCbk(cliPath);
             collectEnvVarsIfNeeded(cliPath);
         })
-        .catch(error => tl.setResult(tl.TaskResult.Failed, 'Error occurred while executing task:\n' + error));
+        .catch((error) => tl.setResult(tl.TaskResult.Failed, 'Error occurred while executing task: ' + error));
 }
 
 function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         let cliDir = toolLib.findLocalTool(jfrogCliToolName, cliVersion);
         if (fs.existsSync(customCliPath)) {
             tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
@@ -129,8 +131,8 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
             const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl, cliVersion);
             createCliDirs();
             return downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion)
-                .then(cliPath => resolve(cliPath))
-                .catch(error => reject(errMsg + '\n' + error));
+                .then((cliPath) => resolve(cliPath))
+                .catch((error) => reject(errMsg + '\n' + error));
         }
     });
 }
@@ -395,7 +397,7 @@ function writeSpecContentToSpecPath(specSource, specPath) {
 }
 
 function cliJoin(...args) {
-    return args.filter(x => x.length > 0).join(' ');
+    return args.filter((x) => x.length > 0).join(' ');
 }
 
 function quote(str) {
@@ -479,10 +481,7 @@ function logCliVersionAndSetSelected(cliPath) {
 function getCliVersion(cliPath) {
     let cliCommand = cliJoin(cliPath, '--version');
     let res = execSync(cliCommand);
-    return String.fromCharCode
-        .apply(null, res)
-        .split(' ')[2]
-        .trim();
+    return String.fromCharCode.apply(null, res).split(' ')[2].trim();
 }
 
 function runCbk(cliPath) {
@@ -506,8 +505,8 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
     return new Promise((resolve, reject) => {
         toolLib
             .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
-            .then(downloadPath => {
-                toolLib.cacheFile(downloadPath, fileName, jfrogCliToolName, cliVersion).then(cliDir => {
+            .then((downloadPath) => {
+                toolLib.cacheFile(downloadPath, fileName, jfrogCliToolName, cliVersion).then((cliDir) => {
                     let cliPath = path.join(cliDir, fileName);
                     if (!isWindows()) {
                         fs.chmodSync(cliPath, 0o555);
@@ -516,7 +515,7 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
                     resolve(cliPath);
                 });
             })
-            .catch(err => {
+            .catch((err) => {
                 reject(err);
             });
     });
@@ -821,6 +820,30 @@ function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
         }
     } catch (cleanupException) {
         tl.setResult(tl.TaskResult.Failed, cleanupException);
+    }
+}
+
+function setJdkHomeForJavaTasks() {
+    let javaHomeSelection = tl.getInput('javaHomeSelection', true);
+    let javaHome;
+    if (javaHomeSelection === 'JDKVersion') {
+        // Set JAVA_HOME to the specified JDK version (default, 1.7, 1.8, etc.)
+        tl.debug('Using the specified JDK version to find and set JAVA_HOME');
+        let jdkVersion = tl.getInput('jdkVersion') || '';
+        let jdkArchitecture = tl.getInput('jdkArchitecture') || '';
+        if (jdkVersion !== 'default') {
+            javaHome = findJavaHome(jdkVersion, jdkArchitecture);
+        }
+    } else {
+        // Set JAVA_HOME to the path specified by the user
+        tl.debug('Setting JAVA_HOME to the path specified by user input');
+        javaHome = tl.getPathInput('jdkUserInputPath', true, true);
+    }
+
+    // Set JAVA_HOME as determined above (if different from default)
+    if (javaHome) {
+        console.log('The Java home location: ' + javaHome);
+        tl.setVariable('JAVA_HOME', javaHome);
     }
 }
 

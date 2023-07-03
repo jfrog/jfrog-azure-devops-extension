@@ -4,15 +4,15 @@ const path = require('path');
 const utils = require('./utils');
 
 module.exports = {
-    resolveFilterSpec: resolveFilterSpec
+    resolveFilterSpec: resolveFilterSpec,
 };
 
 // Make sure to remove any empty entries, or else we'll accidentally match the current directory.
 function getPatternsArrayFromInput(pattern) {
     return pattern
         .split(';')
-        .map(x => x.trim())
-        .filter(x => !!x);
+        .map((x) => x.trim())
+        .filter((x) => !!x);
 }
 
 // Attempts to resolve paths the same way the legacy PowerShell's Find-Files worked
@@ -20,7 +20,7 @@ function resolveFilterSpec(filterSpec, basePath) {
     let patterns = getPatternsArrayFromInput(filterSpec);
     let result = new Set();
 
-    patterns.forEach(pattern => {
+    patterns.forEach((pattern) => {
         let isNegative = false;
         if (pattern.startsWith('+:')) {
             pattern = pattern.substr(2);
@@ -36,7 +36,7 @@ function resolveFilterSpec(filterSpec, basePath) {
         tl.debug(`pattern: ${pattern}, isNegative: ${isNegative}`);
 
         let thisPatternFiles = resolveWildcardPath(pattern);
-        thisPatternFiles.forEach(file => {
+        thisPatternFiles.forEach((file) => {
             if (isNegative) {
                 result.delete(file);
             } else {
@@ -69,7 +69,7 @@ function resolveWildcardPath(pattern) {
         // Use the specified single file
         filesList = [pattern];
     } else {
-        let firstWildcardIndex = function(str) {
+        let firstWildcardIndex = function (str) {
             let idx = str.indexOf('*');
 
             let idxOfWildcard = str.indexOf('?');
@@ -106,7 +106,7 @@ function resolveWildcardPath(pattern) {
             nocomment: true,
             nonegate: true,
             nocase: isWindows,
-            dot: isWindows
+            dot: isWindows,
         });
 
         filesList = allFiles.filter(patternFilter);
@@ -115,5 +115,5 @@ function resolveWildcardPath(pattern) {
     if (!isWindows) {
         return filesList;
     }
-    return filesList.map(file => file.split('/').join('\\'));
+    return filesList.map((file) => file.split('/').join('\\'));
 }

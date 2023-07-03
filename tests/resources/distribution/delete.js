@@ -10,9 +10,9 @@ fs.writeFileSync(
             {
                 site_name: '*',
                 city_name: '*',
-                country_codes: ['*']
-            }
-        ]
+                country_codes: ['*'],
+            },
+        ],
     }),
     'utf8'
 );
@@ -25,7 +25,7 @@ let inputs = {
     distRulesFilePath: filePath,
     deleteFromDist: true,
     dryRun: false,
-    insecureTls: false
+    insecureTls: false,
 };
 
 testUtils.runDistributionTask(testUtils.distribution, {}, inputs);

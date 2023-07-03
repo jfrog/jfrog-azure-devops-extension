@@ -6,7 +6,7 @@ let inputs = {
     buildNumber: '1',
     command: 'Push',
     collectBuildInfo: true,
-    imageName: `${platformDockerDomain}/docker-local/docker-test:1`
+    imageName: `${platformDockerDomain}/docker-local/docker-test:1`,
 };
 
 testUtils.runArtifactoryTask(testUtils.docker, {}, inputs);

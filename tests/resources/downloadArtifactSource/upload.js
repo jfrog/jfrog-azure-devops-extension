@@ -10,16 +10,16 @@ let inputs = {
         files: [
             {
                 pattern: testUtils.getTestLocalFilesDir(__dirname),
-                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
-            }
-        ]
+                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     preserveSymlinks: false,
     collectBuildInfo: true,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

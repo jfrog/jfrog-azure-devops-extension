@@ -12,7 +12,7 @@ let variables = {
     'Build.token': 'open-sesame',
     'Build.secret': 'open-sesame',
     'Build.undefined': 'undefined',
-    'Build.null': 'null'
+    'Build.null': 'null',
 };
 let inputs = {
     command: 'Upload',
@@ -22,9 +22,9 @@ let inputs = {
         files: [
             {
                 pattern: testUtils.getTestLocalFilesDir(__dirname),
-                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME)
-            }
-        ]
+                target: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME),
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
@@ -32,7 +32,7 @@ let inputs = {
     preserveSymlinks: false,
     includeEnvVars: true,
     collectBuildInfo: true,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, variables, inputs);

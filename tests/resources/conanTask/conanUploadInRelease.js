@@ -9,7 +9,7 @@ let variables = {
     'System.HostType': 'release',
     'Build.DefinitionId': BUILD_NAME,
     'Build.DefinitionName': BUILD_NAME,
-    'Build.BuildNumber': BUILD_NUMBER
+    'Build.BuildNumber': BUILD_NUMBER,
 };
 
 let inputs = {
@@ -18,7 +18,7 @@ let inputs = {
     conanCommand: 'Upload',
     patternOrReference: 'Conan-min*',
     extraArguments: '-r artifactory --all',
-    collectBuildInfo: true
+    collectBuildInfo: true,
 };
 
 testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

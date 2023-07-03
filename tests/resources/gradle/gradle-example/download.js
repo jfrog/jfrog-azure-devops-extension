@@ -10,15 +10,15 @@ let inputs = {
                 pattern: testUtils.getRepoKeys().mavenLocalRepo,
                 target: path.join(TEST_NAME, 'files', 'gradle-example', '/'),
                 build: 'Gradle Test/3',
-                flat: 'true'
-            }
-        ]
+                flat: 'true',
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     validateSymlinks: false,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

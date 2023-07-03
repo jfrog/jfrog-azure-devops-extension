@@ -7,7 +7,7 @@ const BUILD_NUMBER = '1';
 
 let inputs = {
     buildName: BUILD_NAME,
-    buildNumber: BUILD_NUMBER
+    buildNumber: BUILD_NUMBER,
 };
 
 testUtils.runArtifactoryTask(testUtils.publish, {}, inputs);

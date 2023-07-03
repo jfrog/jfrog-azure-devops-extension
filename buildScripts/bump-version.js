@@ -8,17 +8,17 @@ const compareVersions = require('compare-versions');
 const editJsonFileOptions = { autosave: true, stringify_width: 4 };
 const optionDefinitions = [
     { name: 'help', alias: 'h', type: Boolean, description: 'Display this usage guide' },
-    { name: 'version', alias: 'v', type: String, description: 'Version to set. Must be bigger than the current version. Format: X.X.X' }
+    { name: 'version', alias: 'v', type: String, description: 'Version to set. Must be bigger than the current version. Format: X.X.X' },
 ];
 const usage = commandLineUsage([
     {
         header: 'Bump version of JFrog Extension',
-        content: 'Tool to Bump version of JFrog Extension. It bumps version in all task.json files and in vss-extension.json.'
+        content: 'Tool to Bump version of JFrog Extension. It bumps version in all task.json files and in vss-extension.json.',
     },
     {
         header: 'Options',
-        optionList: optionDefinitions
-    }
+        optionList: optionDefinitions,
+    },
 ]);
 const commandLineArgsOptions = commandLineArgs(optionDefinitions, { camelCase: true });
 if (commandLineArgsOptions.help || !commandLineArgsOptions.version) {
@@ -53,7 +53,7 @@ function assertVersion() {
  */
 function updateTasksVersion() {
     let files = fs.readdirSync(path.join('tasks'));
-    files.forEach(taskName => {
+    files.forEach((taskName) => {
         let taskDir = path.join('tasks', taskName);
         let taskJsonPath = path.join(taskDir, 'task.json');
         if (fs.existsSync(taskJsonPath)) {
@@ -61,7 +61,7 @@ function updateTasksVersion() {
             updateTaskJsonWithNewVersion(taskJsonPath);
         } else {
             fs.readdir(taskDir, (err, taskVersionDirs) => {
-                taskVersionDirs.forEach(versToBuild => {
+                taskVersionDirs.forEach((versToBuild) => {
                     let taskVersionDirJson = path.join(taskDir, versToBuild, 'task.json');
                     if (fs.existsSync(taskVersionDirJson)) {
                         console.log(
@@ -88,7 +88,7 @@ function updateTaskJsonWithNewVersion(taskJsonPath) {
     taskJson.set('version', {
         Major: curMajorVersion,
         Minor: requestedVersionSplit[1],
-        Patch: requestedVersionSplit[2]
+        Patch: requestedVersionSplit[2],
     });
 }
 

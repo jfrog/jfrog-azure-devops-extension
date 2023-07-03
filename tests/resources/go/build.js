@@ -6,7 +6,7 @@ let BUILD_NUMBER = '3';
 
 let variables = {
     'Build.DefinitionName': BUILD_NAME,
-    'Build.BuildNumber': BUILD_NUMBER
+    'Build.BuildNumber': BUILD_NUMBER,
 };
 
 let inputs = {
@@ -15,7 +15,7 @@ let inputs = {
     resolutionRepo: testUtils.getRepoKeys().goVirtualRepo,
     command: 'build',
     workingDirectory: TEST_NAME,
-    collectBuildInfo: true
+    collectBuildInfo: true,
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

@@ -13,8 +13,8 @@ const configYaml = {
         summaryGroupIndex: '2',
         trackerUrl: 'http://my-jira.com/issues',
         aggregate: 'true',
-        aggregationStatus: 'RELEASED'
-    }
+        aggregationStatus: 'RELEASED',
+    },
 };
 const configString = yaml.safeDump(configYaml);
 
@@ -23,7 +23,7 @@ let inputs = {
     buildNumber: '3',
     configSource: 'taskConfiguration',
     taskConfig: configString,
-    workingDirectory: CUSTOM_WORKING_DIR
+    workingDirectory: CUSTOM_WORKING_DIR,
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

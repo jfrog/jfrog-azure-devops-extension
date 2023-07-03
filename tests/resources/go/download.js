@@ -10,15 +10,15 @@ let inputs = {
             {
                 pattern: testUtils.getRepoKeys().goLocalRepo,
                 target: path.join(testUtils.getLocalTestDir(TEST_NAME), 'files', '/'),
-                flat: 'true'
-            }
-        ]
+                flat: 'true',
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     validateSymlinks: false,
-    specSource: 'taskConfiguration'
+    specSource: 'taskConfiguration',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

@@ -8,7 +8,7 @@ let BUILD_NUMBER = '3';
 
 let variables = {
     'Build.DefinitionName': BUILD_NAME,
-    'Build.BuildNumber': BUILD_NUMBER
+    'Build.BuildNumber': BUILD_NUMBER,
 };
 
 let inputs = {
@@ -25,7 +25,7 @@ let inputs = {
     collectBuildInfo: true,
     filterDeployedArtifacts: true,
     includePatterns: '*1.0-*.jar, *pom*',
-    excludePatterns: '*sources*'
+    excludePatterns: '*sources*',
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');

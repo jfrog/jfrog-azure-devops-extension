@@ -67,7 +67,7 @@ function executeConanTask(commandArgs) {
 
         // Run conan command and set task result
         executeConanCommand(conanPath, commandArgs, workingDir)
-            .then(exitCode => {
+            .then((exitCode) => {
                 if (exitCode !== 0) {
                     reject(new Error('Conan command returned bad exit code: ' + exitCode));
                 }
@@ -75,7 +75,7 @@ function executeConanTask(commandArgs) {
             .then(() => {
                 // Generate build info if requested
                 if (collectBuildInfo) {
-                    generateBuildInfo(conanUserHome, conanTaskId).then(exitCode => {
+                    generateBuildInfo(conanUserHome, conanTaskId).then((exitCode) => {
                         if (exitCode !== 0) {
                             reject(new Error('Failed to generate build info with bad exit code: ' + exitCode));
                         }
@@ -195,7 +195,7 @@ function executeConanCommand(conanPath, commandArgs, workingDir) {
         failOnStdErr: false,
         errStream: process.stdout,
         outStream: process.stdout,
-        ignoreReturnCode: true
+        ignoreReturnCode: true,
     };
 
     // Set working dir if present
@@ -252,7 +252,7 @@ function generateBuildInfo(conanUserHome, conanTaskId) {
         failOnStdErr: false,
         errStream: process.stdout,
         outStream: process.stdout,
-        ignoreReturnCode: true
+        ignoreReturnCode: true,
     };
 
     let conanBuildInfo = tl.tool(conanBuildInfoPath).arg(conanBuildInfoArgs);
@@ -398,15 +398,12 @@ function initCliPartialsBuildDir(buildName, buildNumber) {
 
 function getCliPartialsBuildDir(buildName, buildNumber) {
     const buildId = buildName + '_' + buildNumber + '_' + '';
-    const hexId = crypto
-        .createHash('sha256')
-        .update(buildId)
-        .digest('hex');
+    const hexId = crypto.createHash('sha256').update(buildId).digest('hex');
     return path.join(os.tmpdir(), BUILD_TEMP_PATH, hexId);
 }
 
 module.exports = {
     executeConanTask: executeConanTask,
     getCliPartialsBuildDir: getCliPartialsBuildDir, // Exported for tests
-    purgeConanRemotes: purgeConanRemotes
+    purgeConanRemotes: purgeConanRemotes,
 };

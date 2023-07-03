@@ -7,16 +7,16 @@ let inputs = {
     fileSpec: JSON.stringify({
         files: [
             {
-                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + '*${action}.in'
-            }
-        ]
+                pattern: testUtils.getRemoteTestDir(testUtils.getRepoKeys().repo1, TEST_NAME) + '*${action}.in',
+            },
+        ],
     }),
     failNoOp: true,
     dryRun: false,
     insecureTls: false,
     specSource: 'taskConfiguration',
     replaceSpecVars: true,
-    specVars: 'action=Delete'
+    specVars: 'action=Delete',
 };
 
 testUtils.runArtifactoryTask(testUtils.generic, {}, inputs);

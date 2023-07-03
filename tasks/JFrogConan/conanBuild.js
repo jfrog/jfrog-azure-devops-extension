@@ -55,7 +55,7 @@ function handleConfigInstallCommand() {
         .then(() => {
             setTaskResult(true);
         })
-        .catch(err => {
+        .catch((err) => {
             console.error('Failed to execute Conan Task: ' + err.message);
             setTaskResult(false);
         });
@@ -107,7 +107,7 @@ function handleAddRemoteCommand() {
                 setTaskResult(true);
             });
         })
-        .catch(err => {
+        .catch((err) => {
             console.error('Failed to execute Conan Task: ' + err.message);
             setTaskResult(false);
         });
@@ -131,7 +131,7 @@ function handleCreateCommand() {
         .then(() => {
             setTaskResult(true);
         })
-        .catch(err => {
+        .catch((err) => {
             console.error('Failed to execute Conan Task: ' + err.message);
             setTaskResult(false);
         });
@@ -153,7 +153,7 @@ function handleInstallCommand() {
         .then(() => {
             setTaskResult(true);
         })
-        .catch(err => {
+        .catch((err) => {
             console.error('Failed to execute Conan Task: ' + err.message);
             setTaskResult(false);
         });
@@ -177,7 +177,7 @@ function handleUploadCommand() {
         .then(() => {
             setTaskResult(true);
         })
-        .catch(err => {
+        .catch((err) => {
             console.error('Failed to execute Conan Task: ' + err.message);
             setTaskResult(false);
         });
@@ -195,7 +195,7 @@ function handleCustomCommand() {
         .then(() => {
             setTaskResult(true);
         })
-        .catch(err => {
+        .catch((err) => {
             console.error('Failed to execute Conan Task: ' + err.message);
             setTaskResult(false);
         });

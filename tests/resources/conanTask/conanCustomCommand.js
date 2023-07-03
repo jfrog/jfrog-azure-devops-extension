@@ -10,7 +10,7 @@ let variables = {
     'System.DefinitionId': BUILD_NAME,
     'Build.BuildDirectory': '/tmp/' + BUILD_NAME,
     'Build.DefinitionName': BUILD_NAME,
-    'Build.BuildNumber': BUILD_NUMBER
+    'Build.BuildNumber': BUILD_NUMBER,
 };
 
 let inputs = {
@@ -18,7 +18,7 @@ let inputs = {
     buildNumber: BUILD_NUMBER,
     conanCommand: 'Custom',
     customArguments: 'remote list',
-    conanUserHome: '/tmp/custom/' + BUILD_NAME + '/' + BUILD_NUMBER
+    conanUserHome: '/tmp/custom/' + BUILD_NAME + '/' + BUILD_NUMBER,
 };
 
 testUtils.runArtifactoryTask(testUtils.conan, variables, inputs);

@@ -24,7 +24,7 @@ function performDotnetRestore(cliPath) {
     let sourcesPattern = tl.getInput('rootPath');
     let filesList = solutionPathUtil.resolveFilterSpec(sourcesPattern, tl.getVariable('System.DefaultWorkingDirectory') || process.cwd());
     // A source file is a solution or csproj file.
-    filesList.forEach(sourceFile => {
+    filesList.forEach((sourceFile) => {
         let sourcePath;
         if (!fs.lstatSync(sourceFile).isDirectory()) {
             sourcePath = path.dirname(sourceFile);

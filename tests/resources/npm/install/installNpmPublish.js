@@ -7,7 +7,7 @@ let inputs = {
     workingFolder: 'npm',
     command: 'pack and publish',
     targetRepo: testUtils.getRepoKeys().npmLocalRepo,
-    arguments: ''
+    arguments: '',
 };
 
 testUtils.runArtifactoryTask(testUtils.npm, {}, inputs);

@@ -16,21 +16,21 @@ module.exports = {
                         variableDeclaration: true,
                         objectDestructuring: true,
                         propertyDeclaration: true,
-                        parameter: true
-                    }
+                        parameter: true,
+                    },
                 ],
                 'prefer-const': 'off',
                 'no-extra-boolean-cast': 'off',
                 '@typescript-eslint/no-inferrable-types': 'off',
-                '@typescript-eslint/no-explicit-any': 'off'
-            }
+                '@typescript-eslint/no-explicit-any': 'off',
+            },
         },
         // javascript
         {
             files: ['./tasks/**/*.js', 'jfrog-tasks-utils/*.js'],
             env: {
-                node: true
-            }
-        }
-    ]
+                node: true,
+            },
+        },
+    ],
 };
