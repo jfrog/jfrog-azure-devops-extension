@@ -1,9 +1,10 @@
 const tl = require('azure-pipelines-task-lib/task');
-const uuid = require('uuid/v1');
-const os = require('os');
+const { v4: uuid } = require('uuid');
+const tmpdir = require('os').tmpdir;
+const EOL = require('os').EOL;
 const fs = require('fs-extra');
-const path = require('path');
-const crypto = require('crypto');
+const join = require('path').join;
+const createHash = require('crypto').createHash;
 
 // Helper Constants
 const CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME = 'artifact_property_build.name';
@@ -121,7 +122,7 @@ function getDefaultConanUserHome() {
         buildId = tl.getVariable('Build.DefinitionId');
     }
 
-    return path.join(workFolder, buildId, buildNumber);
+    return join(workFolder, buildId, buildNumber);
 }
 
 /**
@@ -166,15 +167,15 @@ function setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, 
         CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME +
         '=' +
         buildName +
-        os.EOL +
+        EOL +
         CONAN_ARTIFACTS_PROPERTIES_BUILD_NUMBER +
         '=' +
         buildNumber +
-        os.EOL +
+        EOL +
         CONAN_ARTIFACTS_PROPERTIES_BUILD_TIMESTAMP +
         '=' +
         buildTimestamp +
-        os.EOL;
+        EOL;
     fs.outputFileSync(conanArtifactsPropertiesPath, content);
     tl.debug('Conan artifacts.properties file created at ' + conanArtifactsPropertiesPath);
 }
@@ -286,7 +287,7 @@ function completeBuildInfo(conanUserHome, conanTaskId) {
 
     // Delete the previously created BuildInfo
     fs.unlinkSync(buildInfoFilePath);
-    buildInfoFilePath = path.join(getCliPartialsBuildDir(buildName, buildNumber), BUILD_INFO_FILE_NAME + conanTaskId);
+    buildInfoFilePath = join(getCliPartialsBuildDir(buildName, buildNumber), BUILD_INFO_FILE_NAME + conanTaskId);
 
     // Write build info json file
     fs.writeJsonSync(buildInfoFilePath, buildInfoJson);
@@ -301,7 +302,7 @@ function completeBuildInfo(conanUserHome, conanTaskId) {
  * @param conanTaskId (string) - Conan Task Id
  */
 function setConanTraceFileLocation(conanUserHome, conanTaskId) {
-    process.env.CONAN_TRACE_FILE = path.join(conanUserHome, '.conan', 'conan_trace_' + conanTaskId + '.log');
+    process.env.CONAN_TRACE_FILE = join(conanUserHome, '.conan', 'conan_trace_' + conanTaskId + '.log');
 }
 
 /**
@@ -310,7 +311,7 @@ function setConanTraceFileLocation(conanUserHome, conanTaskId) {
  * @param conanTaskId (string) - Conan Task Id
  */
 function getBuildInfoFileLocation(conanUserHome, conanTaskId) {
-    return path.join(conanUserHome, '.conan', 'build_info_' + conanTaskId + '.json');
+    return join(conanUserHome, '.conan', 'build_info_' + conanTaskId + '.json');
 }
 
 /**
@@ -318,7 +319,7 @@ function getBuildInfoFileLocation(conanUserHome, conanTaskId) {
  * @param conanUserHome (string) - Conan User Home location
  */
 function getConanArtifactsPropertiesLocation(conanUserHome) {
-    return path.join(conanUserHome, '.conan', 'artifacts.properties');
+    return join(conanUserHome, '.conan', 'artifacts.properties');
 }
 
 /**
@@ -330,7 +331,7 @@ function convertConanPropertiesToMap(propertiesContent) {
         return {};
     }
     let map = {};
-    let lines = propertiesContent.split(os.EOL);
+    let lines = propertiesContent.split(EOL);
     for (let i = 0; i < lines.length; i++) {
         let parts = lines[i].split('=');
         let key = parts[0];
@@ -369,11 +370,11 @@ function purgeConanRemotes() {
     tl.setVariable('CONAN_USER_HOME', conanUserHome);
 
     // Make sure Conan User Home exists
-    let conanFolder = path.join(conanUserHome, '.conan');
+    let conanFolder = join(conanUserHome, '.conan');
     fs.mkdirsSync(conanFolder);
 
     // Empty registry.txt file to remove all existing remotes
-    let registryFile = path.join(conanFolder, 'registry.txt');
+    let registryFile = join(conanFolder, 'registry.txt');
     console.log('Purging Conan remotes by removing content of ' + registryFile);
     try {
         fs.writeFileSync(registryFile, '');
@@ -388,18 +389,18 @@ function purgeConanRemotes() {
  * @param buildNumber (string) - The build number
  */
 function initCliPartialsBuildDir(buildName, buildNumber) {
-    let partialsBuildDir = path.join(getCliPartialsBuildDir(buildName, buildNumber), 'partials');
+    let partialsBuildDir = join(getCliPartialsBuildDir(buildName, buildNumber), 'partials');
     if (!fs.pathExistsSync(partialsBuildDir)) {
         fs.ensureDirSync(partialsBuildDir);
     }
-    fs.writeJsonSync(path.join(partialsBuildDir, 'details'), { Timestamp: new Date().toISOString() });
-    tl.debug('Created partial details at: ' + path.join(partialsBuildDir, 'details'));
+    fs.writeJsonSync(join(partialsBuildDir, 'details'), { Timestamp: new Date().toISOString() });
+    tl.debug('Created partial details at: ' + join(partialsBuildDir, 'details'));
 }
 
 function getCliPartialsBuildDir(buildName, buildNumber) {
     const buildId = buildName + '_' + buildNumber + '_' + '';
-    const hexId = crypto.createHash('sha256').update(buildId).digest('hex');
-    return path.join(os.tmpdir(), BUILD_TEMP_PATH, hexId);
+    const hexId = createHash('sha256').update(buildId).digest('hex');
+    return join(tmpdir(), BUILD_TEMP_PATH, hexId);
 }
 
 module.exports = {

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task');
-const path = require('path');
+const { join, sep, isAbsolute } = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
@@ -9,15 +9,15 @@ const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').fi
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const jfrogFolderPath = encodePath(path.join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
+const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
 const defaultJfrogCliVersion = '2.42.0';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
 const pluginVersion = '2.7.0';
 const buildAgent = 'jfrog-azure-devops-extension';
-const customFolderPath = encodePath(path.join(jfrogFolderPath, 'current'));
-const customCliPath = encodePath(path.join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
+const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
+const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
 
 // Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
@@ -124,7 +124,7 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
             tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
             resolve(customCliPath);
         } else if (cliDir) {
-            let cliPath = path.join(cliDir, fileName);
+            let cliPath = join(cliDir, fileName);
             tl.debug('Using existing versioned cli path: ' + cliPath);
             resolve(cliPath);
         } else {
@@ -507,7 +507,7 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
             .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
             .then((downloadPath) => {
                 toolLib.cacheFile(downloadPath, fileName, jfrogCliToolName, cliVersion).then((cliDir) => {
-                    let cliPath = path.join(cliDir, fileName);
+                    let cliPath = join(cliDir, fileName);
                     if (!isWindows()) {
                         fs.chmodSync(cliPath, 0o555);
                     }
@@ -616,7 +616,7 @@ function fixWindowsPaths(string) {
  */
 function encodePath(str) {
     let encodedPath = '';
-    let arr = str.split(path.sep);
+    let arr = str.split(sep);
     let count = 0;
     for (let section of arr) {
         if (section.length === 0) {
@@ -630,13 +630,13 @@ function encodePath(str) {
         ) {
             section = quote(section);
         }
-        encodedPath += section + path.sep;
+        encodedPath += section + sep;
     }
-    if (count > 0 && !str.endsWith(path.sep)) {
+    if (count > 0 && !str.endsWith(sep)) {
         encodedPath = encodedPath.substring(0, encodedPath.length - 1);
     }
-    if (str.startsWith(path.sep)) {
-        encodedPath = path.sep + encodedPath;
+    if (str.startsWith(sep)) {
+        encodedPath = sep + encodedPath;
     }
 
     return encodedPath;
@@ -691,10 +691,10 @@ function stripTrailingSlash(str) {
  */
 function determineCliWorkDir(defaultPath, providedPath) {
     if (providedPath) {
-        if (path.isAbsolute(providedPath)) {
+        if (isAbsolute(providedPath)) {
             return providedPath;
         }
-        return path.join(defaultPath, providedPath);
+        return join(defaultPath, providedPath);
     }
     return defaultPath;
 }
@@ -813,7 +813,7 @@ function taskDefaultCleanup(cliPath, workDir, serverIdsArray) {
     // Delete servers if exist.
     deleteCliServers(cliPath, workDir, serverIdsArray);
     try {
-        const configPath = path.join(workDir, '.jfrog', 'projects');
+        const configPath = join(workDir, '.jfrog', 'projects');
         if (fs.existsSync(configPath)) {
             tl.debug('Removing JFrog CLI build tool configuration...');
             tl.rmRF(configPath);

@@ -8,10 +8,10 @@
     "main": "utils",
     "typings": "utils.d.ts",
     "dependencies": {
-        "azure-pipelines-task-lib": "^4.3.1",
+        "azure-pipelines-task-lib": "^4.4.0",
         "azure-pipelines-tool-lib": "^2.0.4",
-        "azure-pipelines-tasks-java-common": "^2.201.0",
-        "typed-rest-client": "^1.8.9"
+        "azure-pipelines-tasks-java-common": "^2.219.1",
+        "typed-rest-client": "^1.8.11"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"

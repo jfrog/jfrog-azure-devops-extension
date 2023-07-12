@@ -1,5 +1,5 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const join = require('path').join;
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
@@ -7,7 +7,7 @@ let inputs = {
     buildNumber: '17',
     command: 'install',
     arguments: '-r requirements.txt --module=jfrog-python-example',
-    workingDirectory: path.join(testUtils.getLocalTestDir(TEST_NAME)),
+    workingDirectory: join(testUtils.getLocalTestDir(TEST_NAME)),
     targetResolveRepo: testUtils.getRepoKeys().pipVirtualRepo,
     collectBuildInfo: true,
     noPipCache: true,

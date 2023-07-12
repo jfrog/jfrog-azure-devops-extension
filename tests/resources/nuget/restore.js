@@ -1,14 +1,14 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const join = require('path').join;
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
     buildName: 'NuGet Test',
     buildNumber: '3',
     command: 'restore',
-    solutionPath: path.join(testUtils.getLocalTestDir(TEST_NAME), '**', '*.sln'),
+    solutionPath: join(testUtils.getLocalTestDir(TEST_NAME), '**', '*.sln'),
     targetResolveRepo: testUtils.getRepoKeys().nugetVirtualRepo,
-    packagesDirectory: path.join(testUtils.getLocalTestDir(TEST_NAME), 'packages'),
+    packagesDirectory: join(testUtils.getLocalTestDir(TEST_NAME), 'packages'),
     verbosityRestore: 'Detailed',
     collectBuildInfo: true,
 };

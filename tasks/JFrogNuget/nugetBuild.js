@@ -5,7 +5,7 @@ const utils = require('@jfrog/tasks-utils/utils.js');
 const NUGET_TOOL_NAME = 'NuGet';
 const NUGET_EXE_FILENAME = 'nuget.exe';
 const NUGET_VERSION = '5.4.0';
-const path = require('path');
+const dirname = require('path').dirname;
 const solutionPathUtil = require('@jfrog/tasks-utils/solutionPathUtil');
 const cliNuGetCommand = 'nuget';
 const cliUploadCommand = 'rt u';
@@ -69,7 +69,7 @@ function exec(cliPath, nugetCommand) {
         filesList.forEach((solutionFile) => {
             let solutionPath;
             if (!fs.lstatSync(solutionFile).isDirectory()) {
-                solutionPath = path.dirname(solutionFile);
+                solutionPath = dirname(solutionFile);
             } else {
                 solutionPath = solutionFile;
             }

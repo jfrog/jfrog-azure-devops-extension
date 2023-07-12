@@ -1,7 +1,8 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const basename = require('path').basename;
+const join = require('path').join;
 
-const TEST_NAME = path.basename(__dirname);
+const TEST_NAME = basename(__dirname);
 const BUILD_NAME = TEST_NAME;
 const BUILD_NUMBER = '2';
 
@@ -18,7 +19,7 @@ let inputs = {
     buildNumber: BUILD_NUMBER,
     conanCommand: 'Install',
     pathOrReference: '..',
-    workingDirectory: path.join(__dirname, 'files', 'conan-install', 'build'),
+    workingDirectory: join(__dirname, 'files', 'conan-install', 'build'),
     extraArguments: '--build missing',
     collectBuildInfo: true,
 };

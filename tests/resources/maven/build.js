@@ -1,5 +1,5 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const join = require('path').join;
 const TEST_NAME = testUtils.getTestName(__dirname);
 let repoKeys = testUtils.getRepoKeys();
 
@@ -21,7 +21,7 @@ let inputs = {
     targetDeployReleaseRepo: repoKeys.mavenLocalRepo,
     targetDeploySnapshotRepo: repoKeys.mavenLocalRepo,
     goals: 'clean install',
-    mavenPOMFile: path.join(TEST_NAME, 'pom.xml'),
+    mavenPOMFile: join(TEST_NAME, 'pom.xml'),
     collectBuildInfo: true,
     filterDeployedArtifacts: true,
     includePatterns: '*1.0-*.jar, *pom*',

@@ -1,9 +1,10 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
-const fs = require('fs-extra');
-const filePath = path.join(testUtils.testDataDir, 'deleteSpec.json');
+const join = require('path').join;
+const writeFileSync = require('fs-extra').writeFileSync;
 
-fs.writeFileSync(
+const filePath = join(testUtils.testDataDir, 'deleteSpec.json');
+
+writeFileSync(
     filePath,
     JSON.stringify({
         distribution_rules: [
