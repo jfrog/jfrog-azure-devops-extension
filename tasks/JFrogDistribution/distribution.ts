@@ -1,6 +1,6 @@
 import * as utils from '@jfrog/tasks-utils';
 import * as tl from 'azure-pipelines-task-lib/task';
-import * as path from 'path';
+import { join } from 'path';
 
 const cliRbcCommand: string = 'ds rbc';
 const cliRbuCommand: string = 'ds rbu';
@@ -42,7 +42,7 @@ function performRbUpdate(cliPath: string, workDir: string): void {
 function performRbCreateUpdate(cliPath: string, workDir: string, cliCommandName: string): void {
     let cliCommand: string = getCliCmdBase(cliPath, cliCommandName, workDir);
 
-    const specPath: string = path.join(workDir, 'rbSpec' + Date.now() + '.json');
+    const specPath: string = join(workDir, 'rbSpec' + Date.now() + '.json');
     cliCommand = utils.handleSpecFile(cliCommand, specPath);
 
     const autoSign: boolean = tl.getBoolInput('autoSign', false);
@@ -135,7 +135,7 @@ function getDistRulesFilePath(workDir: string): string {
         console.log('Using distribution rules file located at ' + filePath);
     } else if (distRulesSource === 'taskConfiguration') {
         const distRulesTaskFile: string = tl.getInput('distRulesTaskFile', true) || '';
-        filePath = path.join(workDir, 'distRules' + Date.now() + '.json');
+        filePath = join(workDir, 'distRules' + Date.now() + '.json');
         tl.writeFile(filePath, distRulesTaskFile);
     } else {
         throw new Error('Failed creating distribution rules file, since the provided file source value is invalid.');

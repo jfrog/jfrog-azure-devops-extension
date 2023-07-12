@@ -1,6 +1,6 @@
 import * as mockRun from 'azure-pipelines-task-lib/mock-run';
 import * as tl from 'azure-pipelines-task-lib/task';
-import * as path from 'path';
+import {join, basename} from 'path';
 import * as fs from 'fs-extra';
 import rimraf from 'rimraf';
 import * as syncRequest from 'sync-request';
@@ -8,8 +8,8 @@ import * as assert from 'assert';
 import NullWritable from 'null-writable';
 import { TaskMockRunner } from 'azure-pipelines-task-lib/mock-run';
 
-const testDataDir: string = path.join(__dirname, 'testData');
-const repoKeysPath: string = path.join(testDataDir, 'configuration', 'repoKeys');
+const testDataDir: string = join(__dirname, 'testData');
+const repoKeysPath: string = join(testDataDir, 'configuration', 'repoKeys');
 const platformUrl: string = process.env.ADO_JFROG_PLATFORM_URL || '';
 const platformUsername: string = process.env.ADO_JFROG_PLATFORM_USERNAME || '';
 const platformPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD || '';
@@ -43,23 +43,23 @@ const repoKeys: any = {
 
 export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername, platformAccessToken, platformDockerDomain };
 
-export const promote: string = path.join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
-export const conan: string = path.join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
-export const docker: string = path.join(__dirname, '..', 'tasks', 'JFrogDocker', 'docker.js');
-export const generic: string = path.join(__dirname, '..', 'tasks', 'JFrogGenericArtifacts', 'runGenericArtifacts.js');
-export const maven: string = path.join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
-export const npm: string = path.join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');
-export const nuget: string = path.join(__dirname, '..', 'tasks', 'JFrogNuget', 'nugetBuild.js');
-export const dotnet: string = path.join(__dirname, '..', 'tasks', 'JFrogDotnet', 'dotnetBuild.js');
-export const gradle: string = path.join(__dirname, '..', 'tasks', 'JFrogGradle', 'gradleBuild.js');
-export const publish: string = path.join(__dirname, '..', 'tasks', 'JFrogPublishBuildInfo', 'publishBuildInfo.js');
-export const discard: string = path.join(__dirname, '..', 'tasks', 'JFrogDiscardBuilds', 'discardBuilds.js');
-export const go: string = path.join(__dirname, '..', 'tasks', 'JFrogGo', 'goBuild.js');
-export const collectIssues: string = path.join(__dirname, '..', 'tasks', 'JFrogCollectIssues', 'collectIssues.js');
-export const toolsInstaller: string = path.join(__dirname, '..', 'tasks', 'JFrogToolsInstaller', 'toolsInstaller.js');
-export const genericCli: string = path.join(__dirname, '..', 'tasks', 'JFrogCliV2', 'jfrogCliRun.js');
-export const pip: string = path.join(__dirname, '..', 'tasks', 'JFrogPip', 'pipBuild.js');
-export const distribution: string = path.join(__dirname, '..', 'tasks', 'JFrogDistribution', 'distribution.js');
+export const promote: string = join(__dirname, '..', 'tasks', 'JFrogBuildPromotion', 'buildPromotion.js');
+export const conan: string = join(__dirname, '..', 'tasks', 'JFrogConan', 'conanBuild.js');
+export const docker: string = join(__dirname, '..', 'tasks', 'JFrogDocker', 'docker.js');
+export const generic: string = join(__dirname, '..', 'tasks', 'JFrogGenericArtifacts', 'runGenericArtifacts.js');
+export const maven: string = join(__dirname, '..', 'tasks', 'JFrogMaven', 'mavenBuild.js');
+export const npm: string = join(__dirname, '..', 'tasks', 'JFrogNpm', 'npmBuild.js');
+export const nuget: string = join(__dirname, '..', 'tasks', 'JFrogNuget', 'nugetBuild.js');
+export const dotnet: string = join(__dirname, '..', 'tasks', 'JFrogDotnet', 'dotnetBuild.js');
+export const gradle: string = join(__dirname, '..', 'tasks', 'JFrogGradle', 'gradleBuild.js');
+export const publish: string = join(__dirname, '..', 'tasks', 'JFrogPublishBuildInfo', 'publishBuildInfo.js');
+export const discard: string = join(__dirname, '..', 'tasks', 'JFrogDiscardBuilds', 'discardBuilds.js');
+export const go: string = join(__dirname, '..', 'tasks', 'JFrogGo', 'goBuild.js');
+export const collectIssues: string = join(__dirname, '..', 'tasks', 'JFrogCollectIssues', 'collectIssues.js');
+export const toolsInstaller: string = join(__dirname, '..', 'tasks', 'JFrogToolsInstaller', 'toolsInstaller.js');
+export const genericCli: string = join(__dirname, '..', 'tasks', 'JFrogCliV2', 'jfrogCliRun.js');
+export const pip: string = join(__dirname, '..', 'tasks', 'JFrogPip', 'pipBuild.js');
+export const distribution: string = join(__dirname, '..', 'tasks', 'JFrogDistribution', 'distribution.js');
 
 export function initTests(): void {
     process.env.JFROG_CLI_REPORT_USAGE = 'false';
@@ -135,7 +135,7 @@ export function deleteBuild(buildName: string): void {
 }
 
 export function cleanToolCache(): void {
-    const jfrogToolDirectory: string = path.join(testDataDir, 'jf');
+    const jfrogToolDirectory: string = join(testDataDir, 'jf');
     if (fs.pathExistsSync(jfrogToolDirectory)) {
         fs.removeSync(jfrogToolDirectory);
     }
@@ -465,10 +465,10 @@ export function setServiceConnectionCredentials(url: string): void {
  * @param newTargetDir - [Optional] new name for the copied directory.
  */
 export function copyTestFilesToTestWorkDir(testDirName: string, dirToCopy: string, newTargetDir?: string): void {
-    const sourceDir: string = path.join(__dirname, 'resources', testDirName, dirToCopy);
-    let targetDir: string = path.join(testDataDir, testDirName);
+    const sourceDir: string = join(__dirname, 'resources', testDirName, dirToCopy);
+    let targetDir: string = join(testDataDir, testDirName);
     if (newTargetDir) {
-        targetDir = path.join(testDataDir, newTargetDir);
+        targetDir = join(testDataDir, newTargetDir);
     }
     fs.copySync(sourceDir, targetDir);
 }
@@ -500,15 +500,15 @@ export function mockGetInputs(inputs: any): void {
 }
 
 export function getTestName(testDir: string): string {
-    return path.basename(testDir);
+    return basename(testDir);
 }
 
 export function getLocalTestDir(testName: string): string {
-    return path.join(testDataDir, testName, '/');
+    return join(testDataDir, testName, '/');
 }
 
 export function getTestLocalFilesDir(testDir: string): string {
-    return path.join(testDir, 'files', '/');
+    return join(testDir, 'files', '/');
 }
 
 export function getRemoteTestDir(repo: string, testName: string): string {

@@ -3,7 +3,7 @@ import * as adoMockTest from 'azure-pipelines-task-lib/mock-test';
 import * as fs from 'fs-extra';
 import * as jfrogUtils from '@jfrog/tasks-utils';
 import * as mocha from 'mocha';
-import * as path from 'path';
+import {join, basename} from 'path';
 import * as syncRequest from 'sync-request';
 import * as TestUtils from './testUtils';
 import { platformDockerDomain } from './testUtils';
@@ -112,9 +112,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Fix windows paths',
             (): void => {
-                const specBeforeFix: string = fs.readFileSync(path.join(__dirname, 'resources', 'fixWindowsPaths', 'specBeforeFix.json'), 'utf8');
+                const specBeforeFix: string = fs.readFileSync(join(__dirname, 'resources', 'fixWindowsPaths', 'specBeforeFix.json'), 'utf8');
                 const expectedSpecAfterFix: string = fs.readFileSync(
-                    path.join(__dirname, 'resources', 'fixWindowsPaths', 'specAfterFix.json'),
+                    join(__dirname, 'resources', 'fixWindowsPaths', 'specAfterFix.json'),
                     'utf8'
                 );
                 const specAfterFix: string = jfrogUtils.fixWindowsPaths(specBeforeFix);
@@ -237,7 +237,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'move');
                 // Download all files
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'expectedFiles'), testDir);
+                assertFiles(join(testDir, 'expectedFiles'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -283,7 +283,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'uploadAndDownload';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -294,7 +294,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'uploadAndDownloadWithSpecVars';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -305,7 +305,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'uploadAndDownloadFromFile';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -316,7 +316,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'uploadAndDownloadWithWorkingDirectory';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -327,7 +327,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'uploadAndDryRunDownload';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'emptyDir'), testDir);
+                assertFiles(join(testDir, 'emptyDir'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -339,7 +339,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'uploadDryRun');
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'expectedDir'), testDir);
+                assertFiles(join(testDir, 'expectedDir'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -351,7 +351,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
                 deleteBuild('downloadArtifactSourceBuild');
             },
             TestUtils.isSkipTest('generic')
@@ -371,7 +371,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             (): void => {
                 const testDir: string = 'downloadFailNoOp';
                 mockTask(testDir, 'download', true);
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -407,7 +407,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'copy');
                 mockTask(testDir, 'delete');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'expectedFiles'), testDir);
+                assertFiles(join(testDir, 'expectedFiles'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -421,7 +421,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
                 mockTask(testDir, 'publish');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
                 const build: syncRequest.Response = getAndAssertBuild('buildPublish', '3');
                 assertBuildModule(build, 'myUploadModule');
                 assertBuildModule(build, 'myDownloadModule');
@@ -486,7 +486,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'promote');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
                 getAndAssertBuild('buildPromote', '3');
                 deleteBuild('buildPromote');
             },
@@ -501,7 +501,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'promote');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
                 getAndAssertBuild('buildPromoteDryRun', '3');
                 deleteBuild('buildPromoteDryRun');
             },
@@ -553,7 +553,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'set');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), testDir);
+                assertFiles(join(testDir, 'files'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -566,7 +566,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'set');
                 mockTask(testDir, 'delete');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'filesExpectedDelete'), testDir);
+                assertFiles(join(testDir, 'filesExpectedDelete'), testDir);
             },
             TestUtils.isSkipTest('generic')
         );
@@ -577,11 +577,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             'Npm install and publish',
             (): void => {
                 const testDir: string = 'npm';
-                mockTask(testDir, path.join('install', 'npmInstall'));
-                mockTask(testDir, path.join('install', 'installNpmPublish'));
-                mockTask(testDir, path.join('install', 'installDownload'));
-                mockTask(testDir, path.join('install', 'installPublish'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, '1'));
+                mockTask(testDir, join('install', 'npmInstall'));
+                mockTask(testDir, join('install', 'installNpmPublish'));
+                mockTask(testDir, join('install', 'installDownload'));
+                mockTask(testDir, join('install', 'installPublish'));
+                assertFiles(join(testDir, 'files'), join(testDir, '1'));
                 getAndAssertBuild('npm Test', '1');
                 deleteBuild('npm Test');
             },
@@ -591,11 +591,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             'Npm ci and publish',
             (): void => {
                 const testDir: string = 'npm';
-                mockTask(testDir, path.join('ci', 'npmCi'));
-                mockTask(testDir, path.join('ci', 'ciNpmPublish'));
-                mockTask(testDir, path.join('ci', 'ciDownload'));
-                mockTask(testDir, path.join('ci', 'ciPublish'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, '2'));
+                mockTask(testDir, join('ci', 'npmCi'));
+                mockTask(testDir, join('ci', 'ciNpmPublish'));
+                mockTask(testDir, join('ci', 'ciDownload'));
+                mockTask(testDir, join('ci', 'ciPublish'));
+                assertFiles(join(testDir, 'files'), join(testDir, '2'));
                 getAndAssertBuild('npm Test', '2');
                 deleteBuild('npm Test');
             },
@@ -611,7 +611,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'build');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                assertFiles(join(testDir, 'files'), join(testDir, 'files'));
                 const build: syncRequest.Response = getAndAssertBuild('Maven Test', '3');
                 const body: any = JSON.parse(build.getBody('utf8'));
                 const modules: any[] = body.buildInfo.modules;
@@ -631,10 +631,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             'Gradle',
             (): void => {
                 const testDir: string = 'gradle';
-                mockTask(testDir, path.join('gradle-example', 'build'));
-                mockTask(testDir, path.join('gradle-example', 'publish'));
-                mockTask(testDir, path.join('gradle-example', 'download'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files', 'gradle-example'));
+                mockTask(testDir, join('gradle-example', 'build'));
+                mockTask(testDir, join('gradle-example', 'publish'));
+                mockTask(testDir, join('gradle-example', 'download'));
+                assertFiles(join(testDir, 'files'), join(testDir, 'files', 'gradle-example'));
                 getAndAssertBuild('Gradle Test', '3');
                 deleteBuild('Gradle Test');
             },
@@ -644,10 +644,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             'Gradle CI',
             (): void => {
                 const testDir: string = 'gradle';
-                mockTask(testDir, path.join('gradle-example-ci', 'build'));
-                mockTask(testDir, path.join('gradle-example-ci', 'publish'));
-                mockTask(testDir, path.join('gradle-example-ci', 'download'));
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files', 'gradle-example-ci'));
+                mockTask(testDir, join('gradle-example-ci', 'build'));
+                mockTask(testDir, join('gradle-example-ci', 'publish'));
+                mockTask(testDir, join('gradle-example-ci', 'download'));
+                assertFiles(join(testDir, 'files'), join(testDir, 'files', 'gradle-example-ci'));
                 getAndAssertBuild('Gradle CI Test', '3');
                 deleteBuild('Gradle CI Test');
             },
@@ -664,7 +664,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'goPublish');
                 mockTask(testDir, 'download');
                 mockTask(testDir, 'publishBuildInfo');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                assertFiles(join(testDir, 'files'), join(testDir, 'files'));
                 getAndAssertBuild('Go Test', '3');
                 deleteBuild('Go Test');
             },
@@ -691,7 +691,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'push');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                assertFiles(join(testDir, 'files'), join(testDir, 'files'));
                 getAndAssertBuild('NuGet Test', '3');
                 deleteBuild('NuGet Test');
             },
@@ -718,7 +718,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'push');
                 mockTask(testDir, 'publish');
                 mockTask(testDir, 'download');
-                assertFiles(path.join(testDir, 'files'), path.join(testDir, 'files'));
+                assertFiles(join(testDir, 'files'), join(testDir, 'files'));
                 getAndAssertBuild('DotNET Test', '7');
                 deleteBuild('DotNET Test');
             },
@@ -737,7 +737,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
                 // Run docker build + tag
                 execSync(
-                    `docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${path.join(__dirname, 'resources', testDir, filesDir)}`
+                    `docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${join(__dirname, 'resources', testDir, filesDir)}`
                 );
 
                 // run docker push
@@ -1003,9 +1003,9 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  * @param shouldFail (Boolean, Optional) - True if the task supposed to fail
  */
 function mockTask(testDir: string, taskName: string, shouldFail?: boolean): void {
-    const taskPath: string = path.join(__dirname, 'resources', testDir, taskName + '.js');
+    const taskPath: string = join(__dirname, 'resources', testDir, taskName + '.js');
     // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
-    const taskJsonDummy: string = path.join(__dirname, 'resources', 'task.json');
+    const taskJsonDummy: string = join(__dirname, 'resources', 'task.json');
     const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
     mockRunner.run(); // Mock a test
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
@@ -1021,12 +1021,12 @@ function mockTask(testDir: string, taskName: string, shouldFail?: boolean): void
 function assertFiles(expectedFiles: string, resultFiles: string): void {
     // Check that all necessary files were downloaded to "testDir/<testName>/"
     const filesToCheck: string[] = [];
-    const filesDir: string = path.join(__dirname, 'resources', expectedFiles);
-    const testData: string = path.join(TestUtils.testDataDir, resultFiles);
+    const filesDir: string = join(__dirname, 'resources', expectedFiles);
+    const testData: string = join(TestUtils.testDataDir, resultFiles);
     if (fs.existsSync(filesDir)) {
         for (const file of fs.readdirSync(filesDir)) {
-            const fileName: string = path.basename(file);
-            const fileToCheck: string = path.join(testData, fileName);
+            const fileName: string = basename(file);
+            const fileToCheck: string = join(testData, fileName);
             assert.ok(fs.existsSync(fileToCheck), fileToCheck + ' does not exist.\n' + tasksOutput);
             filesToCheck.push(fileName);
         }
@@ -1037,7 +1037,7 @@ function assertFiles(expectedFiles: string, resultFiles: string): void {
         return;
     }
     for (const file of fs.readdirSync(testData)) {
-        const fileName: string = path.basename(file);
+        const fileName: string = basename(file);
         assert.ok(filesToCheck.indexOf(fileName) >= 0, fileName + ' should not exist.\n' + tasksOutput);
     }
 }
