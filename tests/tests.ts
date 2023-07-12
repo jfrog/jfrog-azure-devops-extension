@@ -45,7 +45,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'Mask password',
             (): void => {
-                const oldPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD || '';
+                const oldPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD ?? '';
                 process.env.ADO_JFROG_PLATFORM_PASSWORD = 'SUPER_SECRET';
                 let retVal: string = '';
                 try {
@@ -56,7 +56,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             ' --url=' +
                             jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_URL + 'artifactory') +
                             ' --user=' +
-                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_USERNAME || '') +
+                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_USERNAME ?? '') +
                             ' --password=' +
                             jfrogUtils.quote('SUPER_SECRET'),
                         TestUtils.testDataDir

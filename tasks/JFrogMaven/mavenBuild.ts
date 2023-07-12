@@ -27,10 +27,10 @@ function RunTaskCbk(cliPath: string): void {
     }
 
     // Running Maven command
-    let pomFile: string | undefined = tl.getInput('mavenPOMFile') || '';
-    let goalsAndOptions: string | undefined = tl.getInput('goals') || '';
+    let pomFile: string | undefined = tl.getInput('mavenPOMFile') ?? '';
+    let goalsAndOptions: string | undefined = tl.getInput('goals') ?? '';
     goalsAndOptions = utils.cliJoin(goalsAndOptions, '-f', pomFile);
-    let options: string = tl.getInput('options') || '';
+    let options: string = tl.getInput('options') ?? '';
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
@@ -86,7 +86,7 @@ function createMavenConfigFile(cliPath: string, buildDir: string) {
     }
 
     // Configure deployer server, skip if missing. This allows user to resolve dependencies from artifactory without deployment.
-    let artifactoryDeployer: string = tl.getInput('artifactoryDeployService') || '';
+    let artifactoryDeployer: string = tl.getInput('artifactoryDeployService') ?? '';
     if (artifactoryDeployer) {
         serverIdDeployer = utils.assembleUniqueServerId('maven_deployer');
         utils.configureArtifactoryCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);

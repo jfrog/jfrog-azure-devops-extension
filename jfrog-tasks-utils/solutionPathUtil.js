@@ -1,6 +1,6 @@
 // This util will return a list of all files matching the pattern configured in the UI in the solution path.
 const tl = require('azure-pipelines-task-lib/task');
-import { resolve, dirname } from 'path';
+const path = require('path');
 const utils = require('./utils');
 
 module.exports = {
@@ -30,7 +30,7 @@ function resolveFilterSpec(filterSpec, basePath) {
         }
 
         if (basePath) {
-            pattern = resolve(basePath, pattern);
+            pattern = path.resolve(basePath, pattern);
         }
 
         tl.debug(`pattern: ${pattern}, isNegative: ${isNegative}`);
@@ -90,7 +90,7 @@ function resolveWildcardPath(pattern) {
         // include the wildcard character because:
         //  dirname(c:\foo\bar\) => c:\foo (which will make find() return a bunch of stuff we know we'll discard)
         //  dirname(c:\foo\bar\*) => c:\foo\bar
-        let findPathRoot = dirname(pattern.slice(0, idx + 1));
+        let findPathRoot = path.dirname(pattern.slice(0, idx + 1));
 
         tl.debug('find root dir: ' + findPathRoot);
 

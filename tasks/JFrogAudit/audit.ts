@@ -5,7 +5,7 @@ const cliAuditCommand: string = 'audit';
 let serverId: string;
 
 function RunTaskCbk(cliPath: string): void {
-    const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) || '';
+    const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) ?? '';
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') ?? process.cwd();
     const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
 
@@ -16,7 +16,7 @@ function RunTaskCbk(cliPath: string): void {
     auditCommand = utils.addBoolParam(auditCommand, 'allowFailBuild', 'fail');
 
     // Add watches source if provided.
-    const watchesSource: string = tl.getInput('watchesSource', false) || '';
+    const watchesSource: string = tl.getInput('watchesSource', false) ?? '';
     switch (watchesSource) {
         // Having a dash (-) in a param name in a visible rule is failing verification on Azure Server (TFS).
         // For that reason we do not use a dash in repo-path, and handle this param separately (not passing the option blindly to the CLI).

@@ -11,13 +11,13 @@ function RunTaskCbk(cliPath: string): void {
         return;
     }
 
-    let defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || '';
+    let defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') ?? '';
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
-    const imageName: string = tl.getInput('imageName', true) || '';
-    const command: string = tl.getInput('command', true) || '';
+    const imageName: string = tl.getInput('imageName', true) ?? '';
+    const command: string = tl.getInput('command', true) ?? '';
     let cliCommand: string = utils.cliJoin(cliPath, cliDockerCommand, command.toLowerCase(), utils.quote(imageName));
     switch (command) {
         case 'Push':
@@ -32,7 +32,7 @@ function RunTaskCbk(cliPath: string): void {
                 cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
             }
             // Add watches source if provided.
-            const watchesSource: string = tl.getInput('watchesSource', false) || '';
+            const watchesSource: string = tl.getInput('watchesSource', false) ?? '';
             switch (watchesSource) {
                 // Having a dash (-) in a param name in a visible rule is failing verification on Azure Server (TFS).
                 // For that reason we do not use a dash in repo-path, and handle this param separately (not passing the option blindly to the CLI).

@@ -11,7 +11,7 @@ let serverId: string;
 
 function RunTaskCbk(cliPath: string): void {
     const workDir: string = getWorkDir();
-    const rbCommand: string = tl.getInput('command', true) || '';
+    const rbCommand: string = tl.getInput('command', true) ?? '';
     switch (rbCommand) {
         case 'create':
             performRbCreate(cliPath, workDir);
@@ -58,7 +58,7 @@ function performRbCreateUpdate(cliPath: string, workDir: string, cliCommandName:
 
     const addReleaseNotes: boolean = tl.getBoolInput('addReleaseNotes', false);
     if (addReleaseNotes) {
-        const specInputPath: string = tl.getPathInput('releaseNotesFile', true, true) || '';
+        const specInputPath: string = tl.getPathInput('releaseNotesFile', true, true) ?? '';
         cliCommand = utils.cliJoin(cliCommand, '--release-notes-path=' + utils.quote(specInputPath));
         cliCommand = utils.addStringParam(cliCommand, 'releaseNotesSyntax', 'release-notes-syntax', true);
     }
@@ -129,12 +129,12 @@ function execCli(cliPath: string, workDir: string, cliCommand: string, allowDryR
 
 function getDistRulesFilePath(workDir: string): string {
     let filePath: string = '';
-    const distRulesSource: string = tl.getInput('distRulesSource', false) || '';
+    const distRulesSource: string = tl.getInput('distRulesSource', false) ?? '';
     if (distRulesSource === 'file') {
-        filePath = tl.getPathInput('distRulesFilePath', true, true) || '';
+        filePath = tl.getPathInput('distRulesFilePath', true, true) ?? '';
         console.log('Using distribution rules file located at ' + filePath);
     } else if (distRulesSource === 'taskConfiguration') {
-        const distRulesTaskFile: string = tl.getInput('distRulesTaskFile', true) || '';
+        const distRulesTaskFile: string = tl.getInput('distRulesTaskFile', true) ?? '';
         filePath = join(workDir, 'distRules' + Date.now() + '.json');
         tl.writeFile(filePath, distRulesTaskFile);
     } else {
@@ -144,7 +144,7 @@ function getDistRulesFilePath(workDir: string): string {
 }
 
 function getWorkDir(): string {
-    const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) || '';
+    const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) ?? '';
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || process.cwd();
     return utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
 }
@@ -158,8 +158,8 @@ function getWorkDir(): string {
  * @param workDir - Working directory.
  */
 function getCliCmdBase(cliPath: string, cliCommandName: string, workDir: string): string {
-    const rbName: string = tl.getInput('rbName', true) || '';
-    const rbVersion: string = tl.getInput('rbVersion', true) || '';
+    const rbName: string = tl.getInput('rbName', true) ?? '';
+    const rbVersion: string = tl.getInput('rbVersion', true) ?? '';
     const cliCommand: string = utils.cliJoin(cliPath, cliCommandName, rbName, rbVersion);
     serverId = utils.configureDefaultDistributionServer('distribution_' + cliCommandName.replace(' ', '_'), cliPath, workDir);
     return utils.addServerIdOption(cliCommand, serverId);
