@@ -17,7 +17,7 @@ installTests();
 function installJfrogTaskUtils() {
     clean(TASKS_UTILS_DIR, true);
     execNpm('i', TASKS_UTILS_DIR);
-    exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" --directory ' + join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
+    exec('npx clean-modules -y "!**/shelljs/src/test.js" --directory ' + join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
     execNpm('pack', TASKS_UTILS_DIR);
 }
 
