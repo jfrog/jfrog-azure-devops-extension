@@ -9,7 +9,7 @@
         "clean-modules": "^3.0.2",
         "command-line-args": "^5.0.2",
         "command-line-usage": "^7.0.1",
-        "compare-versions": "^6.0.0-rc.2",
+        "compare-versions": "^6.0.0",
         "edit-json-file": "^1.1.0",
         "fs-extra": "^11.1.1",
         "rimraf": "^3.0.1"
