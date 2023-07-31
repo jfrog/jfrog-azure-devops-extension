@@ -1,7 +1,8 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const basename = require('path').basename;
+const join = require('path').join;
 
-const TEST_NAME = path.basename(__dirname);
+const TEST_NAME = basename(__dirname);
 
 let inputs = {
     command: 'Download',
@@ -9,7 +10,7 @@ let inputs = {
         files: [
             {
                 pattern: testUtils.stripTrailingSlash(testUtils.getRepoKeys().nugetLocalRepo) + '/custom/path/',
-                target: path.join(testUtils.getLocalTestDir(TEST_NAME), 'files', '/'),
+                target: join(testUtils.getLocalTestDir(TEST_NAME), 'files', '/'),
                 build: 'DotNET Test/7',
                 flat: 'true',
             },

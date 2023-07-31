@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
-const path = require('path');
+const join = require('path').join;
 const fs = require('fs');
 
 const cliUploadCommand = 'rt u';
@@ -131,7 +131,7 @@ function handleGenericDeleteArtifacts(cliPath, workDir) {
 }
 
 function performGenericTask(cliCommand, cliPath, workDir) {
-    let specPath = path.join(workDir, 'genericSpec' + Date.now() + '.json');
+    let specPath = join(workDir, 'genericSpec' + Date.now() + '.json');
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
     try {
         cliCommand = utils.addCommonGenericParams(cliCommand, specPath);

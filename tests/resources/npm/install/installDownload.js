@@ -1,5 +1,5 @@
 const testUtils = require('../../../testUtils');
-const path = require('path');
+const join = require('path').join;
 
 const TEST_NAME = 'npm';
 
@@ -9,7 +9,7 @@ let inputs = {
         files: [
             {
                 pattern: testUtils.getRepoKeys().npmLocalRepo,
-                target: path.join(testUtils.getLocalTestDir(TEST_NAME), '1', '/'),
+                target: join(testUtils.getLocalTestDir(TEST_NAME), '1', '/'),
                 flat: 'true',
             },
         ],

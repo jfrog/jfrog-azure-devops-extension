@@ -6,7 +6,7 @@ const pipConfigCommand: string = 'pip-config';
 const disablePipCacheFlags: string = '--no-cache-dir --force-reinstall';
 
 function RunTaskCbk(cliPath: string): void {
-    const pipCommand: string = tl.getInput('command', true) || '';
+    const pipCommand: string = tl.getInput('command', true) ?? '';
     switch (pipCommand) {
         case 'install':
             performPipInstall(cliPath);
@@ -15,7 +15,7 @@ function RunTaskCbk(cliPath: string): void {
 }
 
 function performPipInstall(cliPath: string): void {
-    const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) || '';
+    const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) ?? '';
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || process.cwd();
     const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
     const pipArguments: string = buildPipCliArgs();
@@ -49,7 +49,7 @@ function performPipConfig(cliPath: string, requiredWorkDir: string): string[] {
 
 // Creates the Python CLI arguments
 function buildPipCliArgs(): string {
-    let pipArguments: string = tl.getInput('arguments') || '';
+    let pipArguments: string = tl.getInput('arguments') ?? '';
     const noCache: boolean = tl.getBoolInput('noPipCache');
     if (noCache) {
         pipArguments = utils.cliJoin(pipArguments, disablePipCacheFlags);

@@ -1,10 +1,9 @@
 const fs = require('fs');
-const path = require('path');
+const join = require('path').join;
 const assert = require('assert');
 const commandLineArgs = require('command-line-args');
 const commandLineUsage = require('command-line-usage');
 const editJsonFile = require('edit-json-file');
-const compareVersions = require('compare-versions');
 const editJsonFileOptions = { autosave: true, stringify_width: 4 };
 const optionDefinitions = [
     { name: 'help', alias: 'h', type: Boolean, description: 'Display this usage guide' },
@@ -52,17 +51,17 @@ function assertVersion() {
  * Tasks' versions are set to be the extension's version.
  */
 function updateTasksVersion() {
-    let files = fs.readdirSync(path.join('tasks'));
+    let files = fs.readdirSync(join('tasks'));
     files.forEach((taskName) => {
-        let taskDir = path.join('tasks', taskName);
-        let taskJsonPath = path.join(taskDir, 'task.json');
+        let taskDir = join('tasks', taskName);
+        let taskJsonPath = join(taskDir, 'task.json');
         if (fs.existsSync(taskJsonPath)) {
             console.log('Updating version of task ' + taskName + ' to X.' + requestedVersionSplit[1] + '.' + requestedVersionSplit[2]);
             updateTaskJsonWithNewVersion(taskJsonPath);
         } else {
             fs.readdir(taskDir, (err, taskVersionDirs) => {
                 taskVersionDirs.forEach((versToBuild) => {
-                    let taskVersionDirJson = path.join(taskDir, versToBuild, 'task.json');
+                    let taskVersionDirJson = join(taskDir, versToBuild, 'task.json');
                     if (fs.existsSync(taskVersionDirJson)) {
                         console.log(
                             'Updating version of task ' +

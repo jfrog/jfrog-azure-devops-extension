@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const basename = require('path').basename;
 
-const TEST_NAME = path.basename(__dirname);
+const TEST_NAME = basename(__dirname);
 
 let inputs = {
     definition: 'downloadArtifactSourceBuild',

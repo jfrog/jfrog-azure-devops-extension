@@ -1,5 +1,5 @@
 const testUtils = require('../../../testUtils');
-const path = require('path');
+const join = require('path').join;
 const TEST_NAME = 'gradle';
 
 let inputs = {
@@ -8,7 +8,7 @@ let inputs = {
         files: [
             {
                 pattern: testUtils.getRepoKeys().mavenLocalRepo,
-                target: path.join(TEST_NAME, 'files', 'gradle-example', '/'),
+                target: join(TEST_NAME, 'files', 'gradle-example', '/'),
                 build: 'Gradle Test/3',
                 flat: 'true',
             },

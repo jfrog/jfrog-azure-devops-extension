@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const join = require('path').join;
 
-const TEST_NAME = path.basename(__dirname);
+const TEST_NAME = basename(__dirname);
 const BUILD_NAME = TEST_NAME;
 const BUILD_NUMBER = '3';
 
@@ -18,7 +18,7 @@ let inputs = {
     buildNumber: BUILD_NUMBER,
     conanCommand: 'Config Install',
     configSourceType: 'zip',
-    configZipPath: path.join(__dirname, 'files', 'conan-config', 'conan-config.zip'),
+    configZipPath: join(__dirname, 'files', 'conan-config', 'conan-config.zip'),
     extraArguments: '',
 };
 

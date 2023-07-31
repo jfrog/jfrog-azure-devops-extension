@@ -1,10 +1,10 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
-const fs = require('fs-extra');
+const join = require('path').join;
+const writeFileSync = require('fs-extra').writeFileSync;
 const TEST_NAME = testUtils.getTestName(__dirname);
-const specPath = path.join(testUtils.testDataDir, 'updateSpec.json');
+const specPath = join(testUtils.testDataDir, 'updateSpec.json');
 
-fs.writeFileSync(
+writeFileSync.writeFileSync(
     specPath,
     JSON.stringify({
         files: [

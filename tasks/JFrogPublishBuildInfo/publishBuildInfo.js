@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
-const path = require('path');
+const join = require('path').join;
 
 const cliBuildPublishCommand = 'rt bp';
 let serverId;
@@ -48,7 +48,7 @@ function RunTaskCbk(cliPath) {
 function attachBuildInfoUrl(buildInfoUrl, buildName, buildNumber, workDir) {
     let artifactoryService = tl.getInput('artifactoryConnection', true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
-    let artifactoryUrlFile = path.join(workDir, 'artifactoryUrlFile');
+    let artifactoryUrlFile = join(workDir, 'artifactoryUrlFile');
     let buildDetails = {
         buildInfoUiUrl: buildInfoUrl,
         // Set the following fields for backward compatibility,

@@ -1,5 +1,5 @@
 const testUtils = require('../../../testUtils');
-const path = require('path');
+const join = require('path').join;
 const TEST_NAME = 'gradle';
 let repoKeys = testUtils.getRepoKeys();
 
@@ -20,7 +20,7 @@ let inputs = {
     targetRepo: repoKeys.mavenLocalRepo,
     workDir: testUtils.getLocalTestDir(TEST_NAME),
     tasks: 'clean aP',
-    gradleBuildFile: path.join(testUtils.getLocalTestDir(TEST_NAME), 'build.gradle'),
+    gradleBuildFile: join(testUtils.getLocalTestDir(TEST_NAME), 'build.gradle'),
     deployMavenDesc: false,
     deployIvyDesc: false,
     usesPlugin: true,

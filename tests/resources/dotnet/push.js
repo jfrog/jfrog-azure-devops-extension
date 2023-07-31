@@ -1,5 +1,5 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const join = require('path').join;
 const TEST_NAME = testUtils.getTestName(__dirname);
 
 let inputs = {
@@ -8,7 +8,7 @@ let inputs = {
     command: 'push',
     targetDeployRepo: testUtils.getRepoKeys().nugetLocalRepo,
     targetDeployPath: 'custom/path',
-    pathToNupkg: path.join(testUtils.getLocalTestDir(TEST_NAME), 'nugetTest*.nupkg'),
+    pathToNupkg: join(testUtils.getLocalTestDir(TEST_NAME), 'nugetTest*.nupkg'),
     collectBuildInfo: true,
 };
 

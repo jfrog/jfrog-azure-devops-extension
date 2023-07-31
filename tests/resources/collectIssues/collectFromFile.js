@@ -1,7 +1,7 @@
 const testUtils = require('../../testUtils');
-const path = require('path');
+const join = require('path').join;
 const TEST_NAME = testUtils.getTestName(__dirname);
-const configPath = path.join(testUtils.testDataDir, TEST_NAME, 'config.yaml');
+const configPath = join(testUtils.testDataDir, TEST_NAME, 'config.yaml');
 const CUSTOM_WORKING_DIR = 'customDir';
 
 let inputs = {
@@ -13,5 +13,5 @@ let inputs = {
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'resources');
-testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'collectIssues_.git_suffix', path.join(CUSTOM_WORKING_DIR, '.git'));
+testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'collectIssues_.git_suffix', join(CUSTOM_WORKING_DIR, '.git'));
 testUtils.runArtifactoryTask(testUtils.collectIssues, {}, inputs);

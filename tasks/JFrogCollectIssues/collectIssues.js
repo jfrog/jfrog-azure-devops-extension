@@ -1,6 +1,6 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
-const path = require('path');
+const join = require('path').join;
 const fs = require('fs');
 
 const cliCollectIssuesCommand = 'rt bag';
@@ -27,7 +27,7 @@ function RunTaskCbk(cliPath) {
     let configSource = tl.getInput('configSource', false);
 
     // Create config yaml.
-    let configPath = path.join(requiredWorkDir, 'issuesConfig_' + Date.now() + '.yaml');
+    let configPath = join(requiredWorkDir, 'issuesConfig_' + Date.now() + '.yaml');
     try {
         writeConfigFile(configSource, configPath);
     } catch (ex) {

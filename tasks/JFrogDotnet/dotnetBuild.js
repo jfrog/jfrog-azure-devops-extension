@@ -1,7 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const fs = require('fs');
 const utils = require('@jfrog/tasks-utils/utils.js');
-const path = require('path');
+const dirname = require('path').dirname;
 const solutionPathUtil = require('@jfrog/tasks-utils/solutionPathUtil');
 const cliDotnetCoreRestoreCommand = 'dotnet restore';
 const cliUploadCommand = 'rt u';
@@ -27,7 +27,7 @@ function performDotnetRestore(cliPath) {
     filesList.forEach((sourceFile) => {
         let sourcePath;
         if (!fs.lstatSync(sourceFile).isDirectory()) {
-            sourcePath = path.dirname(sourceFile);
+            sourcePath = dirname(sourceFile);
         } else {
             sourcePath = sourceFile;
         }

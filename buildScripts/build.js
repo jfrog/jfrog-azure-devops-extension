@@ -1,7 +1,7 @@
 const exec = require('child_process').execSync;
-const rimraf = require('rimraf');
+const sync = require('rimraf').sync;
 const fs = require('fs-extra');
-const path = require('path');
+const join = require('path').join;
 const TASKS_UTILS_DIR = 'jfrog-tasks-utils';
 const TASKS_DIR = 'tasks';
 const TESTS_DIR = 'tests';
@@ -17,7 +17,7 @@ installTests();
 function installJfrogTaskUtils() {
     clean(TASKS_UTILS_DIR, true);
     execNpm('i', TASKS_UTILS_DIR);
-    exec('npx clean-modules -y --exclude "**/shelljs/src/test.js" --directory ' + path.join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
+    exec('npx clean-modules -y "!**/shelljs/src/test.js" --directory ' + join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
     execNpm('pack', TASKS_UTILS_DIR);
 }
 
@@ -27,13 +27,13 @@ function installJfrogTaskUtils() {
 function installTasks() {
     fs.readdir(TASKS_DIR, (err, files) => {
         files.forEach((taskName) => {
-            let taskDir = path.join(TASKS_DIR, taskName);
+            let taskDir = join(TASKS_DIR, taskName);
             // We want to ignore files like .DS_Store may exist in TASKS_DIR
             if (!fs.lstatSync(taskDir).isDirectory()) {
                 return;
             }
             // If a package.json is missing, npm will exec the install command on the parent folder. This will cause an endless install loop.
-            if (fs.existsSync(path.join(taskDir, 'package.json'))) {
+            if (fs.existsSync(join(taskDir, 'package.json'))) {
                 // tasks/<task-name>/package.json
                 clean(taskDir);
                 copyTaskUtilsModules(taskDir);
@@ -42,8 +42,8 @@ function installTasks() {
                 // tasks/<task-name>/<task-version>/package.json
                 fs.readdir(taskDir, (err, taskVersionDirs) => {
                     taskVersionDirs.forEach((versToBuild) => {
-                        let taskVersionDir = path.join(taskDir, versToBuild);
-                        if (fs.existsSync(path.join(taskVersionDir, 'package.json'))) {
+                        let taskVersionDir = join(taskDir, versToBuild);
+                        if (fs.existsSync(join(taskVersionDir, 'package.json'))) {
                             clean(taskVersionDir);
                             copyTaskUtilsModules(taskVersionDir);
                             execNpm('i', taskVersionDir);
@@ -69,7 +69,7 @@ function installTests() {
  * @param dest - The destination
  */
 function copyTaskUtilsModules(dest) {
-    fs.copySync(path.join(TASKS_UTILS_DIR, 'node_modules'), path.join(dest, 'node_modules'));
+    fs.copySync(join(TASKS_UTILS_DIR, 'node_modules'), join(dest, 'node_modules'));
 }
 
 /**
@@ -78,10 +78,10 @@ function copyTaskUtilsModules(dest) {
  * @param cleanPackage (Boolean) - True to clean the 'npm pack' results.
  */
 function clean(cwd, cleanPackage) {
-    rimraf.sync(path.join(cwd, 'node_modules'));
-    rimraf.sync(path.join(cwd, 'package-lock.json'));
+    sync(join(cwd, 'node_modules'));
+    sync(join(cwd, 'package-lock.json'));
     if (cleanPackage) {
-        rimraf.sync(path.join(cwd, '*.tgz'));
+        sync(join(cwd, '*.tgz'));
     }
 }
 
