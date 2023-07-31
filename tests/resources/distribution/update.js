@@ -4,7 +4,7 @@ const writeFileSync = require('fs-extra').writeFileSync;
 const TEST_NAME = testUtils.getTestName(__dirname);
 const specPath = join(testUtils.testDataDir, 'updateSpec.json');
 
-writeFileSync.writeFileSync(
+writeFileSync(
     specPath,
     JSON.stringify({
         files: [
