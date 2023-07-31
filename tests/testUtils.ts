@@ -1,6 +1,6 @@
 import * as mockRun from 'azure-pipelines-task-lib/mock-run';
 import * as tl from 'azure-pipelines-task-lib/task';
-import {join, basename} from 'path';
+import { join, basename } from 'path';
 import * as fs from 'fs-extra';
 import rimraf from 'rimraf';
 import * as syncRequest from 'sync-request';

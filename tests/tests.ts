@@ -3,7 +3,7 @@ import * as adoMockTest from 'azure-pipelines-task-lib/mock-test';
 import * as fs from 'fs-extra';
 import * as jfrogUtils from '@jfrog/tasks-utils';
 import * as mocha from 'mocha';
-import {join, basename} from 'path';
+import { join, basename } from 'path';
 import * as syncRequest from 'sync-request';
 import * as TestUtils from './testUtils';
 import { platformDockerDomain } from './testUtils';
@@ -113,10 +113,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             'Fix windows paths',
             (): void => {
                 const specBeforeFix: string = fs.readFileSync(join(__dirname, 'resources', 'fixWindowsPaths', 'specBeforeFix.json'), 'utf8');
-                const expectedSpecAfterFix: string = fs.readFileSync(
-                    join(__dirname, 'resources', 'fixWindowsPaths', 'specAfterFix.json'),
-                    'utf8'
-                );
+                const expectedSpecAfterFix: string = fs.readFileSync(join(__dirname, 'resources', 'fixWindowsPaths', 'specAfterFix.json'), 'utf8');
                 const specAfterFix: string = jfrogUtils.fixWindowsPaths(specBeforeFix);
                 assert.strictEqual(specAfterFix, TestUtils.isWindows() ? expectedSpecAfterFix : specBeforeFix, '\nSpec after fix:\n' + specAfterFix);
             },
@@ -736,9 +733,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
 
                 // Run docker build + tag
-                execSync(
-                    `docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${join(__dirname, 'resources', testDir, filesDir)}`
-                );
+                execSync(`docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${join(__dirname, 'resources', testDir, filesDir)}`);
 
                 // run docker push
                 mockTask(testDir, 'push');

@@ -1,5 +1,5 @@
 const testUtils = require('../../testUtils');
-join;
+const join = require('path').join;
 
 const TEST_NAME = basename(__dirname);
 const BUILD_NAME = TEST_NAME;
