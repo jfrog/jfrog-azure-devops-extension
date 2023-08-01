@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "public": true,
     "id": "jfrog-azure-devops-extension",
-    "version": "2.7.0",
+    "version": "2.8.0",
     "name": "JFrog",
     "description": "Integrate your JFrog Platform with Visual Studio Team Services.",
     "publisher": "JFrog",
