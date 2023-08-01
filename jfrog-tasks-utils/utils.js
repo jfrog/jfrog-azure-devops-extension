@@ -10,7 +10,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.44.0';
+const defaultJfrogCliVersion = '2.44.1';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
@@ -271,7 +271,7 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
             cliCommand,
             '--user=' + (isWindows() ? quote(serviceUser) : singleQuote(serviceUser)),
             '--basic-auth-only',
-            secretInStdinSupported ? '--password-stdin' : '--password=' + (isWindows() ? quote(servicePassword) : singleQuote(servicePassword))
+            secretInStdinSupported ? '--password-stdin' : '--password=' + (isWindows() ? quote(servicePassword) : singleQuote(servicePassword)),
         );
         stdinSecret = secretInStdinSupported ? servicePassword : undefined;
     }

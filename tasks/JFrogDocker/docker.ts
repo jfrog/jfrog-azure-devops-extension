@@ -11,7 +11,7 @@ function RunTaskCbk(cliPath: string): void {
         return;
     }
 
-    let defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') ?? '';
+    const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') ?? '';
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;

@@ -24,7 +24,7 @@ define(['TFS/DistributedTask/TaskRestClient'], (taskRestClient) => {
                                 timelineId,
                                 recId,
                                 'artifactoryType',
-                                'buildDetails'
+                                'buildDetails',
                             )
                             .then((attachmentContent) => {
                                 let buildDetails = JSON.parse(bufferToString(attachmentContent));

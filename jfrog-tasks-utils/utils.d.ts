@@ -6,7 +6,7 @@ declare module '@jfrog/tasks-utils' {
         runTaskFunc: (cliPath: string) => void,
         cliVersion?: string,
         cliDownloadUrl?: string,
-        cliAuthHandlers?: ifm.IRequestHandler[]
+        cliAuthHandlers?: ifm.IRequestHandler[],
     ): void;
     export function quote(str: string): string;
     export function downloadCli(cliDownloadUrl?: string, cliAuthHandlers?: ifm.IRequestHandler[], cliVersion?: string): Promise<string>;
@@ -27,7 +27,7 @@ declare module '@jfrog/tasks-utils' {
         requiredWorkDir: string,
         configCommand: string,
         repoResolver: string,
-        repoDeploy: string
+        repoDeploy: string,
     ): string[];
     export function addProjectOption(cliCommand: string): string;
     export function addServerIdOption(cliCommand: string, serverId: string): string;

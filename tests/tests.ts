@@ -59,7 +59,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_USERNAME ?? '') +
                             ' --password=' +
                             jfrogUtils.quote('SUPER_SECRET'),
-                        TestUtils.testDataDir
+                        TestUtils.testDataDir,
                     );
                 } catch (ex) {
                     retVal = ex as string;
@@ -68,7 +68,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 process.env.ADO_JFROG_PLATFORM_PASSWORD = oldPassword;
                 assert.ok(!retVal.toString().includes('SUPER_SECRET'), 'Output contains password');
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
 
         runAsyncTest(
@@ -94,7 +94,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     })
                     .catch((): string => 'download with proxy failed');
             },
-            TestUtils.isSkipTest('proxy')
+            TestUtils.isSkipTest('proxy'),
         );
 
         runSyncTest(
@@ -106,7 +106,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\bc', 'a\bc'), 'jf rt u a\bc a\bc');
                 assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\\bc\\', 'a\\bc\\'), 'jf rt u a\\bc\\ a\\bc\\');
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
 
         runSyncTest(
@@ -117,7 +117,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const specAfterFix: string = jfrogUtils.fixWindowsPaths(specBeforeFix);
                 assert.strictEqual(specAfterFix, TestUtils.isWindows() ? expectedSpecAfterFix : specBeforeFix, '\nSpec after fix:\n' + specAfterFix);
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
 
         runSyncTest(
@@ -141,7 +141,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assert.strictEqual(jfrogUtils.encodePath('"dir 1"'), '"dir 1"');
                 assert.strictEqual(jfrogUtils.encodePath("'dir 1'"), "'dir 1'");
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
 
         runSyncTest(
@@ -162,7 +162,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                         assert.fail('Unsupported OS found: ' + os.type());
                 }
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
 
         runSyncTest(
@@ -171,26 +171,26 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 if (TestUtils.isWindows()) {
                     assert.strictEqual(
                         jfrogUtils.determineCliWorkDir('C:\\myAgent\\_work\\1', 'C:\\myAgent\\_work\\1\\myFolder'),
-                        'C:\\myAgent\\_work\\1\\myFolder'
+                        'C:\\myAgent\\_work\\1\\myFolder',
                     );
                     assert.strictEqual(jfrogUtils.determineCliWorkDir('C:\\myAgent\\_work\\1', ''), 'C:\\myAgent\\_work\\1');
                     assert.strictEqual(
                         jfrogUtils.determineCliWorkDir('C:\\myAgent\\_work\\1', 'myFolder\\123'),
-                        'C:\\myAgent\\_work\\1\\myFolder\\123'
+                        'C:\\myAgent\\_work\\1\\myFolder\\123',
                     );
                 } else {
                     assert.strictEqual(
                         jfrogUtils.determineCliWorkDir('/Users/myUser/myAgent/_work/1', '/Users/myUser/myAgent/_work/1/myFolder'),
-                        '/Users/myUser/myAgent/_work/1/myFolder'
+                        '/Users/myUser/myAgent/_work/1/myFolder',
                     );
                     assert.strictEqual(jfrogUtils.determineCliWorkDir('/Users/myUser/myAgent/_work/1', ''), '/Users/myUser/myAgent/_work/1');
                     assert.strictEqual(
                         jfrogUtils.determineCliWorkDir('/Users/myUser/myAgent/_work/1', 'myFolder/123'),
-                        '/Users/myUser/myAgent/_work/1/myFolder/123'
+                        '/Users/myUser/myAgent/_work/1/myFolder/123',
                     );
                 }
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
 
         runSyncTest(
@@ -205,7 +205,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assert.strictEqual(jfrogUtils.compareVersions('1.37.3', '1.37.1'), 1);
                 assert.strictEqual(jfrogUtils.compareVersions('2.37.1', '1.37.1'), 1);
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
 
         /**
@@ -217,7 +217,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             (): void => {
                 testGetCliPartialsBuildDir();
             },
-            TestUtils.isSkipTest('unit')
+            TestUtils.isSkipTest('unit'),
         );
     });
 
@@ -236,7 +236,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'expectedFiles'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -255,7 +255,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'toolsInstaller');
                 assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool is missing from cache');
             },
-            TestUtils.isSkipTest('installer')
+            TestUtils.isSkipTest('installer'),
         );
 
         runSyncTest(
@@ -269,7 +269,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'toolsInstallerCustomVersion');
                 assert.ok(toolLib.findLocalToolVersions('jf').length === 1, 'tool was not downloaded to cache');
             },
-            TestUtils.isSkipTest('installer')
+            TestUtils.isSkipTest('installer'),
         );
     });
 
@@ -282,7 +282,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'files'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -293,7 +293,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'files'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -304,7 +304,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'files'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -315,7 +315,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'files'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -326,7 +326,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'emptyDir'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -338,7 +338,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'expectedDir'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -351,7 +351,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertFiles(join(testDir, 'files'), testDir);
                 deleteBuild('downloadArtifactSourceBuild');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -360,7 +360,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'uploadFailNoOp';
                 mockTask(testDir, 'upload', true);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -370,7 +370,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download', true);
                 assertFiles(join(testDir, 'files'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -390,7 +390,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertBuildEnv(build, 'buildInfo.env.BUILD_SECRET', undefined);
                 deleteBuild('includeEnv');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -406,7 +406,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'expectedFiles'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -424,7 +424,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertBuildModule(build, 'myDownloadModule');
                 deleteBuild('buildPublish');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -444,7 +444,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertBuildEnv(build, 'buildInfo.env.BUILD_SECRET', 'open-sesame');
                 deleteBuild('excludeEnv');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -457,7 +457,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertBuildUrl(build, 'https://ecosys.visualstudio.com/ecosys/_build?buildId=5');
                 deleteBuild('buildUrlBuildPipeline');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -470,7 +470,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertBuildUrl(build, 'https://ecosys.visualstudio.com/ecosys/_release?releaseId=6');
                 deleteBuild('buildUrlReleasePipeline');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -487,7 +487,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('buildPromote', '3');
                 deleteBuild('buildPromote');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -502,7 +502,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('buildPromoteDryRun', '3');
                 deleteBuild('buildPromoteDryRun');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -538,7 +538,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
                 deleteBuild('buildDiscard');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -552,7 +552,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'files'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -565,7 +565,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'filesExpectedDelete'), testDir);
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -582,7 +582,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('npm Test', '1');
                 deleteBuild('npm Test');
             },
-            TestUtils.isSkipTest('npm')
+            TestUtils.isSkipTest('npm'),
         );
         runSyncTest(
             'Npm ci and publish',
@@ -596,7 +596,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('npm Test', '2');
                 deleteBuild('npm Test');
             },
-            TestUtils.isSkipTest('npm')
+            TestUtils.isSkipTest('npm'),
         );
     });
 
@@ -619,7 +619,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assert.ok(modules[0].dependencies.length === 2);
                 deleteBuild('Maven Test');
             },
-            TestUtils.isSkipTest('maven')
+            TestUtils.isSkipTest('maven'),
         );
     });
 
@@ -635,7 +635,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('Gradle Test', '3');
                 deleteBuild('Gradle Test');
             },
-            TestUtils.isSkipTest('gradle')
+            TestUtils.isSkipTest('gradle'),
         );
         runSyncTest(
             'Gradle CI',
@@ -648,7 +648,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('Gradle CI Test', '3');
                 deleteBuild('Gradle CI Test');
             },
-            TestUtils.isSkipTest('gradle')
+            TestUtils.isSkipTest('gradle'),
         );
     });
 
@@ -665,7 +665,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('Go Test', '3');
                 deleteBuild('Go Test');
             },
-            TestUtils.isSkipTest('go')
+            TestUtils.isSkipTest('go'),
         );
     });
 
@@ -679,7 +679,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('NuGet Test', '3');
                 deleteBuild('NuGet Test');
             },
-            TestUtils.isSkipTest('nuget')
+            TestUtils.isSkipTest('nuget'),
         );
         runSyncTest(
             'NuGet push',
@@ -692,7 +692,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('NuGet Test', '3');
                 deleteBuild('NuGet Test');
             },
-            TestUtils.isSkipTest('nuget')
+            TestUtils.isSkipTest('nuget'),
         );
     });
 
@@ -706,7 +706,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('DotNET Test', '7');
                 deleteBuild('DotNET Test');
             },
-            TestUtils.isSkipTest('dotnet')
+            TestUtils.isSkipTest('dotnet'),
         );
         runSyncTest(
             'Dotnet push',
@@ -719,7 +719,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('DotNET Test', '7');
                 deleteBuild('DotNET Test');
             },
-            TestUtils.isSkipTest('dotnet')
+            TestUtils.isSkipTest('dotnet'),
         );
     });
 
@@ -751,7 +751,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 // Clean
                 deleteBuild('dockerTest');
             },
-            TestUtils.isSkipTest('docker')
+            TestUtils.isSkipTest('docker'),
         );
     });
 
@@ -765,7 +765,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertIssuesCollection('Collect issues', '3');
                 deleteBuild('Collect issues');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
 
         runSyncTest(
@@ -777,7 +777,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assertIssuesCollection('Collect issues from file', '4');
                 deleteBuild('Collect issues from file');
             },
-            TestUtils.isSkipTest('generic')
+            TestUtils.isSkipTest('generic'),
         );
     });
 
@@ -788,7 +788,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomCommand');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -797,7 +797,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomCommandWithWorkingDir');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -806,7 +806,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomInvalidCommand', true);
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -815,7 +815,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomCommandWithBuildInfo');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -824,7 +824,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanAddRemote');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -833,7 +833,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanAddRemoteWithPurge');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -844,7 +844,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'conanCreate');
                 mockTask(testDir, 'conanUpload');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -855,7 +855,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'conanCreate');
                 mockTask(testDir, 'conanUploadInRelease');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -864,7 +864,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanInstall');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -873,7 +873,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanConfigInstall');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
 
         runSyncTest(
@@ -887,7 +887,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('conanTask', '1');
                 deleteBuild('conanTask');
             },
-            TestUtils.isSkipTest('conan')
+            TestUtils.isSkipTest('conan'),
         );
     });
 
@@ -901,7 +901,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 getAndAssertBuild('Pip Test', '17');
                 deleteBuild('Pip Test');
             },
-            TestUtils.isSkipTest('pip')
+            TestUtils.isSkipTest('pip'),
         );
     });
 
@@ -935,7 +935,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 mockTask(testDir, 'delete');
                 waitForBundleDeletion(rbName, rbVersion, true).catch((): string => 'deletion failed');
             },
-            TestUtils.isSkipTest('distribution')
+            TestUtils.isSkipTest('distribution'),
         );
 
         after(function (): void {
@@ -1100,7 +1100,7 @@ function assertBuildUrl(build: any, url: string): void {
 function assertBuild(build: any, buildName: string, buildNumber: string): void {
     assert.ok(
         build.statusCode < 300 && build.statusCode >= 200,
-        'Build ' + buildName + '/' + buildNumber + " doesn't exist in Artifactory.\n" + tasksOutput
+        'Build ' + buildName + '/' + buildNumber + " doesn't exist in Artifactory.\n" + tasksOutput,
     );
 }
 
@@ -1125,7 +1125,7 @@ function assertRemoteReleaseBundle(bundleName: string, bundleVersion: string, ex
     const response: syncRequest.Response = TestUtils.getRemoteReleaseBundle(bundleName, bundleVersion);
     assert.ok(
         response.statusCode === 200,
-        'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8')
+        'Expected operation to succeed. Status code: ' + response.statusCode + '. Error: ' + response.getBody('utf8'),
     );
     let bodyStr: string = response.getBody('utf8');
     if (bodyStr[0] !== '[') {
@@ -1196,7 +1196,7 @@ function assertIssuesCollection(buildName: string, buildNumber: string): void {
     const actualVcsRevision: string = body.buildInfo.vcs[0].revision;
     assert.ok(
         expectedVcsRevision === actualVcsRevision,
-        "Expected vcs revision: '" + expectedVcsRevision + "', actual: '" + actualVcsRevision + "'.\n" + tasksOutput
+        "Expected vcs revision: '" + expectedVcsRevision + "', actual: '" + actualVcsRevision + "'.\n" + tasksOutput,
     );
 }
 

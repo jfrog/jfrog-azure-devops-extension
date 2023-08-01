@@ -183,7 +183,7 @@ function performArtifactSourceDownload(cliPath, workDir) {
         utils.quote('*'),
         utils.quote(downloadPath),
         '--build=' + utils.quote(buildName + '/' + buildNumber),
-        '--fail-no-op'
+        '--fail-no-op',
     );
 
     // Add project flag if provided

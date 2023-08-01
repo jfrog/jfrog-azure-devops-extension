@@ -78,7 +78,7 @@ function handleAddRemoteCommand() {
         // Access token is not supported.
         console.error(
             'Access Token is not supported for authentication with Artifactory, please configure Artifactory service connection' +
-                ' to work with basic authentication.'
+                ' to work with basic authentication.',
         );
         setTaskResult(false);
         return;

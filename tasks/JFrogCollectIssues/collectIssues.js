@@ -42,7 +42,7 @@ function RunTaskCbk(cliPath) {
         cliCollectIssuesCommand,
         utils.quote(buildName),
         utils.quote(buildNumber),
-        '--config=' + utils.quote(configPath)
+        '--config=' + utils.quote(configPath),
     );
     cliCommand = utils.addProjectOption(cliCommand);
     cliCommand = utils.addServerIdOption(cliCommand, serverId);

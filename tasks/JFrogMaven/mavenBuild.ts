@@ -11,7 +11,7 @@ utils.executeCliTask(RunTaskCbk);
 function RunTaskCbk(cliPath: string): void {
     utils.setJdkHomeForJavaTasks();
     checkAndSetMavenHome();
-    let workDir: string | undefined = tl.getVariable('System.DefaultWorkingDirectory');
+    const workDir: string | undefined = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
@@ -27,10 +27,10 @@ function RunTaskCbk(cliPath: string): void {
     }
 
     // Running Maven command
-    let pomFile: string | undefined = tl.getInput('mavenPOMFile') ?? '';
+    const pomFile: string | undefined = tl.getInput('mavenPOMFile') ?? '';
     let goalsAndOptions: string | undefined = tl.getInput('goals') ?? '';
     goalsAndOptions = utils.cliJoin(goalsAndOptions, '-f', pomFile);
-    let options: string = tl.getInput('options') ?? '';
+    const options: string = tl.getInput('options') ?? '';
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
@@ -48,7 +48,7 @@ function RunTaskCbk(cliPath: string): void {
 }
 
 function checkAndSetMavenHome(): void {
-    let m2HomeEnvVar: string | undefined = tl.getVariable('M2_HOME');
+    const m2HomeEnvVar: string | undefined = tl.getVariable('M2_HOME');
     if (!m2HomeEnvVar) {
         console.log('M2_HOME is not defined. Retrieving Maven home using mvn --version.');
         // The M2_HOME environment variable is not defined.
@@ -56,12 +56,12 @@ function checkAndSetMavenHome(): void {
         // depending on the installation type and the OS (for example: For Mac with brew install: /usr/local/Cellar/maven/{version}/libexec or Ubuntu with debian: /usr/share/maven),
         // we need to grab the location using the mvn --version command
         // Setup tool runner that executes Maven only to retrieve its version
-        let mvnExec: string = tl.which('mvn', true);
-        let res: string = tl.tool(mvnExec).arg('-version').execSync().stdout.trim();
-        let mavenHomeLine: string = res.split('\n')[1].trim();
-        let regexMatch: RegExpMatchArray | null = mavenHomeLine.match('^Maven\\shome:\\s(.+)');
+        const mvnExec: string = tl.which('mvn', true);
+        const res: string = tl.tool(mvnExec).arg('-version').execSync().stdout.trim();
+        const mavenHomeLine: string = res.split('\n')[1].trim();
+        const regexMatch: RegExpMatchArray | null = mavenHomeLine.match('^Maven\\shome:\\s(.+)');
         if (regexMatch) {
-            let mavenHomePath: string = regexMatch[1];
+            const mavenHomePath: string = regexMatch[1];
             console.log('The Maven home location: ' + mavenHomePath);
             process.env['M2_HOME'] = mavenHomePath;
         } else {
@@ -74,7 +74,7 @@ function createMavenConfigFile(cliPath: string, buildDir: string) {
     let cliCommand: string = utils.cliJoin(cliPath, mavenConfigCommand);
 
     // Configure resolver server, throws on failure.
-    let artifactoryResolver: string | undefined = tl.getInput('artifactoryResolverService');
+    const artifactoryResolver: string | undefined = tl.getInput('artifactoryResolverService');
     if (artifactoryResolver) {
         serverIdResolver = utils.assembleUniqueServerId('maven_resolver');
         utils.configureArtifactoryCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
@@ -86,14 +86,14 @@ function createMavenConfigFile(cliPath: string, buildDir: string) {
     }
 
     // Configure deployer server, skip if missing. This allows user to resolve dependencies from artifactory without deployment.
-    let artifactoryDeployer: string = tl.getInput('artifactoryDeployService') ?? '';
+    const artifactoryDeployer: string = tl.getInput('artifactoryDeployService') ?? '';
     if (artifactoryDeployer) {
         serverIdDeployer = utils.assembleUniqueServerId('maven_deployer');
         utils.configureArtifactoryCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
         cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
         cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
-        let filterDeployedArtifacts: boolean | undefined = tl.getBoolInput('filterDeployedArtifacts');
+        const filterDeployedArtifacts: boolean | undefined = tl.getBoolInput('filterDeployedArtifacts');
         if (filterDeployedArtifacts) {
             cliCommand = utils.addStringParam(cliCommand, 'includePatterns', 'include-patterns', false);
             cliCommand = utils.addStringParam(cliCommand, 'excludePatterns', 'exclude-patterns', false);
