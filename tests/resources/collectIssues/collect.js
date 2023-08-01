@@ -16,7 +16,7 @@ const configYaml = {
         aggregationStatus: 'RELEASED',
     },
 };
-const configString = yaml.safeDump(configYaml);
+const configString = yaml.dump(configYaml);
 
 let inputs = {
     buildName: 'Collect issues',
