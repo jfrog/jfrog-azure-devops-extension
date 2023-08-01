@@ -162,7 +162,7 @@ export function createTestRepositories(): void {
             rclass: 'remote',
             packageType: 'generic',
             url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf',
-        })
+        }),
     );
     createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
     createRepo(
@@ -171,7 +171,7 @@ export function createTestRepositories(): void {
             rclass: 'remote',
             packageType: 'maven',
             url: 'https://repo.maven.apache.org/maven2',
-        })
+        }),
     );
     createRepo(
         repoKeys.nugetLocalRepo,
@@ -179,7 +179,7 @@ export function createTestRepositories(): void {
             rclass: 'local',
             packageType: 'nuget',
             repoLayoutRef: 'nuget-default',
-        })
+        }),
     );
     createRepo(
         repoKeys.nugetRemoteRepo,
@@ -191,7 +191,7 @@ export function createTestRepositories(): void {
             feedContextPath: 'api/v2',
             v3FeedUrl: 'https://api.nuget.org/v3/index.json',
             url: 'https://www.nuget.org/',
-        })
+        }),
     );
     createRepo(
         repoKeys.nugetVirtualRepo,
@@ -200,7 +200,7 @@ export function createTestRepositories(): void {
             packageType: 'nuget',
             repoLayoutRef: 'nuget-default',
             repositories: [repoKeys.nugetRemoteRepo, repoKeys.nugetLocalRepo],
-        })
+        }),
     );
     createRepo(
         repoKeys.npmLocalRepo,
@@ -208,7 +208,7 @@ export function createTestRepositories(): void {
             rclass: 'local',
             packageType: 'npm',
             repoLayoutRef: 'npm-default',
-        })
+        }),
     );
     createRepo(
         repoKeys.npmRemoteRepo,
@@ -217,7 +217,7 @@ export function createTestRepositories(): void {
             packageType: 'npm',
             repoLayoutRef: 'npm-default',
             url: 'https://registry.npmjs.org',
-        })
+        }),
     );
     createRepo(
         repoKeys.npmVirtualRepo,
@@ -226,7 +226,7 @@ export function createTestRepositories(): void {
             packageType: 'npm',
             repoLayoutRef: 'npm-default',
             repositories: [repoKeys.npmLocalRepo, repoKeys.npmRemoteRepo],
-        })
+        }),
     );
     createRepo(repoKeys.conanLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'conan' }));
     createRepo(
@@ -235,7 +235,7 @@ export function createTestRepositories(): void {
             rclass: 'local',
             packageType: 'go',
             repoLayoutRef: 'go-default',
-        })
+        }),
     );
     createRepo(
         repoKeys.goRemoteRepo,
@@ -244,7 +244,7 @@ export function createTestRepositories(): void {
             packageType: 'go',
             repoLayoutRef: 'go-default',
             url: 'https://gocenter.io',
-        })
+        }),
     );
     createRepo(
         repoKeys.goVirtualRepo,
@@ -253,12 +253,12 @@ export function createTestRepositories(): void {
             packageType: 'go',
             repoLayoutRef: 'go-default',
             repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo],
-        })
+        }),
     );
     createRepo(repoKeys.pipLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'pypi', repoLayoutRef: 'simple-default' }));
     createRepo(
         repoKeys.pipRemoteRepo,
-        JSON.stringify({ rclass: 'remote', packageType: 'pypi', repoLayoutRef: 'simple-default', url: 'https://files.pythonhosted.org' })
+        JSON.stringify({ rclass: 'remote', packageType: 'pypi', repoLayoutRef: 'simple-default', url: 'https://files.pythonhosted.org' }),
     );
     createRepo(
         repoKeys.pipVirtualRepo,
@@ -267,7 +267,7 @@ export function createTestRepositories(): void {
             packageType: 'pypi',
             repoLayoutRef: 'simple-default',
             repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo],
-        })
+        }),
     );
     if (!isSkipTest('distribution')) {
         createRepo(repoKeys.releaseBundlesRepo, JSON.stringify({ rclass: 'releaseBundles' }));
@@ -336,7 +336,7 @@ export function getRepoListFromArtifactory(): string[] {
     });
     assert.ok(
         res.statusCode === 200 || res.statusCode === 201,
-        'Failed getting repositories from Artifactory. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8')
+        'Failed getting repositories from Artifactory. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8'),
     );
     const repoArray: any[] = JSON.parse(res.getBody('utf8'));
     return repoArray.map((repo): any => repo.key);
@@ -352,7 +352,7 @@ export function createRepo(repoKey: string, body: string): syncRequest.Response 
     });
     assert.ok(
         res.statusCode === 200 || res.statusCode === 201,
-        'Failed creating repo: ' + repoKey + '. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8')
+        'Failed creating repo: ' + repoKey + '. Status code: ' + res.statusCode + '. Error: ' + res.getBody('utf8'),
     );
     return res;
 }
@@ -374,7 +374,7 @@ export function getLocalReleaseBundle(bundleName: string, bundleVersion: string,
             headers: {
                 Authorization: getAuthorizationHeaderValue(),
             },
-        }
+        },
     );
     if (!expectExist) {
         assert.ok(
@@ -386,7 +386,7 @@ export function getLocalReleaseBundle(bundleName: string, bundleVersion: string,
                 '" not to exist. Status code: ' +
                 res.statusCode +
                 '. Error: ' +
-                res.getBody('utf8')
+                res.getBody('utf8'),
         );
         return res;
     }
@@ -399,7 +399,7 @@ export function getLocalReleaseBundle(bundleName: string, bundleVersion: string,
             '" to exist. Status code: ' +
             res.statusCode +
             '. Error: ' +
-            res.getBody('utf8')
+            res.getBody('utf8'),
     );
     return res;
 }
@@ -412,7 +412,7 @@ export function getRemoteReleaseBundle(bundleName: string, bundleVersion: string
             headers: {
                 Authorization: getAuthorizationHeaderValue(),
             },
-        }
+        },
     );
 }
 
@@ -426,7 +426,7 @@ export function deleteReleaseBundle(bundleName: string, bundleVersion: string): 
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ dry_run: false, distribution_rules: [{ site_name: '*' }], on_success: 'delete' }),
-        }
+        },
     );
 }
 

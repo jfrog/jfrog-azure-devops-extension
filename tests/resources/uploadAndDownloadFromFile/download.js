@@ -17,7 +17,7 @@ writeFileSync(
             },
         ],
     }),
-    'utf8'
+    'utf8',
 );
 
 let inputs = {

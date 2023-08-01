@@ -56,7 +56,7 @@ function RunTaskCbk(cliPath) {
             if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {
                 tl.setResult(
                     tl.TaskResult.Failed,
-                    "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf '. The command received is: " + cliCommand
+                    "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf '. The command received is: " + cliCommand,
                 );
                 utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
                 return;
