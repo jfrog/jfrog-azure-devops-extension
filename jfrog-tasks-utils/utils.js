@@ -569,7 +569,7 @@ function getArchitecture() {
     const arch = process.arch;
     if (platform.includes('darwin')) {
         // macOS architecture:
-        return arch === 'arm64' ? 'mac-arm64' : 'mac-386';
+        return arch.contains('arm64') || arch.contains('aarch64') ? 'mac-arm64' : 'mac-386';
     }
 
     // linux architecture:
