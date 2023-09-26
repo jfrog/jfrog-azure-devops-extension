@@ -22,7 +22,8 @@
         "node-tunnel": "^4.0.1",
         "null-writable": "^1.0.5",
         "rimraf": "^3.0.0",
-        "sync-request": "^6.1.0"
+        "sync-request": "^6.1.0",
+        "ts-node": "^10.9.1"
     },
     "scripts": {
         "test": "npm i && mocha -r ts-node/register tests.ts -t 600000"

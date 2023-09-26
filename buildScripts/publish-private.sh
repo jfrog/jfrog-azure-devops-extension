@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -eu
+#!/usr/bin/env bash
+set -eu
 
 # This script publishes JFrog Artifactory extension privately for sanity tests.
 # Currently it will work only on Unix and Linux.
@@ -19,15 +20,21 @@ if [ -z "$ADO_ARTIFACTORY_API_KEY" ]; then
 fi
 
 export PUBLISHER=$ADO_ARTIFACTORY_DEVELOPER-private
-export GIT_HEAD=`git rev-parse --short HEAD`
+GIT_HEAD=$(git rev-parse --short HEAD)
+export GIT_HEAD
 
 cp vss-extension.json vss-extension-private.json
 
-npx tfx extension unshare -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER --unshare-with $ADO_ARTIFACTORY_DEVELOPER 2>/dev/null
-npx tfx extension unpublish -t $ADO_ARTIFACTORY_API_KEY --extension-id jfrog-azure-devops-extension --publisher $PUBLISHER
-npx tfx extension create --manifest-globs vss-extension-private.json --publisher $PUBLISHER
-npx tfx extension publish -t $ADO_ARTIFACTORY_API_KEY --publisher $PUBLISHER --manifests vss-extension-private.json --override "{\"public\": false, \"version\": \"$RANDOM.$RANDOM.$RANDOM\", \"description\": \"Commit SHA: $GIT_HEAD\"}" --share-with $ADO_ARTIFACTORY_DEVELOPER
-npx tfx extension install --publisher $PUBLISHER --extension-id jfrog-azure-devops-extension --service-url https://$ADO_ARTIFACTORY_DEVELOPER.visualstudio.com -t $ADO_ARTIFACTORY_API_KEY
+npx tfx extension unshare -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER" --unshare-with "$ADO_ARTIFACTORY_DEVELOPER" 2>/dev/null
+npx tfx extension unpublish -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER"
+npx tfx extension create --manifest-globs vss-extension-private.json --publisher "$PUBLISHER"
+# Check that vsix size is less then 30MB
+if [ "$(du -m -- *.vsix | awk '{print $1}')" -gt 30 ]; then
+    echo "extension vsix size is greater than 30MB! Hint: Most of the dependencies on package-json are ^x.y.z, so maybe one of them got updated, and the node_modules directory became bigger."
+    exit 1
+fi
+npx tfx extension publish -t "$ADO_ARTIFACTORY_API_KEY" --publisher "$PUBLISHER" --manifests vss-extension-private.json --override "{\"public\": false, \"version\": \"$RANDOM.$RANDOM.$RANDOM\", \"description\": \"Commit SHA: $GIT_HEAD\"}" --share-with "$ADO_ARTIFACTORY_DEVELOPER"
+npx tfx extension install --publisher "$PUBLISHER" --extension-id jfrog-azure-devops-extension --service-url https://"$ADO_ARTIFACTORY_DEVELOPER".visualstudio.com -t "$ADO_ARTIFACTORY_API_KEY"
 
-rm *.vsix
+rm -- *.vsix
 rm vss-extension-private.json
