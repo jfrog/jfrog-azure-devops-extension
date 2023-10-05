@@ -10,7 +10,7 @@ environment:
   nodejs_version: "16"
 
   GOPATH: c:\gopath
-  GOVERSION: 1.20.5
+  GOVERSION: 1.20.8
   GOROOT: c:\Program Files\Go
   # Added in order to prevent fetching the outdated dependencies versions from go cache.
   GOPROXY: direct
@@ -30,7 +30,7 @@ install:
   - cmd: set PATH=%PYTHON_HOME%;%PYTHON_HOME%\Scripts;%PATH%
   - python -m pip install --upgrade pip
   - cmd: powershell Install-Product node $env:nodejs_version
-  - npm i -gq jfrog-cli-v2-jf
+  - npm i -gq jfrog-cli-v2-jf@2.44.1
   - pip install "conan<2" -q
   - cmd: nuget update -self
   - sh: conan profile new default --detect # This command produces a warning that is handled by the following command.
