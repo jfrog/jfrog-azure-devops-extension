@@ -31,6 +31,11 @@ function RunTaskCbk(cliPath: string): void {
             if (tl.getBoolInput('allowFailBuild', false)) {
                 cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
             }
+
+            if (tl.getBoolInput('allowBypassArchiveLimits', false)) {
+                cliCommand = utils.addBoolParam(cliCommand, 'allowBypassArchiveLimits', 'bypass-archive-limits');
+            }
+
             // Add watches source if provided.
             const watchesSource: string = tl.getInput('watchesSource', false) ?? '';
             switch (watchesSource) {
