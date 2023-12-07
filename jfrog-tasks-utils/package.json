@@ -9,7 +9,7 @@
     "typings": "utils.d.ts",
     "dependencies": {
         "azure-pipelines-task-lib": "4.5.0",
-        "azure-pipelines-tool-lib": "^2.0.4",
+        "azure-pipelines-tool-lib": "2.0.6",
         "azure-pipelines-tasks-java-common": "^2.219.1",
         "typed-rest-client": "^1.8.11"
     },
