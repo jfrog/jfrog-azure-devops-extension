@@ -129,6 +129,15 @@
             "visibleRule": "command = Scan && watchesSource!=none"
         },
         {
+            "name": "allowBypassArchiveLimits",
+            "type": "boolean",
+            "label": "Bypass archive limits",
+            "defaultValue": "false",
+            "required": true,
+            "helpMarkDown": "Allow to bypass the indexer-app archive limits, defaults to false.",
+            "visibleRule": "command = Scan && watchesSource!=none"
+        },
+        {
             "name": "collectBuildInfo",
             "type": "boolean",
             "label": "Collect build info",
