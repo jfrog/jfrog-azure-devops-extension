@@ -10,11 +10,11 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.44.1';
+const defaultJfrogCliVersion = '2.52.1';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
-const pluginVersion = '2.8.0';
+const pluginVersion = '2.9.0';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
@@ -89,8 +89,8 @@ module.exports = {
  * Executes a CLI task, downloads the CLI if necessary.
  * @param runTaskFunc - Task to run.
  * @param cliVersion - Specific CLI version to use in the current task execution.
- * @param cliDownloadUrl [Optional, Default - releases.jfrog.io] - URL to download the required CLI executable from.
- * @param cliAuthHandlers [Optional, Default - Anonymous] - Authentication handlers to download CLI with.
+ * @param cliDownloadUrl - [Optional, Default - releases.jfrog.io] - URL to download the required CLI executable from.
+ * @param cliAuthHandlers - [Optional, Default - Anonymous] - Authentication handlers to download CLI with.
  */
 function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers) {
     process.env.JFROG_CLI_HOME = jfrogFolderPath;
@@ -376,7 +376,7 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
  * File-spec content is written to provided specPath.
  * @param specSource - Value of 'file' uses PathInput 'file', value of 'taskConfiguration' uses input of 'fileSpec'.
  * @param specPath - File destination for the file-spec.
- * @throws - On input read error, or write-file error.
+ * @throws On input read error, or write-file error.
  */
 function writeSpecContentToSpecPath(specSource, specPath) {
     let fileSpec;
@@ -425,10 +425,11 @@ function addBoolParam(cliCommand, inputParam, cliParam) {
 function addIntParam(cliCommand, inputParam, cliParam) {
     let val = tl.getInput(inputParam, false);
     if (val) {
-        if (isNaN(val)) {
+        let numVal = parseInt(val);
+        if (isNaN(numVal)) {
             throw 'Illegal value "' + val + '" for ' + inputParam + ', should be numeric.';
         }
-        cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
+        cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + numVal);
     }
     return cliCommand;
 }
@@ -611,7 +612,7 @@ function fixWindowsPaths(string) {
 /**
  * Encodes spaces with quotes in a path.
  * a/b/Program Files/c --> a/b/"Program Files"/c
- * @param str (String) - The path to encoded.
+ * @param str (String) - The path to encode.
  * @returns {string} - The encoded path.
  */
 function encodePath(str) {
@@ -660,7 +661,7 @@ function collectEnvVarsIfNeeded(cliPath) {
 /**
  * Runs collect environment variables JFrog CLI command.
  * @param cliPath - (String) - The cli path.
- * @returns (String|void) - String with error message or void if passes successfully.
+ * @returns (void) - String with error message or void if passes successfully.
  * @throws In CLI execution failure.
  */
 function collectEnvVars(cliPath) {
