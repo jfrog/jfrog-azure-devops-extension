@@ -7,7 +7,7 @@ let inputs = {
     command: 'Push',
     collectBuildInfo: true,
     imageName: `${platformDockerDomain}/${testUtils.getRepoKeys().dockerLocalRepo}/docker-test:1`,
-    cmdOptions: ``
+    cmdOptions: ``,
 };
 
 testUtils.runArtifactoryTask(testUtils.docker, {}, inputs);
