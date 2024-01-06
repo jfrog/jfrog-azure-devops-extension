@@ -21,6 +21,7 @@ function RunTaskCbk(cliPath: string): void {
     let cliCommand: string = utils.cliJoin(cliPath, cliDockerCommand, command.toLowerCase(), utils.quote(imageName));
     switch (command) {
         case 'Push':
+            cliCommand = utils.appendOptionsToCliCommand(cliCommand);
         case 'Pull': {
             serverId = utils.configureDefaultArtifactoryServer('docker_' + command, cliPath, defaultWorkDir);
             cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);

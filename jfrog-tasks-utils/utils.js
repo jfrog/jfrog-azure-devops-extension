@@ -1030,6 +1030,18 @@ function appendBuildFlagsToCliCommand(cliCommand) {
     return cliCommand;
 }
 
+
+/**
+ * Appends options param to provided cli command if command options not blank.
+ * */
+function appendOptionsToCliCommand(cliCommand) {
+    let cmdOptions = tl.getInput('cmdOptions', true) ?? ''; 
+    if (cmdOptions != '') {
+        cliCommand = cliJoin(cliCommand, cmdOptions);
+    }
+    return cliCommand;
+}
+
 /**
  * Returns the current timestamp in seconds
  */
