@@ -93,7 +93,7 @@ function executeGradle(cliPath, workDir) {
         tasksAndOptions = utils.cliJoin(tasksAndOptions, options);
     }
     tasksAndOptions = utils.cliJoin(tasksAndOptions, '-b', tl.getInput('gradleBuildFile'));
-    let gradleCommand = utils.cliJoin(cliPath, cliGradleCommand, utils.quote(tasksAndOptions));
+    let gradleCommand = utils.cliJoin(cliPath, cliGradleCommand, tasksAndOptions);
     gradleCommand = utils.appendBuildFlagsToCliCommand(gradleCommand);
 
     // Execute cli.
