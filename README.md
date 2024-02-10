@@ -173,7 +173,7 @@ You'll therefore need to download and install it manually.
 To install the Maven Extractor jar on an agent with no internet access:
 
 1. Create the directory structure on your agent's
-   file-system: `$(Agent.ToolsDirectory)/_jf/.jfrog/dependencies/maven/2.x.x`
+   file-system: `~/.jfrog/dependencies/maven/2.x.x`
 2. Download
    the latest [build-info-extractor-maven3-2.x.x-uber.jar](https://search.maven.org/artifact/org.jfrog.buildinfo/build-info-extractor)
    and place it inside the "maven" directory you created.
@@ -188,7 +188,7 @@ file. You'll therefore need to download and install it manually.
 To install the Gradle Extractor jar on an agent with no internet access:
 
 1. Create the directory structure on your agent's
-   file-system: `$(Agent.ToolsDirectory)/_jf/.jfrog/dependencies/gradle/4.x.x`
+   file-system: `~/.jfrog/dependencies/gradle/4.x.x`
 2. Download
    the latest [build-info-extractor-gradle-4.x.x-uber.jar](https://plugins.gradle.org/plugin/com.jfrog.artifactory)
    and place it inside the "gradle" directory you created.
