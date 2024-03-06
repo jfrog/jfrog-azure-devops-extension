@@ -230,6 +230,16 @@
             "required": true,
             "groupName": "advanced",
             "helpMarkDown": "Select if you'd like the command to skip performing docker login."
+        },
+        {
+            "name": "cmdOptions",
+            "type": "string",
+            "label": "Options",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advanced",
+            "visibleRule": "command != Scan",
+            "helpMarkDown": "Options for Pull and Push docker command."
         }
     ],
     "execution": {

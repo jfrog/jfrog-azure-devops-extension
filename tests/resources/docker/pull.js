@@ -7,6 +7,7 @@ let inputs = {
     command: 'Pull',
     collectBuildInfo: true,
     imageName: `${platformDockerDomain}/docker-local/docker-test:1`,
+    cmdOptions: `--all-tags`,
 };
 
 testUtils.runArtifactoryTask(testUtils.docker, {}, inputs);

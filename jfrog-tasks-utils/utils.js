@@ -61,6 +61,7 @@ module.exports = {
     createBuildToolConfigFile: createBuildToolConfigFile,
     assembleUniqueServerId: assembleUniqueServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
+    appendOptionsToCliCommand: appendOptionsToCliCommand,
     compareVersions: compareVersions,
     addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
     useCliServer: useCliServer,
@@ -761,6 +762,17 @@ function appendBuildFlagsToCliCommand(cliCommand) {
         cliCommand = cliJoin(cliCommand, '--build-name=' + quote(buildName), '--build-number=' + quote(buildNumber));
         cliCommand = addStringParam(cliCommand, 'module', 'module', false);
         return addProjectOption(cliCommand);
+    }
+    return cliCommand;
+}
+
+/**
+ * Appends options param to provided cli command if command options not blank.
+ * */
+function appendOptionsToCliCommand(cliCommand) {
+    let cmdOptions = tl.getInput('cmdOptions', true) ?? '';
+    if (cmdOptions != '') {
+        cliCommand = cliJoin(cliCommand, cmdOptions);
     }
     return cliCommand;
 }
