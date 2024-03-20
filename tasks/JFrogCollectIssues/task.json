@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "9",
-        "Patch": "3"
+        "Patch": "4"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "JFrog Collect Build Issues",
