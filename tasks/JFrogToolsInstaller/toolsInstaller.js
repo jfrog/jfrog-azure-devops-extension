@@ -1,9 +1,9 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 
-InstallCliAndExecuteCliTask(RunTaskCbk);
+await InstallCliAndExecuteCliTask(RunTaskCbk);
 
-function InstallCliAndExecuteCliTask(RunTaskCbk) {
+async function InstallCliAndExecuteCliTask(RunTaskCbk) {
     let artifactoryService = tl.getInput('artifactoryConnection', true);
     let artifactoryUrl = tl.getEndpointUrl(artifactoryService, false);
     let cliInstallationRepo = tl.getInput('cliInstallationRepo', true);
@@ -21,7 +21,7 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     // Set the requested CLI version env to download it now, and to use in succeeding tasks.
     tl.setVariable(utils.pipelineRequestedCliVersionEnv, cliVersion);
     let downloadUrl = utils.buildCliArtifactoryDownloadUrl(artifactoryUrl, cliInstallationRepo, cliVersion);
-    let authHandlers = utils.createAuthHandlers(artifactoryService);
+    let authHandlers = await utils.createAuthHandlers(artifactoryService);
     utils.executeCliTask(RunTaskCbk, cliVersion, downloadUrl, authHandlers);
 }
 

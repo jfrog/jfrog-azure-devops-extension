@@ -8,7 +8,7 @@ let serverIdResolver;
 
 utils.executeCliTask(RunTaskCbk);
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     utils.setJdkHomeForJavaTasks();
     let workDir = getWorkDir();
     try {
@@ -16,7 +16,7 @@ function RunTaskCbk(cliPath) {
             tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
             return;
         }
-        executeGradleConfig(cliPath, workDir);
+        await executeGradleConfig(cliPath, workDir);
         executeGradle(cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
@@ -45,7 +45,7 @@ function getWorkDir() {
  * @param cliPath - Path to JFrog CLI
  * @param workDir - Gradle project directory
  */
-function executeGradleConfig(cliPath, workDir) {
+async function executeGradleConfig(cliPath, workDir) {
     // Build the cli config command.
     let cliCommand = utils.cliJoin(cliPath, gradleConfigCommand);
 
@@ -53,7 +53,7 @@ function executeGradleConfig(cliPath, workDir) {
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
     if (artifactoryResolver) {
         serverIdResolver = utils.assembleUniqueServerId('gradle_resolver');
-        utils.configureArtifactoryCliServer(artifactoryResolver, serverIdResolver, cliPath, workDir);
+        await utils.configureArtifactoryCliServer(artifactoryResolver, serverIdResolver, cliPath, workDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolver));
     } else {
         console.log('Resolution from Artifactory is not configured');
@@ -63,7 +63,7 @@ function executeGradleConfig(cliPath, workDir) {
     let artifactoryDeployer = tl.getInput('artifactoryDeployerService');
     if (artifactoryDeployer) {
         serverIdDeployer = utils.assembleUniqueServerId('gradle_deployer');
-        utils.configureArtifactoryCliServer(artifactoryDeployer, serverIdDeployer, cliPath, workDir);
+        await utils.configureArtifactoryCliServer(artifactoryDeployer, serverIdDeployer, cliPath, workDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
     }
 

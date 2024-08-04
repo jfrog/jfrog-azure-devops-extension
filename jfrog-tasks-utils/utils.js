@@ -3,6 +3,8 @@ const tl = require('azure-pipelines-task-lib/task');
 const { join, sep, isAbsolute } = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
+const azNodeLib = require('azure-devops-node-api');
+const fetch = require('node-fetch');
 const credentialsHandler = require('typed-rest-client/Handlers');
 const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
 
@@ -156,10 +158,19 @@ function getCliExePathInArtifactory(cliVersion) {
     return cliVersion + '/' + cliPackage + '/' + fileName;
 }
 
-function createAuthHandlers(serviceConnection) {
+async function createAuthHandlers(serviceConnection) {
+    let serviceUrl = tl.getEndpointUrl(serviceConnection, false);
     let artifactoryUser = tl.getEndpointAuthorizationParameter(serviceConnection, 'username', true);
     let artifactoryPassword = tl.getEndpointAuthorizationParameter(serviceConnection, 'password', true);
     let artifactoryAccessToken = tl.getEndpointAuthorizationParameter(serviceConnection, 'apitoken', true);
+    let artifactoryProviderName = tl.getEndpointAuthorizationParameter(serviceConnection, 'providerName', true);
+    let artifactoryAuthServer = tl.getEndpointAuthorizationParameter(serviceConnection, 'authServer', true);
+
+    // Check if Artifactory should be accessed using Azure DevOps OIDC Token
+    if (artifactoryProviderName) {
+        const accessToken = await getAccessTokenWithOIDForEndpoint(serviceConnection, artifactoryProviderName, serviceUrl, artifactoryAuthServer);
+        return [new credentialsHandler.BearerCredentialHandler(accessToken, false)];
+    }
 
     // Check if Artifactory should be accessed using access-token.
     if (artifactoryAccessToken) {
@@ -173,6 +184,67 @@ function createAuthHandlers(serviceConnection) {
 
     // Use basic authentication.
     return [new credentialsHandler.BasicCredentialHandler(artifactoryUser, artifactoryPassword, false)];
+}
+
+async function getAccessTokenWithOIDForEndpoint(endpoint_name, provider_name, endpoint_server, auth_server) {
+    const adoToken = await getOidcTokenForEndpoint(endpoint_name);
+    const oidcTokenParts = adoToken.split('.');
+    if (oidcTokenParts.length !== 3) {
+        throw new Error('Invalid oidc token');
+    }
+    const oidcClaims = JSON.parse(Buffer.from(oidcTokenParts[1], 'base64').toString());
+
+    // Log the OIDC token claims so users know how to configure AWS
+    console.log('OIDC Token Subject: ', oidcClaims.sub);
+    console.log(`OIDC Token Claims: {"sub": "${oidcClaims.sub}"}`);
+    console.log('OIDC Token Issuer (Provider URL): ', oidcClaims.iss);
+    console.log('OIDC Token Audience: ', oidcClaims.aud);
+
+    const artifactoryTokenRequestBoth = {
+        grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
+        subject_token_type: 'urn:ietf:params:oauth:token-type:id_token',
+        subject_token: adoToken,
+        provider_name: provider_name,
+    };
+
+    let token_server = auth_server ? auth_server : endpoint_server;
+
+    let response = await fetch(`${token_server}/access/api/v1/oidc/token`, {
+        method: 'post',
+        body: JSON.stringify(artifactoryTokenRequestBoth),
+        headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await response.json();
+    console.log(`JFrog access token acquired, expires in ${(data.expires_in / 60).toFixed(2)} minutes.`);
+
+    return data.access_token;
+}
+
+async function getOidcTokenForEndpoint(endpoint_name) {
+    const jobId = getVariableRequired('System.JobId');
+    const planId = getVariableRequired('System.PlanId');
+    const projectId = getVariableRequired('System.TeamProjectId');
+    const hub = getVariableRequired('System.HostType');
+    const uri = getVariableRequired('System.CollectionUri');
+    const token = getVariableRequired('System.AccessToken');
+
+    const auth = azNodeLib.getBasicHandler('', token);
+    const connection = new azNodeLib.WebApi(uri, auth);
+    const api = await connection.getTaskApi();
+    const response = await api.createOidcToken({}, projectId, hub, planId, jobId, endpoint_name);
+    if (!response.oidcToken) {
+        throw new Error('Invalid createOidcToken response, no oidcToken.');
+    }
+    return response.oidcToken;
+}
+
+function getVariableRequired(name) {
+    const variable = tl.getVariable(name);
+    if (!variable) {
+        throw new Error(`Required variable '${name}' returned undefined!`);
+    }
+
+    return variable;
 }
 
 function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
@@ -237,31 +309,38 @@ function maskSecrets(str) {
         .replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
-function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(jfrogService, '--url', serverId, cliPath, buildDir);
+async function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
+    return await configureSpecificCliServer(jfrogService, '--url', serverId, cliPath, buildDir);
 }
 
-function configureArtifactoryCliServer(artifactoryService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(artifactoryService, '--artifactory-url', serverId, cliPath, buildDir);
+async function configureArtifactoryCliServer(artifactoryService, serverId, cliPath, buildDir) {
+    return await configureSpecificCliServer(artifactoryService, '--artifactory-url', serverId, cliPath, buildDir);
 }
 
-function configureDistributionCliServer(distributionService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(distributionService, '--distribution-url', serverId, cliPath, buildDir);
+async function configureDistributionCliServer(distributionService, serverId, cliPath, buildDir) {
+    return await configureSpecificCliServer(distributionService, '--distribution-url', serverId, cliPath, buildDir);
 }
 
-function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
+async function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
+    return await configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
 }
 
-function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
+async function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
     let serviceUrl = tl.getEndpointUrl(service, false);
     let serviceUser = tl.getEndpointAuthorizationParameter(service, 'username', true);
     let servicePassword = tl.getEndpointAuthorizationParameter(service, 'password', true);
     let serviceAccessToken = tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
+    let artifactoryProviderName = tl.getEndpointAuthorizationParameter(service, 'providerName', true);
+    let artifactoryAuthServer = tl.getEndpointAuthorizationParameter(service, 'authServer', true);
+
     let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
     let stdinSecret;
     let secretInStdinSupported = isStdinSecretSupported();
-    if (serviceAccessToken) {
+    if (artifactoryProviderName) {
+        const serviceAccessToken = await getAccessTokenWithOIDForEndpoint(service, artifactoryProviderName, serviceUrl, artifactoryAuthServer);
+        cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));
+        stdinSecret = secretInStdinSupported ? serviceAccessToken : undefined;
+    } else if (serviceAccessToken) {
         // Add access-token if required.
         cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));
         stdinSecret = secretInStdinSupported ? serviceAccessToken : undefined;

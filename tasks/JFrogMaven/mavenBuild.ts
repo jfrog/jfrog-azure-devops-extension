@@ -8,7 +8,7 @@ let serverIdResolver: string;
 
 utils.executeCliTask(RunTaskCbk);
 
-function RunTaskCbk(cliPath: string): void {
+async function RunTaskCbk(cliPath: string): Promise<void> {
     utils.setJdkHomeForJavaTasks();
     checkAndSetMavenHome();
     const workDir: string | undefined = tl.getVariable('System.DefaultWorkingDirectory');
@@ -19,7 +19,7 @@ function RunTaskCbk(cliPath: string): void {
 
     // Create Maven config file.
     try {
-        createMavenConfigFile(cliPath, workDir);
+        await createMavenConfigFile(cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
         cleanup(cliPath, workDir);
@@ -70,14 +70,14 @@ function checkAndSetMavenHome(): void {
     }
 }
 
-function createMavenConfigFile(cliPath: string, buildDir: string) {
+async function createMavenConfigFile(cliPath: string, buildDir: string) {
     let cliCommand: string = utils.cliJoin(cliPath, mavenConfigCommand);
 
     // Configure resolver server, throws on failure.
     const artifactoryResolver: string | undefined = tl.getInput('artifactoryResolverService');
     if (artifactoryResolver) {
         serverIdResolver = utils.assembleUniqueServerId('maven_resolver');
-        utils.configureArtifactoryCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
+        await utils.configureArtifactoryCliServer(artifactoryResolver, serverIdResolver, cliPath, buildDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(serverIdResolver));
         cliCommand = utils.addStringParam(cliCommand, 'targetResolveReleaseRepo', 'repo-resolve-releases', true);
         cliCommand = utils.addStringParam(cliCommand, 'targetResolveSnapshotRepo', 'repo-resolve-snapshots', true);
@@ -89,7 +89,7 @@ function createMavenConfigFile(cliPath: string, buildDir: string) {
     const artifactoryDeployer: string = tl.getInput('artifactoryDeployService') ?? '';
     if (artifactoryDeployer) {
         serverIdDeployer = utils.assembleUniqueServerId('maven_deployer');
-        utils.configureArtifactoryCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
+        await utils.configureArtifactoryCliServer(artifactoryDeployer, serverIdDeployer, cliPath, buildDir);
         cliCommand = utils.cliJoin(cliCommand, '--server-id-deploy=' + utils.quote(serverIdDeployer));
         cliCommand = utils.addStringParam(cliCommand, 'targetDeployReleaseRepo', 'repo-deploy-releases', true);
         cliCommand = utils.addStringParam(cliCommand, 'targetDeploySnapshotRepo', 'repo-deploy-snapshots', true);
