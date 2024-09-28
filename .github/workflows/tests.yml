@@ -1,12 +1,20 @@
 name: Node.js CI
 
 on:
-  push:
-    branches:
-      - github-actions-tests
-  pull_request:
-    branches:
-      - github-actions-tests
+  workflow_dispatch:
+    inputs:
+      ado_jfrog_platform_url:
+        description: 'Enter the JFrog Platform URL'
+        required: true
+      ado_jfrog_platform_username:
+        description: 'Enter the JFrog Platform Username'
+        required: true
+      ado_jfrog_platform_password:
+        description: 'Enter the JFrog Platform Password'
+        required: true
+      ado_jfrog_platform_docker_domain:
+        description: 'Enter the JFrog Platform Docker Domain'
+        required: true
 
 jobs:
   test:
@@ -27,4 +35,7 @@ jobs:
       - name: Run tests
         run: npm test
         env:
-          ADO_JFROG_PLATFORM_URL: ${{ secrets.PLATFORM_URL }}
+          ADO_JFROG_PLATFORM_URL: ${{ inputs.ado_jfrog_platform_url }}
+          ADO_JFROG_PLATFORM_USERNAME: ${{ inputs.ado_jfrog_platform_username }}
+          ADO_JFROG_PLATFORM_PASSWORD: ${{ inputs.ado_jfrog_platform_password }}
+          ADO_JFROG_PLATFORM_DOCKER_DOMAIN: ${{ inputs.ado_jfrog_platform_docker_domain }}
