@@ -26,3 +26,5 @@ jobs:
 
       - name: Run tests
         run: npm test
+        env:
+          ADO_JFROG_PLATFORM_URL: ${{ secrets.PLATFORM_URL }}
