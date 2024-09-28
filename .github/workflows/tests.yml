@@ -3,10 +3,10 @@ name: Node.js CI
 on:
   push:
     branches:
-      - main
+      - github-actions-tests
   pull_request:
     branches:
-      - main
+      - github-actions-tests
 
 jobs:
   test:
