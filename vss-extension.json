@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "public": true,
     "id": "jfrog-azure-devops-extension",
-    "version": "2.10.1",
+    "version": "2.11.0",
     "name": "JFrog",
     "description": "Integrate your JFrog Platform with Visual Studio Team Services.",
     "publisher": "JFrog",
@@ -149,6 +149,37 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "providerName",
+                                "name": "Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform. The OIDC provider & token claim details are provided in the build log output of any task using this connection.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "authServer",
+                                "name": "Auth Server",
+                                "description": "The access token will be obtained from this server but operations will use the server URL from above. May be required if using edge nodes.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -234,6 +265,37 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "providerName",
+                                "name": "Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform. The OIDC provider & token claim details are provided in the build log output of any task using this connection.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "authServer",
+                                "name": "Auth Server",
+                                "description": "The access token will be obtained from this server but operations will use the server URL from above. May be required if using edge nodes.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -309,6 +371,37 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "providerName",
+                                "name": "Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform. The OIDC provider & token claim details are provided in the build log output of any task using this connection.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "authServer",
+                                "name": "Auth Server",
+                                "description": "The access token will be obtained from this server but operations will use the server URL from above. May be required if using edge nodes.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": false,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -380,6 +473,37 @@
                                 "isConfidential": true,
                                 "validation": {
                                     "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "providerName",
+                                "name": "Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform. The OIDC provider & token claim details are provided in the build log output of any task using this connection.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "authServer",
+                                "name": "Auth Server",
+                                "description": "The access token will be obtained from this server but operations will use the server URL from above. May be required if using edge nodes.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": false,
                                     "dataType": "string"
                                 }
                             }
