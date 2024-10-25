@@ -1,0 +1,52 @@
+name: Tests
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  # Triggers the workflow on labeled PRs only.
+  pull_request_target:
+    types: [ labeled ]
+# Ensures that only the latest commit is running for each PR at a time.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  Tests:
+    if: contains(github.event.pull_request.labels.*.name, 'safe to test') || github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu, windows ]
+        include:
+          - os: windows
+            extraSkipTests: ",conan"
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install Conan
+        run: pip install "conan<2" -q
+
+      - name: Install JFrog CLI
+        run: curl -fL https://install-cli.jfrog.io | sh
+
+      - name: Install local Artifactory
+        uses: jfrog/.github/actions/install-local-artifactory@main
+        with:
+          RTLIC: ${{ secrets.RTLIC }}
+
+      - name: Install
+        run: npm install --no-fund
+
+      - name: Run tests
+        run: npm t
+        env:
+          ADO_JFROG_PLATFORM_URL: http://localhost:8081/
+          ADO_JFROG_PLATFORM_USERNAME: admin
+          ADO_JFROG_PLATFORM_PASSWORD: password
+          ADO_SKIP_TESTS: docker,distribution${{ matrix.extraSkipTests }}

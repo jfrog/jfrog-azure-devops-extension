@@ -7,8 +7,8 @@
     "devDependencies": {
         "@types/node": "^20.7.0",
         "@types/q": "^1.5.6",
-        "@typescript-eslint/eslint-plugin": "^6.7.3",
-        "@typescript-eslint/parser": "^6.7.3",
+        "@typescript-eslint/eslint-plugin": "^8.11.0",
+        "@typescript-eslint/parser": "^8.11.0",
         "eslint": "^8.50.0",
         "eslint-config-prettier": "^9.0.0",
         "prettier": "^3.0.3",
@@ -22,7 +22,7 @@
         "install": "node buildScripts/build.js",
         "postinstall": "npm run compile",
         "create": "tfx extension create",
-        "test": "npm i --no-fund && npm t --prefix=tests",
+        "test": "npm t --prefix=tests",
         "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",
         "compile": "npx tsc -p ./",
         "lint": "npx eslint . --ext .ts,.tsx,.js"

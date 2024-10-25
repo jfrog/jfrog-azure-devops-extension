@@ -243,7 +243,7 @@ export function createTestRepositories(): void {
             rclass: 'remote',
             packageType: 'go',
             repoLayoutRef: 'go-default',
-            url: 'https://gocenter.io',
+            url: 'https://proxy.golang.org',
         }),
     );
     createRepo(

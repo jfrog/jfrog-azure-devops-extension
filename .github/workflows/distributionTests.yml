@@ -1,0 +1,33 @@
+name: Distribution Tests
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  # Triggers the workflow on labeled PRs only.
+  pull_request_target:
+    types: [ labeled ]
+# Ensures that only the latest commit is running for each PR at a time.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  Distribution-Tests:
+    if: contains(github.event.pull_request.labels.*.name, 'safe to test') || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install
+        run: npm install --no-fund
+
+      - name: Run tests
+        run: npm t
+        env:
+          ADO_JFROG_PLATFORM_URL: ${{ secrets.PLATFORM_URL }}
+          ADO_JFROG_PLATFORM_ACCESS_TOKEN: ${{ secrets.PLATFORM_ADMIN_TOKEN }}
+          ADO_SKIP_TESTS: unit,proxy,generic,installer,npm,maven,gradle,conan,nuget,dotnet,go,pip,docker
