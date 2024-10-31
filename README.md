@@ -4,129 +4,129 @@
 
 # JFrog Azure DevOps Extension
 
-|                                                                                                           Azure DevOps Extension                                                                                                           | Installs                                                                                                                                                                                                                                                                                                    |                                                                                                                                   Tests (Master)                                                                                                                                    |                                                                                                                                           Tests (Dev)                                                                                                                                           |
-|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| [![JFrog Extension Marketplace](https://img.shields.io/static/v1?label=%20&color=blue&style=for-the-badge&logo=azuredevops&message=JFrog%20(New))](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension) | [![JFrog Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-azure-devops-extension?label=Total&color=blue&style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)               | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v2?svg=true&passingText=v2%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/v2) |     [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true&passingText=dev%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/dev)      |
-|  [![JFrog Extension Marketplace](https://img.shields.io/static/v1?label=%20&color=blue&style=for-the-badge&logo=azuredevops&message=Artifactory)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)  | [![Artifactory Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-artifactory-vsts-extension?label=Total&color=blue&style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension) | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v1?svg=true&passingText=v1%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/v1) | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev-v1?svg=true&passingText=dev-v1%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/dev-v1) |
+|                                                                                                            Azure DevOps Extension                                                                                                            | Installs                                                                                                                                                                                                                                                                                                    |                                                                                                                                   Tests (Master)                                                                                                                                    |                                                                                                                                           Tests (Dev)                                                                                                                                           |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [![JFrog Extension Marketplace](<https://img.shields.io/static/v1?label=%20&color=blue&style=for-the-badge&logo=azuredevops&message=JFrog%20(New)>)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension) | [![JFrog Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-azure-devops-extension?label=Total&color=blue&style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)               | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v2?svg=true&passingText=v2%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/v2) |     [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev?svg=true&passingText=dev%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/dev)      |
+|   [![JFrog Extension Marketplace](https://img.shields.io/static/v1?label=%20&color=blue&style=for-the-badge&logo=azuredevops&message=Artifactory)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)   | [![Artifactory Extension Marketplace Installs](https://img.shields.io/visual-studio-marketplace/azure-devops/installs/total/JFrog.jfrog-artifactory-vsts-extension?label=Total&color=blue&style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-artifactory-vsts-extension) | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/v1?svg=true&passingText=v1%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/v1) | [![Build status](https://ci.appveyor.com/api/projects/status/ki6edykufqy9h5bl/branch/dev-v1?svg=true&passingText=dev-v1%20-%20passing&failingText=dev%20-%20failing&pendingText=dev%20-%20pending)](https://ci.appveyor.com/project/jfrog-ecosystem/jfrog-azure-devops-extension/branch/dev-v1) |
 
 </div>
 
 # Overview
 
-[JFrog](https://jfrog.com/) provides tight integration with [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)*
+[JFrog](https://jfrog.com/) provides tight integration with [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the _[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)_
 Beyond managing efficient deployment of your artifacts to [JFrog Artifactory](https://jfrog.com/artifactory), the extension lets you capture information about
 artifacts deployed, dependencies resolved, environment data associated with the build runs and more,
 that effectively facilitates fully traceable builds.
-JFrog brings continuous integration to [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the *JFrog* extension.
+JFrog brings continuous integration to [Azure DevOps](https://azure.microsoft.com/en-us/services/devops/) through the _JFrog_ extension.
 
-The *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)* for Azure DevOps supports:
+The _[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)_ for Azure DevOps supports:
 
-* Running your builds while using [JFrog Artifactory](https://jfrog.com/artifactory) as the binary repository manager.
-* Gaining full traceability of your builds by capturing your build-info from your builds and publishing it to [JFrog Artifactory](https://jfrog.com/artifactory).
-* Managing your binaries lifecycle with [JFrog Artifactory](https://jfrog.com/artifactory).
-* Auditing your projects and scanning your builds with [JFrog Xray](https://jfrog.com/xray).
-* Distributing your artifacts with [JFrog Distribution](https://jfrog.com/distribution/).
-
+- Running your builds while using [JFrog Artifactory](https://jfrog.com/artifactory) as the binary repository manager.
+- Gaining full traceability of your builds by capturing your build-info from your builds and publishing it to [JFrog Artifactory](https://jfrog.com/artifactory).
+- Managing your binaries lifecycle with [JFrog Artifactory](https://jfrog.com/artifactory).
+- Auditing your projects and scanning your builds with [JFrog Xray](https://jfrog.com/xray).
+- Distributing your artifacts with [JFrog Distribution](https://jfrog.com/distribution/).
 
 ## Table of contents
 
-- [Table of contents](#Table-of-contents)
-    - [Overview](#Overview)
-    - [Download and Installation](#Download-and-Installation)
-        - [Installing the Extension](#Installing-the-Extension)
-        - [Installing the Build Agent](#Installing-the-Build-Agent)
-        - [Configuring the Service Connections](#Configuring-the-Service-Connections)
-    - [Executing JFrog CLI Commands](#Executing-JFrog-CLI-Commands)
-    - [Build tools Tasks](#build-tools-tasks)
-        - [JFrog Maven](#JFrog-Maven-Task)
-        - [JFrog Gradle](#JFrog-Gradle-Task)
-        - [JFrog Npm](#JFrog-Npm-Task)
-        - [JFrog Nuget](#JFrog-Nuget-and-NET-Core-Task)
-        - [JFrog .NET Core](#JFrog-Nuget-and-NET-Core-Task)
-        - [JFrog Pip](#JFrog-Pip-Task)
-        - [JFrog Conan](#JFrog-Conan-Task)
-        - [JFrog Go](#JFrog-Go-Task)
-    - [Build Tasks](#Build-tasks)
-        - [JFrog Collect Build Issues](#JFrog-Collect-Build-Issues)
-        - [JFrog Publish Build Info](#JFrog-Publish-Build-Info)
-        - [JFrog Build Promotion](#JFrog-Build-Promotion)
-        - [Discarding Published Builds](#Discarding-Published-Builds-from-Artifactory)
-    - [Managing Generic Artifacts](#Managing-Generic-Artifacts)
-    - [JFrog Xray](#JFrog-Xray-tasks)
-        - [Audit project's dependencies for Security Vulnerabilities](#Audit-projects-dependencies-for-Security-Vulnerabilities)
-        - [Scanning Published Builds for Security Vulnerabilities with JFrog Xray](#Scanning-Published-Builds-for-Security-Vulnerabilities)
-    - [JFrog Docker Tasks](#JFrog-Docker-tasks)
-        - [Pushing and Pulling Docker Images to and from Artifactory](#Pushing-and-Pulling-Docker-Images-to-and-from-Artifactory)
-        - [Scanning Local Docker Images with JFrog Xray](#Scanning-Local-Docker-Images-with-JFrog-Xray)
-    - [JFrog Distribution](#Managing-and-Distributing-Release-Bundles)
-        - [JFrog Distribution Task](#JFrog-Distribution-V2-Task)
-    - [Contributions](#Contribution)
+- [Table of contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Download and Installation](#download-and-installation)
+    - [Installing the Extension](#installing-the-extension)
+    - [Installing the Build Agent](#installing-the-build-agent)
+    - [Configuring the Service Connections](#configuring-the-service-connections)
+  - [Executing JFrog CLI Commands](#executing-jfrog-cli-commands)
+  - [Build tools Tasks](#build-tools-tasks)
+    - [JFrog Maven](#jfrog-maven-task)
+    - [JFrog Gradle](#jfrog-gradle-task)
+    - [JFrog Npm](#jfrog-npm-task)
+    - [JFrog Nuget](#jfrog-nuget-and-net-core-task)
+    - [JFrog .NET Core](#jfrog-nuget-and-net-core-task)
+    - [JFrog Pip](#jfrog-pip-task)
+    - [JFrog Conan](#jfrog-conan-task)
+    - [JFrog Go](#jfrog-go-task)
+  - [Build Tasks](#build-tasks)
+    - [JFrog Collect Build Issues](#jfrog-collect-build-issues)
+    - [JFrog Publish Build Info](#jfrog-publish-build-info)
+    - [JFrog Build Promotion](#jfrog-build-promotion)
+    - [Discarding Published Builds](#discarding-published-builds-from-artifactory)
+  - [Managing Generic Artifacts](#managing-generic-artifacts)
+  - [JFrog Xray](#jfrog-xray-tasks)
+    - [Audit project's dependencies for Security Vulnerabilities](#audit-projects-dependencies-for-security-vulnerabilities)
+    - [Scanning Published Builds for Security Vulnerabilities with JFrog Xray](#scanning-published-builds-for-security-vulnerabilities)
+  - [JFrog Docker Tasks](#jfrog-docker-tasks)
+    - [Pushing and Pulling Docker Images to and from Artifactory](#pushing-and-pulling-docker-images-to-and-from-artifactory)
+    - [Scanning Local Docker Images with JFrog Xray](#scanning-local-docker-images-with-jfrog-xray)
+  - [JFrog Distribution](#managing-and-distributing-release-bundles)
+    - [JFrog Distribution Task](#jfrog-distribution-v2-task)
+  - [Contributions](#contribution)
 
 ## Download and Installation
 
 ### Installing the Extension
 
-To install the *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)*, execute the following steps:
+To install the _[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)_, execute the following steps:
 
-* Go to
-  the [Visual Studio Marketplace Jfrog Extension Page](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
-  and sign in to your account.
+- Go to
+    the [Visual Studio Marketplace Jfrog Extension Page](https://marketplace.visualstudio.com/items?itemName=JFrog.jfrog-azure-devops-extension)
+    and sign in to your account.
 
-  <img src="./images/extension-install.png" alt=""/>
-  
-* Click on *Get It Free*
+            <img src="./images/extension-install.png" alt=""/>
 
-  <img width="400px" src="./images/get-it-free.png" alt="">
-  
-* Select the account to which you want to apply the extension and confirm installation.
+- Click on _Get It Free_
 
-* In the JFrog Extension page, click *Install*.
+            <img width="400px" src="./images/get-it-free.png" alt="">
 
-  <img width="400px" src="./images/organization-install.png" alt="">
+- Select the account to which you want to apply the extension and confirm installation.
 
+- In the JFrog Extension page, click _Install_.
 
+            <img width="400px" src="./images/organization-install.png" alt="">
 
 ### Installing the Build Agent
 
 To run the JFrog tasks, the build agents use three tools:
 
-* JFrog CLI: Runs all the JFrog tasks.
-* Maven Extractor (Used by the [JFrog Maven](#jfrog-maven-task) task)
-* Gradle Extractor (Used by the [JFrog Gradle](#jfrog-gradle-Task) task)
-* Conan client (Used by the [JFrog Conan](#jfrog-conan-task) task)
+- JFrog CLI: Runs all the JFrog tasks.
+- Maven Extractor (Used by the [JFrog Maven](#jfrog-maven-task) task)
+- Gradle Extractor (Used by the [JFrog Gradle](#jfrog-gradle-task) task)
+- Conan client (Used by the [JFrog Conan](#jfrog-conan-task) task)
 
 <details>
     <summary>
 
 #### Automatic Installation
+
 </summary>
 
 If the build agent has access to the internet, JFrog CLI along with the Maven and Gradle Extractors are downloaded and
 installed automatically on the agent, the first time they are required.
+
 </details>
 
 <details>
     <summary>
 
 #### Custom tools Installation
+
 </summary>
 
 You can configure the pipeline to download JFrog CLI and the Maven Extractor from a JFrog Artifactory instance, which is
 configured to proxy the download repositories.
 
-* Create two remote repositories in Artifactory:
-* Create a remote repository in Artifactory for downloading *JFrog CLI*. Name the repository *jfrog-cli-remote* and
-  set its URL
-  to [https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/](https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/)
-* Create a remote repository in Artifactory for downloading the *Maven and Gradle Extractors*. Name the URL *extractors* and set its URL
-  to: [https://releases.jfrog.io/artifactory/oss-release-local/](https://releases.jfrog.io/artifactory/oss-release-local/)
-* Make sure to configure the Artifactory server with the *jfrog-cli-remote* and *extractors* repositories in as a
-  [service connection](#Configuring-the-Service-Connections) in Azure DevOps of type *JFrog Artifactory V2*.
-* Add the *JFrog Tools Installer* task to your build or release pipeline.
-* Select the Artifactory service you configured.
-* Select *jfrog-cli-remote* as the target repository to download the JFrog CLI.
-* If your pipeline uses the [JFrog Maven](#jfrog-maven-task) or [JFrog Gradle](#jfrog-Gradle-task) tasks, select *extractors* as the repository to
-  download the Maven Extractor.
+- Create two remote repositories in Artifactory:
+- Create a remote repository in Artifactory for downloading _JFrog CLI_. Name the repository _jfrog-cli-remote_ and
+    set its URL
+    to [https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/](https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/)
+- Create a remote repository in Artifactory for downloading the _Maven and Gradle Extractors_. Name the URL _extractors_ and set its URL
+    to: [https://releases.jfrog.io/artifactory/oss-release-local/](https://releases.jfrog.io/artifactory/oss-release-local/)
+- Make sure to configure the Artifactory server with the _jfrog-cli-remote_ and _extractors_ repositories in as a
+    [service connection](#configuring-the-service-connections) in Azure DevOps of type _JFrog Artifactory V2_.
+- Add the _JFrog Tools Installer_ task to your build or release pipeline.
+- Select the Artifactory service you configured.
+- Select _jfrog-cli-remote_ as the target repository to download the JFrog CLI.
+- If your pipeline uses the [JFrog Maven](#jfrog-maven-task) or [JFrog Gradle](#jfrog-gradle-task) tasks, select _extractors_ as the repository to
+    download the Maven Extractor.
 
 ![tool-installer.png](images/tool-installer.png)
 
@@ -145,6 +145,7 @@ configured to proxy the download repositories.
     <summary>
 
 #### Manual Installation
+
 </summary>
 
 ##### Installing JFrog CLI
@@ -158,9 +159,9 @@ To install JFrog CLI on an agent with no internet access:
 
 1. Create the directory structure on your agent's `file-system: $(Agent.ToolsDirectory)/_jf/current/`
 2. Download the latest JFrog CLI version from [here](https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/).
-3. Please make sure to download the executable matching your agent's operating system. Make sure to download the *jf*
-   executable of JFrog CLI and not the legacy *jfrog* executable.
-4. Copy the downloaded *jf* executable to the *current* directory you created.
+3. Please make sure to download the executable matching your agent's operating system. Make sure to download the _jf_
+   executable of JFrog CLI and not the legacy _jfrog_ executable.
+4. Copy the downloaded _jf_ executable to the _current_ directory you created.
 
 ##### Installing the Maven Extractor
 
@@ -212,12 +213,12 @@ The build agent requires using Node.JS version 8 and above. To check which versi
 agent:
 
 1. Navigate to the `Worker\Handlers\Node` folder located under the Agent home.
-2. From the terminal, run *node -v*
+2. From the terminal, run _node -v_
 
 To upgrade Node.JS on the build agent:
 
-* Replace the existing node.exe file on the agent with the node.exe file with the required version located in
-  the `Worker\Handlers\Node` folder under the agent home.
+- Replace the existing node.exe file on the agent with the node.exe file with the required version located in
+    the `Worker\Handlers\Node` folder under the agent home.
 
 </details>
 
@@ -226,12 +227,48 @@ To upgrade Node.JS on the build agent:
 To allow the JFrog tasks to work with your JFrog environment, you'll need to configure the following service connections
 in Azure DevOps.
 
-|                     Service connection                      | Used by tasks                                                                                                                                                                                                                                                                     |                
-|:-----------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|   <img width="200px" src="./images/service-platform.png">   | JFrog CLI V2                                                                                                                                                                                                                                                                      | 
-| <img width="200px" src="./images/service-artifactory.png">  | JFrog Tools Installer<br>JFrog Generic Artifacts<br>JFrog Nuget<br>JFrog .NET Core<br>JFrog npm<br>JFrog Pip<br>JFrog Maven<br>JFrog Gradle<br>JFrog Go<br>JFrog Conan<br>JFrog Collect Build Issues<br>JFrog Discard Builds<br>JFrog Build Promotion<br>JFrog Publish Build Info |   
-|     <img width="200px" src="./images/service-xray.png">     | JFrog Audit<br>JFrog Build Scan                                                                                                                                                                                                                                                   | 
-| <img width="200px" src="./images/service-distribution.png"> | JFrog Distribution                                                                                                                                                                                                                                                                | 
+|                     Service connection                      | Used by tasks                                                                                                                                                                                                                                                                     |
+| :---------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   <img width="200px" src="./images/service-platform.png">   | JFrog CLI V2                                                                                                                                                                                                                                                                      |
+| <img width="200px" src="./images/service-artifactory.png">  | JFrog Tools Installer<br>JFrog Generic Artifacts<br>JFrog Nuget<br>JFrog .NET Core<br>JFrog npm<br>JFrog Pip<br>JFrog Maven<br>JFrog Gradle<br>JFrog Go<br>JFrog Conan<br>JFrog Collect Build Issues<br>JFrog Discard Builds<br>JFrog Build Promotion<br>JFrog Publish Build Info |
+|     <img width="200px" src="./images/service-xray.png">     | JFrog Audit<br>JFrog Build Scan                                                                                                                                                                                                                                                   |
+| <img width="200px" src="./images/service-distribution.png"> | JFrog Distribution                                                                                                                                                                                                                                                                |
+
+### Authenticating to JFrog from Azure Devops
+
+When authenticating with JFrog we offer the following authentication methods:
+
+- Basic Authentication
+    Provide username and password in the service connection with permissions to deploy.
+- Token Based Authentication
+    Provide access token with permissions to deploy.
+- Oidc authentication
+    In order to configure Oidc authentication we need to initially setup a oidc integration provider in Jfrog. See documentation on how to configure oidc [here](https://jfrog.com/help/r/jfrog-platform-administration-documentation/configure-an-oidc-integration)
+    Obtaining a JFrog Access Token
+
+To obtain a JFrog access token, follow these simple steps:
+
+Prepare the JWT: First, you need a valid JWT (JSON Web Token), which in this case is provided by Azure DevOps (ADO). This JWT represents the identity of the requestor and will be used for authentication. Its important that you extract the information in this token and configure the identity mapping in JFrog Oidc integration provider to assert information in the provided token.
+
+This is the format of a JWT:
+
+```
+{
+"jti": "<guid>",
+"sub": "sc://<DevopsOrgName>/<ProjectName>/<ServiceConnectionName>",
+"aud": "api://AzureADTokenExchange",
+"iss": "<https://vstoken.dev.azure.com/><GUID>",
+"nbf": 1708639268,
+"exp": 1708640467,
+"iat": 1708639868
+}
+
+```
+
+note: the above exact values can be viewed in the system log when executing a build in azure devops with a oidc authenticated service connection
+provider_name: The name of the OIDC provider, which is necessary to link the request to JFrog's authentication provider.
+
+Use the Access Token: The obtained access token can now be used to authenticate against JFrog services, allowing you to interact with repositories, publish artifacts, and more. This is all done by associating your JFrog task to the service connection configured with oidc.
 
 <details>
   <summary>Not Using a Public CA (Certificate Authority)?</summary>
@@ -246,6 +283,7 @@ is under JFrog CLI's home directory.
 The home directory default location is `$(Agent.ToolsDirectory)/_jf/`
 
 Read more about this in the [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli).
+
 </details>
 
 <details>
@@ -263,7 +301,6 @@ To enable TLS 1.2 on TFS:
 
 </details>
 
-
 <br>
 
 ## Executing JFrog CLI Commands
@@ -272,11 +309,12 @@ To enable TLS 1.2 on TFS:
     <summary>
 
 #### JFrog CLI V2 Task
+
 </summary>
 
-The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named *JFrog CLI V2*,
-which allows executing *[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)* commands.
-The command will use the connection details provided by the selected *JFrog Platform* service connection configured in
+The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named _JFrog CLI V2_,
+which allows executing _[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)_ commands.
+The command will use the connection details provided by the selected _JFrog Platform_ service connection configured in
 Azure DevOps,
 so there's no need to provide the connection details as command options.
 
@@ -293,8 +331,8 @@ Single command example:
   inputs:
     jfrogPlatformConnection: 'JFrog Platform V2'
     command: |
-      jf go-config --repo-resolve=go-remote --repo-deploy=go-local 
-      jf go build 
+      jf go-config --repo-resolve=go-remote --repo-deploy=go-local
+      jf go build
       jf go-publish v1.0.0
       jf rt bce $(Build.DefinitionName) $(Build.BuildNumber)
       jf rt build-publish $(Build.DefinitionName) $(Build.BuildNumber)
@@ -308,12 +346,11 @@ Multiple commands example:
     jfrogPlatformConnection: 'JFrog Platform V2'
     command: |
       jf rt ping
-      jf terraform-config --repo-deploy=terraform-remote 
+      jf terraform-config --repo-deploy=terraform-remote
       jf terraform publish --namespace=example --provider=aws --tag=v0.0.1
 ```
 
 </details>
-
 
 <br>
 
@@ -322,24 +359,24 @@ Multiple commands example:
 <details>
   <summary>JFrog Generic Artifacts task</summary>
 
-The *JFrog Generic Artifacts* task supports following operations with JFrog Artifactory:
+The _JFrog Generic Artifacts_ task supports following operations with JFrog Artifactory:
 
-* Uploading artifacts to Artifactory
-* Downloading artifacts from Artifactory
-* Copying artifacts in Artifactory
-* Moving artifacts in Artifactory
-* Deleting artifacts in Artifactory
-* Setting properties on artifacts in Artifactory
-* Deleting properties from artifacts in Artifactory
+- Uploading artifacts to Artifactory
+- Downloading artifacts from Artifactory
+- Copying artifacts in Artifactory
+- Moving artifacts in Artifactory
+- Deleting artifacts in Artifactory
+- Setting properties on artifacts in Artifactory
+- Deleting properties from artifacts in Artifactory
 
 The task triggers [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) to perform these actions
 using [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs).
 When the task is used for uploading and downloading artifacts, it can also be configured to capture the build-info,
-which can be later published to Artifactory using the *JFrog Publish Build Info* task.
+which can be later published to Artifactory using the _JFrog Publish Build Info_ task.
 
 When configuring the task, do the following:
 
-1. Select your configured *JFrog Artifactory V2* service connection.
+1. Select your configured _JFrog Artifactory V2_ service connection.
 
 2. Specify whether you'd like define the File Spec through the task UI or have the task read the spec from a file.
 
@@ -347,11 +384,11 @@ When configuring the task, do the following:
 
 4. Set the other task options.
 
-5. Check the *Advanced* section for additional options.
+5. Check the _Advanced_ section for additional options.
 
 ### Generic artifacts handling
 
-The *JFrog Generic Artifacts* task allows performing generic actions on artifacts, such as:
+The _JFrog Generic Artifacts_ task allows performing generic actions on artifacts, such as:
 
 1. Downloading and uploading from/to Artifactory
 2. Setting or deleting properties on artifacts in Artifactory
@@ -364,7 +401,7 @@ The downloaded dependencies are defined
 using [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs)
 and can be also configured to capture the build-info.
 It will store the downloaded files as dependencies in the build-info which can later be published to Artifactory using
-the *JFrog Publish Build-Info* task.
+the _JFrog Publish Build-Info_ task.
 
 ![GenericDownload](images/marketplace/generic-download.png)
 
@@ -374,7 +411,7 @@ The task also supports uploading your generated build artifacts from the build a
 The artifacts are defined
 using [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs).
 The task can be also configured to capture build-info and stores the uploaded files as artifacts in the build-info. The
-captured build-info can be later published to Artifactory using the *JFrog Publish Build-Info* task.
+captured build-info can be later published to Artifactory using the _JFrog Publish Build-Info_ task.
 
 ![GenericUpload](images/marketplace/generic-upload.png)
 
@@ -417,26 +454,25 @@ YAML Example:
 
 </details>
 
-
 <br>
 
 ## Build tools Tasks
 
-
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Maven Task
+
 </summary>
 
 ![mvn.png](images/marketplace/mvn.png)
 
-The *JFrog Maven* task allows triggering Maven builds, while resolving dependencies and deploying artifacts from and
+The _JFrog Maven_ task allows triggering Maven builds, while resolving dependencies and deploying artifacts from and
 to Artifactory.
-The task uses the configured *JFrog Artifactory V2* service connection.
+The task uses the configured _JFrog Artifactory V2_ service connection.
 The task can also be configured to capture build-info and store the downloaded and uploaded artifacts as build
 dependencies and build artifacts.
-The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
+The captured build-info can be later published to Artifactory using the _[JFrog Publish Build-Info](#jfrog-publish-build-info)_ task.
 
 ![mvn.png](images/maven-task.png)
 
@@ -468,33 +504,35 @@ The patterns can include wildcards and should be separated by a comma followed b
 
 For more information about Maven repositories,
 see [Artifactory Maven Repository](https://jfrog.com/help/r/jfrog-artifactory-documentation/maven-repository)
+
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Gradle Task
+
 </summary>
 
 ![gradle.png](images/marketplace/gradle.png)
 
-The *JFrog Gradle* task allows triggering Gradle builds, while resolving dependencies and deploying artifacts from and
+The _JFrog Gradle_ task allows triggering Gradle builds, while resolving dependencies and deploying artifacts from and
 to Artifactory.
-The task uses the configured *JFrog Artifactory V2* service connection.
+The task uses the configured _JFrog Artifactory V2_ service connection.
 
 The task can also be configured to capture build-info and store the downloaded and uploaded artifacts as build
 dependencies and build artifacts.
-The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
+The captured build-info can be later published to Artifactory using the _[JFrog Publish Build-Info](#jfrog-publish-build-info)_ task.
 
-Behind the scenes, the *JFrog Gradle* task uses
+Behind the scenes, the _JFrog Gradle_ task uses
 the [Gradle Artifactory Plugin](https://jfrog.com/help/r/jfrog-integrations-documentation/gradle-artifactory-plugin) to
 integrate with the Gradle build.
 In case your Gradle script already applies
 the [Gradle Artifactory Plugin](https://jfrog.com/help/r/jfrog-integrations-documentation/gradle-artifactory-plugin),
-set the *Use Artifactory Plugin* option, to let the task know that it shouldn't apply the plugin in the Gradle script.
+set the _Use Artifactory Plugin_ option, to let the task know that it shouldn't apply the plugin in the Gradle script.
 
-You should set *artifactoryPublish* as one of the Gradle tasks in the task(s) fields.
-*artifactoryPublish* is a task that is exposed by the Gradle Artifactory Plugin, and is used for deploying artifacts
+You should set _artifactoryPublish_ as one of the Gradle tasks in the task(s) fields.
+_artifactoryPublish_ is a task that is exposed by the Gradle Artifactory Plugin, and is used for deploying artifacts
 as well as publishing build-info to Artifactory.
 
 ![gradle.png](images/gradle-task.png)
@@ -513,19 +551,20 @@ as well as publishing build-info to Artifactory.
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Npm Task
+
 </summary>
 
 ![npm.png](images/marketplace/npm.png)
 
-The *JFrog Npm* task allows triggering npm builds, while resolving npm dependencies and deploying npm packages from
+The _JFrog Npm_ task allows triggering npm builds, while resolving npm dependencies and deploying npm packages from
 and to Artifactory.
-The task uses the configured *JFrog Artifactory V2* service connection.
+The task uses the configured _JFrog Artifactory V2_ service connection.
 
 The task can be also configured to capture build-info and store the uploaded files as artifacts in it.
-The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
+The captured build-info can be later published to Artifactory using the _[JFrog Publish Build-Info](#jfrog-publish-build-info)_ task.
 
 ![npm.png](images/npm-task.png)
 
@@ -548,20 +587,20 @@ see [Artifactory npm Registry](https://jfrog.com/help/r/jfrog-artifactory-docume
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Nuget and .NET Core Task
-</summary>
 
+</summary>
 
 ![nuget.png](images/marketplace/nuget.png)
 
-The *JFrog Nuget* and *JFrog .NET Core* tasks allow restoring NuGet packages from Artifactory.
+The _JFrog Nuget_ and _JFrog .NET Core_ tasks allow restoring NuGet packages from Artifactory.
 These tasks also allow publishing NuGet packages to Artifactory.
-The task uses the configured *JFrog Artifactory V2* service connection.
+The task uses the configured _JFrog Artifactory V2_ service connection.
 The tasks can be configured to capture build-info.
 The build-info stores the restored packages as build dependencies and uploaded packages as build artifacts.
-The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
+The captured build-info can be later published to Artifactory using the _[JFrog Publish Build-Info](#jfrog-publish-build-info)_ task.
 
 ![nuget.png](images/nuget-task.png)
 
@@ -580,18 +619,20 @@ The captured build-info can be later published to Artifactory using the *[JFrog 
 
 For more information about Nuget repositories,
 see [Artifactory NuGet Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/nuget-repositories)
+
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Pip Task
+
 </summary>
 
 ![pip.png](images/marketplace/pip.png)
 
-The *JFrog Pip* task allows installing Pip packages from Artifactory.
-The task uses the configured *JFrog Artifactory V2* service connection.
+The _JFrog Pip_ task allows installing Pip packages from Artifactory.
+The task uses the configured _JFrog Artifactory V2_ service connection.
 The tasks can also be configured to capture build-info. The build-info stores the installed packages as build
 dependencies.
 The captured build-info can be later published to Artifactory using
@@ -610,17 +651,17 @@ the [Publishing Build Info to Artifactory](http://www.jfrog.com#PublishingBuildI
     buildNumber: '$(Build.BuildNumber)'
 ```
 
-*Recording all dependencies as part of the build-info*
-When running the *JFrog Pip* task inside a Python environment, which already has some of the packages installed, the
+_Recording all dependencies as part of the build-info_
+When running the _JFrog Pip_ task inside a Python environment, which already has some of the packages installed, the
 installed packages will not be included as part of the build-info, if they were not originally installed from
 Artifactory. A warning message will be added to the build log in this case.
 
-*How to include all packages in the build-info?*
-Running the task for the first time with the *Disable local pip cache* option checked,
+_How to include all packages in the build-info?_
+Running the task for the first time with the _Disable local pip cache_ option checked,
 should re-download and install these packages, and they will therefore be included in the build-info.
 It is also recommended to run the command from inside
 a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
-The *Virtual environment setup command* field allows this.
+The _Virtual environment setup command_ field allows this.
 
 ![pip-advanced.png](images/pip-advanced.png)
 
@@ -631,25 +672,26 @@ included in the build-info, even if they are already cached locally.
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Conan Task
+
 </summary>
 
 ![conan.png](images/marketplace/conan.png)
 
 [Conan](https://conan.io/) is a package manager for C and C++.
 
-The *JFrog Conan* task allows triggering a conan build while resolving conan dependencies from a conan repository in
+The _JFrog Conan_ task allows triggering a conan build while resolving conan dependencies from a conan repository in
 Artifactory.
-The task uses the configured *JFrog Artifactory V2* service connection.
+The task uses the configured _JFrog Artifactory V2_ service connection.
 It also allows publishing conan packages to an Artifactory conan repository.
 The task can be also configured to capture build-info and store the downloaded and uploaded packages as build
 dependencies and artifact.
-The captured build-info can be later published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
+The captured build-info can be later published to Artifactory using the _[JFrog Publish Build-Info](#jfrog-publish-build-info)_ task.
 
-The task supports the *config install* , *add remote* , *create* and *upload* conan commands.
-In addition, it supports a *custom* option, allowing to configure the task to execute any conan command.
+The task supports the _config install_ , _add remote_ , _create_ and _upload_ conan commands.
+In addition, it supports a _custom_ option, allowing to configure the task to execute any conan command.
 The full documentation of Conan is available at the [conan website](https://docs.conan.io/en/latest/).
 
 ![conan.png](images/conan-task.png)
@@ -665,20 +707,22 @@ The full documentation of Conan is available at the [conan website](https://docs
 
 For more information about Conan repositories,
 see [Artifactory Conan Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/conan-repositories)
+
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Go Task
+
 </summary>
 
-The *JFrog Go* task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
-The task uses the configured *JFrog Artifactory V2* service connection.
+The _JFrog Go_ task allows triggering a go build, while resolving go dependencies from a go repository in Artifactory.
+The task uses the configured _JFrog Artifactory V2_ service connection.
 It also allows publishing go packages to an Artifactory go repository.
 The task can be also configured to capture build-info and store the downloaded and uploaded packages as build
 dependencies and artifact.
-The captured build-info can be later published to Artifactory using the *JFrog Publish Build-Info* task.
+The captured build-info can be later published to Artifactory using the _JFrog Publish Build-Info_ task.
 
 ![go.png](images/go-task.png)
 
@@ -697,26 +741,26 @@ The captured build-info can be later published to Artifactory using the *JFrog P
 
 For more information about Go repositories,
 see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/go-registry)
-</details>
 
+</details>
 
 <br>
 
 ## Build Tasks
 
-
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Collect Build Issues
+
 </summary>
 
 Being able to look at the build which was published to Artifactory, and see all JIRA issues associated with it, is one
 of the most powerful capabilities of Artifactory when it comes to managing metadata about artifacts builds.
 
-The *JFrog Collect Build Issues* task collects the list of tracked project issues (for example, issues stored in JIRA,
+The _JFrog Collect Build Issues_ task collects the list of tracked project issues (for example, issues stored in JIRA,
 GitHub or any other bug tracking systems, and adds these issues to the build-info.
-The task uses the configured *JFrog Artifactory V2* service connection. The issues are collected by reading the git
+The task uses the configured _JFrog Artifactory V2_ service connection. The issues are collected by reading the git
 commit messages from the local git log.
 Each commit message is matched against a pre-configured regular expression, which retrieves the issue ID and issue
 summary.
@@ -742,7 +786,7 @@ issues:
 ##### Configuration properties
 
 | Property name     | Description                                                                                                                                                                                                                                                                                                             |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Version           | The schema version is intended for internal use. Do not change!                                                                                                                                                                                                                                                         |
 | trackerName       | The name (type) of the issue tracking system. For example, JIRA. This property can take any value.                                                                                                                                                                                                                      |
 | regexp            | A regular expression used for matching the git commit messages. The expression should include two capturing groups - for the issue key (ID) and the issue summary. In the example above, the regular expression matches the commit messages as displayed in the following example:<br>HAP-1007 - This is a sample issue |
@@ -759,14 +803,15 @@ It can then be accesses and used by this task.
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Publish Build Info
+
 </summary>
 
 Most of the JFrog tasks can be configured to collect and store build-info locally.
-The task uses the configured *JFrog Artifactory V2* service connection.
-The collected build info can be then published to Artifactory using the *JFrog Publish Build Info* task.
+The task uses the configured _JFrog Artifactory V2_ service connection.
+The collected build info can be then published to Artifactory using the _JFrog Publish Build Info_ task.
 
 For more information about Build Info,
 see [Artifactory Build Integration](https://jfrog.com/help/r/jfrog-cli/build-integration)
@@ -784,7 +829,7 @@ collect environment variables from the agent and add them to the build-info.
     excludeEnvVars: '*password*;*psw*;*secret*;*key*;*token*;*auth*;'
 ```
 
-After the build-info is published to Artifactory, it can be accessed from the *Artifactory* tab in the Build Results.
+After the build-info is published to Artifactory, it can be accessed from the _Artifactory_ tab in the Build Results.
 
 ![build-results.png](images/marketplace/build-results.png)
 ![bi-in-artifactory.png](images/marketplace/bi-in-artifactory.png)
@@ -792,36 +837,36 @@ After the build-info is published to Artifactory, it can be accessed from the *A
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Build Promotion
-</summary>
 
+</summary>
 
 To support the artifacts life-cycle, Artifactory supports promoting published builds from one repository to another.
 
-The *JFrog Build Promotion* task promotes a build, by either copying or moving the build artifacts and/or dependencies
+The _JFrog Build Promotion_ task promotes a build, by either copying or moving the build artifacts and/or dependencies
 to a target repository.
 
 This task can be added as part of a Build or Release pipeline.
 
-Run these steps to configure the *JFrog Build Promotion* task:
+Run these steps to configure the _JFrog Build Promotion_ task:
 
-1. Select the configured *JFrog Artifactory V2* service connection, to which the build has been published.
+1. Select the configured _JFrog Artifactory V2_ service connection, to which the build has been published.
 
-2. Specify the name of a* target repository* to which the build should be promoted.
+2. Specify the name of a*target repository* to which the build should be promoted.
 
-3. Set the *status* of the build and optionally add a *Comment*. These details will be visible as part of the Build
+3. Set the _status_ of the build and optionally add a _Comment_. These details will be visible as part of the Build
    History in the Artifactory UI.
 
-4. (Optional) Set a *source repository* for the promotion.
+4. (Optional) Set a _source repository_ for the promotion.
 
-5. Select the *include build dependencies* if you want the build dependencies to be promoted.
+5. Select the _include build dependencies_ if you want the build dependencies to be promoted.
 
-6. To copy and not to move the artifacts to the target repository, select the *Use copy* option to copy the artifacts
+6. To copy and not to move the artifacts to the target repository, select the _Use copy_ option to copy the artifacts
    to the target repository.
 
-7. Select *Dry run* to test the promotion prior to running the build promotion.
+7. Select _Dry run_ to test the promotion prior to running the build promotion.
 
 ![build-promotion.png](images/marketplace/build-promotion.png)
 
@@ -844,24 +889,24 @@ Run these steps to configure the *JFrog Build Promotion* task:
 
 You can control the life cycle of your artifacts by promoting them from one Artifactory repository to another.
 Build Promotion can come in handy when embedding it as part of release pipeline in Azure DevOps.
-To help you achieve this, follow these steps for creating a release which includes the *JFrog Build Promotion* task.
+To help you achieve this, follow these steps for creating a release which includes the _JFrog Build Promotion_ task.
 
 1. Create a new Release.
    ![promotion.png](images/promotion1.png)
-2. Click *environment* and select a template for the release.
+2. Click _environment_ and select a template for the release.
    ![promotion.png](images/promotion2.png)
-3. Click *Artifact* and select *Build* as the source type.
+3. Click _Artifact_ and select _Build_ as the source type.
 4. Fill out the rest of the form details.
 5. If you'd like this release to always use the latest build from Artifactory, select specify a specific build number
-   as the *Default version* and select one of the available build number i the *Build number* list box.
+   as the _Default version_ and select one of the available build number i the _Build number_ list box.
 6. If you'd like to promote a specific build number during the release, select specify at the time of release
-   creation as the *Default version*:
+   creation as the _Default version_:
    ![promotion.png](images/promotion3.png)
-7. If you wish to promote the latest build number, select specify a specific build number as the *Default version*
-   and then select *any* build number. Then, click on the *Variables* tab and add
-   the *ARTIFACTORY_RELEASE_BUILD_NUMBER* pipeline variable with *LATEST* as the value.
+7. If you wish to promote the latest build number, select specify a specific build number as the _Default version_
+   and then select _any_ build number. Then, click on the _Variables_ tab and add
+   the _ARTIFACTORY_RELEASE_BUILD_NUMBER_ pipeline variable with _LATEST_ as the value.
    ![promotion.png](images/promotion4.png)
-8. Configure the *Artifactory Build Promotion* task as one of your release pipeline tasks.
+8. Configure the _Artifactory Build Promotion_ task as one of your release pipeline tasks.
    The task uses a build number which will be selected later on, upon creating a release.
    ![promotion.png](images/promotion5.png)
 9. That's it, you're done!
@@ -872,16 +917,17 @@ To help you achieve this, follow these steps for creating a release which includ
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### Discarding Published Builds from Artifactory
+
 </summary>
 
-To discard old runs of a build from Artifactory, add the *JFrog Discard Builds* task to the pipeline.
+To discard old runs of a build from Artifactory, add the _JFrog Discard Builds_ task to the pipeline.
 
 Run these steps to configure the task.
 
-1. Select the configured *JFrog Artifactory V2* service connection, on which you'd like the builds to be discarded.
+1. Select the configured _JFrog Artifactory V2_ service connection, on which you'd like the builds to be discarded.
 
 2. Type the name of the build.
 
@@ -915,14 +961,14 @@ Run these steps to configure the task.
 ## JFrog Xray tasks
 
 <details>
-  <summary> 
+  <summary>
 
 #### Audit project's dependencies for Security Vulnerabilities
+
 </summary>
 
-
-The *JFrog Audit* task triggers an audit of your project dependencies for security vulnerabilities with JFrog Xray.
-The task uses the configured *JFrog Xray V2* service connection.
+The _JFrog Audit_ task triggers an audit of your project dependencies for security vulnerabilities with JFrog Xray.
+The task uses the configured _JFrog Xray V2_ service connection.
 The scan is synchronous, meaning the tasks waits for the scan to finish.
 To determine the policy for identifying the vulnerabilities, you can either set a list for Xray Watches or select a
 JFrog Project or path in Artifactory associated with the policy.
@@ -944,17 +990,18 @@ JFrog Project or path in Artifactory associated with the policy.
 </details>
 
 <details>
-  <summary> 
+  <summary>
 
 #### Scanning Published Builds for Security Vulnerabilities
+
 </summary>
 
-The *JFrog Build Scan* task allows triggering a build scan with JFrog Xray.
-For the build to be scanned, it first needs to be published to Artifactory using the *[JFrog Publish Build-Info](#JFrog-Publish-Build-Info)* task.
-The task uses the configured *JFrog Xray V2* service connection.
+The _JFrog Build Scan_ task allows triggering a build scan with JFrog Xray.
+For the build to be scanned, it first needs to be published to Artifactory using the _[JFrog Publish Build-Info](#jfrog-publish-build-info)_ task.
+The task uses the configured _JFrog Xray V2_ service connection.
 When the scan is triggered, Xray starts scanning the build artifacts and dependencies.
 The scan is synchronous, meaning the tasks waits for the scan to finish.
-If the *Allow fail build* task option is set and Xray is configured to fail the build, the build pipeline will fail,
+If the _Allow fail build_ task option is set and Xray is configured to fail the build, the build pipeline will fail,
 if vulnerabilities are found.
 
 > This functionality requires version 3.37.0 or above of JFrog Xray.
@@ -979,23 +1026,23 @@ build-info report.
 
 </details>
 
-
 <br>
 
 ## JFrog Docker tasks
 
 <details>
-  <summary> 
+  <summary>
 
 #### Pushing and Pulling Docker Images to and from Artifactory
+
 </summary>
 
-The *JFrog Docker* task allows pushing and pulling docker images to and from a docker repository in Artifactory.
+The _JFrog Docker_ task allows pushing and pulling docker images to and from a docker repository in Artifactory.
 The task can be also configured to capture build-info for the pushed or pulled image.
 In addition to details about the build and the build environment, the build info includes the image layers as build
 dependencies and build artifacts.
 The task stores build info locally on the build agent.
-The stored build-info can be later published to Artifactory using the *JFrog Publish Build Info* task.
+The stored build-info can be later published to Artifactory using the _JFrog Publish Build Info_ task.
 
 > This functionality requires version 7.33.3 or above of Artifactory.
 
@@ -1018,14 +1065,14 @@ see [Artifactory Docker Registry](https://jfrog.com/help/r/jfrog-artifactory-doc
 
 </details>
 
-
 <details>
-  <summary> 
+  <summary>
 
 #### Scanning Local Docker Images with JFrog Xray
+
 </summary>
 
-The *JFrog Docker* task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
+The _JFrog Docker_ task allows scanning local docker images using JFrog Xray. The scan results is displayed in the
 build log.
 
 By default, the result will include all vulnerabilities found. You may however configure the task to show only
@@ -1057,11 +1104,9 @@ You do this by configuring the task to use:
 
 </details>
 
-
 <br>
 
 ## Using Published Artifacts in a Release
-
 
 Artifacts which were published to Artifactory can be made available for a Release Pipeline.
 There are two ways to achieve this:
@@ -1070,9 +1115,10 @@ There are two ways to achieve this:
     <summary>
 
 #### Using JFrog Generic Artifacts task
+
 </summary>
 
-The first way is to use the [JFrog Generic Artifacts](#Managing-Generic-Artifacts) task to download the files during the
+The first way is to use the [JFrog Generic Artifacts](#managing-generic-artifacts) task to download the files during the
 release. Read more about this in
 the Downloading Generic Dependencies from Artifactory section.
 
@@ -1082,6 +1128,7 @@ the Downloading Generic Dependencies from Artifactory section.
     <summary>
 
 #### Using Azure Artifact source
+
 </summary>
 
 You can also set Artifactory as an artifact source for the release.
@@ -1091,34 +1138,34 @@ Info to Artifactory section.
 
 Follow these steps to add Artifactory as an artifact source to a Release.
 
-1. Create a new Release and click on *Artifacts Add*
+1. Create a new Release and click on _Artifacts Add_
 
-   ![release1.png](images/release1.png)
+    ![release1.png](images/release1.png)
 
-2. Select the *Artifactory* source type.
+2. Select the _Artifactory_ source type.
 
-   ![release2.png](images/release2.png)
+    ![release2.png](images/release2.png)
 
 3. Select an Artifactory service, a build name, and the default version to use.
 
-   ![release3.png](images/release3.png)
+    ![release3.png](images/release3.png)
 
-   That's it! You're done.
+    That's it! You're done.
 
-   Now, when initiating the Release, the artifacts associated with the defined build are downloaded to the release
-   agent.
+    Now, when initiating the Release, the artifacts associated with the defined build are downloaded to the release
+    agent.
 
 </details>
-
 
 <br>
 
 ## Managing and Distributing Release Bundles
 
 <details>
-  <summary> 
+  <summary>
 
 #### JFrog Distribution V2 Task
+
 </summary>
 
 [JFrog Distribution](https://jfrog.com/help/r/jfrog-distribution-documentation) is a centralized platform that lets you
@@ -1133,19 +1180,19 @@ As part of the release flow, release bundles are verified by the target destinat
 correctly and safe to use.
 JFrog DistributionDistributing Release Bundles
 
-The *JFrog Distribution* task allows creating, updating, signing and deleting release bundles.
+The _JFrog Distribution_ task allows creating, updating, signing and deleting release bundles.
 It also allows distributing the release to the edge nodes.
 
-* The task requires configuring your *JFrog Distribution V2* instance as a service connection in Azure DevOps.
-* You can then set the instance you configured as the Distribution service value in the task.
-* The task triggers [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) to execute the distribution actions.
-* When creating or updating a release bundle, you need to
-  provide [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs) defining the
-  artifacts to be included in the release bundle.
-* When distributing a release bundle, you can control the distribution destinations by defining rules distribution rules
-  in a JSON format.
+- The task requires configuring your _JFrog Distribution V2_ instance as a service connection in Azure DevOps.
+- You can then set the instance you configured as the Distribution service value in the task.
+- The task triggers [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) to execute the distribution actions.
+- When creating or updating a release bundle, you need to
+    provide [File Specs](https://jfrog.com/help/r/jfrog-integrations-documentation/using-file-specs) defining the
+    artifacts to be included in the release bundle.
+- When distributing a release bundle, you can control the distribution destinations by defining rules distribution rules
+    in a JSON format.
 
-*Distribution Rules JSON structure* Here's an example:
+_Distribution Rules JSON structure_ Here's an example:
 
 ```JSON
    {
@@ -1200,11 +1247,9 @@ The Distribution Rules format also supports wildcards. For example:
 
 </details>
 
-
 <br>
 
 ## Contribution
-
 
 We welcome pull requests from the community!
 
@@ -1217,6 +1262,7 @@ To build and run the extension sources, please follow these steps:
 
 1. Clone the code from git.
 2. To Build and create the JFrog Artifactory extension `vsix` file, run the following command.
+
     ```
     npm i
     npm run create
@@ -1238,6 +1284,7 @@ Use the following commands to run from terminal:
 
 1. Set the ADO_JFROG_PLATFORM_URL, ADO_JFROG_PLATFORM_USERNAME and ADO_JFROG_PLATFORM_PASSWORD environment variables
    with your JFrog Platform URL, username and password:
+
     ```
     export ADO_JFROG_PLATFORM_URL='https://myrepo.jfrog.io/'
     export ADO_JFROG_PLATFORM_USERNAME=admin
@@ -1245,6 +1292,7 @@ Use the following commands to run from terminal:
     ```
 
 2. Run the following commands:
+
     ```
     npm i -g jfrog-cli-v2-jf
     npm t
@@ -1255,10 +1303,10 @@ ts-node: `mocha -r ts-node/register tests.ts -t 1000000`.
 
 #### Skipping Tests
 
-In order to skip tests, set the ADO_SKIP_TESTS environment variable with the tests you wish to skip, separated by
+In order to skip tests, set the ADO*SKIP_TESTS environment variable with the tests you wish to skip, separated by
 commas.
-The supported values are: *maven*, *gradle*, *npm*, *go*, *nuget*, *dotnet*, *conan*, *pip*, *proxy*,
-*distribution*, *unit*, *installer* and *generic*.
+The supported values are: \_maven*, _gradle_, _npm_, _go_, _nuget_, _dotnet_, _conan_, _pip_, _proxy_,
+_distribution_, _unit_, _installer_ and _generic_.
 
 For example, for skipping the nuget and dotnet tests:
 
@@ -1271,14 +1319,13 @@ export ADO_SKIP_TESTS=nuget,dotnet
 <details>
     <summary>Pull request guidelines</summary>
 
-* Pull requests should be created on the *dev* branch.
-* Please make sure the code is covered by tests.
-* Please run `npm run format` for formatting the code before submitting the pull request.
-* Please run `npm run lint` and make sure no new tslint warnings were introduced.
+- Pull requests should be created on the _dev_ branch.
+- Please make sure the code is covered by tests.
+- Please run `npm run format` for formatting the code before submitting the pull request.
+- Please run `npm run lint` and make sure no new tslint warnings were introduced.
 
 </details>
 
 ## Reporting issues
 
 Please help us improve jfrog-azure-devops-extension by [reporting issues](https://github.com/jfrog/jfrog-azure-devops-extension/issues/new/choose) you encounter.
-

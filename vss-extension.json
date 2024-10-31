@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "public": true,
     "id": "jfrog-azure-devops-extension",
-    "version": "2.10.1",
+    "version": "2.10.4",
     "name": "JFrog",
     "description": "Integrate your JFrog Platform with Visual Studio Team Services.",
     "publisher": "JFrog",
@@ -14,26 +14,9 @@
     "icons": {
         "default": "images/jfrog-logo-200.png"
     },
-    "scopes": [
-        "vso.build",
-        "vso.build_execute"
-    ],
-    "categories": [
-        "Azure Pipelines"
-    ],
-    "tags": [
-        "JFrog",
-        "Artifactory",
-        "Distribution",
-        "Xray",
-        "Artifact",
-        "Build",
-        "Release",
-        "Promote",
-        "Upload",
-        "Download",
-        "Repository"
-    ],
+    "scopes": ["vso.build", "vso.build_execute"],
+    "categories": ["Azure Pipelines"],
+    "tags": ["JFrog", "Artifactory", "Distribution", "Xray", "Artifact", "Build", "Release", "Promote", "Upload", "Download", "Repository"],
     "content": {
         "details": {
             "path": "overview.md"
@@ -72,9 +55,7 @@
             "id": "jfrog-platform-service",
             "description": "Service Endpoint type for JFrog Platform connections. Currently only used by the 'JFrog CLI V2' task.",
             "type": "ms.vss-endpoint.service-endpoint-type",
-            "targets": [
-                "ms.vss-endpoint.endpoint-types"
-            ],
+            "targets": ["ms.vss-endpoint.endpoint-types"],
             "properties": {
                 "name": "jfrogPlatformService",
                 "displayName": "JFrog Platform V2",
@@ -149,6 +130,37 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "oidcProviderName",
+                                "name": "OIDC Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "jfrogPlatformUrl",
+                                "name": "Platform URL",
+                                "description": "The access token will be obtained from this URL (e.g. https://my.jfrog.com)",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -157,9 +169,7 @@
             "id": "jfrog-artifactory-service",
             "description": "Service Endpoint type for Artifactory connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
-            "targets": [
-                "ms.vss-endpoint.endpoint-types"
-            ],
+            "targets": ["ms.vss-endpoint.endpoint-types"],
             "properties": {
                 "name": "jfrogArtifactoryService",
                 "displayName": "JFrog Artifactory V2",
@@ -234,6 +244,37 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "oidcProviderName",
+                                "name": "OIDC Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "jfrogPlatformUrl",
+                                "name": "Platform URL",
+                                "description": "The access token will be obtained from this URL (e.g. https://my.jfrog.com)",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -242,9 +283,7 @@
             "id": "jfrog-distribution-service",
             "description": "Service Endpoint type for Distribution connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
-            "targets": [
-                "ms.vss-endpoint.endpoint-types"
-            ],
+            "targets": ["ms.vss-endpoint.endpoint-types"],
             "properties": {
                 "name": "jfrogDistributionService",
                 "displayName": "JFrog Distribution V2",
@@ -309,6 +348,37 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "oidcProviderName",
+                                "name": "OIDC Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "jfrogPlatformUrl",
+                                "name": "Platform URL",
+                                "description": "The access token will be obtained from this URL (e.g. https://my.jfrog.com)",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -317,9 +387,7 @@
             "id": "jfrog-xray-service",
             "description": "Service Endpoint type for Xray connections",
             "type": "ms.vss-endpoint.service-endpoint-type",
-            "targets": [
-                "ms.vss-endpoint.endpoint-types"
-            ],
+            "targets": ["ms.vss-endpoint.endpoint-types"],
             "properties": {
                 "name": "jfrogXrayService",
                 "displayName": "JFrog Xray V2",
@@ -384,6 +452,37 @@
                                 }
                             }
                         ]
+                    },
+                    {
+                        "type": "ms.vss-endpoint.endpoint-auth-scheme-none",
+                        "displayName": "Azure DevOps OIDC (Services only)",
+                        "properties": {
+                            "isVerifiable": "False"
+                        },
+                        "inputDescriptors": [
+                            {
+                                "id": "oidcProviderName",
+                                "name": "OIDC Provider Name",
+                                "description": "The OIDC \"Provider Name\" configured in JFrog Platform.",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            },
+                            {
+                                "id": "jfrogPlatformUrl",
+                                "name": "Platform URL",
+                                "description": "The access token will be obtained from this URL (e.g. https://my.jfrog.com)",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -392,9 +491,7 @@
             "id": "jfrog-artifactory-release-artifact-type",
             "description": "Artifactory",
             "type": "ms.vss-releaseartifact.release-artifact-type",
-            "targets": [
-                "ms.vss-releaseartifact.artifact-types"
-            ],
+            "targets": ["ms.vss-releaseartifact.artifact-types"],
             "properties": {
                 "name": "JFrogArtifactory",
                 "displayName": "Artifactory V2",
@@ -433,10 +530,7 @@
                         "hasDynamicValueInformation": true,
                         "inputMode": "Combo",
                         "isConfidential": false,
-                        "dependencyInputIds": [
-                            "connection",
-                            "projectKey"
-                        ],
+                        "dependencyInputIds": ["connection", "projectKey"],
                         "validation": {
                             "isRequired": true,
                             "dataType": "string",
@@ -590,12 +684,7 @@
                         "properties": {
                             "visibleRule": "defaultVersionType == specificVersionType"
                         },
-                        "dependencyInputIds": [
-                            "connection",
-                            "definition",
-                            "defaultVersionType",
-                            "projectKey"
-                        ],
+                        "dependencyInputIds": ["connection", "definition", "defaultVersionType", "projectKey"],
                         "validation": {
                             "isRequired": true,
                             "dataType": "string"
@@ -634,9 +723,7 @@
             "id": "artifactory-build-info-tab",
             "type": "ms.vss-build-web.build-results-tab",
             "description": "A tab in build result to enforce Artifactory integration",
-            "targets": [
-                "ms.vss-build-web.build-results-view"
-            ],
+            "targets": ["ms.vss-build-web.build-results-view"],
             "properties": {
                 "name": "Artifactory",
                 "uri": "artifactory-build-info.html"
@@ -645,9 +732,7 @@
         {
             "id": "jfrog-promote-build-task",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogBuildPromotion"
             }
@@ -655,9 +740,7 @@
         {
             "id": "jfrog-maven",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogMaven"
             }
@@ -665,9 +748,7 @@
         {
             "id": "jfrog-gradle",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogGradle"
             }
@@ -675,9 +756,7 @@
         {
             "id": "jfrog-npm",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogNpm"
             }
@@ -685,9 +764,7 @@
         {
             "id": "jfrog-nuget",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogNuget"
             }
@@ -695,9 +772,7 @@
         {
             "id": "jfrog-dotnet",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogDotnet"
             }
@@ -705,9 +780,7 @@
         {
             "id": "jfrog-publish-build-info",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogPublishBuildInfo"
             }
@@ -715,9 +788,7 @@
         {
             "id": "jfrog-conan-build-task",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogConan"
             }
@@ -725,9 +796,7 @@
         {
             "id": "jfrog-build-scan-task",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogBuildScan"
             }
@@ -735,9 +804,7 @@
         {
             "id": "jfrog-audit-task",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogAudit"
             }
@@ -745,9 +812,7 @@
         {
             "id": "jfrog-docker-task",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogDocker"
             }
@@ -755,9 +820,7 @@
         {
             "id": "jfrog-discard-builds-task",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogDiscardBuilds"
             }
@@ -765,9 +828,7 @@
         {
             "id": "jfrog-tools-installer-task",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogToolsInstaller"
             }
@@ -775,9 +836,7 @@
         {
             "id": "jfrog-go",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogGo"
             }
@@ -785,9 +844,7 @@
         {
             "id": "jfrog-pip",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogPip"
             }
@@ -795,9 +852,7 @@
         {
             "id": "jfrog-distribution",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogDistribution"
             }
@@ -805,9 +860,7 @@
         {
             "id": "jfrog-collect-issues",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogCollectIssues"
             }
@@ -815,9 +868,7 @@
         {
             "id": "jfrog-cli-v2",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogCliV2"
             }
@@ -825,9 +876,7 @@
         {
             "id": "jfrog-generic-artifacts",
             "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
+            "targets": ["ms.vss-distributed-task.tasks"],
             "properties": {
                 "name": "tasks/JFrogGenericArtifacts"
             }
