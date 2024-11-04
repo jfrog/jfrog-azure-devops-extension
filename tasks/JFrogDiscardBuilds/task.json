@@ -85,7 +85,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "discardBuilds.js",
             "workingDirectory": "$(currentDirectory)"
         }

@@ -233,7 +233,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "docker.js",
             "workingDirectory": "$(currentDirectory)"
         }

@@ -93,7 +93,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "collectIssues.js",
             "workingDirectory": "$(currentDirectory)"
         }

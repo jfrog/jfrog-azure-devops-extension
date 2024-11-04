@@ -215,7 +215,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "nugetBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }

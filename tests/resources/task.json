@@ -3,7 +3,7 @@
     "name": "TaskJsonDummyForTests",
     "description": "Task json used to avoid the 'unable to find task json' warnings",
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "",
             "workingDirectory": "$(currentDirectory)"
         }

@@ -307,7 +307,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "mavenBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }

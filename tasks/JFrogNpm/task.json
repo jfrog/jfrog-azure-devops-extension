@@ -179,7 +179,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "npmBuild.js"
         }
     }

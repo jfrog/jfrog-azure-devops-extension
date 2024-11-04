@@ -102,7 +102,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "toolsInstaller.js",
             "workingDirectory": "$(currentDirectory)"
         }

@@ -131,7 +131,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "buildPromotion.js",
             "argumentFormat": "",
             "workingDirectory": "$(currentDirectory)"

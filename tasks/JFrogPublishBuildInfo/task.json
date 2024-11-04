@@ -61,7 +61,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node16": {
             "target": "publishBuildInfo.js",
             "workingDirectory": "$(currentDirectory)"
         }
