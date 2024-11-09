@@ -39,6 +39,7 @@ const repoKeys: any = {
     pipRemoteRepo: 'pip-remote',
     pipVirtualRepo: 'pip-virtual',
     releaseBundlesRepo: 'rb-repo',
+    dockerLocalRepo: 'docker-local'
 };
 
 export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername, platformAccessToken, platformDockerDomain };
@@ -164,113 +165,137 @@ export function createTestRepositories(): void {
             url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf',
         }),
     );
-    createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
-    createRepo(
-        repoKeys.mavenRemoteRepo,
-        JSON.stringify({
-            rclass: 'remote',
-            packageType: 'maven',
-            url: 'https://repo.maven.apache.org/maven2',
-        }),
-    );
-    createRepo(
-        repoKeys.nugetLocalRepo,
-        JSON.stringify({
-            rclass: 'local',
-            packageType: 'nuget',
-            repoLayoutRef: 'nuget-default',
-        }),
-    );
-    createRepo(
-        repoKeys.nugetRemoteRepo,
-        JSON.stringify({
-            rclass: 'remote',
-            packageType: 'nuget',
-            repoLayoutRef: 'nuget-default',
-            downloadContextPath: 'api/v2/package',
-            feedContextPath: 'api/v2',
-            v3FeedUrl: 'https://api.nuget.org/v3/index.json',
-            url: 'https://www.nuget.org/',
-        }),
-    );
-    createRepo(
-        repoKeys.nugetVirtualRepo,
-        JSON.stringify({
-            rclass: 'virtual',
-            packageType: 'nuget',
-            repoLayoutRef: 'nuget-default',
-            repositories: [repoKeys.nugetRemoteRepo, repoKeys.nugetLocalRepo],
-        }),
-    );
-    createRepo(
-        repoKeys.npmLocalRepo,
-        JSON.stringify({
-            rclass: 'local',
-            packageType: 'npm',
-            repoLayoutRef: 'npm-default',
-        }),
-    );
-    createRepo(
-        repoKeys.npmRemoteRepo,
-        JSON.stringify({
-            rclass: 'remote',
-            packageType: 'npm',
-            repoLayoutRef: 'npm-default',
-            url: 'https://registry.npmjs.org',
-        }),
-    );
-    createRepo(
-        repoKeys.npmVirtualRepo,
-        JSON.stringify({
-            rclass: 'virtual',
-            packageType: 'npm',
-            repoLayoutRef: 'npm-default',
-            repositories: [repoKeys.npmLocalRepo, repoKeys.npmRemoteRepo],
-        }),
-    );
-    createRepo(repoKeys.conanLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'conan' }));
-    createRepo(
-        repoKeys.goLocalRepo,
-        JSON.stringify({
-            rclass: 'local',
-            packageType: 'go',
-            repoLayoutRef: 'go-default',
-        }),
-    );
-    createRepo(
-        repoKeys.goRemoteRepo,
-        JSON.stringify({
-            rclass: 'remote',
-            packageType: 'go',
-            repoLayoutRef: 'go-default',
-            url: 'https://proxy.golang.org',
-        }),
-    );
-    createRepo(
-        repoKeys.goVirtualRepo,
-        JSON.stringify({
-            rclass: 'virtual',
-            packageType: 'go',
-            repoLayoutRef: 'go-default',
-            repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo],
-        }),
-    );
-    createRepo(repoKeys.pipLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'pypi', repoLayoutRef: 'simple-default' }));
-    createRepo(
-        repoKeys.pipRemoteRepo,
-        JSON.stringify({ rclass: 'remote', packageType: 'pypi', repoLayoutRef: 'simple-default', url: 'https://files.pythonhosted.org' }),
-    );
-    createRepo(
-        repoKeys.pipVirtualRepo,
-        JSON.stringify({
-            rclass: 'virtual',
-            packageType: 'pypi',
-            repoLayoutRef: 'simple-default',
-            repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo],
-        }),
-    );
+    if (!isSkipTest('maven')) {    
+        createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
+        createRepo(
+            repoKeys.mavenRemoteRepo,
+            JSON.stringify({
+                rclass: 'remote',
+                packageType: 'maven',
+                url: 'https://repo.maven.apache.org/maven2',
+            }),
+        );
+    }
+    if (!isSkipTest('nuget') && !isSkipTest('dotnet')) {    
+        createRepo(
+            repoKeys.nugetLocalRepo,
+            JSON.stringify({
+                rclass: 'local',
+                packageType: 'nuget',
+                repoLayoutRef: 'nuget-default',
+            }),
+        );
+        createRepo(
+            repoKeys.nugetRemoteRepo,
+            JSON.stringify({
+                rclass: 'remote',
+                packageType: 'nuget',
+                repoLayoutRef: 'nuget-default',
+                downloadContextPath: 'api/v2/package',
+                feedContextPath: 'api/v2',
+                v3FeedUrl: 'https://api.nuget.org/v3/index.json',
+                url: 'https://www.nuget.org/',
+            }),
+        );
+        createRepo(
+            repoKeys.nugetVirtualRepo,
+            JSON.stringify({
+                rclass: 'virtual',
+                packageType: 'nuget',
+                repoLayoutRef: 'nuget-default',
+                repositories: [repoKeys.nugetRemoteRepo, repoKeys.nugetLocalRepo],
+            }),
+        );
+    }
+    if (!isSkipTest('npm')) {    
+        createRepo(
+            repoKeys.npmLocalRepo,
+            JSON.stringify({
+                rclass: 'local',
+                packageType: 'npm',
+                repoLayoutRef: 'npm-default',
+            }),
+        );
+        createRepo(
+            repoKeys.npmRemoteRepo,
+            JSON.stringify({
+                rclass: 'remote',
+                packageType: 'npm',
+                repoLayoutRef: 'npm-default',
+                url: 'https://registry.npmjs.org',
+            }),
+        );
+        createRepo(
+            repoKeys.npmVirtualRepo,
+            JSON.stringify({
+                rclass: 'virtual',
+                packageType: 'npm',
+                repoLayoutRef: 'npm-default',
+                repositories: [repoKeys.npmLocalRepo, repoKeys.npmRemoteRepo],
+            }),
+        );
+    }
+    if (!isSkipTest('conan')) {    
+        createRepo(repoKeys.conanLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'conan' }));
+    }
+    if (!isSkipTest('go')) {    
+        createRepo(
+            repoKeys.goLocalRepo,
+            JSON.stringify({
+                rclass: 'local',
+                packageType: 'go',
+                repoLayoutRef: 'go-default',
+            }),
+        );
+        createRepo(
+            repoKeys.goRemoteRepo,
+            JSON.stringify({
+                rclass: 'remote',
+                packageType: 'go',
+                repoLayoutRef: 'go-default',
+                url: 'https://proxy.golang.org',
+            }),
+        );
+        createRepo(
+            repoKeys.goVirtualRepo,
+            JSON.stringify({
+                rclass: 'virtual',
+                packageType: 'go',
+                repoLayoutRef: 'go-default',
+                repositories: [repoKeys.goLocalRepo, repoKeys.goRemoteRepo],
+            }),
+        );
+    }
+    if (!isSkipTest('pip')) {    
+        createRepo(repoKeys.pipLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'pypi', repoLayoutRef: 'simple-default' }));
+        createRepo(
+            repoKeys.pipRemoteRepo,
+            JSON.stringify({ rclass: 'remote', packageType: 'pypi', repoLayoutRef: 'simple-default', url: 'https://files.pythonhosted.org' }),
+        );
+        createRepo(
+            repoKeys.pipVirtualRepo,
+            JSON.stringify({
+                rclass: 'virtual',
+                packageType: 'pypi',
+                repoLayoutRef: 'simple-default',
+                repositories: [repoKeys.pipLocalRepo, repoKeys.pipRemoteRepo],
+            }),
+        );
+    }
     if (!isSkipTest('distribution')) {
         createRepo(repoKeys.releaseBundlesRepo, JSON.stringify({ rclass: 'releaseBundles' }));
+    }
+    if (!isSkipTest('docker')) {
+        createRepo(
+            repoKeys.dockerLocalRepo,
+            JSON.stringify({
+                rclass: 'local',
+                packageType: 'docker',
+                dockerApiVersion: 'V2',
+                dockerV1Enabled: false,
+                enableTokenAuthentication: true
+            }),
+        );
     }
 }
 

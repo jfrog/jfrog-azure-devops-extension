@@ -1,4 +1,5 @@
-name: Distribution Tests
+# Tests that require access to a cloud JFrog platform instance
+name: Cloud Instance Tests
 on:
   push:
     branches:
@@ -13,7 +14,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  Distribution-Tests:
+  Cloud-Tests:
     if: contains(github.event.pull_request.labels.*.name, 'safe to test') || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -30,4 +31,5 @@ jobs:
         env:
           ADO_JFROG_PLATFORM_URL: ${{ secrets.PLATFORM_URL }}
           ADO_JFROG_PLATFORM_ACCESS_TOKEN: ${{ secrets.PLATFORM_ADMIN_TOKEN }}
-          ADO_SKIP_TESTS: unit,proxy,generic,installer,npm,maven,gradle,conan,nuget,dotnet,go,pip,docker
+          ADO_JFROG_PLATFORM_DOCKER_DOMAIN: ${{ secrets.CONTAINER_REGISTRY }}
+          ADO_SKIP_TESTS: unit,proxy,generic,installer,npm,maven,gradle,conan,nuget,dotnet,go,pip

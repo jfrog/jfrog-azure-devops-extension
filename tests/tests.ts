@@ -745,7 +745,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
 
                 // Run docker build + tag
-                execSync(`docker build -t ${platformDockerDomain}/docker-local/docker-test:1 ${join(__dirname, 'resources', testDir, filesDir)}`);
+                execSync(`docker build -t ${platformDockerDomain}/${repoKeys.dockerLocalRepo}/docker-test:1 ${join(__dirname, 'resources', testDir, filesDir)}`);
 
                 // run docker push
                 mockTask(testDir, 'push');
