@@ -28,7 +28,6 @@ function executeConanTask(commandArgs) {
 
         let conanTaskId = generateConanTaskUUId();
         tl.debug('Conan Task Id: ' + conanTaskId);
-        let buildTimestamp = Date.now();
 
         let conanPath = null;
         try {
@@ -58,7 +57,7 @@ function executeConanTask(commandArgs) {
             let buildName = tl.getInput('buildName', true);
             let buildNumber = tl.getInput('buildNumber', true);
             try {
-                initCliPartialsBuildDir(buildName, buildNumber);
+                let buildTimestamp = initCliPartialsBuildDir(buildName, buildNumber);
                 setConanTraceFileLocation(conanUserHome, conanTaskId);
                 setArtifactsBuildInfoProperties(conanUserHome, buildName, buildNumber, buildTimestamp);
             } catch (err) {
@@ -387,14 +386,56 @@ function purgeConanRemotes() {
  * Creates the path of for partials build info and initializing the details file with Timestamp.
  * @param buildName (string) - The build name
  * @param buildNumber (string) - The build number
+ * @returns {number} - The timestamp of the build in milliseconds.
  */
 function initCliPartialsBuildDir(buildName, buildNumber) {
     let partialsBuildDir = join(getCliPartialsBuildDir(buildName, buildNumber), 'partials');
+    let buildDetailsFile = join(partialsBuildDir, 'details');
+
+    // If a build was initialized before this task, read the build timestamp from the existing build details.
+    if (fs.pathExistsSync(buildDetailsFile)) {
+        let buildTimestamp = readTimestampFromPartial(buildDetailsFile);
+        if (buildTimestamp) {
+            tl.debug('Read timestamp "' + buildTimestamp + '" from partial build details at: ' + buildDetailsFile);
+            return buildTimestamp;
+        }
+    }
+    // If a build was not initialized, create a new build details file.
+    return createBuildDetailsPartial(partialsBuildDir, buildDetailsFile);
+}
+
+/**
+ * Creates the partial details file with the current timestamp.
+ * @param partialsBuildDir (string) - path to the build's partials directory.
+ * @param buildDetailsFile (string) - path to the build's partial build details file.
+ * @returns {number} - The timestamp of the build in milliseconds.
+ */
+function createBuildDetailsPartial(partialsBuildDir, buildDetailsFile) {
     if (!fs.pathExistsSync(partialsBuildDir)) {
         fs.ensureDirSync(partialsBuildDir);
     }
-    fs.writeJsonSync(join(partialsBuildDir, 'details'), { Timestamp: new Date().toISOString() });
-    tl.debug('Created partial details at: ' + join(partialsBuildDir, 'details'));
+
+    // The start time is saved as ISO, but the artifacts property is saved as a timestamp.
+    let buildStartTime = new Date();
+    fs.writeJsonSync(buildDetailsFile, { Timestamp: buildStartTime.toISOString() });
+    tl.debug('Created partial build details at: ' + buildDetailsFile);
+    return buildStartTime.getTime();
+}
+
+/**
+ * Reads the build start time from the build's partial build details file, and returns it as timestamp.
+ * @param buildDetailsFile (string) - path to the build's partial build details file.
+ * @returns {number} - The timestamp of the build in milliseconds.
+ */
+function readTimestampFromPartial(buildDetailsFile) {
+    try {
+        const data = fs.readFileSync(buildDetailsFile, 'utf8');
+        const jsonData = JSON.parse(data);
+        return Date.parse(jsonData.Timestamp);
+    } catch (err) {
+        console.error('Error reading or parsing the build details partials file:', err);
+        return undefined;
+    }
 }
 
 function getCliPartialsBuildDir(buildName, buildNumber) {
@@ -405,6 +446,8 @@ function getCliPartialsBuildDir(buildName, buildNumber) {
 
 module.exports = {
     executeConanTask: executeConanTask,
-    getCliPartialsBuildDir: getCliPartialsBuildDir, // Exported for tests
     purgeConanRemotes: purgeConanRemotes,
+    // Exported for tests:
+    getCliPartialsBuildDir: getCliPartialsBuildDir,
+    initCliPartialsBuildDir: initCliPartialsBuildDir,
 };

@@ -39,7 +39,7 @@ const repoKeys: any = {
     pipRemoteRepo: 'pip-remote',
     pipVirtualRepo: 'pip-virtual',
     releaseBundlesRepo: 'rb-repo',
-    dockerLocalRepo: 'docker-local'
+    dockerLocalRepo: 'docker-local',
 };
 
 export { testDataDir, repoKeys, platformUrl, platformPassword, platformUsername, platformAccessToken, platformDockerDomain };
@@ -165,7 +165,7 @@ export function createTestRepositories(): void {
             url: 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf',
         }),
     );
-    if (!isSkipTest('maven')) {    
+    if (!isSkipTest('maven')) {
         createRepo(repoKeys.mavenLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'maven' }));
         createRepo(
             repoKeys.mavenRemoteRepo,
@@ -176,7 +176,7 @@ export function createTestRepositories(): void {
             }),
         );
     }
-    if (!isSkipTest('nuget') && !isSkipTest('dotnet')) {    
+    if (!isSkipTest('nuget') && !isSkipTest('dotnet')) {
         createRepo(
             repoKeys.nugetLocalRepo,
             JSON.stringify({
@@ -207,7 +207,7 @@ export function createTestRepositories(): void {
             }),
         );
     }
-    if (!isSkipTest('npm')) {    
+    if (!isSkipTest('npm')) {
         createRepo(
             repoKeys.npmLocalRepo,
             JSON.stringify({
@@ -235,10 +235,10 @@ export function createTestRepositories(): void {
             }),
         );
     }
-    if (!isSkipTest('conan')) {    
+    if (!isSkipTest('conan')) {
         createRepo(repoKeys.conanLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'conan' }));
     }
-    if (!isSkipTest('go')) {    
+    if (!isSkipTest('go')) {
         createRepo(
             repoKeys.goLocalRepo,
             JSON.stringify({
@@ -266,7 +266,7 @@ export function createTestRepositories(): void {
             }),
         );
     }
-    if (!isSkipTest('pip')) {    
+    if (!isSkipTest('pip')) {
         createRepo(repoKeys.pipLocalRepo, JSON.stringify({ rclass: 'local', packageType: 'pypi', repoLayoutRef: 'simple-default' }));
         createRepo(
             repoKeys.pipRemoteRepo,
@@ -293,7 +293,7 @@ export function createTestRepositories(): void {
                 packageType: 'docker',
                 dockerApiVersion: 'V2',
                 dockerV1Enabled: false,
-                enableTokenAuthentication: true
+                enableTokenAuthentication: true,
             }),
         );
     }

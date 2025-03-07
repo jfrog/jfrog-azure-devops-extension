@@ -219,6 +219,14 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             },
             TestUtils.isSkipTest('unit'),
         );
+
+        runSyncTest(
+            'Conan Utils - Init build details partial and verify consistency in timestamp',
+            (): void => {
+                testInitCliPartialsBuildDir();
+            },
+            TestUtils.isSkipTest('unit'),
+        );
     });
 
     describe('JFrog CLI Task Tests', (): void => {
@@ -745,7 +753,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 const filesDir: string = TestUtils.isWindows() ? 'windowsFiles' : 'unixFiles';
 
                 // Run docker build + tag
-                execSync(`docker build -t ${platformDockerDomain}/${repoKeys.dockerLocalRepo}/docker-test:1 ${join(__dirname, 'resources', testDir, filesDir)}`);
+                execSync(
+                    `docker build -t ${platformDockerDomain}/${repoKeys.dockerLocalRepo}/docker-test:1 ${join(__dirname, 'resources', testDir, filesDir)}`,
+                );
 
                 // run docker push
                 mockTask(testDir, 'push');
@@ -1225,6 +1235,31 @@ function testGetCliPartialsBuildDir(): void {
     testDTO.testsBuildNames.forEach((element: string): void => assertPathExists(conanUtils.getCliPartialsBuildDir(element, testDTO.testBuildNumber)));
     // Cleanup the created partials
     testDTO.testsBuildNames.forEach((element: string): void => runBuildCommand('bc', element, testDTO.testBuildNumber));
+}
+
+function testInitCliPartialsBuildDir(): void {
+    const testsBuildName: string = 'partialTestBuildName';
+    const testBuildNumber: string = '123';
+
+    // Cleanup old partials.
+    runBuildCommand('bc', testsBuildName, testBuildNumber);
+
+    // Init build partials directory. A new build timestamp should be generated.
+    let originalBuildTimestamp: number = conanUtils.initCliPartialsBuildDir(testsBuildName, testBuildNumber);
+    assert.ok(originalBuildTimestamp, 'A timestamp should have been generated');
+    assert.equal(originalBuildTimestamp.toString().length, 13, 'The timestamp should be valid');
+
+    // Calling initialization again. Since it already exists, we expect the same timestamp to be returned.
+    let newBuildTimestamp: number = conanUtils.initCliPartialsBuildDir(testsBuildName, testBuildNumber);
+    assert.equal(originalBuildTimestamp, newBuildTimestamp, 'The timestamp should not have changed');
+
+    // Cleanup existing partials, init again and assert the new timestamp.
+    runBuildCommand('bc', testsBuildName, testBuildNumber);
+    newBuildTimestamp = conanUtils.initCliPartialsBuildDir(testsBuildName, testBuildNumber);
+    assert.notEqual(originalBuildTimestamp, newBuildTimestamp, 'The timestamp should have changed');
+
+    // Cleanup test.
+    runBuildCommand('bc', testsBuildName, testBuildNumber);
 }
 
 function runBuildCommand(command: string, buildName: string, buildNumber: string): void {
