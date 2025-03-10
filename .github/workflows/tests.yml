@@ -33,6 +33,18 @@ jobs:
       - name: Install Conan
         run: pip install "conan<2" -q
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      - name: Install Mono
+        run: |
+          sudo apt update
+          sudo apt install mono-complete
+          mono --version
+        if: ${{ matrix.os == 'ubuntu' }}
+
       - name: Install JFrog CLI
         run: curl -fL https://install-cli.jfrog.io | sh
 
