@@ -13,7 +13,7 @@
     "version": {
         "Major": "1",
         "Minor": "10",
-        "Patch": "3"
+        "Patch": "4"
     },
     "demands": [],
     "minimumAgentVersion": "1.83.0",
@@ -276,7 +276,11 @@
         }
     ],
     "execution": {
-        "Node16": {
+        "Node10": {
+            "target": "distribution.js",
+            "workingDirectory": "$(currentDirectory)"
+        },
+        "Node20_1": {
             "target": "distribution.js",
             "workingDirectory": "$(currentDirectory)"
         }

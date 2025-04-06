@@ -13,7 +13,7 @@
     "version": {
         "Major": "1",
         "Minor": "10",
-        "Patch": "3"
+        "Patch": "4"
     },
     "demands": [
         "maven"
@@ -307,7 +307,11 @@
         }
     ],
     "execution": {
-        "Node16": {
+        "Node10": {
+            "target": "mavenBuild.js",
+            "workingDirectory": "$(currentDirectory)"
+        },
+        "Node20_1": {
             "target": "mavenBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }

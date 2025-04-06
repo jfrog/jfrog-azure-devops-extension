@@ -13,7 +13,7 @@
     "version": {
         "Major": "1",
         "Minor": "10",
-        "Patch": "3"
+        "Patch": "4"
     },
     "demands": [],
     "minimumAgentVersion": "1.89.0",
@@ -102,7 +102,11 @@
         }
     ],
     "execution": {
-        "Node16": {
+        "Node10": {
+            "target": "toolsInstaller.js",
+            "workingDirectory": "$(currentDirectory)"
+        },
+        "Node20_1": {
             "target": "toolsInstaller.js",
             "workingDirectory": "$(currentDirectory)"
         }
