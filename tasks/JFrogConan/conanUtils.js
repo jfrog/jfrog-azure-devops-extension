@@ -390,18 +390,18 @@ function purgeConanRemotes() {
  */
 function initCliPartialsBuildDir(buildName, buildNumber) {
     let partialsBuildDir = join(getCliPartialsBuildDir(buildName, buildNumber), 'partials');
-    let buildDetailsFile = join(partialsBuildDir, 'details');
+    let partialBuildDetailsFile = join(partialsBuildDir, 'details');
 
     // If a build was initialized before this task, read the build timestamp from the existing build details.
-    if (fs.pathExistsSync(buildDetailsFile)) {
-        let buildTimestamp = readTimestampFromPartial(buildDetailsFile);
+    if (fs.pathExistsSync(partialBuildDetailsFile)) {
+        let buildTimestamp = readTimestampFromBuildPartialDetailsFile(partialBuildDetailsFile);
         if (buildTimestamp) {
-            tl.debug('Read timestamp "' + buildTimestamp + '" from partial build details at: ' + buildDetailsFile);
+            tl.debug('Read timestamp "' + buildTimestamp + '" from partial build details at: ' + partialBuildDetailsFile);
             return buildTimestamp;
         }
     }
     // If a build was not initialized, create a new build details file.
-    return createBuildDetailsPartial(partialsBuildDir, buildDetailsFile);
+    return createBuildDetailsPartial(partialsBuildDir, partialBuildDetailsFile);
 }
 
 /**
@@ -427,7 +427,7 @@ function createBuildDetailsPartial(partialsBuildDir, buildDetailsFile) {
  * @param buildDetailsFile (string) - path to the build's partial build details file.
  * @returns {number} - The timestamp of the build in milliseconds.
  */
-function readTimestampFromPartial(buildDetailsFile) {
+function readTimestampFromBuildPartialDetailsFile(buildDetailsFile) {
     try {
         const data = fs.readFileSync(buildDetailsFile, 'utf8');
         const jsonData = JSON.parse(data);
