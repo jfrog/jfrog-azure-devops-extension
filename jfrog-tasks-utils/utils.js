@@ -10,7 +10,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.71.3';
+const defaultJfrogCliVersion = '2.75.0';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
@@ -252,13 +252,6 @@ function configureDistributionCliServer(distributionService, serverId, cliPath, 
 function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
 }
-function logIDToken(oidcToken) {
-    const oidcClaims = JSON.parse(Buffer.from(oidcToken.split('.')[1], 'base64').toString());
-    console.log('OIDC Token Subject: ', oidcClaims.sub);
-    console.log(`OIDC Token Claims: {"sub": "${oidcClaims.sub}"}`);
-    console.log('OIDC Token Issuer (Provider URL): ', oidcClaims.iss);
-    console.log('OIDC Token Audience: ', oidcClaims.aud);
-}
 
 function getADOIdToken(serviceConnectionID) {
     const uri = tl.getVariable('System.CollectionUri');
@@ -283,9 +276,7 @@ function getADOIdToken(serviceConnectionID) {
         }
 
         const parsedResponse = JSON.parse(response.getBody('utf8'));
-        const idToken = parsedResponse.oidcToken;
-        logIDToken(idToken);
-        return idToken;
+        return parsedResponse.oidcToken;
     } catch (error) {
         throw new Error(`Failed to get or parse response: ${error.message}`);
     }
