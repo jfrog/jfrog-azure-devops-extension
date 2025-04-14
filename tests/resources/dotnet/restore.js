@@ -11,6 +11,7 @@ let inputs = {
     packagesDirectory: join(testUtils.getLocalTestDir(TEST_NAME), 'packages'),
     verbosityRestore: 'Minimal',
     collectBuildInfo: true,
+    arguments: '"--allow-insecure-connections"',
 };
 
 testUtils.copyTestFilesToTestWorkDir(TEST_NAME, 'restore');

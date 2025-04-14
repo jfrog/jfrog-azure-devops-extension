@@ -112,7 +112,7 @@ To install the _[JFrog Extension](https://marketplace.visualstudio.com/items?ite
 
 ### Installing the Build Agent
 
-To run the JFrog tasks, the build agents use three tools:
+To run the JFrog tasks, the build agents use the following tools:
 
 - JFrog CLI: Runs all the JFrog tasks.
 - Maven Extractor (Used by the [JFrog Maven](#jfrog-maven-task) task)

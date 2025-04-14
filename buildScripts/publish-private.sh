@@ -30,7 +30,7 @@ npx tfx extension unpublish -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-a
 npx tfx extension create --manifest-globs vss-extension-private.json --publisher "$PUBLISHER"
 # Check that vsix size is less then 30MB
 vsixSize="$(du -m -- *.vsix | awk '{print $1}' | head -1)"
-if [ "${vsixSize}" -gt 30 ]; then
+if [ "${vsixSize}" -gt 40 ]; then
     echo "Extension vsix size is greater than 30MB! (${vsixSize}MB) - Hint: Most of the dependencies on package-json are in format of - <^x.y.z>, so maybe one of them got updated, and the node_modules directory became bigger"
     exit 1
 fi

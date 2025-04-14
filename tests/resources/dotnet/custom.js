@@ -5,7 +5,7 @@ const TEST_NAME = testUtils.getTestName(__dirname);
 let inputs = {
     command: 'custom',
     customCommand: 'restore',
-    arguments: '"--build-name=DotNET Test" "--build-number=7"',
+    arguments: '"--build-name=DotNET Test" "--build-number=7" "--allow-insecure-connections"',
     rootPath: join(testUtils.getLocalTestDir(TEST_NAME)),
     targetResolveRepo: testUtils.getRepoKeys().nugetVirtualRepo,
     nugetProtocolVersion: 'v3',

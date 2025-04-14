@@ -10,7 +10,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.74.1';
+const defaultJfrogCliVersion = '2.71.3';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
@@ -303,12 +303,12 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
 
     if (oidcProviderName) {
         const idToken = getADOIdToken(service);
-        cliCommand = cliJoin(
+        (cliCommand = cliJoin(
             cliCommand,
             '--oidc-provider-name=' + (isWindows() ? quote(oidcProviderName) : singleQuote(oidcProviderName)),
-            '--oidc-provider-type=' + 'Azure'),
-            '--oidc-token-id=' + (isWindows() ? quote(idToken) : singleQuote(idToken)
-        );
+            '--oidc-provider-type=' + 'Azure',
+        )),
+            '--oidc-token-id=' + (isWindows() ? quote(idToken) : singleQuote(idToken));
         return executeCliCommand(cliCommand, buildDir, { stdinSecret });
     }
 
