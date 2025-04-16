@@ -19,7 +19,8 @@ const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
-const request = require('sync-request');
+const HttpClient = require('typed-rest-client/HttpClient').HttpClient;
+
 // Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
 // or a specific version was requested in a task. If not set, use the default CLI version.
 const pipelineRequestedCliVersionEnv = 'JFROG_CLI_PIPELINE_REQUESTED_VERSION_AZURE';
@@ -253,7 +254,7 @@ function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
 }
 
-function getADOIdToken(serviceConnectionID) {
+async function fetchAzureOidcToken(serviceConnectionID) {
     const uri = tl.getVariable('System.CollectionUri');
     const teamPrjID = tl.getVariable('System.TeamProjectId');
     const hub = tl.getVariable('System.HostType');
@@ -262,24 +263,34 @@ function getADOIdToken(serviceConnectionID) {
     const apiVersion = '7.1-preview.1';
 
     const url = `${uri}${teamPrjID}/_apis/distributedtask/hubs/${hub}/plans/${planID}/jobs/${jobID}/oidctoken?api-version=${apiVersion}&serviceConnectionId=${serviceConnectionID}`;
+    const token = tl.getVariable('System.AccessToken');
 
-    try {
-        const response = request('POST', url, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${tl.getVariable('System.AccessToken')}`,
-            },
-        });
-
-        if (response.statusCode !== 200) {
-            throw new Error(`HTTP request failed with status code ${response.statusCode}`);
-        }
-
-        const parsedResponse = JSON.parse(response.getBody('utf8'));
-        return parsedResponse.oidcToken;
-    } catch (error) {
-        throw new Error(`Failed to get or parse response: ${error.message}`);
+    if (!token) {
+        throw new Error('System.AccessToken is not available. Make sure "Allow scripts to access OAuth token" is enabled.');
     }
+
+    const httpClient = new HttpClient('jfrog-azure-devops-extension');
+
+    const res = await httpClient.post(url, '', {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    });
+
+    if (res.message.statusCode !== 200) {
+        throw new Error(`OIDC token request failed: HTTP ${res.message.statusCode}`);
+    }
+
+    const body = await res.readBody();
+
+    /** @type {{ oidcToken?: string }} */
+    const parsed = JSON.parse(body);
+
+    if (!parsed.oidcToken) {
+        throw new Error('OIDC token not found in response body.');
+    }
+
+    tl.debug('Successfully fetched OIDC token from Azure DevOps.');
+    return parsed.oidcToken;
 }
 
 function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
@@ -293,13 +304,13 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     let secretInStdinSupported = isStdinSecretSupported();
 
     if (oidcProviderName) {
-        const idToken = getADOIdToken(service);
-        (cliCommand = cliJoin(
+        const idToken = fetchAzureOidcToken(service);
+        cliCommand = cliJoin(
             cliCommand,
             '--oidc-provider-name=' + (isWindows() ? quote(oidcProviderName) : singleQuote(oidcProviderName)),
-            '--oidc-provider-type=' + 'Azure',
-        )),
-            '--oidc-token-id=' + (isWindows() ? quote(idToken) : singleQuote(idToken));
+            '--oidc-provider-type=Azure',
+            '--oidc-token-id=' + (isWindows() ? quote(idToken) : singleQuote(idToken))
+        );
         return executeCliCommand(cliCommand, buildDir, { stdinSecret });
     }
 
