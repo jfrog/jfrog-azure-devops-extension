@@ -19,7 +19,7 @@ const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
-const HttpClient = require('typed-rest-client/HttpClient').HttpClient;
+const syncRequest = require('sync-request');
 
 // Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
 // or a specific version was requested in a task. If not set, use the default CLI version.
@@ -254,7 +254,7 @@ function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
 }
 
-async function fetchAzureOidcToken(serviceConnectionID) {
+function fetchAzureOidcToken(serviceConnectionID) {
     const uri = tl.getVariable('System.CollectionUri');
     const teamPrjID = tl.getVariable('System.TeamProjectId');
     const hub = tl.getVariable('System.HostType');
@@ -262,35 +262,31 @@ async function fetchAzureOidcToken(serviceConnectionID) {
     const jobID = tl.getVariable('System.JobId');
     const apiVersion = '7.1-preview.1';
 
-    const url = `${uri}${teamPrjID}/_apis/distributedtask/hubs/${hub}/plans/${planID}/jobs/${jobID}/oidctoken?api-version=${apiVersion}&serviceConnectionId=${serviceConnectionID}`;
     const token = tl.getVariable('System.AccessToken');
-
     if (!token) {
         throw new Error('System.AccessToken is not available. Make sure "Allow scripts to access OAuth token" is enabled.');
     }
 
-    const httpClient = new HttpClient('jfrog-azure-devops-extension');
+    const url = `${uri}${teamPrjID}/_apis/distributedtask/hubs/${hub}/plans/${planID}/jobs/${jobID}/oidctoken?api-version=${apiVersion}&serviceConnectionId=${serviceConnectionID}`;
 
-    const res = await httpClient.post(url, '', {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+    const res = syncRequest('POST', url, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
     });
 
-    if (res.message.statusCode !== 200) {
-        throw new Error(`OIDC token request failed: HTTP ${res.message.statusCode}`);
+    if (res.statusCode !== 200) {
+        throw new Error(`OIDC token request failed: HTTP ${res.statusCode}\nBody: ${res.getBody('utf8')}`);
     }
-
-    const body = await res.readBody();
-
-    /** @type {{ oidcToken?: string }} */
-    const parsed = JSON.parse(body);
-
-    if (!parsed.oidcToken) {
+    const body = JSON.parse(res.getBody('utf8'));
+    console.info(body)
+    console.info(body.oidcToken)
+    if (!body.oidcToken) {
         throw new Error('OIDC token not found in response body.');
     }
-
-    tl.debug('Successfully fetched OIDC token from Azure DevOps.');
-    return parsed.oidcToken;
+    console.info("end of functoin")
+    return body.oidcToken;
 }
 
 function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
@@ -302,7 +298,7 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
     let stdinSecret;
     let secretInStdinSupported = isStdinSecretSupported();
-
+    console.info("hello")
     if (oidcProviderName) {
         const idToken = fetchAzureOidcToken(service);
         cliCommand = cliJoin(
@@ -316,7 +312,7 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
 
     if (serviceAccessToken) {
         // Add access-token if required.
-        cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));
+        cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-saaatdin' : '--access-token=' + quote(serviceAccessToken));
         stdinSecret = secretInStdinSupported ? serviceAccessToken : undefined;
     } else {
         // Add username and password.
