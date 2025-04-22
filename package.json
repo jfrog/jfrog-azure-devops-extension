@@ -16,6 +16,11 @@
         "ts-node": "^10.9.1",
         "typescript": "^5.2.2"
     },
+    "overrides": {
+        "clipboardy": "^3.0.0",
+        "execa": "^5.1.1",
+        "cross-spawn": "^7.0.0"
+    },
     "scripts": {
         "format": "prettier --write \"**/{*.ts,*.js,package.json}\"",
         "preinstall": "cd buildScripts && npm i --no-fund",
