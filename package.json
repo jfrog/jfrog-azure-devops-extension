@@ -28,6 +28,6 @@
         "lint": "npx eslint . --ext .ts,.tsx,.js"
     },
     "dependencies": {
-        "sync-request": "^6.1.0"
+        "semver": "^7.7.1"
     }
 }

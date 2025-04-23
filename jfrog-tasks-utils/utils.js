@@ -308,7 +308,7 @@ function fetchAzureOidcToken(serviceConnectionID) {
     if (!body.oidcToken) {
         throw new Error('OIDC token not found in response body.');
     }
-    debugLogIDToken(body.oidcToken)
+    debugLogIDToken(body.oidcToken);
     return body.oidcToken;
 }
 
