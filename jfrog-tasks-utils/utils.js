@@ -6,6 +6,7 @@ const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
 const syncRequest = require('sync-request');
+import * as semver from 'semver';
 
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
@@ -257,6 +258,26 @@ function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
 }
 
+/**
+ * logging oidc token values for debugging
+ * @param oidcToken
+ */
+function debugLogIDToken(oidcToken) {
+    /**
+     * @typedef {Object} OidcClaims
+     * @property {string} sub - The subject of the token.
+     * @property {string} iss - The issuer of the token.
+     * @property {string} aud - The audience of the token.
+     */
+
+    /** @type {OidcClaims} */
+    const oidcClaims = JSON.parse(Buffer.from(oidcToken.split('.')[1], 'base64').toString());
+    console.debug('OIDC Token Subject: ', oidcClaims.sub);
+    console.debug(`OIDC Token Claims: {"sub": "${oidcClaims.sub}"}`);
+    console.debug('OIDC Token Issuer (Provider URL): ', oidcClaims.iss);
+    console.debug('OIDC Token Audience: ', oidcClaims.aud);
+}
+
 function fetchAzureOidcToken(serviceConnectionID) {
     const uri = tl.getVariable('System.CollectionUri');
     const teamPrjID = tl.getVariable('System.TeamProjectId');
@@ -287,14 +308,19 @@ function fetchAzureOidcToken(serviceConnectionID) {
     if (!body.oidcToken) {
         throw new Error('OIDC token not found in response body.');
     }
+    debugLogIDToken(body.oidcToken)
     return body.oidcToken;
 }
 
 function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
     // First validate supported CLI version
-    if (getCliVersion(cliPath) < minSupportedOidcCliVersion) {
+    let cliVersion = getCliVersion(cliPath);
+    if (semver.lt(cliVersion, '2.75.0')) {
+        throw new Error('CLI version too low');
+    }
+    if (cliVersion < minSupportedOidcCliVersion) {
         throw new Error(
-            `The CLI version ${getCliVersion(cliPath)} is not supported for OIDC token exchange. Minimum required version is ${minSupportedOidcCliVersion}.`,
+            `The CLI version ${cliVersion} is not supported for OIDC token exchange. Minimum required version is ${minSupportedOidcCliVersion}.`,
         );
     }
     let oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
