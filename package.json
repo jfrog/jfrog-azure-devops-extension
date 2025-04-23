@@ -26,5 +26,8 @@
         "publish-private": "npm i --no-fund && bash buildScripts/publish-private.sh",
         "compile": "npx tsc -p ./",
         "lint": "npx eslint . --ext .ts,.tsx,.js"
+    },
+    "dependencies": {
+        "sync-request": "^6.1.0"
     }
 }

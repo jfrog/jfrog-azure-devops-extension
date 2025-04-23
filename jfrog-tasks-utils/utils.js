@@ -272,21 +272,64 @@ function fetchAzureOidcToken(serviceConnectionID) {
     const res = syncRequest('POST', url, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
+            Authorization: `Bearer ${token}`,
+        },
     });
 
     if (res.statusCode !== 200) {
         throw new Error(`OIDC token request failed: HTTP ${res.statusCode}\nBody: ${res.getBody('utf8')}`);
     }
+    /** @type {{ oidcToken?: string }} */
     const body = JSON.parse(res.getBody('utf8'));
-    console.info(body)
-    console.info(body.oidcToken)
     if (!body.oidcToken) {
         throw new Error('OIDC token not found in response body.');
     }
-    console.info("end of functoin")
+    const oidcClaims = JSON.parse(Buffer.from(body.oidcToken.split('.')[1], 'base64').toString());
+    console.log('OIDC Token Subject: ', oidcClaims.sub);
+    console.log(`OIDC Token Claims: {"sub": "${oidcClaims.sub}"}`);
+    console.log('OIDC Token Issuer (Provider URL): ', oidcClaims.iss);
+    console.log('OIDC Token Audience: ', oidcClaims.aud);
     return body.oidcToken;
+}
+
+function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
+    let oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
+    const repoName = tl.getVariable('Build.Repository.Name');
+    const idToken = fetchAzureOidcToken(service);
+
+    // Build the CLI command
+    let cliCommand = cliJoin(
+        cliPath,
+        `eot ${quote(oidcProviderName)} ${quote(idToken)} --url=${quote(serviceUrl)} --oidc-provider-type=Azure --oidc-audience=${quote(oidcAudience)} --repository=${quote(repoName)}`
+    );
+
+    let exeRes;
+    try {
+        // Execute the CLI command and capture the output
+        exeRes = executeCliCommand(cliCommand, buildDir, { withOutput: true }).toString();
+        console.log('Exchange OIDC token result:', exeRes);
+    } catch (error) {
+        console.error('Error occurred while executing the CLI command:', error);
+        throw error;
+    }
+
+    // Extract AccessToken
+    const accessTokenMatch = exeRes.match(/AccessToken:\s*([^\s]+)/);
+    const accessToken = accessTokenMatch ? accessTokenMatch[1] : null;
+
+    // Extract Username
+    const usernameMatch = exeRes.match(/Username:\s*([^\s]+)/);
+    const username = usernameMatch ? usernameMatch[1] : null;
+
+    if (!accessToken || !username) {
+        throw new Error('Failed to extract AccessToken or Username from the CLI output.');
+    }
+
+    // Set output variables
+    tl.setVariable('oidc_user', username, true);
+    tl.setVariable('oidc_token', accessToken, true);
+
+    return accessToken;
 }
 
 function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
@@ -298,21 +341,18 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
     let stdinSecret;
     let secretInStdinSupported = isStdinSecretSupported();
-    console.info("hello")
+
+    // In the case of OIDC, we exchange tokens via the CLI
+    // and populate the access token to the CLI config.
+    // This is done by the exchange command and not the config to export
+    // username and access token params for further use by the users.
     if (oidcProviderName) {
-        const idToken = fetchAzureOidcToken(service);
-        cliCommand = cliJoin(
-            cliCommand,
-            '--oidc-provider-name=' + (isWindows() ? quote(oidcProviderName) : singleQuote(oidcProviderName)),
-            '--oidc-provider-type=Azure',
-            '--oidc-token-id=' + (isWindows() ? quote(idToken) : singleQuote(idToken))
-        );
-        return executeCliCommand(cliCommand, buildDir, { stdinSecret });
+        serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir);
     }
 
     if (serviceAccessToken) {
         // Add access-token if required.
-        cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-saaatdin' : '--access-token=' + quote(serviceAccessToken));
+        cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));
         stdinSecret = secretInStdinSupported ? serviceAccessToken : undefined;
     } else {
         // Add username and password.
