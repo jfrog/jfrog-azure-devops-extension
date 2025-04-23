@@ -5,6 +5,7 @@ const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
+const syncRequest = require('sync-request');
 
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
@@ -19,7 +20,8 @@ const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
-const syncRequest = require('sync-request');
+const oidcUserOutputName = 'oidc_user';
+const oidcTokenOutputName = 'oidc_token';
 
 // Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
 // or a specific version was requested in a task. If not set, use the default CLI version.
@@ -284,11 +286,6 @@ function fetchAzureOidcToken(serviceConnectionID) {
     if (!body.oidcToken) {
         throw new Error('OIDC token not found in response body.');
     }
-    const oidcClaims = JSON.parse(Buffer.from(body.oidcToken.split('.')[1], 'base64').toString());
-    console.log('OIDC Token Subject: ', oidcClaims.sub);
-    console.log(`OIDC Token Claims: {"sub": "${oidcClaims.sub}"}`);
-    console.log('OIDC Token Issuer (Provider URL): ', oidcClaims.iss);
-    console.log('OIDC Token Audience: ', oidcClaims.aud);
     return body.oidcToken;
 }
 
@@ -300,36 +297,57 @@ function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderN
     // Build the CLI command
     let cliCommand = cliJoin(
         cliPath,
-        `eot ${quote(oidcProviderName)} ${quote(idToken)} --url=${quote(serviceUrl)} --oidc-provider-type=Azure --oidc-audience=${quote(oidcAudience)} --repository=${quote(repoName)}`
+        `eot ${quote(oidcProviderName)} ${quote(idToken)} --url=${quote(serviceUrl)} --oidc-provider-type=Azure --oidc-audience=${quote(oidcAudience)} --repository=${quote(repoName)}`,
     );
 
-    let exeRes;
-    try {
-        // Execute the CLI command and capture the output
-        exeRes = executeCliCommand(cliCommand, buildDir, { withOutput: true }).toString();
-        console.log('Exchange OIDC token result:', exeRes);
-    } catch (error) {
-        console.error('Error occurred while executing the CLI command:', error);
-        throw error;
-    }
+    // Execute the CLI command and capture the output
+    let exeRes = executeCliCommand(cliCommand, buildDir, { withOutput: true }).toString();
 
     // Extract AccessToken
-    const accessTokenMatch = exeRes.match(/AccessToken:\s*([^\s]+)/);
-    const accessToken = accessTokenMatch ? accessTokenMatch[1] : null;
-
-    // Extract Username
-    const usernameMatch = exeRes.match(/Username:\s*([^\s]+)/);
-    const username = usernameMatch ? usernameMatch[1] : null;
-
-    if (!accessToken || !username) {
-        throw new Error('Failed to extract AccessToken or Username from the CLI output.');
-    }
+    const { username, accessToken } = extractAccessTokenAndUsername(exeRes);
 
     // Set output variables
-    tl.setVariable('oidc_user', username, true);
-    tl.setVariable('oidc_token', accessToken, true);
+    tl.setVariable(oidcUserOutputName, username, true);
+    tl.setVariable(oidcTokenOutputName, accessToken, true);
 
     return accessToken;
+}
+
+/**
+ * Extracts AccessToken and Username from the CLI output.
+ * Supports both JSON and non-JSON (regex) outputs.
+ * Currently, the output is a non-valid JSON, which should be changed in the future.
+ * @param {string} output - The CLI output.
+ * @returns {{ accessToken: string, username: string }} - Extracted values.
+ * @throws {Error} - If neither JSON nor regex extraction succeeds.
+ */
+function extractAccessTokenAndUsername(output) {
+    // Attempt to parse as JSON
+    try {
+        const parsedOutput = JSON.parse(output);
+        if (parsedOutput.AccessToken && parsedOutput.Username) {
+            return {
+                accessToken: parsedOutput.AccessToken,
+                username: parsedOutput.Username,
+            };
+        }
+    } catch (e) {
+        console.debug('Failed to parse output as JSON, trying with regex..');
+    }
+
+    // Fallback to regex extraction
+    const accessTokenMatch = output.match(/AccessToken:\s*(\S+)/);
+    const usernameMatch = output.match(/Username:\s*(\S+)/);
+
+    if (accessTokenMatch && usernameMatch) {
+        return {
+            accessToken: accessTokenMatch[1],
+            username: usernameMatch[1],
+        };
+    }
+
+    // If both methods fail, throw an error
+    throw new Error('Failed to extract AccessToken or Username from the output.');
 }
 
 function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
