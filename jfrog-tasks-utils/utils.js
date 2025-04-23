@@ -15,6 +15,7 @@ const defaultJfrogCliVersion = '2.75.0';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
+const minSupportedOidcCliVersion = '2.75.0';
 const pluginVersion = '2.10.4';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
@@ -290,6 +291,12 @@ function fetchAzureOidcToken(serviceConnectionID) {
 }
 
 function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
+    // First validate supported CLI version
+    if (getCliVersion(cliPath) < minSupportedOidcCliVersion) {
+        throw new Error(
+            `The CLI version ${getCliVersion(cliPath)} is not supported for OIDC token exchange. Minimum required version is ${minSupportedOidcCliVersion}.`,
+        );
+    }
     let oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
     const repoName = tl.getVariable('Build.Repository.Name');
     const idToken = fetchAzureOidcToken(service);
@@ -324,6 +331,13 @@ function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderN
 function extractAccessTokenAndUsername(output) {
     // Attempt to parse as JSON
     try {
+        /**
+         * @typedef {Object} ParsedOutput
+         * @property {string} AccessToken
+         * @property {string} Username
+         */
+
+        /** @type {ParsedOutput} */
         const parsedOutput = JSON.parse(output);
         if (parsedOutput.AccessToken && parsedOutput.Username) {
             return {

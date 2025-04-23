@@ -294,14 +294,14 @@ Login to your JFrog instance as an Administrator, then as [described in the docu
 
 Now fill out the integration with the parameters of your Azure DevOps instance.
 
-| Property name | Description                                                                             |
-| ------------- | --------------------------------------------------------------------------------------- |
+| Property name | Description                                                               |
+| ------------- |---------------------------------------------------------------------------|
 | Provider Name | A name for your provider, this name is used in the Azure DevOps tasks in the pipelines. |
-| Provider Type | Must be set to `Generic OpenID Connect`                                                 |
-| Description   | A description of what this provider is for.                                             |
-| Provider URL  | `https://vstoken.dev.azure.com/{ORG_GUID}` (see how to get the {ORG_GUID} below).       |
-| Audience      | Must be set to `api://AzureADTokenExchange`.                                            |
-| Token Issuer  | If the issuer is different from the provider, for Azure DevOps this can be left blank.  |
+| Provider Type | `Azure`                                                                  |
+| Description   | A description of what this provider is for.                               |
+| Provider URL  | `https://vstoken.dev.azure.com/{ORG_GUID}` (see how to get the {ORG_GUID} below). |
+| Audience      | Must be set to `api://AzureADTokenExchange`.                              |
+| Token Issuer  | If the issuer is different from the provider, for Azure DevOps this can be left blank. |
 
 As an example the final integration configuration will look like:
 
