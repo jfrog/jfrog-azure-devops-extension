@@ -395,12 +395,10 @@ A sample configuration would look like this:
 
 Now this Service Connection can be used for any of JFrog tasks as normal, authenticating with a temporary access token each time the pipeline runs.
 
-> [!IMPORTANT]
-> When using JFrog CLI version `2.75.0` or later, the extension automatically exports the authenticated user and access token
+> 💡 **Tip**  
+> The extension automatically exports the authenticated user and access token
 > as step outputs named `oidc_user` and `oidc_token`. These outputs can be used in later steps (e.g., for Docker login, Helm registry, or custom scripts).
-> If you override the CLI version in your pipeline and use an older version, these outputs may not be available.
 > Example usage in a later step:
-
 
 ```yaml
  steps:
@@ -418,8 +416,6 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
        echo "OIDC Token (from env): $env:oidc_token"
    displayName: 'Use OIDC Output Variables'
 ```
-
-
 
 
 See [JFrog CLI - OIDC Token Exchange (`jf eot`)](https://jfrog.com/help/r/jfrog-cli/jfrog-cli-eot) for more information on how the CLI handles OpenID Connect tokens behind the scenes.
