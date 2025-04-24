@@ -274,6 +274,10 @@ Setting up OpenID Connect has 3 separate parts:
 - Configuring Identity Mappings with Claim rules, matching to Projects & Service Connections.
 - Configuring Service Connections as OpenID Connect in the Projects in your Azure Devops Instance.
 
+> [!IMPORTANT]
+> To use OIDC authentication, make sure you're using **JFrog CLI version 2.75.0 or later**  
+> and **JFrog Azure DevOps Extension version 2.11.0 or later**.
+
 Follow the guides below to configure each part.
 
 <details>
@@ -385,28 +389,30 @@ This requires you to fill in the following inputs:
 | Description (optional)       | A short of the purpose of this ServiceConnection                                                       |
 
 
-> **Tip**: When using JFrog CLI version `2.75.0` or later, the extension automatically exports the authenticated user and access token
+> [!TIP]
+> When using JFrog CLI version `2.75.0` or later, the extension automatically exports the authenticated user and access token
 > as step outputs named `oidc_user` and `oidc_token`. These outputs can be used in later steps (e.g., for Docker login, Helm registry, or custom scripts).
+>
+> If you override the CLI version in your pipeline and use an older version, these outputs may not be available.
 >
 > Example usage in a later step:
 >
- ```yaml
-steps:
-- task: JfrogCliV2@1
-  name: jfStep
-  inputs:
-  jfrogPlatformConnection: 'azure-oidc'
-  command: 'jf rt ping'
-
-- task: PowerShell@2
-  inputs:
-  targetType: 'inline'
-  script: |
-      echo "OIDC Username (from output): $(jfStep.oidc_user)"
-      echo "OIDC Token (from env): $env:oidc_token"
-  displayName: 'Use OIDC Output Variables'
+> ```yaml
+> steps:
+> - task: JfrogCliV2@1
+>   name: jfStep
+>   inputs:
+>     jfrogPlatformConnection: 'azure-oidc'
+>     command: 'jf rt ping'
+> 
+> - task: PowerShell@2
+>   inputs:
+>     targetType: 'inline'
+>     script: |
+>       echo "OIDC Username (from output): $(jfStep.oidc_user)"
+>       echo "OIDC Token (from env): $env:oidc_token"
+>   displayName: 'Use OIDC Output Variables'
 > ```
-
 
 A sample configuration would look like this:
 
