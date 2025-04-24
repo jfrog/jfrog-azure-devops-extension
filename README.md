@@ -389,12 +389,11 @@ This requires you to fill in the following inputs:
 | Description (optional)       | A short of the purpose of this ServiceConnection                                                       |
 
 
+
 > [!TIP]
 > When using JFrog CLI version `2.75.0` or later, the extension automatically exports the authenticated user and access token
 > as step outputs named `oidc_user` and `oidc_token`. These outputs can be used in later steps (e.g., for Docker login, Helm registry, or custom scripts).
->
 > If you override the CLI version in your pipeline and use an older version, these outputs may not be available.
->
 > Example usage in a later step:
 >
 > ```yaml
@@ -412,8 +411,9 @@ This requires you to fill in the following inputs:
 >       echo "OIDC Username (from output): $(jfStep.oidc_user)"
 >       echo "OIDC Token (from env): $env:oidc_token"
 >   displayName: 'Use OIDC Output Variables'
-> ```
-
+> ```yaml
+>
+> 
 A sample configuration would look like this:
 
 ![oidc-service-connection.png](images/oidc-service-connection.png)
