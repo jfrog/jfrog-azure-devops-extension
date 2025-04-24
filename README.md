@@ -400,22 +400,23 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
 > as step outputs named `oidc_user` and `oidc_token`. These outputs can be used in later steps (e.g., for Docker login, Helm registry, or custom scripts).
 > If you override the CLI version in your pipeline and use an older version, these outputs may not be available.
 > Example usage in a later step:
->
-> ```yaml
-> steps:
-> - task: JfrogCliV2@1
->   name: jfStep
->   inputs:
->     jfrogPlatformConnection: 'azure-oidc'
->     command: 'jf rt ping'
-> 
-> - task: PowerShell@2
->   inputs:
->     targetType: 'inline'
->     script: |
->       echo "OIDC Username (from output): $(jfStep.oidc_user)"
->       echo "OIDC Token (from env): $env:oidc_token"
->   displayName: 'Use OIDC Output Variables'
+
+ ```yaml
+ steps:
+ - task: JfrogCliV2@1
+   name: jfStep
+   inputs:
+     jfrogPlatformConnection: 'azure-oidc'
+     command: 'jf rt ping'
+ 
+ - task: PowerShell@2
+   inputs:
+     targetType: 'inline'
+     script: |
+       echo "OIDC Username (from output): $(jfStep.oidc_user)"
+       echo "OIDC Token (from env): $env:oidc_token"
+   displayName: 'Use OIDC Output Variables'
+   ```
 
 
 
