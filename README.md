@@ -401,7 +401,8 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
 > If you override the CLI version in your pipeline and use an older version, these outputs may not be available.
 > Example usage in a later step:
 
- ```yaml
+
+```yaml
  steps:
  - task: JfrogCliV2@1
    name: jfStep
@@ -416,7 +417,7 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
        echo "OIDC Username (from output): $(jfStep.oidc_user)"
        echo "OIDC Token (from env): $env:oidc_token"
    displayName: 'Use OIDC Output Variables'
-   ```
+```
 
 
 
