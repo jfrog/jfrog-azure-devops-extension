@@ -389,6 +389,11 @@ This requires you to fill in the following inputs:
 | Description (optional)       | A short of the purpose of this ServiceConnection                                                       |
 
 
+A sample configuration would look like this:
+
+![oidc-service-connection.png](images/oidc-service-connection.png)
+
+Now this Service Connection can be used for any of JFrog tasks as normal, authenticating with a temporary access token each time the pipeline runs.
 
 > [!TIP]
 > When using JFrog CLI version `2.75.0` or later, the extension automatically exports the authenticated user and access token
@@ -411,18 +416,8 @@ This requires you to fill in the following inputs:
 >       echo "OIDC Username (from output): $(jfStep.oidc_user)"
 >       echo "OIDC Token (from env): $env:oidc_token"
 >   displayName: 'Use OIDC Output Variables'
-> ```yaml
->
-> 
-A sample configuration would look like this:
 
-![oidc-service-connection.png](images/oidc-service-connection.png)
 
-Now this Service Connection can be used for any of JFrog tasks as normal, authenticating with a temporary access token each time the pipeline runs.
-
-> **Note**: OpenID Connect authentication requires JFrog CLI version `2.75.0` or higher.
-> If your pipeline uses an earlier version (e.g., by overriding the CLI version via environment variable or custom installation),
-> the authentication may fail or not support the full feature set (such as step outputs).
 
 
 See [JFrog CLI - OIDC Token Exchange (`jf eot`)](https://jfrog.com/help/r/jfrog-cli/jfrog-cli-eot) for more information on how the CLI handles OpenID Connect tokens behind the scenes.
