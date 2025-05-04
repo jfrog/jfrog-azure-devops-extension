@@ -288,13 +288,14 @@ Follow the guides below to configure each part.
 </summary>
 
 
-First you must configure your JFrog instance to have an OpenID Connect integration to your Azure DevOps server.
-Login to your JFrog instance as an Administrator, then as [described in the documentation:](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-configurations-overview)
+First, configure an OpenID Connect integration to your Azure DevOps server in your JFrog instance.
+Log in to your JFrog instance as an administrator,
+then as [described in the documentation:](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-configurations-overview)
 
-1. Go to the Administrator panel.
-2. Select General Management.
-3. Choose Manage Integrations.
-4. Select New Integration - OpenID Connect
+1. Go to the **Administrator panel**.
+2. Select **General Management**.
+3. Choose **Manage Integrations**.
+4. Select New Integration - **OpenID Connect**
 
 Now fill out the integration with the parameters of your Azure DevOps instance.
 
@@ -307,13 +308,13 @@ Now fill out the integration with the parameters of your Azure DevOps instance.
 | Audience      | example: `api://AzureADTokenExchange`                                                 |
 | Token Issuer  | If the issuer is different from the provider, for Azure DevOps this can be left blank. |
 
-As an example the final integration configuration will look like:
+For example, the final integration configuration will look like this:
 
 ![oidc-integration.png](images/oidc-integration.png)
 
 In order to obtain your Azure DevOps Organization GUID (`{ORG_GUID}`) you can simply run a pipeline in your Azure DevOps organization using any of the JFrog Task setup using a Service Connection configured with the `OpenID Connect Integration` authentication method, see the [Configure the Service Connection](#configure-the-service-connection) section. Even if the task fails due to you not yet having configured the Integration in JFrog, it will output the relevant information as part of the pipeline.
 
-In the Pipeline Output, look for the `OIDC Token Issuer`, this value is what you must put in as your `Provider URL`.
+In the Pipeline Output, look for the `OIDC Token Issuer`,value, which you need to enter as your `Provider URL`.
 The rest of the information can also be helpful for you to configure the Identity Mappings as described in the section below.
 
 ```
@@ -376,7 +377,6 @@ Just make sure to never replace your Organization name with a `*` operator as th
 </summary>
 
 You must configure a `ServiceConnection` setting the `Authentication method` to `OpenID Connect Integration`.
-All four types of Service Connections are supported, they will all require the same input regardless of the type.
 
 This requires you to fill in the following inputs:
 
