@@ -297,7 +297,7 @@ then as [described in the documentation:](https://jfrog.com/help/r/jfrog-platfor
 3. Choose **Manage Integrations**.
 4. Select New Integration - **OpenID Connect**
 
-Now fill out the integration with the parameters of your Azure DevOps instance.
+Next, fill out the integration form with your Azure DevOps instance parameters.
 
 | Property name | Description                                                                           |
 | ------------- |---------------------------------------------------------------------------------------|
