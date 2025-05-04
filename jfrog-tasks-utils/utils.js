@@ -5,20 +5,25 @@ const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
+const syncRequest = require('sync-request');
+import * as semver from 'semver';
 
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.73.3';
+const defaultJfrogCliVersion = '2.75.0';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
+const minSupportedOidcCliVersion = '2.75.0';
 const pluginVersion = '2.10.4';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
+const oidcUserOutputName = 'oidc_user';
+const oidcTokenOutputName = 'oidc_token';
 
 // Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
 // or a specific version was requested in a task. If not set, use the default CLI version.
@@ -253,14 +258,156 @@ function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
     return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
 }
 
+/**
+ * logging oidc token values for debugging
+ * @param oidcToken
+ */
+function debugLogIDToken(oidcToken) {
+    /**
+     * @typedef {Object} OidcClaims
+     * @property {string} sub - The subject of the token.
+     * @property {string} iss - The issuer of the token.
+     * @property {string} aud - The audience of the token.
+     */
+
+    /** @type {OidcClaims} */
+    const oidcClaims = JSON.parse(Buffer.from(oidcToken.split('.')[1], 'base64').toString());
+    console.debug('OIDC Token Subject: ', oidcClaims.sub);
+    console.debug(`OIDC Token Claims: {"sub": "${oidcClaims.sub}"}`);
+    console.debug('OIDC Token Issuer (Provider URL): ', oidcClaims.iss);
+    console.debug('OIDC Token Audience: ', oidcClaims.aud);
+}
+
+function fetchAzureOidcToken(serviceConnectionID) {
+    const uri = tl.getVariable('System.CollectionUri');
+    const teamPrjID = tl.getVariable('System.TeamProjectId');
+    const hub = tl.getVariable('System.HostType');
+    const planID = tl.getVariable('System.PlanId');
+    const jobID = tl.getVariable('System.JobId');
+    const apiVersion = '7.1-preview.1';
+
+    const token = tl.getVariable('System.AccessToken');
+    if (!token) {
+        throw new Error('System.AccessToken is not available. Make sure "Allow scripts to access OAuth token" is enabled.');
+    }
+
+    const url = `${uri}${teamPrjID}/_apis/distributedtask/hubs/${hub}/plans/${planID}/jobs/${jobID}/oidctoken?api-version=${apiVersion}&serviceConnectionId=${serviceConnectionID}`;
+
+    const res = syncRequest('POST', url, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (res.statusCode !== 200) {
+        throw new Error(`OIDC token request failed: HTTP ${res.statusCode}\nBody: ${res.getBody('utf8')}`);
+    }
+    /** @type {{ oidcToken?: string }} */
+    const body = JSON.parse(res.getBody('utf8'));
+    if (!body.oidcToken) {
+        throw new Error('OIDC token not found in response body.');
+    }
+    debugLogIDToken(body.oidcToken);
+    return body.oidcToken;
+}
+
+function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
+    // First validate supported CLI version
+    let cliVersion = getCliVersion(cliPath);
+    if (semver.lt(cliVersion, '2.75.0')) {
+        throw new Error('CLI version too low');
+    }
+    if (cliVersion < minSupportedOidcCliVersion) {
+        throw new Error(
+            `The CLI version ${cliVersion} is not supported for OIDC token exchange. Minimum required version is ${minSupportedOidcCliVersion}.`,
+        );
+    }
+    let oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
+    const repoName = tl.getVariable('Build.Repository.Name');
+    const idToken = fetchAzureOidcToken(service);
+
+    // Build the CLI command
+    let cliCommand = cliJoin(
+        cliPath,
+        `eot ${quote(oidcProviderName)} ${quote(idToken)} --url=${quote(serviceUrl)} --oidc-provider-type=Azure --oidc-audience=${quote(oidcAudience)} --repository=${quote(repoName)}`,
+    );
+
+    // Execute the CLI command and capture the output
+    let exeRes = executeCliCommand(cliCommand, buildDir, { withOutput: true }).toString();
+
+    // Extract AccessToken
+    const { username, accessToken } = extractAccessTokenAndUsername(exeRes);
+
+    // Set output variables
+    tl.setVariable(oidcUserOutputName, username, true);
+    tl.setVariable(oidcTokenOutputName, accessToken, true);
+
+    return accessToken;
+}
+
+/**
+ * Extracts AccessToken and Username from the CLI output.
+ * Supports both JSON and non-JSON (regex) outputs.
+ * Currently, the output is a non-valid JSON, which should be changed in the future.
+ * @param {string} output - The CLI output.
+ * @returns {{ accessToken: string, username: string }} - Extracted values.
+ * @throws {Error} - If neither JSON nor regex extraction succeeds.
+ */
+function extractAccessTokenAndUsername(output) {
+    // Attempt to parse as JSON
+    try {
+        /**
+         * @typedef {Object} ParsedOutput
+         * @property {string} AccessToken
+         * @property {string} Username
+         */
+
+        /** @type {ParsedOutput} */
+        const parsedOutput = JSON.parse(output);
+        if (parsedOutput.AccessToken && parsedOutput.Username) {
+            return {
+                accessToken: parsedOutput.AccessToken,
+                username: parsedOutput.Username,
+            };
+        }
+    } catch (e) {
+        console.debug('Failed to parse output as JSON, trying with regex..');
+    }
+
+    // Fallback to regex extraction
+    const accessTokenMatch = output.match(/AccessToken:\s*(\S+)/);
+    const usernameMatch = output.match(/Username:\s*(\S+)/);
+
+    if (accessTokenMatch && usernameMatch) {
+        return {
+            accessToken: accessTokenMatch[1],
+            username: usernameMatch[1],
+        };
+    }
+
+    // If both methods fail, throw an error
+    throw new Error('Failed to extract AccessToken or Username from the output.');
+}
+
 function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
     let serviceUrl = tl.getEndpointUrl(service, false);
     let serviceUser = tl.getEndpointAuthorizationParameter(service, 'username', true);
     let servicePassword = tl.getEndpointAuthorizationParameter(service, 'password', true);
     let serviceAccessToken = tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
+    let oidcProviderName = tl.getEndpointAuthorizationParameter(service, 'oidcProviderName', true);
     let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
     let stdinSecret;
     let secretInStdinSupported = isStdinSecretSupported();
+
+    // In the case of OIDC, we exchange tokens via the CLI
+    // and populate the access token to the CLI config.
+    // This is done by the exchange command and not the config to export
+    // username and access token params for further use by the users.
+    if (oidcProviderName) {
+        serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir);
+    }
+
     if (serviceAccessToken) {
         // Add access-token if required.
         cliCommand = cliJoin(cliCommand, secretInStdinSupported ? '--access-token-stdin' : '--access-token=' + quote(serviceAccessToken));

@@ -36,6 +36,7 @@ The *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog
         - [Installing the Extension](#Installing-the-Extension)
         - [Installing the Build Agent](#Installing-the-Build-Agent)
         - [Configuring the Service Connections](#Configuring-the-Service-Connections)
+        - [Using OpenID Connect (OIDC) Authentication](#using-openid-connect-oidc-authentication)
     - [Executing JFrog CLI Commands](#Executing-JFrog-CLI-Commands)
     - [Build tools Tasks](#build-tools-tasks)
         - [JFrog Maven](#JFrog-Maven-Task)
@@ -263,8 +264,168 @@ To enable TLS 1.2 on TFS:
 
 </details>
 
+## Using OpenID Connect (OIDC) Authentication
+
+Using OpenID Connect (OIDC) to authenticate your pipelines eliminates the need for long lived static credentials providing a whole range of [security and practical benefits](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-integration-benefits).   
+You can read more about the [JFrog OpenID Connection Integration](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-integration) in the documentation.
+
+Setting up OpenID Connect has 3 separate parts:
+- Setting up an OpenID Connect Integration inside of the JFrog Platform.
+- Configuring Identity Mappings with Claim rules, matching to Projects & Service Connections.
+- Configuring Service Connections as OpenID Connect in the Projects in your Azure Devops Instance.
+
+> [!IMPORTANT]
+> To use OIDC authentication, make sure you're using **JFrog CLI version 2.75.0 or later**  
+> and **JFrog Azure DevOps Extension version 2.11.0 or later**.
+
+Follow the guides below to configure each part.
+
+<details>
+    <summary>
+
+#### Configure OpenID Connect Integration
+
+</summary>
+
+
+First, configure an OpenID Connect integration to your Azure DevOps server in your JFrog instance.
+Log in to your JFrog instance as an administrator,
+then as [described in the documentation:](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-configurations-overview)
+
+1. Go to the **Administrator panel**.
+2. Select **General Management**.
+3. Choose **Manage Integrations**.
+4. Select New Integration - **OpenID Connect**
+
+Next, fill out the integration form with your Azure DevOps instance parameters.
+
+| Property name | Description                                                                           |
+| ------------- |---------------------------------------------------------------------------------------|
+| Provider Name | A name for your provider, this name is used in the Azure DevOps tasks in the pipelines. |
+| Provider Type | `Azure`                                                                               |
+| Description   | A description of what this provider is for.                                           |
+| Provider URL  | `https://vstoken.dev.azure.com/{ORG_GUID}` (see how to get the {ORG_GUID} below).     |
+| Audience      | example: `api://AzureADTokenExchange`                                                 |
+| Token Issuer  | If the issuer is different from the provider, for Azure DevOps this can be left blank. |
+
+For example, the final integration configuration will look like this:
+
+![oidc-integration.png](images/oidc-integration.png)
+
+In order to obtain your Azure DevOps Organization GUID (`{ORG_GUID}`) you can simply run a pipeline in your Azure DevOps organization using any of the JFrog Task setup using a Service Connection configured with the `OpenID Connect Integration` authentication method, see the [Configure the Service Connection](#configure-the-service-connection) section. Even if the task fails due to you not yet having configured the Integration in JFrog, it will output the relevant information as part of the pipeline.
+
+In the Pipeline Output, look for the `OIDC Token Issuer`,value, which you need to enter as your `Provider URL`.
+The rest of the information can also be helpful for you to configure the Identity Mappings as described in the section below.
+
+```
+OIDC Token Subject: sc://<DevopsOrgName>/<ProjectName>/<ServiceConnectionName>
+OIDC Token Claims: {"sub": "sc://<DevopsOrgName>/<ProjectName>/<ServiceConnectionName>"}
+OIDC Token Issuer: https://vstoken.dev.azure.com/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+OIDC Token Audience: api://AzureADTokenExchange
+```
+
+> **Security Tip**: It's safe to log OpenID Connect claims like `sub`, `aud`, or `iss` in debug output for troubleshooting purposes.
+> However, never print the full ID token or access token, even in debug logs.
+
+
+</details>
+
+<details>
+    <summary>
+
+#### Configure Identity Mappings
+
+</summary>
+
+When the `OpenID Connect Integration` has been configured, you must now configure `Identity Mappings` for your projects and service connections to allow them to utilize the integration.
+You can find the full documentation for configuring [Identity Mappings in the Documentation](https://jfrog.com/help/r/jfrog-platform-administration-documentation/identity-mappings).
+For this part we will focus on how to setup the JSON Claim which is used to map the JWT request of the pipeline to the access rights in your mapping.
+
+When working with OpenID Connect, we must look at the `ID Token` that our provider (Azure DevOps) outputs.
+Based on the information in the token, we can map properties into rules in our `Identity Mappings` JSON Claim.
+The `ID Token` from the Azure DevOps token provider looks like this:
+
+```json
+{
+  "jti": "<guid>",
+  "sub": "sc://<DevopsOrgName>/<ProjectName>/<ServiceConnectionName>",
+  "aud": "api://AzureADTokenExchange",
+  "iss": "https://vstoken.dev.azure.com/<ORG_GUID>",
+  "nbf": 1708639268,
+  "exp": 1708640467,
+  "iat": 1708639868
+}
+```
+
+Relative to most other `ID Token` providers, our options are fairly sparse, the only sensible option is using the subject (`"sub"`) field.
+The claim mapping does support wildcards with the `*` operator.
+
+A sample JSON Claim mapping which maps a specified ServiceConnection in a specified Project in your Organization would look like this:
+
+![oidc-json-mapping.png](images/oidc-json-mapping.png)
+
+To allow all projects in your Organization with a ServiceConnection with a specified name, you could replace MyProject with `*`.
+Just make sure to never replace your Organization name with a `*` operator as that would allow any Azure DevOps Organization to gain access to your instance.
+
+</details>
+
+<details>
+    <summary>
+
+#### Configure the Service Connection
+
+</summary>
+
+You must configure a `ServiceConnection` setting the `Authentication method` to `OpenID Connect Integration`.
+
+This requires you to fill in the following inputs:
+
+| Property name                | Description                                                                                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Server URL                   | The URL of your JFrog instance with the `/artifactory` path fx. (`https://my.jfrog.io/artifactory`) |
+| OpenID Connect Provider Name | The `Provider Name` you configured in the `Configure OpenID Connect Integration` step                  |
+| Platform URL                 | The URL of your JFrog instance fx. (`https://my.jfrog.io/`)                                         |
+| Service connection name      | The name of the Service Connection, must match the values put into the `JSON Claims mapping`           |
+| Description (optional)       | A short of the purpose of this ServiceConnection                                                       |
+
+
+A sample configuration would look like this:
+
+![oidc-service-connection.png](images/oidc-service-connection.png)
+
+Now this Service Connection can be used for any of JFrog tasks as normal, authenticating with a temporary access token each time the pipeline runs.
+
+> 💡 **Tip**  
+> The extension automatically exports the authenticated user and access token
+> as step outputs named `oidc_user` and `oidc_token`. These outputs can be used in later steps (e.g., for Docker login, Helm registry, or custom scripts).
+> Example usage in a later step:
+
+```yaml
+ steps:
+ - task: JfrogCliV2@1
+   name: jfStep
+   inputs:
+     jfrogPlatformConnection: 'azure-oidc'
+     command: 'jf rt ping'
+ 
+ - task: PowerShell@2
+   inputs:
+     targetType: 'inline'
+     script: |
+       echo "OIDC Username (from output): $(jfStep.oidc_user)"
+       echo "OIDC Token (from env): $env:oidc_token"
+   displayName: 'Use OIDC Output Variables'
+```
+
+
+See [JFrog CLI - OIDC Token Exchange (`jf eot`)](https://jfrog.com/help/r/jfrog-cli/jfrog-cli-eot) for more information on how the CLI handles OpenID Connect tokens behind the scenes.
+
+</details>
+
 
 <br>
+
+
 
 ## Executing JFrog CLI Commands
 
