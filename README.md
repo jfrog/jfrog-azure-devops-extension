@@ -403,7 +403,6 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
 ```yaml
  steps:
  - task: JfrogCliV2@1
-   name: jfStep
    inputs:
      jfrogPlatformConnection: 'azure-oidc'
      command: 'jf rt ping'
@@ -412,8 +411,8 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
    inputs:
      targetType: 'inline'
      script: |
-       echo "OIDC Username (from output): $(jfStep.oidc_user)"
-       echo "OIDC Token (from env): $env:oidc_token"
+            echo "OIDC Username (from output): $(oidc_user)"
+            echo "OIDC Token (from output): $(oidc_token)"
    displayName: 'Use OIDC Output Variables'
 ```
 
