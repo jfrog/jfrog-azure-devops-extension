@@ -227,6 +227,15 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             },
             TestUtils.isSkipTest('unit'),
         );
+
+        runSyncTest(
+            'Maven paths with spaces',
+            (): void => {
+                const testDir: string = 'maven';
+                mockTask(testDir, 'spaces_test');
+            },
+            TestUtils.isSkipTest('unit'),
+        );
     });
 
     describe('JFrog CLI Task Tests', (): void => {
