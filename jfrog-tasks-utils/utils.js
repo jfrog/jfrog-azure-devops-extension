@@ -131,7 +131,7 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
             let cliPath = join(cliDir, fileName);
 
             tl.debug('Using existing versioned cli path: ' + cliPath);
-            resolve('tests/testdata/current/jf');
+            resolve('jf');
         } else {
             const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl, cliVersion);
             createCliDirs();
@@ -217,6 +217,7 @@ function executeCliCommand(cliCommand, runningDir, options = {}) {
         const stdin = options.stdinSecret ? 'pipe' : 0;
         const stdout = options.withOutput ? 'pipe' : 1;
         const stderr = 2;
+        cliCommand = "/home/runner/work/jfrog-azure-devops-extension/jfrog-azure-devops-extension/tests/testData/current/jf";
         console.log('Executing JFrog CLI Command:\n' + maskSecrets(cliCommand));
         return execSync(cliCommand, { cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret });
     } catch (ex) {
