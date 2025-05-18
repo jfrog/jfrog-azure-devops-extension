@@ -650,6 +650,7 @@ function downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion = defaultJfrogC
         cliDownloadUrl = buildReleasesDownloadUrl(cliVersion);
         cliAuthHandlers = [];
     }
+    console.log('Download Url determined as ' + cliDownloadUrl);
     return new Promise((resolve, reject) => {
         toolLib
             .downloadTool(cliDownloadUrl, null, cliAuthHandlers)
