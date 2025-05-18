@@ -6,12 +6,13 @@ const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
 const syncRequest = require('sync-request');
-const semver = require('semver');
+import * as semver from 'semver';
+
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
-const defaultJfrogCliVersion = '2.76.0';
+const defaultJfrogCliVersion = '2.75.0';
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
@@ -123,15 +124,6 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 
 function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
     return new Promise(function (resolve, reject) {
-        // Use the committed binary path directly
-        const committedBinaryPath = join(__dirname, '..', 'tests', 'testdata', 'current', 'jf');
-        if (fs.existsSync(committedBinaryPath)) {
-            tl.debug('Using committed JFrog CLI binary: ' + committedBinaryPath);
-            resolve(committedBinaryPath);
-            return;
-        }
-
-        // Fallback to existing logic if the committed binary is not found
         let cliDir = toolLib.findLocalTool(jfrogCliToolName, cliVersion);
         if (fs.existsSync(customCliPath)) {
             tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
@@ -225,7 +217,6 @@ function executeCliCommand(cliCommand, runningDir, options = {}) {
         const stdin = options.stdinSecret ? 'pipe' : 0;
         const stdout = options.withOutput ? 'pipe' : 1;
         const stderr = 2;
-        cliCommand = "/home/runner/work/jfrog-azure-devops-extension/jfrog-azure-devops-extension/tests/testData/current/jf";
         console.log('Executing JFrog CLI Command:\n' + maskSecrets(cliCommand));
         return execSync(cliCommand, { cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret });
     } catch (ex) {
