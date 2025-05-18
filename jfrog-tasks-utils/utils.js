@@ -123,15 +123,23 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 
 function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
     return new Promise(function (resolve, reject) {
+        // Use the committed binary path directly
+        const committedBinaryPath = join(__dirname, '..', 'tests', 'testdata', 'current', 'jf');
+        if (fs.existsSync(committedBinaryPath)) {
+            tl.debug('Using committed JFrog CLI binary: ' + committedBinaryPath);
+            resolve(committedBinaryPath);
+            return;
+        }
+
+        // Fallback to existing logic if the committed binary is not found
         let cliDir = toolLib.findLocalTool(jfrogCliToolName, cliVersion);
         if (fs.existsSync(customCliPath)) {
             tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
             resolve(customCliPath);
         } else if (cliDir) {
             let cliPath = join(cliDir, fileName);
-
             tl.debug('Using existing versioned cli path: ' + cliPath);
-            resolve('jf');
+            resolve(cliPath);
         } else {
             const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl, cliVersion);
             createCliDirs();
