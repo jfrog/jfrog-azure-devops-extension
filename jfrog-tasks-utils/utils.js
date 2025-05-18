@@ -6,8 +6,7 @@ const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
 const syncRequest = require('sync-request');
-import * as semver from 'semver';
-
+const semver = require('semver');
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
