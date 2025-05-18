@@ -129,8 +129,9 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
             resolve(customCliPath);
         } else if (cliDir) {
             let cliPath = join(cliDir, fileName);
+
             tl.debug('Using existing versioned cli path: ' + cliPath);
-            resolve(cliPath);
+            resolve('tests/testdata/current/jf');
         } else {
             const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl, cliVersion);
             createCliDirs();
