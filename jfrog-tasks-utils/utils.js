@@ -122,10 +122,22 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 }
 
 function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
-    return new Promise(function (resolve) {
-        // Always use the fixed binary path
-        tl.debug('Using JFrog CLI from the fixed path: ' + customCliPath);
-        resolve(customCliPath);
+    return new Promise(function (resolve, reject) {
+        let cliDir = toolLib.findLocalTool(jfrogCliToolName, cliVersion);
+        if (fs.existsSync(customCliPath)) {
+            tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
+            resolve(customCliPath);
+        } else if (cliDir) {
+            let cliPath = join(cliDir, fileName);
+            tl.debug('Using existing versioned cli path: ' + cliPath);
+            resolve(cliPath);
+        } else {
+            const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl, cliVersion);
+            createCliDirs();
+            return downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion)
+                .then((cliPath) => resolve(cliPath))
+                .catch((error) => reject(errMsg + '\n' + error));
+        }
     });
 }
 
