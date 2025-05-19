@@ -20,7 +20,7 @@ const pluginVersion = '2.10.4';
 const buildAgent = 'jfrog-azure-devops-extension';
 const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
 const customCliPath = encodePath(join(__dirname, '..', 'tests', 'testdata', 'current', 'jf')); // Fixed path to the binary
-const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
+const jfrogCliReleasesUrl = 'https://ecosysjfrog.jfrog.io/artifactory/jfrog-cli-beta';
 const oidcUserOutputName = 'oidc_user';
 const oidcTokenOutputName = 'oidc_token';
 
