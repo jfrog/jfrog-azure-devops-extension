@@ -41,6 +41,13 @@ declare module '@jfrog/tasks-utils' {
     export function removeExtractorsDownloadVariables(cliPath: string, workDir: string);
     export function configureArtifactoryCliServer(artifactoryService: string, serverId: string, cliPath: string, buildDir: string);
     export function setJdkHomeForJavaTasks();
-
+    export function fetchAzureOidcToken(serviceConnectionID: string): string;
+    export function exchangeOidcTokenAndSetStepVariables(
+        service: service,
+        serviceUrl: string,
+        oidcProviderName: string,
+        cliPath: string,
+        buildDir: string,
+    ): string;
     export { taskSelectedCliVersionEnv };
 }
