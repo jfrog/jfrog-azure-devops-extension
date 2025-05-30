@@ -29,7 +29,7 @@ function RunTaskCbk(cliPath: string): void {
     // Running Maven command
     const pomFile: string | undefined = tl.getInput('mavenPOMFile') ?? '';
     let goalsAndOptions: string | undefined = tl.getInput('goals') ?? '';
-    goalsAndOptions = utils.cliJoin(goalsAndOptions, '-f', pomFile);
+    goalsAndOptions = utils.cliJoin(goalsAndOptions, '-f', utils.quote(pomFile));
     const options: string = tl.getInput('options') ?? '';
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
