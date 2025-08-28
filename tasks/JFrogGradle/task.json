@@ -41,8 +41,8 @@
             "type": "filePath",
             "label": "Gradle build file",
             "defaultValue": "build.gradle",
-            "required": true,
-            "helpMarkDown": "Relative path to build.gradle file."
+            "required": false,
+            "helpMarkDown": "Relative path to build.gradle file. Not respected for Gradle 9."
         },
         {
             "name": "workDir",

@@ -657,6 +657,8 @@ You should set *artifactoryPublish* as one of the Gradle tasks in the task(s) fi
 *artifactoryPublish* is a task that is exposed by the Gradle Artifactory Plugin, and is used for deploying artifacts
 as well as publishing build-info to Artifactory.
 
+> **Note:** Starting with Gradle 9, the `gradleBuildFile` parameter is not respected due to changes in how Gradle handles build file specification. However, this parameter is still required for Gradle versions 8 and below. The task automatically detects the Gradle version and adjusts its behavior accordingly.
+
 ![gradle.png](images/gradle-task.png)
 
 ```YAML
