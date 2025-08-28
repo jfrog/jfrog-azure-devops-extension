@@ -10,16 +10,44 @@ const semver = require('semver');
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
 const defaultJfrogCliVersion = '2.78.8';
+
+/**
+ * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
+ */
+function getJfrogFolderPath() {
+    let toolsDir = tl.getVariable('Agent.ToolsDirectory') || '';
+    
+    // Clean up any malformed quotes and path separators (Windows-specific Azure DevOps issues)
+    if (toolsDir && isWindows()) {
+        toolsDir = toolsDir.replace(/"/g, '').replace(/[\/\\]+/g, sep);
+    }
+    
+    const rawPath = join(toolsDir, '_jf');
+    return encodePath(rawPath);
+}
+
+let jfrogFolderPath = getJfrogFolderPath();
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
 const minSupportedOidcCliVersion = '2.75.0';
 const pluginVersion = '2.12.1';
 const buildAgent = 'jfrog-azure-devops-extension';
-const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
-const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
+
+/**
+ * Get the custom folder path, dynamically calculated based on current jfrogFolderPath
+ */
+function getCustomFolderPath() {
+    return encodePath(join(jfrogFolderPath, 'current'));
+}
+
+/**
+ * Get the custom CLI path, dynamically calculated based on current paths
+ */
+function getCustomCliPath() {
+    return encodePath(join(getCustomFolderPath(), fileName));
+}
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
 const oidcUserOutputName = 'oidc_user';
 const oidcTokenOutputName = 'oidc_token';
@@ -65,6 +93,9 @@ module.exports = {
     createBuildToolConfigFile: createBuildToolConfigFile,
     assembleUniqueServerId: assembleUniqueServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
+    getJfrogFolderPath: getJfrogFolderPath,
+    getCustomFolderPath: getCustomFolderPath,
+    getCustomCliPath: getCustomCliPath,
     compareVersions: compareVersions,
     addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
     useCliServer: useCliServer,
@@ -124,9 +155,9 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
     return new Promise(function (resolve, reject) {
         let cliDir = toolLib.findLocalTool(jfrogCliToolName, cliVersion);
-        if (fs.existsSync(customCliPath)) {
-            tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
-            resolve(customCliPath);
+        if (fs.existsSync(getCustomCliPath())) {
+            tl.debug('Using JFrog CLI from the custom CLI path: ' + getCustomCliPath());
+            resolve(getCustomCliPath());
         } else if (cliDir) {
             let cliPath = join(cliDir, fileName);
             tl.debug('Using existing versioned cli path: ' + cliPath);
@@ -189,7 +220,7 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
     } else {
         errMsg += '\nIf the chosen Artifactory Service cannot access the internet, you ';
     }
-    errMsg += 'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + customCliPath;
+    errMsg += 'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + getCustomCliPath();
     return errMsg;
 }
 
@@ -639,7 +670,27 @@ function runCbk(cliPath) {
 
 function createCliDirs() {
     if (!fs.existsSync(jfrogFolderPath)) {
-        fs.mkdirSync(jfrogFolderPath);
+        try {
+            console.log('Creating JFrog CLI directory: ' + jfrogFolderPath);
+            fs.mkdirSync(jfrogFolderPath, { recursive: true });
+        } catch (error) {
+            console.error('Failed to create JFrog CLI directory: ' + jfrogFolderPath);
+            console.error('Original Agent.ToolsDirectory: ' + (tl.getVariable('Agent.ToolsDirectory') || 'undefined'));
+            console.error('Error details: ' + error.message);
+            
+            // Try alternative approach: create directory without encoding
+            const fallbackPath = join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf').replace(/"/g, '');
+            console.log('Attempting fallback path: ' + fallbackPath);
+            try {
+                fs.mkdirSync(fallbackPath, { recursive: true });
+                console.log('Successfully created directory using fallback path');
+                // Update the global variable to use the working path
+                jfrogFolderPath = fallbackPath;
+            } catch (fallbackError) {
+                console.error('Fallback path also failed: ' + fallbackError.message);
+                throw new Error(`Unable to create JFrog CLI directory. Tried paths: "${jfrogFolderPath}" and "${fallbackPath}". Error: ${error.message}`);
+            }
+        }
     }
 }
 
@@ -762,8 +813,29 @@ function fixWindowsPaths(string) {
  * @returns {string} - The encoded path.
  */
 function encodePath(str) {
+    if (!str) {
+        return str;
+    }
+
+    // Clean up any malformed quotes in the input path first
+    // Handle cases like G:"Project-Agent"\Agent_work_tool by removing isolated quotes
+    let cleanedStr = str;
+    
+    // More robust regex patterns that work cross-platform
+    // Pattern 1: Remove quotes around path segments that don't contain spaces
+    // Matches: G:"Project-Agent" -> G:Project-Agent
+    cleanedStr = cleanedStr.replace(/([:\\/])"([^"\\\/\s]*)"([\\\/]|$)/g, '$1$2$3');
+    
+    // Pattern 2: Remove quotes at the beginning of path segments (after separators)
+    // Matches: \"Project-Agent" -> \Project-Agent
+    cleanedStr = cleanedStr.replace(/([\\\/])"([^"\\\/]*)"(?=[\\\/]|$)/g, '$1$2');
+    
+    // Pattern 3: Remove quotes after drive letters on Windows
+    // Matches: G:"something" -> G:something
+    cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1$2');
+    
     let encodedPath = '';
-    let arr = str.split(sep);
+    let arr = cleanedStr.split(sep);
     let count = 0;
     for (let section of arr) {
         if (section.length === 0) {
@@ -779,10 +851,10 @@ function encodePath(str) {
         }
         encodedPath += section + sep;
     }
-    if (count > 0 && !str.endsWith(sep)) {
+    if (count > 0 && !cleanedStr.endsWith(sep)) {
         encodedPath = encodedPath.substring(0, encodedPath.length - 1);
     }
-    if (str.startsWith(sep)) {
+    if (cleanedStr.startsWith(sep)) {
         encodedPath = sep + encodedPath;
     }
 
