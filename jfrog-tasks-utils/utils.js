@@ -20,7 +20,7 @@ function getJfrogFolderPath() {
     
     // Clean up any malformed quotes and path separators (Windows-specific Azure DevOps issues)
     if (toolsDir && isWindows()) {
-        toolsDir = toolsDir.replace(/"/g, '').replace(/[\/\\]+/g, sep);
+        toolsDir = toolsDir.replace(/"/g, '').replace(/[/\\]+/g, sep);
     }
     
     const rawPath = join(toolsDir, '_jf');
@@ -824,11 +824,11 @@ function encodePath(str) {
     // More robust regex patterns that work cross-platform
     // Pattern 1: Remove quotes around path segments that don't contain spaces
     // Matches: G:"Project-Agent" -> G:Project-Agent
-    cleanedStr = cleanedStr.replace(/([:\\/])"([^"\\\/\s]*)"([\\\/]|$)/g, '$1$2$3');
+    cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
     
     // Pattern 2: Remove quotes at the beginning of path segments (after separators)
     // Matches: \"Project-Agent" -> \Project-Agent
-    cleanedStr = cleanedStr.replace(/([\\\/])"([^"\\\/]*)"(?=[\\\/]|$)/g, '$1$2');
+    cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
     
     // Pattern 3: Remove quotes after drive letters on Windows
     // Matches: G:"something" -> G:something
