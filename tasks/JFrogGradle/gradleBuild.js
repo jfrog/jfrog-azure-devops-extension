@@ -17,7 +17,27 @@ function RunTaskCbk(cliPath) {
             return;
         }
         executeGradleConfig(cliPath, workDir);
-        executeGradle(cliPath, workDir);
+
+        // Check Gradle version
+        let isGradle9OrAbove = false;
+        const gradleVersion = getGradleVersion(cliPath, workDir);
+
+        if (gradleVersion) {
+            // Parse major version number
+            const versionParts = gradleVersion.split('.');
+            const majorVersion = parseInt(versionParts[0], 10);
+
+            if (!isNaN(majorVersion) && majorVersion >= 9) {
+                isGradle9OrAbove = true;
+                console.log(`Gradle ${majorVersion} detected - using Gradle 9+ compatible mode`);
+            } else {
+                console.log(`Gradle ${majorVersion} detected - using standard mode`);
+            }
+        } else {
+            console.log('Could not determine Gradle version - using standard mode');
+        }
+
+        executeGradle(cliPath, workDir, isGradle9OrAbove);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;
@@ -82,17 +102,56 @@ function executeGradleConfig(cliPath, workDir) {
 }
 
 /**
+ * Get Gradle version from the project.
+ * @param cliPath - Path to JFrog CLI
+ * @param workDir - Gradle project directory
+ * @returns {string}
+ */
+function getGradleVersion(cliPath, workDir) {
+    try {
+        // Use JFrog CLI to get gradle version, which will handle wrapper logic internally
+        // based on the gradle configuration
+        const gradleCommand = utils.cliJoin(cliPath, cliGradleCommand, '--version');
+
+        // Execute gradle --version through JFrog CLI and capture output
+        const gradleVersionOutput = utils.executeCliCommand(gradleCommand, workDir, { withOutput: true }).toString();
+
+        // Parse version from output using regex (works cross-platform)
+        // Looking for pattern like "Gradle 9.0.1" or "Gradle 8.5"
+        const versionMatch = gradleVersionOutput.match(/Gradle\s+(\d+\.\d+(?:\.\d+)?)/);
+
+        if (versionMatch && versionMatch[1]) {
+            const version = versionMatch[1];
+            console.log(`Detected Gradle version: ${version}`);
+            return version;
+        } else {
+            console.log('Could not parse Gradle version from output:');
+            console.log(gradleVersionOutput);
+            return '';
+        }
+    } catch (error) {
+        console.log(`Error getting Gradle version: ${error.message}`);
+        return '';
+    }
+}
+
+/**
  * Run 'jf gradle'.
  * @param cliPath - Path to JFrog CLI
  * @param workDir - Gradle project directory
+ * @param isGradle9 - Whether Gradle version 9 or higher is being used
  */
-function executeGradle(cliPath, workDir) {
+function executeGradle(cliPath, workDir, isGradle9) {
     let tasksAndOptions = tl.getInput('tasks');
     let options = tl.getInput('options');
     if (options) {
         tasksAndOptions = utils.cliJoin(tasksAndOptions, options);
     }
-    tasksAndOptions = utils.cliJoin(tasksAndOptions, '-b', tl.getInput('gradleBuildFile'));
+    // Gradle 9+ changed how build files are specified, so we don't use the -b flag
+    // for version 9 and above to avoid compatibility issues
+    if (!isGradle9) {
+        tasksAndOptions = utils.cliJoin(tasksAndOptions, '-b', tl.getInput('gradleBuildFile'));
+    }
     let gradleCommand = utils.cliJoin(cliPath, cliGradleCommand, tasksAndOptions);
     gradleCommand = utils.appendBuildFlagsToCliCommand(gradleCommand);
 
