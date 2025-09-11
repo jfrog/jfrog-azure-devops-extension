@@ -833,6 +833,10 @@ function encodePath(str) {
     // Matches: \"user-name" -> \user-name (cross-platform)
     cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
     
+    // Pattern 4: Fallback pattern for any remaining quoted segments
+    // This ensures we catch any edge cases that the above patterns might miss
+    cleanedStr = cleanedStr.replace(/"([^"]+)"/g, '$1');
+    
     let encodedPath = '';
     let arr = cleanedStr.split(sep);
     let count = 0;
