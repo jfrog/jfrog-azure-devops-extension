@@ -1,4 +1,4 @@
-const fs = require('fs');
+    const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task');
 const { join, sep, isAbsolute } = require('path');
 const execSync = require('child_process').execSync;
@@ -34,6 +34,23 @@ const minSupportedServerIdEnvCliVersion = '2.37.0';
 const minSupportedOidcCliVersion = '2.75.0';
 const pluginVersion = '2.12.1';
 const buildAgent = 'jfrog-azure-devops-extension';
+
+/**
+ * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
+ */
+function getJfrogFolderPath() {
+    let toolsDir = tl.getVariable('Agent.ToolsDirectory') || '';
+    
+    // Clean up any malformed quotes and path separators (Windows-specific Azure DevOps issues)
+    if (toolsDir && isWindows()) {
+        toolsDir = toolsDir.replace(/"/g, '').replace(/[/\\]+/g, sep);
+    }
+    
+    const rawPath = join(toolsDir, '_jf');
+    return encodePath(rawPath);
+}
+
+let jfrogFolderPath = getJfrogFolderPath();
 
 /**
  * Get the custom folder path, dynamically calculated based on current jfrogFolderPath
@@ -674,9 +691,8 @@ function createCliDirs() {
             console.log('Creating JFrog CLI directory: ' + jfrogFolderPath);
             fs.mkdirSync(jfrogFolderPath, { recursive: true });
         } catch (error) {
-            console.error('Failed to create JFrog CLI directory: ' + jfrogFolderPath);
-            console.error('Original Agent.ToolsDirectory: ' + (tl.getVariable('Agent.ToolsDirectory') || 'undefined'));
-            console.error('Error details: ' + error.message);
+            const originalToolsDir = tl.getVariable('Agent.ToolsDirectory') || 'undefined';
+            console.error(`Failed to create JFrog CLI directory. Original Agent.ToolsDirectory: ${originalToolsDir}, Attempted path: ${jfrogFolderPath}, Error: ${error.message}`);
             
             // Try alternative approach: create directory without encoding
             const fallbackPath = join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf').replace(/"/g, '');
@@ -687,8 +703,7 @@ function createCliDirs() {
                 // Update the global variable to use the working path
                 jfrogFolderPath = fallbackPath;
             } catch (fallbackError) {
-                console.error('Fallback path also failed: ' + fallbackError.message);
-                throw new Error(`Unable to create JFrog CLI directory. Tried paths: "${jfrogFolderPath}" and "${fallbackPath}". Error: ${error.message}`);
+                throw new Error(`Unable to create JFrog CLI directory. Attempted paths: "${jfrogFolderPath}" and "${fallbackPath}". Original error: ${error.message}`);
             }
         }
     }
@@ -817,22 +832,23 @@ function encodePath(str) {
         return str;
     }
 
-    // Clean up any malformed quotes in the input path first
-    // Handle cases like G:"Project-Agent"\Agent_work_tool by removing isolated quotes
     let cleanedStr = str;
     
-    // More robust regex patterns that work cross-platform
-    // Pattern 1: Remove quotes around path segments that don't contain spaces
-    // Matches: G:"Project-Agent" -> G:Project-Agent
-    cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
-    
-    // Pattern 2: Remove quotes at the beginning of path segments (after separators)
-    // Matches: \"Project-Agent" -> \Project-Agent
-    cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
-    
-    // Pattern 3: Remove quotes after drive letters on Windows
-    // Matches: G:"something" -> G:something
-    cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1$2');
+    // Clean up malformed quotes only on Windows (where this Azure DevOps issue occurs)
+    if (isWindows()) {
+        // Handle cases like G:"Project-Agent"\Agent_work_tool by removing isolated quotes
+        // Pattern 1: Remove quotes around path segments that don't contain spaces
+        // Matches: G:"Project-Agent" -> G:Project-Agent
+        cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
+        
+        // Pattern 2: Remove quotes at the beginning of path segments (after separators)
+        // Matches: \"Project-Agent" -> \Project-Agent
+        cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
+        
+        // Pattern 3: Remove quotes after drive letters on Windows
+        // Matches: G:"something" -> G:something
+        cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1$2');
+    }
     
     let encodedPath = '';
     let arr = cleanedStr.split(sep);
