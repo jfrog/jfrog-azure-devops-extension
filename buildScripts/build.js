@@ -15,10 +15,22 @@ installTests();
  * Install JFrog task utils.
  */
 function installJfrogTaskUtils() {
-    clean(TASKS_UTILS_DIR, true);
-    execNpm('i', TASKS_UTILS_DIR);
-    exec('npx clean-modules -y "!**/shelljs/src/test.js" --directory ' + join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
-    execNpm('pack', TASKS_UTILS_DIR);
+    // Check if we already have a committed package (for CI fix)
+    const existingPackage = join(TASKS_UTILS_DIR, 'jfrog-tasks-utils-1.0.0.tgz');
+    const hasCommittedPackage = fs.existsSync(existingPackage);
+    
+    if (!hasCommittedPackage) {
+        clean(TASKS_UTILS_DIR, true);
+        execNpm('i', TASKS_UTILS_DIR);
+        exec('npx clean-modules -y "!**/shelljs/src/test.js" --directory ' + join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
+        execNpm('pack', TASKS_UTILS_DIR);
+    } else {
+        // Use committed package (contains latest fixes for CI)
+        clean(TASKS_UTILS_DIR, false); // Don't clean the .tgz file
+        execNpm('i', TASKS_UTILS_DIR);
+        exec('npx clean-modules -y "!**/shelljs/src/test.js" --directory ' + join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
+        console.log('Using committed package with latest path encoding fixes:', existingPackage);
+    }
 }
 
 /**
