@@ -817,19 +817,18 @@ function encodePath(str) {
 
     let cleanedStr = str;
     
-    // Clean up malformed quotes only on Windows (where this Azure DevOps issue occurs)
+    // Clean up malformed quotes in paths
+    // Pattern 1: Remove quotes around path segments that don't contain spaces
+    // Matches: "user-name" -> user-name (cross-platform)
+    cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
+    
+    // Pattern 2: Remove quotes at the beginning of path segments (after separators)
+    // Matches: \"user-name" -> \user-name (cross-platform)
+    cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
+    
+    // Pattern 3: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
+    // Matches: G:"something" -> G:something
     if (isWindows()) {
-        // Handle cases like G:"Project-Agent"\Agent_work_tool by removing isolated quotes
-        // Pattern 1: Remove quotes around path segments that don't contain spaces
-        // Matches: G:"Project-Agent" -> G:Project-Agent
-        cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
-        
-        // Pattern 2: Remove quotes at the beginning of path segments (after separators)
-        // Matches: \"Project-Agent" -> \Project-Agent
-        cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
-        
-        // Pattern 3: Remove quotes after drive letters on Windows
-        // Matches: G:"something" -> G:something
         cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1$2');
     }
     
