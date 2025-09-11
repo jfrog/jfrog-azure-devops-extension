@@ -827,9 +827,9 @@ function encodePath(str) {
     cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
     
     // Pattern 3: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
-    // Matches: G:"something" -> G:something
+    // Matches: G:"Project-Agent" -> G:\Project-Agent
     if (isWindows()) {
-        cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1$2');
+        cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1\\$2');
     }
     
     let encodedPath = '';
