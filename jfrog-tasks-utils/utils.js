@@ -818,6 +818,13 @@ function encodePath(str) {
     let cleanedStr = str;
     
     // Clean up malformed quotes in paths
+    // Pattern 3: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
+    // Matches: G:"Project-Agent" -> G:\Project-Agent
+    // This must run FIRST to handle Windows drive letters before general patterns
+    if (isWindows()) {
+        cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1\\$2');
+    }
+    
     // Pattern 1: Remove quotes around path segments that don't contain spaces
     // Matches: "user-name" -> user-name (cross-platform)
     cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
@@ -825,12 +832,6 @@ function encodePath(str) {
     // Pattern 2: Remove quotes at the beginning of path segments (after separators)
     // Matches: \"user-name" -> \user-name (cross-platform)
     cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
-    
-    // Pattern 3: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
-    // Matches: G:"Project-Agent" -> G:\Project-Agent
-    if (isWindows()) {
-        cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1\\$2');
-    }
     
     let encodedPath = '';
     let arr = cleanedStr.split(sep);
