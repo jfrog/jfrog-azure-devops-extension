@@ -36,23 +36,6 @@ const pluginVersion = '2.12.1';
 const buildAgent = 'jfrog-azure-devops-extension';
 
 /**
- * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
- */
-function getJfrogFolderPath() {
-    let toolsDir = tl.getVariable('Agent.ToolsDirectory') || '';
-    
-    // Clean up any malformed quotes and path separators (Windows-specific Azure DevOps issues)
-    if (toolsDir && isWindows()) {
-        toolsDir = toolsDir.replace(/"/g, '').replace(/[/\\]+/g, sep);
-    }
-    
-    const rawPath = join(toolsDir, '_jf');
-    return encodePath(rawPath);
-}
-
-let jfrogFolderPath = getJfrogFolderPath();
-
-/**
  * Get the custom folder path, dynamically calculated based on current jfrogFolderPath
  */
 function getCustomFolderPath() {
