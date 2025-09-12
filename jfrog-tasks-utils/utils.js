@@ -816,49 +816,73 @@ function encodePath(str) {
     }
 
     let cleanedStr = str;
+    let hadMalformedQuotes = false;
     
     // Clean up malformed quotes in paths
     // Pattern 3: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
     // Matches: G:"Project-Agent" -> G:\Project-Agent
+    // Also handles: C:\"Program Files" -> C:\Program Files
+    // This pattern is content-based (looks for drive letters) rather than platform-based
     // This must run FIRST to handle Windows drive letters before general patterns
-    if (isWindows()) {
-        cleanedStr = cleanedStr.replace(/^([A-Za-z]:)"([^"]*)"/, '$1\\$2');
+    const driveQuotePattern = /^([A-Za-z]:)\\?"([^"]*)"(.*)$/;
+    if (driveQuotePattern.test(cleanedStr)) {
+        hadMalformedQuotes = true;
+        cleanedStr = cleanedStr.replace(driveQuotePattern, '$1\\$2$3');
     }
     
     // Pattern 1: Remove quotes around path segments that don't contain spaces
     // Matches: "user-name" -> user-name (cross-platform)
-    cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
+    const pattern1 = /([:/\\])"([^"/\\\s]*)"([/\\]|$)/g;
+    if (pattern1.test(str)) {
+        hadMalformedQuotes = true;
+        cleanedStr = cleanedStr.replace(pattern1, '$1$2$3');
+    }
     
     // Pattern 2: Remove quotes at the beginning of path segments (after separators)
     // Matches: \"user-name" -> \user-name (cross-platform)
-    cleanedStr = cleanedStr.replace(/([/\\])"([^"/\\]*)"(?=[/\\]|$)/g, '$1$2');
+    const pattern2 = /([/\\])"([^"/\\]*)"(?=[/\\]|$)/g;
+    if (pattern2.test(str)) {
+        hadMalformedQuotes = true;
+        cleanedStr = cleanedStr.replace(pattern2, '$1$2');
+    }
     
     // Pattern 4: Fallback pattern for any remaining quoted segments
     // This ensures we catch any edge cases that the above patterns might miss
-    cleanedStr = cleanedStr.replace(/"([^"]+)"/g, '$1');
+    const pattern4 = /"([^"]+)"/g;
+    if (pattern4.test(str)) {
+        hadMalformedQuotes = true;
+        cleanedStr = cleanedStr.replace(pattern4, '$1');
+    }
+    
+    // Determine the appropriate separator based on path content
+    // Windows paths use backslash, Unix paths use forward slash
+    const pathSeparator = cleanedStr.includes('\\') ? '\\' : sep;
     
     let encodedPath = '';
-    let arr = cleanedStr.split(sep);
+    let arr = cleanedStr.split(pathSeparator);
     let count = 0;
     for (let section of arr) {
         if (section.length === 0) {
             continue;
         }
         count++;
+        // Only add quotes to segments with spaces if we didn't clean up malformed quotes
+        // This preserves the behavior for paths that had malformed quotes (Azure DevOps issue)
         if (
+            !hadMalformedQuotes &&
             section.indexOf(' ') > 0 && // contains space
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
             !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
         ) {
             section = quote(section);
         }
-        encodedPath += section + sep;
+        encodedPath += section + pathSeparator;
     }
-    if (count > 0 && !cleanedStr.endsWith(sep)) {
+    if (count > 0 && !cleanedStr.endsWith(pathSeparator)) {
         encodedPath = encodedPath.substring(0, encodedPath.length - 1);
     }
-    if (cleanedStr.startsWith(sep)) {
-        encodedPath = sep + encodedPath;
+    if (cleanedStr.startsWith(pathSeparator)) {
+        encodedPath = pathSeparator + encodedPath;
     }
 
     return encodedPath;
