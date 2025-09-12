@@ -61,6 +61,7 @@ function installTasks() {
 function installTests() {
     clean(TESTS_DIR);
     copyTaskUtilsModules(TESTS_DIR);
+    copyTaskUtilsPackage(TESTS_DIR);
     execNpm('i', TESTS_DIR);
 }
 
@@ -70,6 +71,18 @@ function installTests() {
  */
 function copyTaskUtilsModules(dest) {
     fs.copySync(join(TASKS_UTILS_DIR, 'node_modules'), join(dest, 'node_modules'));
+}
+
+/**
+ * Copy jfrog-tasks-utils package (.tgz file) to destination directory
+ * @param dest - The destination
+ */
+function copyTaskUtilsPackage(dest) {
+    const tgzFiles = fs.readdirSync(TASKS_UTILS_DIR).filter(file => file.endsWith('.tgz'));
+    if (tgzFiles.length > 0) {
+        const tgzFile = tgzFiles[0]; // Take the first .tgz file found
+        fs.copySync(join(TASKS_UTILS_DIR, tgzFile), join(dest, tgzFile));
+    }
 }
 
 /**
