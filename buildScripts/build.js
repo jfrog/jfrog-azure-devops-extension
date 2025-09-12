@@ -75,13 +75,24 @@ function copyTaskUtilsModules(dest) {
 
 /**
  * Copy jfrog-tasks-utils package (.tgz file) to destination directory
- * @param dest - The destination
+ * This is needed for tests that reference the package via file: dependency
+ * @param dest - The destination directory
  */
 function copyTaskUtilsPackage(dest) {
     const tgzFiles = fs.readdirSync(TASKS_UTILS_DIR).filter(file => file.endsWith('.tgz'));
     if (tgzFiles.length > 0) {
         const tgzFile = tgzFiles[0]; // Take the first .tgz file found
-        fs.copySync(join(TASKS_UTILS_DIR, tgzFile), join(dest, tgzFile));
+        const srcPath = join(TASKS_UTILS_DIR, tgzFile);
+        const destPath = join(dest, tgzFile);
+        
+        if (fs.existsSync(srcPath)) {
+            fs.copySync(srcPath, destPath);
+            console.log(`Copied ${tgzFile} to ${dest}`);
+        } else {
+            console.warn(`Source file ${srcPath} does not exist`);
+        }
+    } else {
+        console.warn(`No .tgz files found in ${TASKS_UTILS_DIR}`);
     }
 }
 

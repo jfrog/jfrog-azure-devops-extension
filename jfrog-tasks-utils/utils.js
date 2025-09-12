@@ -1,4 +1,4 @@
-    const fs = require('fs');
+const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task');
 const { join, sep, isAbsolute } = require('path');
 const execSync = require('child_process').execSync;
@@ -816,42 +816,39 @@ function encodePath(str) {
     }
 
     let cleanedStr = str;
-    let hadMalformedQuotes = false;
+    let segmentsToNotQuote = new Set();
     
-    // Clean up malformed quotes in paths
-    // Pattern 3: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
+    // Clean up malformed quotes in paths - only handle specific Azure DevOps patterns
+    // Pattern 1: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
     // Matches: G:"Project-Agent" -> G:\Project-Agent
-    // Also handles: C:\"Program Files" -> C:\Program Files
-    // This pattern is content-based (looks for drive letters) rather than platform-based
-    // This must run FIRST to handle Windows drive letters before general patterns
+    // Also handles: C:"Program Files" -> C:\Program Files
     const driveQuotePattern = /^([A-Za-z]:)\\?"([^"]*)"(.*)$/;
     if (driveQuotePattern.test(cleanedStr)) {
-        hadMalformedQuotes = true;
-        cleanedStr = cleanedStr.replace(driveQuotePattern, '$1\\$2$3');
+        const match = cleanedStr.match(driveQuotePattern);
+        if (match) {
+            segmentsToNotQuote.add(match[2]); // Don't re-quote the segment that was malformed
+            cleanedStr = cleanedStr.replace(driveQuotePattern, '$1\\$2$3');
+        }
     }
     
-    // Pattern 1: Remove quotes around path segments that don't contain spaces
-    // Matches: "user-name" -> user-name (cross-platform)
+    // Pattern 2: Remove quotes around path segments that don't contain spaces (cross-platform)
+    // Matches: /home/"user-name"/tools -> /home/user-name/tools
     const pattern1 = /([:/\\])"([^"/\\\s]*)"([/\\]|$)/g;
-    if (pattern1.test(str)) {
-        hadMalformedQuotes = true;
-        cleanedStr = cleanedStr.replace(pattern1, '$1$2$3');
+    let match;
+    while ((match = pattern1.exec(str)) !== null) {
+        segmentsToNotQuote.add(match[2]); // Don't re-quote segments that had malformed quotes
     }
+    cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
     
-    // Pattern 2: Remove quotes at the beginning of path segments (after separators)
-    // Matches: \"user-name" -> \user-name (cross-platform)
-    const pattern2 = /([/\\])"([^"/\\]*)"(?=[/\\]|$)/g;
-    if (pattern2.test(str)) {
-        hadMalformedQuotes = true;
-        cleanedStr = cleanedStr.replace(pattern2, '$1$2');
-    }
-    
-    // Pattern 4: Fallback pattern for any remaining quoted segments
-    // This ensures we catch any edge cases that the above patterns might miss
-    const pattern4 = /"([^"]+)"/g;
-    if (pattern4.test(str)) {
-        hadMalformedQuotes = true;
-        cleanedStr = cleanedStr.replace(pattern4, '$1');
+    // Pattern 3: Remove quotes around path segments that DO contain spaces (Unix malformed quotes only)
+    // Matches: /opt/"Program Files"/jfrog -> /opt/Program Files/jfrog
+    // Only apply to Unix paths (containing forward slashes) to avoid breaking Windows legitimate quotes
+    if (!cleanedStr.includes('\\')) {
+        const pattern2 = /([:/])"([^"/]*)"([/]|$)/g;
+        while ((match = pattern2.exec(str)) !== null) {
+            segmentsToNotQuote.add(match[2]); // Don't re-quote segments that had malformed quotes
+        }
+        cleanedStr = cleanedStr.replace(/([:/])"([^"/]*)"([/]|$)/g, '$1$2$3');
     }
     
     // Determine the appropriate separator based on path content
@@ -866,10 +863,10 @@ function encodePath(str) {
             continue;
         }
         count++;
-        // Only add quotes to segments with spaces if we didn't clean up malformed quotes
-        // This preserves the behavior for paths that had malformed quotes (Azure DevOps issue)
+        // Add quotes to segments with spaces if they're not already quoted
+        // Skip segments that we cleaned malformed quotes from
         if (
-            !hadMalformedQuotes &&
+            !segmentsToNotQuote.has(section) &&
             section.indexOf(' ') > 0 && // contains space
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
             !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
