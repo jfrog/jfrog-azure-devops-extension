@@ -17,12 +17,12 @@ const defaultJfrogCliVersion = '2.78.8';
  */
 function getJfrogFolderPath() {
     let toolsDir = tl.getVariable('Agent.ToolsDirectory') || '';
-    
+
     // Clean up any malformed quotes and path separators (Windows-specific Azure DevOps issues)
     if (toolsDir && isWindows()) {
         toolsDir = toolsDir.replace(/"/g, '').replace(/[/\\]+/g, sep);
     }
-    
+
     const rawPath = join(toolsDir, '_jf');
     return encodePath(rawPath);
 }
@@ -220,7 +220,8 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
     } else {
         errMsg += '\nIf the chosen Artifactory Service cannot access the internet, you ';
     }
-    errMsg += 'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + getCustomCliPath();
+    errMsg +=
+        'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + getCustomCliPath();
     return errMsg;
 }
 
@@ -675,8 +676,10 @@ function createCliDirs() {
             fs.mkdirSync(jfrogFolderPath, { recursive: true });
         } catch (error) {
             const originalToolsDir = tl.getVariable('Agent.ToolsDirectory') || 'undefined';
-            console.error(`Failed to create JFrog CLI directory. Original Agent.ToolsDirectory: ${originalToolsDir}, Attempted path: ${jfrogFolderPath}, Error: ${error.message}`);
-            
+            console.error(
+                `Failed to create JFrog CLI directory. Original Agent.ToolsDirectory: ${originalToolsDir}, Attempted path: ${jfrogFolderPath}, Error: ${error.message}`,
+            );
+
             // Try alternative approach: create directory without encoding
             const fallbackPath = join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf').replace(/"/g, '');
             console.log('Attempting fallback path: ' + fallbackPath);
@@ -686,7 +689,9 @@ function createCliDirs() {
                 // Update the global variable to use the working path
                 jfrogFolderPath = fallbackPath;
             } catch (fallbackError) {
-                throw new Error(`Unable to create JFrog CLI directory. Attempted paths: "${jfrogFolderPath}" and "${fallbackPath}". Original error: ${error.message}`);
+                throw new Error(
+                    `Unable to create JFrog CLI directory. Attempted paths: "${jfrogFolderPath}" and "${fallbackPath}". Original error: ${error.message}`,
+                );
             }
         }
     }
@@ -805,19 +810,38 @@ function fixWindowsPaths(string) {
 }
 
 /**
- * Encodes spaces with quotes in a path.
- * a/b/Program Files/c --> a/b/"Program Files"/c
- * @param str (String) - The path to encode.
- * @returns {string} - The encoded path.
+ * Encodes the provided path for safe usage in command line execution.
+ *
+ * Key features:
+ * - Fixes Windows drive letter paths with malformed quotes: C:"Program Files" -> C:\Program Files
+ * - Removes quotes from path segments that don't need them
+ * - Preserves legitimate quotes around segments with spaces
+ * - Uses smart path separator detection (\ for Windows, / for Unix)
+ * - Prevents re-quoting of segments that had malformed quotes removed
+ *
+ * Examples:
+ * - a/b/Program Files/c --> a/b/"Program Files"/c
+ * - C:"Program Files"\JFrog --> C:\Program Files\JFrog
+ * - G:"Project-Agent"\tools --> G:\Project-Agent\tools
+ *
+ * @param {string} str - The path to encode. Can be null, undefined, or empty.
+ * @returns {string} - The encoded path, or the original value if null/undefined/empty.
+ * @throws {TypeError} - If str is not a string, null, or undefined.
  */
 function encodePath(str) {
-    if (!str) {
+    // Handle null, undefined, and empty string cases
+    if (str == null || str === '') {
         return str;
     }
 
-    let cleanedStr = str;
+    // Validate input type
+    if (typeof str !== 'string') {
+        throw new TypeError(`encodePath expects a string, but received: ${typeof str}`);
+    }
+
+    let cleanedStr = str.trim(); // Remove leading/trailing whitespace
     let segmentsToNotQuote = new Set();
-    
+
     // Clean up malformed quotes in paths - only handle specific Azure DevOps patterns
     // Pattern 1: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
     // Matches: G:"Project-Agent" -> G:\Project-Agent
@@ -830,7 +854,7 @@ function encodePath(str) {
             cleanedStr = cleanedStr.replace(driveQuotePattern, '$1\\$2$3');
         }
     }
-    
+
     // Pattern 2: Remove quotes around path segments that don't contain spaces (cross-platform)
     // Matches: /home/"user-name"/tools -> /home/user-name/tools
     const pattern1 = /([:/\\])"([^"/\\\s]*)"([/\\]|$)/g;
@@ -839,7 +863,7 @@ function encodePath(str) {
         segmentsToNotQuote.add(match[2]); // Don't re-quote segments that had malformed quotes
     }
     cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
-    
+
     // Pattern 3: Remove quotes around path segments that DO contain spaces (Unix malformed quotes only)
     // Matches: /opt/"Program Files"/jfrog -> /opt/Program Files/jfrog
     // Only apply to Unix paths (containing forward slashes) to avoid breaking Windows legitimate quotes
@@ -850,19 +874,21 @@ function encodePath(str) {
         }
         cleanedStr = cleanedStr.replace(/([:/])"([^"/]*)"([/]|$)/g, '$1$2$3');
     }
-    
+
     // Determine the appropriate separator based on path content
     // Windows paths use backslash, Unix paths use forward slash
     const pathSeparator = cleanedStr.includes('\\') ? '\\' : sep;
-    
+
     let encodedPath = '';
     let arr = cleanedStr.split(pathSeparator);
     let count = 0;
+
     for (let section of arr) {
         if (section.length === 0) {
             continue;
         }
         count++;
+
         // Add quotes to segments with spaces if they're not already quoted
         // Skip segments that we cleaned malformed quotes from
         if (
@@ -871,7 +897,12 @@ function encodePath(str) {
             !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
             !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
         ) {
-            section = quote(section);
+            try {
+                section = quote(section);
+            } catch (error) {
+                // If quoting fails, log warning and continue with unquoted section
+                console.warn(`Warning: Failed to quote path segment "${section}": ${error.message}`);
+            }
         }
         encodedPath += section + pathSeparator;
     }

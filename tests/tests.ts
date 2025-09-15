@@ -128,8 +128,8 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     assert.strictEqual(jfrogUtils.encodePath('dir 1\\dir2\\a b.txt'), '"dir 1"\\dir2\\"a b.txt"');
                     assert.strictEqual(jfrogUtils.encodePath('dir1\\dir2\\a.txt'), 'dir1\\dir2\\a.txt');
                     assert.strictEqual(jfrogUtils.encodePath('dir1\\'), 'dir1\\');
-                    
-                    // Test malformed quote handling (Azure DevOps issue)
+
+                    // Test malformed quote handling
                     assert.strictEqual(jfrogUtils.encodePath('G:"Project-Agent"\\Agent_work_tool'), 'G:\\Project-Agent\\Agent_work_tool');
                     assert.strictEqual(jfrogUtils.encodePath('C:"Program Files"\\JFrog'), 'C:\\Program Files\\JFrog');
                     assert.strictEqual(jfrogUtils.encodePath('D:\\Agent\\"work folder"\\tools'), 'D:\\Agent\\"work folder"\\tools');
@@ -139,7 +139,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     assert.strictEqual(jfrogUtils.encodePath('dir1/dir2/a.txt'), 'dir1/dir2/a.txt');
                     assert.strictEqual(jfrogUtils.encodePath('dir1/'), 'dir1/');
                     assert.strictEqual(jfrogUtils.encodePath('/dir1'), '/dir1');
-                    
+
                     // Test malformed quote handling (Unix paths)
                     assert.strictEqual(jfrogUtils.encodePath('/home/"user-name"/tools'), '/home/user-name/tools');
                     assert.strictEqual(jfrogUtils.encodePath('/opt/"Program Files"/jfrog'), '/opt/Program Files/jfrog');
