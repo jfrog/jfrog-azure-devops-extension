@@ -829,7 +829,6 @@ function fixWindowsPaths(string) {
  * @throws {TypeError} - If str is not a string, null, or undefined.
  */
 function encodePath(str) {
-    // Handle null, undefined, and empty string cases
     if (str == null || str === '') {
         return str;
     }

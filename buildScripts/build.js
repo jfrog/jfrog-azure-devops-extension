@@ -61,7 +61,6 @@ function installTasks() {
 function installTests() {
     clean(TESTS_DIR);
     copyTaskUtilsModules(TESTS_DIR);
-    copyTaskUtilsPackage(TESTS_DIR);
     execNpm('i', TESTS_DIR);
 }
 
@@ -71,62 +70,6 @@ function installTests() {
  */
 function copyTaskUtilsModules(dest) {
     fs.copySync(join(TASKS_UTILS_DIR, 'node_modules'), join(dest, 'node_modules'));
-}
-
-/**
- * Copy jfrog-tasks-utils package (.tgz file) to destination directory
- * This is needed for tests that reference the package via file: dependency
- * @param {string} dest - The destination directory
- * @throws {Error} If the copy operation fails
- */
-function copyTaskUtilsPackage(dest) {
-    try {
-        // Validate destination directory exists
-        if (!fs.existsSync(dest)) {
-            throw new Error(`Destination directory does not exist: ${dest}`);
-        }
-
-        // Validate source directory exists
-        if (!fs.existsSync(TASKS_UTILS_DIR)) {
-            throw new Error(`Source directory does not exist: ${TASKS_UTILS_DIR}`);
-        }
-
-        const tgzFiles = fs.readdirSync(TASKS_UTILS_DIR).filter((file) => file.endsWith('.tgz'));
-
-        if (tgzFiles.length === 0) {
-            console.warn(`No .tgz files found in ${TASKS_UTILS_DIR}`);
-            console.warn('This may cause test failures. Ensure "npm pack" was run in jfrog-tasks-utils directory.');
-            return;
-        }
-
-        if (tgzFiles.length > 1) {
-            console.warn(`Multiple .tgz files found: ${tgzFiles.join(', ')}. Using: ${tgzFiles[0]}`);
-        }
-
-        const tgzFile = tgzFiles[0];
-        const srcPath = join(TASKS_UTILS_DIR, tgzFile);
-        const destPath = join(dest, tgzFile);
-
-        // Verify source file exists and has content
-        const srcStats = fs.statSync(srcPath);
-        if (srcStats.size === 0) {
-            throw new Error(`Source file is empty: ${srcPath}`);
-        }
-
-        // Copy the file
-        fs.copySync(srcPath, destPath);
-
-        // Verify copy was successful
-        const destStats = fs.statSync(destPath);
-        if (destStats.size !== srcStats.size) {
-            throw new Error(`Copy verification failed: source size ${srcStats.size} != dest size ${destStats.size}`);
-        }
-
-        console.log(`✓ Successfully copied ${tgzFile} (${srcStats.size} bytes) to ${dest}`);
-    } catch (error) {
-        console.error(`Error copying tasks-utils package: ${error.message}`);
-        throw error; // Re-throw to fail the build if this is critical
-    }
 }
 
 /**

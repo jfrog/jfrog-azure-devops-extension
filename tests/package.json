@@ -7,7 +7,7 @@
     "description": "Test utils",
     "main": "testUtils.ts",
     "dependencies": {
-        "@jfrog/tasks-utils": "file:jfrog-tasks-utils-1.0.0.tgz",
+        "@jfrog/tasks-utils": "file:../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz",
         "azure-pipelines-task-lib": "4.12.0",
         "fs-extra": "11.2.0",
         "js-yaml": "^4.1.0",
