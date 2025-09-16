@@ -798,13 +798,6 @@ function getCliExecutableName() {
     return executable;
 }
 
-/**
- * Escape single backslashes in a string.
- * / -> //
- * // -> //
- * @param string (String) - The string to escape
- * @returns (String) - The string after escaping
- */
 function fixWindowsPaths(string) {
     return isWindows() ? string.replace(/([^\\])\\(?!\\)/g, '$1\\\\') : string;
 }
@@ -838,7 +831,7 @@ function encodePath(str) {
         throw new TypeError(`encodePath expects a string, but received: ${typeof str}`);
     }
 
-    let cleanedStr = str.trim(); // Remove leading/trailing whitespace
+    let cleanedStr = str.trim();
     let segmentsToNotQuote = new Set();
 
     // Clean up malformed quotes in paths - only handle specific Azure DevOps patterns
@@ -849,7 +842,7 @@ function encodePath(str) {
     if (driveQuotePattern.test(cleanedStr)) {
         const match = cleanedStr.match(driveQuotePattern);
         if (match) {
-            segmentsToNotQuote.add(match[2]); // Don't re-quote the segment that was malformed
+            segmentsToNotQuote.add(match[2]);
             cleanedStr = cleanedStr.replace(driveQuotePattern, '$1\\$2$3');
         }
     }
@@ -859,7 +852,7 @@ function encodePath(str) {
     const pattern1 = /([:/\\])"([^"/\\\s]*)"([/\\]|$)/g;
     let match;
     while ((match = pattern1.exec(str)) !== null) {
-        segmentsToNotQuote.add(match[2]); // Don't re-quote segments that had malformed quotes
+        segmentsToNotQuote.add(match[2]);
     }
     cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
 
@@ -869,7 +862,7 @@ function encodePath(str) {
     if (!cleanedStr.includes('\\')) {
         const pattern2 = /([:/])"([^"/]*)"([/]|$)/g;
         while ((match = pattern2.exec(str)) !== null) {
-            segmentsToNotQuote.add(match[2]); // Don't re-quote segments that had malformed quotes
+            segmentsToNotQuote.add(match[2]);
         }
         cleanedStr = cleanedStr.replace(/([:/])"([^"/]*)"([/]|$)/g, '$1$2$3');
     }
@@ -892,9 +885,9 @@ function encodePath(str) {
         // Skip segments that we cleaned malformed quotes from
         if (
             !segmentsToNotQuote.has(section) &&
-            section.indexOf(' ') > 0 && // contains space
-            !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
-            !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
+            section.indexOf(' ') > 0 &&
+            !(section.startsWith("'") && section.endsWith("'")) &&
+            !(section.startsWith('"') && section.endsWith('"'))
         ) {
             try {
                 section = quote(section);
