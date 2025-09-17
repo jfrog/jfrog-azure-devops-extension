@@ -14,6 +14,9 @@ declare module '@jfrog/tasks-utils' {
     export function fixWindowsPaths(string: string): string;
     export function encodePath(str: string): string;
     export function getArchitecture(): string;
+    export function getJfrogFolderPath(): string;
+    export function getCustomFolderPath(): string;
+    export function getCustomCliPath(): string;
     export function determineCliWorkDir(defaultPath: string, providedPath: string): string;
     export function compareVersions(version1: string, version2: string): number;
     export function executeCliCommand(cliCommand: string, runningDir: string, options?: {}): string;

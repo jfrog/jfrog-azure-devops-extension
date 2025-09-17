@@ -10,16 +10,44 @@ const semver = require('semver');
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const jfrogFolderPath = encodePath(join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf'));
 const defaultJfrogCliVersion = '2.78.8';
+
+/**
+ * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
+ */
+function getJfrogFolderPath() {
+    let toolsDir = tl.getVariable('Agent.ToolsDirectory') || '';
+
+    // Clean up any malformed quotes and path separators (Windows-specific Azure DevOps issues)
+    if (toolsDir && isWindows()) {
+        toolsDir = toolsDir.replace(/"/g, '').replace(/[/\\]+/g, sep);
+    }
+
+    const rawPath = join(toolsDir, '_jf');
+    return encodePath(rawPath);
+}
+
+let jfrogFolderPath = getJfrogFolderPath();
 const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
 const minSupportedOidcCliVersion = '2.75.0';
 const pluginVersion = '2.12.1';
 const buildAgent = 'jfrog-azure-devops-extension';
-const customFolderPath = encodePath(join(jfrogFolderPath, 'current'));
-const customCliPath = encodePath(join(customFolderPath, fileName)); // Optional - Customized jfrog-cli path.
+
+/**
+ * Get the custom folder path, dynamically calculated based on current jfrogFolderPath
+ */
+function getCustomFolderPath() {
+    return encodePath(join(jfrogFolderPath, 'current'));
+}
+
+/**
+ * Get the custom CLI path, dynamically calculated based on current paths
+ */
+function getCustomCliPath() {
+    return encodePath(join(getCustomFolderPath(), fileName));
+}
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
 const oidcUserOutputName = 'oidc_user';
 const oidcTokenOutputName = 'oidc_token';
@@ -65,6 +93,9 @@ module.exports = {
     createBuildToolConfigFile: createBuildToolConfigFile,
     assembleUniqueServerId: assembleUniqueServerId,
     appendBuildFlagsToCliCommand: appendBuildFlagsToCliCommand,
+    getJfrogFolderPath: getJfrogFolderPath,
+    getCustomFolderPath: getCustomFolderPath,
+    getCustomCliPath: getCustomCliPath,
     compareVersions: compareVersions,
     addTrailingSlashIfNeeded: addTrailingSlashIfNeeded,
     useCliServer: useCliServer,
@@ -124,9 +155,9 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
     return new Promise(function (resolve, reject) {
         let cliDir = toolLib.findLocalTool(jfrogCliToolName, cliVersion);
-        if (fs.existsSync(customCliPath)) {
-            tl.debug('Using JFrog CLI from the custom CLI path: ' + customCliPath);
-            resolve(customCliPath);
+        if (fs.existsSync(getCustomCliPath())) {
+            tl.debug('Using JFrog CLI from the custom CLI path: ' + getCustomCliPath());
+            resolve(getCustomCliPath());
         } else if (cliDir) {
             let cliPath = join(cliDir, fileName);
             tl.debug('Using existing versioned cli path: ' + cliPath);
@@ -189,7 +220,8 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
     } else {
         errMsg += '\nIf the chosen Artifactory Service cannot access the internet, you ';
     }
-    errMsg += 'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + customCliPath;
+    errMsg +=
+        'may also manually download version ' + cliVersion + ' of JFrog CLI and place it on the agent in the following path: ' + getCustomCliPath();
     return errMsg;
 }
 
@@ -639,7 +671,29 @@ function runCbk(cliPath) {
 
 function createCliDirs() {
     if (!fs.existsSync(jfrogFolderPath)) {
-        fs.mkdirSync(jfrogFolderPath);
+        try {
+            console.log('Creating JFrog CLI directory: ' + jfrogFolderPath);
+            fs.mkdirSync(jfrogFolderPath, { recursive: true });
+        } catch (error) {
+            const originalToolsDir = tl.getVariable('Agent.ToolsDirectory') || 'undefined';
+            console.error(
+                `Failed to create JFrog CLI directory. Original Agent.ToolsDirectory: ${originalToolsDir}, Attempted path: ${jfrogFolderPath}, Error: ${error.message}`,
+            );
+
+            // Try alternative approach: create directory without encoding
+            const fallbackPath = join(tl.getVariable('Agent.ToolsDirectory') || '', '_jf').replace(/"/g, '');
+            console.log('Attempting fallback path: ' + fallbackPath);
+            try {
+                fs.mkdirSync(fallbackPath, { recursive: true });
+                console.log('Successfully created directory using fallback path');
+                // Update the global variable to use the working path
+                jfrogFolderPath = fallbackPath;
+            } catch (fallbackError) {
+                throw new Error(
+                    `Unable to create JFrog CLI directory. Attempted paths: "${jfrogFolderPath}" and "${fallbackPath}". Original error: ${error.message}`,
+                );
+            }
+        }
     }
 }
 
@@ -744,46 +798,111 @@ function getCliExecutableName() {
     return executable;
 }
 
-/**
- * Escape single backslashes in a string.
- * / -> //
- * // -> //
- * @param string (String) - The string to escape
- * @returns (String) - The string after escaping
- */
 function fixWindowsPaths(string) {
     return isWindows() ? string.replace(/([^\\])\\(?!\\)/g, '$1\\\\') : string;
 }
 
 /**
- * Encodes spaces with quotes in a path.
- * a/b/Program Files/c --> a/b/"Program Files"/c
- * @param str (String) - The path to encode.
- * @returns {string} - The encoded path.
+ * Encodes the provided path for safe usage in command line execution.
+ *
+ * Key features:
+ * - Fixes Windows drive letter paths with malformed quotes: C:"Program Files" -> C:\Program Files
+ * - Removes quotes from path segments that don't need them
+ * - Preserves legitimate quotes around segments with spaces
+ * - Uses smart path separator detection (\ for Windows, / for Unix)
+ * - Prevents re-quoting of segments that had malformed quotes removed
+ *
+ * Examples:
+ * - a/b/Program Files/c --> a/b/"Program Files"/c
+ * - C:"Program Files"\JFrog --> C:\Program Files\JFrog
+ * - G:"Project-Agent"\tools --> G:\Project-Agent\tools
+ *
+ * @param {string} str - The path to encode. Can be null, undefined, or empty.
+ * @returns {string} - The encoded path, or the original value if null/undefined/empty.
+ * @throws {TypeError} - If str is not a string, null, or undefined.
  */
 function encodePath(str) {
+    if (str == null || str === '') {
+        return str;
+    }
+
+    // Validate input type
+    if (typeof str !== 'string') {
+        throw new TypeError(`encodePath expects a string, but received: ${typeof str}`);
+    }
+
+    let cleanedStr = str.trim();
+    let segmentsToNotQuote = new Set();
+
+    // Clean up malformed quotes in paths - only handle specific Azure DevOps patterns
+    // Pattern 1: Remove quotes after drive letters (Windows-specific Azure DevOps issue)
+    // Matches: G:"Project-Agent" -> G:\Project-Agent
+    // Also handles: C:"Program Files" -> C:\Program Files
+    const driveQuotePattern = /^([A-Za-z]:)\\?"([^"]*)"(.*)$/;
+    if (driveQuotePattern.test(cleanedStr)) {
+        const match = cleanedStr.match(driveQuotePattern);
+        if (match) {
+            segmentsToNotQuote.add(match[2]);
+            cleanedStr = cleanedStr.replace(driveQuotePattern, '$1\\$2$3');
+        }
+    }
+
+    // Pattern 2: Remove quotes around path segments that don't contain spaces (cross-platform)
+    // Matches: /home/"user-name"/tools -> /home/user-name/tools
+    const pattern1 = /([:/\\])"([^"/\\\s]*)"([/\\]|$)/g;
+    let match;
+    while ((match = pattern1.exec(str)) !== null) {
+        segmentsToNotQuote.add(match[2]);
+    }
+    cleanedStr = cleanedStr.replace(/([:/\\])"([^"/\\\s]*)"([/\\]|$)/g, '$1$2$3');
+
+    // Pattern 3: Remove quotes around path segments that DO contain spaces (Unix malformed quotes only)
+    // Matches: /opt/"Program Files"/jfrog -> /opt/Program Files/jfrog
+    // Only apply to Unix paths (containing forward slashes) to avoid breaking Windows legitimate quotes
+    if (!cleanedStr.includes('\\')) {
+        const pattern2 = /([:/])"([^"/]*)"([/]|$)/g;
+        while ((match = pattern2.exec(str)) !== null) {
+            segmentsToNotQuote.add(match[2]);
+        }
+        cleanedStr = cleanedStr.replace(/([:/])"([^"/]*)"([/]|$)/g, '$1$2$3');
+    }
+
+    // Determine the appropriate separator based on path content
+    // Windows paths use backslash, Unix paths use forward slash
+    const pathSeparator = cleanedStr.includes('\\') ? '\\' : sep;
+
     let encodedPath = '';
-    let arr = str.split(sep);
+    let arr = cleanedStr.split(pathSeparator);
     let count = 0;
+
     for (let section of arr) {
         if (section.length === 0) {
             continue;
         }
         count++;
+
+        // Add quotes to segments with spaces if they're not already quoted
+        // Skip segments that we cleaned malformed quotes from
         if (
-            section.indexOf(' ') > 0 && // contains space
-            !(section.startsWith("'") && section.endsWith("'")) && // not already quoted with single quotation mark
-            !(section.startsWith('"') && section.endsWith('"')) // not already quoted with double quotation mark
+            !segmentsToNotQuote.has(section) &&
+            section.indexOf(' ') > 0 &&
+            !(section.startsWith("'") && section.endsWith("'")) &&
+            !(section.startsWith('"') && section.endsWith('"'))
         ) {
-            section = quote(section);
+            try {
+                section = quote(section);
+            } catch (error) {
+                // If quoting fails, log warning and continue with unquoted section
+                console.warn(`Warning: Failed to quote path segment "${section}": ${error.message}`);
+            }
         }
-        encodedPath += section + sep;
+        encodedPath += section + pathSeparator;
     }
-    if (count > 0 && !str.endsWith(sep)) {
+    if (count > 0 && !cleanedStr.endsWith(pathSeparator)) {
         encodedPath = encodedPath.substring(0, encodedPath.length - 1);
     }
-    if (str.startsWith(sep)) {
-        encodedPath = sep + encodedPath;
+    if (cleanedStr.startsWith(pathSeparator)) {
+        encodedPath = pathSeparator + encodedPath;
     }
 
     return encodedPath;
