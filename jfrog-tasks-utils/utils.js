@@ -10,7 +10,7 @@ const semver = require('semver');
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const defaultJfrogCliVersion = '2.78.8';
+const defaultJfrogCliVersion = '2.81.0';
 
 /**
  * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
