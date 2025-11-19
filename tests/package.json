@@ -8,20 +8,19 @@
     "main": "testUtils.ts",
     "dependencies": {
         "@jfrog/tasks-utils": "file:../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz",
-        "azure-pipelines-task-lib": "4.12.0",
+        "azure-pipelines-task-lib": "5.2.1",
         "fs-extra": "11.2.0",
-        "js-yaml": "^4.1.0",
+        "js-yaml": "^4.1.1",
         "path": "^0.12.7"
     },
     "devDependencies": {
         "@types/fs-extra": "^11.0.1",
         "@types/mocha": "^10.0.1",
         "@types/node": "^20.4.5",
-        "@types/rimraf": "^3.0.0",
         "mocha": "^10.2.0",
         "node-tunnel": "^4.0.1",
         "null-writable": "^1.0.5",
-        "rimraf": "^3.0.0",
+        "rimraf": "^6.1.2",
         "sync-request": "^6.1.0",
         "ts-node": "^10.9.1"
     },
