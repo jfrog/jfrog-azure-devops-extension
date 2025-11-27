@@ -239,9 +239,9 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Maven paths with spaces',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'maven';
-                mockTask(testDir, 'spaces_test');
+                await mockTask(testDir, 'spaces_test');
             },
             TestUtils.isSkipTest('unit'),
         );
@@ -250,16 +250,16 @@ describe('JFrog Artifactory Extension Tests', (): void => {
     describe('JFrog CLI Task Tests', (): void => {
         runSyncTest(
             'JFrog CLI Task Test',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'jfrogCliTask';
                 // Upload a.in. b.in and c.in
-                mockTask(testDir, 'upload');
+                await mockTask(testDir, 'upload');
                 // Delete a.in
-                mockTask(testDir, 'delete');
+                await mockTask(testDir, 'delete');
                 // Rename b.in to d.in
-                mockTask(testDir, 'move');
+                await mockTask(testDir, 'move');
                 // Download all files
-                mockTask(testDir, 'download');
+                await mockTask(testDir, 'download');
                 assertFiles(join(testDir, 'expectedFiles'), testDir);
             },
             TestUtils.isSkipTest('generic'),
@@ -999,14 +999,14 @@ function distributionCleanUp(rbName: string, rbVersion: string): void {
  * @param testFunc (Function) - The test logic
  * @param skip (Boolean, Optional) - True if test should be skipped
  */
-function runSyncTest(description: string, testFunc: () => void, skip?: boolean): void {
+function runSyncTest(description: string, testFunc: () => void | Promise<void>, skip?: boolean): void {
     if (skip) {
         it.skip(description);
         return;
     }
 
-    it(description, (done): void => {
-        testFunc();
+    it(description, async (done): Promise<void> => {
+        await testFunc();
         done();
     }).timeout(1000000); // 10 minutes
 }
@@ -1037,12 +1037,12 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  * @param taskName (String) - The '.js' file
  * @param shouldFail (Boolean, Optional) - True if the task supposed to fail
  */
-function mockTask(testDir: string, taskName: string, shouldFail?: boolean): void {
+async function mockTask(testDir: string, taskName: string, shouldFail?: boolean): Promise<void> {
     const taskPath: string = join(__dirname, 'resources', testDir, taskName + '.js');
     // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
     const taskJsonDummy: string = join(__dirname, 'resources', 'task.json');
     const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
-    mockRunner.runAsync(); // Mock a test
+    await mockRunner.runAsync();
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
     assert.ok(shouldFail ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
 }
