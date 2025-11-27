@@ -1042,7 +1042,7 @@ function mockTask(testDir: string, taskName: string, shouldFail?: boolean): void
     // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
     const taskJsonDummy: string = join(__dirname, 'resources', 'task.json');
     const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
-    mockRunner.run(); // Mock a test
+    mockRunner.runAsync(); // Mock a test
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
     assert.ok(shouldFail ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
 }
