@@ -2,7 +2,7 @@ import * as mockRun from 'azure-pipelines-task-lib/mock-run';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { join, basename } from 'path';
 import * as fs from 'fs-extra';
-import { rimraf } from 'rimraf';
+import { rimraf, rimrafSync } from 'rimraf';
 import * as syncRequest from 'sync-request';
 import * as assert from 'assert';
 import NullWritable from 'null-writable';
@@ -67,14 +67,12 @@ export function initTests(): void {
     process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_LOG_LEVEL = 'ERROR';
     tl.setStdStream(new NullWritable());
-    
-    cleanUpOldRepositories();
-    recreateTestDataDir();
-    
     tl.setVariable('Agent.WorkFolder', testDataDir);
     tl.setVariable('Agent.TempDirectory', testDataDir);
     tl.setVariable('Agent.ToolsDirectory', testDataDir);
 
+    cleanUpOldRepositories();
+    recreateTestDataDir();
     createTestRepositories();
 }
 
@@ -115,8 +113,10 @@ export function runTaskForService(testMain: string, variables: any, inputs: any)
 }
 
 export function recreateTestDataDir(): void {
-    fs.removeSync(testDataDir);
-    fs.ensureDirSync(testDataDir);
+    if (fs.existsSync(testDataDir)) {
+        rimrafSync(testDataDir);
+    }
+    fs.mkdirSync(testDataDir);
 }
 
 export function getBuild(buildName: string, buildNumber: string): syncRequest.Response {
@@ -531,17 +531,7 @@ export function getLocalTestDir(testName: string): string {
 }
 
 export function getTestLocalFilesDir(testDir: string): string {
-    const testName: string = getTestName(testDir);
-    const targetFilesDir: string = join(getLocalTestDir(testName), 'files', '/');
-    const sourceFilesDir: string = join(testDir, 'files', '/');
-    
-    // Copy files from resources to testData if they exist and haven't been copied yet
-    if (fs.existsSync(sourceFilesDir) && !fs.existsSync(targetFilesDir)) {
-        fs.ensureDirSync(join(getLocalTestDir(testName)));
-        fs.copySync(sourceFilesDir, targetFilesDir);
-    }
-    
-    return targetFilesDir;
+    return join(testDir, 'files', '/');
 }
 
 export function getRemoteTestDir(repo: string, testName: string): string {
