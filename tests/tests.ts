@@ -16,7 +16,7 @@ import { execSync } from 'child_process';
 
 let tasksOutput: string;
 
-describe('JFrog Artifactory Extension Tests', (): void => {
+describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
     let repoKeys: any;
     before(function (): void {
         this.timeout(120000); // 2 minutes timer for the before hook only.
@@ -31,7 +31,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         repoKeys = TestUtils.getRepoKeys();
     });
 
-    beforeEach((): void => {
+    beforeEach(async (): Promise<void> => {
         tasksOutput = '';
     });
 
@@ -40,11 +40,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         TestUtils.cleanUpAllTests();
     });
 
-    describe('Unit Tests', (): void => {
+    describe('Unit Tests', async (): Promise<void> => {
         console.log('OS:', os.type());
         runSyncTest(
             'Mask password',
-            (): void => {
+            async (): Promise<void> => {
                 const oldPassword: string = process.env.ADO_JFROG_PLATFORM_PASSWORD ?? '';
                 process.env.ADO_JFROG_PLATFORM_PASSWORD = 'SUPER_SECRET';
                 let retVal: string = '';
@@ -87,7 +87,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
                 jfrogUtils
                     .downloadCli()
-                    .then((): void => {
+                    .then(async (): Promise<void> => {
                         tunnel.close();
                         process.env.HTTP_PROXY = '';
                         done(cliDownloadedWithProxy ? '' : new Error('CLI downloaded without using the proxy server'));
@@ -99,7 +99,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Cli join',
-            (): void => {
+            async (): Promise<void> => {
                 assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u'), 'jf rt u');
                 assert.strictEqual(jfrogUtils.cliJoin('jf'), 'jf');
                 assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a/b/c', 'a/b/c'), 'jf rt u a/b/c a/b/c');
@@ -111,7 +111,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Fix windows paths',
-            (): void => {
+            async (): Promise<void> => {
                 const specBeforeFix: string = fs.readFileSync(join(__dirname, 'resources', 'fixWindowsPaths', 'specBeforeFix.json'), 'utf8');
                 const expectedSpecAfterFix: string = fs.readFileSync(join(__dirname, 'resources', 'fixWindowsPaths', 'specAfterFix.json'), 'utf8');
                 const specAfterFix: string = jfrogUtils.fixWindowsPaths(specBeforeFix);
@@ -122,7 +122,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Encode paths',
-            (): void => {
+            async (): Promise<void> => {
                 if (TestUtils.isWindows()) {
                     assert.strictEqual(jfrogUtils.encodePath('dir1\\dir 2\\dir 3'), 'dir1\\"dir 2"\\"dir 3"');
                     assert.strictEqual(jfrogUtils.encodePath('dir 1\\dir2\\a b.txt'), '"dir 1"\\dir2\\"a b.txt"');
@@ -155,7 +155,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Get architecture',
-            (): void => {
+            async (): Promise<void> => {
                 const arch: string = jfrogUtils.getArchitecture();
                 switch (os.type()) {
                     case 'Linux':
@@ -176,7 +176,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Utils - determine cli workdir',
-            (): void => {
+            async (): Promise<void> => {
                 if (TestUtils.isWindows()) {
                     assert.strictEqual(
                         jfrogUtils.determineCliWorkDir('C:\\myAgent\\_work\\1', 'C:\\myAgent\\_work\\1\\myFolder'),
@@ -204,7 +204,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'CLI version compare',
-            (): void => {
+            async (): Promise<void> => {
                 assert.strictEqual(jfrogUtils.compareVersions('1.37.1', '1.37.1'), 0);
                 assert.strictEqual(jfrogUtils.compareVersions('0.8', '1.37.1'), -1);
                 assert.strictEqual(jfrogUtils.compareVersions('1', '1.37.1'), -1);
@@ -223,7 +223,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
          */
         runSyncTest(
             'Conan Utils - Get Cli Partials Build Dir',
-            (): void => {
+            async (): Promise<void> => {
                 testGetCliPartialsBuildDir();
             },
             TestUtils.isSkipTest('unit'),
@@ -231,7 +231,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Utils - Init build details partial and verify consistency in timestamp',
-            (): void => {
+            async (): Promise<void> => {
                 testInitCliPartialsBuildDir();
             },
             TestUtils.isSkipTest('unit'),
@@ -247,7 +247,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('JFrog CLI Task Tests', (): void => {
+    describe('JFrog CLI Task Tests', async (): Promise<void> => {
         runSyncTest(
             'JFrog CLI Task Test',
             async (): Promise<void> => {
@@ -266,10 +266,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Tools Installer Tests', (): void => {
+    describe('Tools Installer Tests', async (): Promise<void> => {
         runSyncTest(
             'Download CLI',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
@@ -286,7 +286,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Download Custom CLI version',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'toolsInstaller';
                 // Clean tool cache
                 TestUtils.cleanToolCache();
@@ -299,10 +299,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Upload and Download Tests', (): void => {
+    describe('Upload and Download Tests', async (): Promise<void> => {
         runSyncTest(
             'Upload and download',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'uploadAndDownload';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
@@ -313,7 +313,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Upload and download with Spec Vars',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'uploadAndDownloadWithSpecVars';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
@@ -324,7 +324,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Upload and download from file',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'uploadAndDownloadFromFile';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
@@ -335,7 +335,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Upload and download with working directory',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'uploadAndDownloadWithWorkingDirectory';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
@@ -346,7 +346,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Upload and dry-run download',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'uploadAndDryRunDownload';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
@@ -357,7 +357,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Dry-run upload and download',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'dryRunUploadAndDownload';
                 mockTask(testDir, 'uploadDryRun');
                 mockTask(testDir, 'upload');
@@ -369,7 +369,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Download artifact source',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'downloadArtifactSource';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
@@ -382,7 +382,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Upload fail-no-op',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'uploadFailNoOp';
                 mockTask(testDir, 'upload', true);
             },
@@ -391,7 +391,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Download fail-no-op',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'downloadFailNoOp';
                 mockTask(testDir, 'download', true);
                 assertFiles(join(testDir, 'files'), testDir);
@@ -401,7 +401,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Include environment variables',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'includeEnv';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
@@ -420,10 +420,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Move Copy Delete Tests', (): void => {
+    describe('Move Copy Delete Tests', async (): Promise<void> => {
         runSyncTest(
             'Move Copy Delete',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'moveCopyDelete';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'move');
@@ -436,10 +436,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Publish Build Info Tests', (): void => {
+    describe('Publish Build Info Tests', async (): Promise<void> => {
         runSyncTest(
             'Publish build info',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'publishBuildInfo';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'download');
@@ -455,7 +455,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Exclude Environment Variables',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'excludeEnv';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
@@ -475,7 +475,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Build URL build pipeline',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'buildUrlBuildPipeline';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
@@ -488,7 +488,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Build URL release pipeline',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'buildUrlReleasePipeline';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
@@ -500,10 +500,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Build Promotion Tests', (): void => {
+    describe('Build Promotion Tests', async (): Promise<void> => {
         runSyncTest(
             'Build promotion',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'promotion';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
@@ -518,7 +518,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Build promotion dry run',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'promotionDryRun';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'publish');
@@ -532,10 +532,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Discard Builds Tests', (): void => {
+    describe('Discard Builds Tests', async (): Promise<void> => {
         runSyncTest(
             'Discard builds',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'discard';
                 for (let i: number = 1; i <= 4; i++) {
                     mockTask(testDir, 'upload' + i.toString());
@@ -568,10 +568,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Properties Tests', (): void => {
+    describe('Properties Tests', async (): Promise<void> => {
         runSyncTest(
             'Set properties',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'setProperties';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'set');
@@ -583,7 +583,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Delete properties',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'deleteProperties';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'set');
@@ -595,10 +595,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Npm Tests', (): void => {
+    describe('Npm Tests', async (): Promise<void> => {
         runSyncTest(
             'Npm install and publish',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'npm';
                 mockTask(testDir, join('install', 'npmInstall'));
                 mockTask(testDir, join('install', 'installNpmPublish'));
@@ -612,7 +612,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
         runSyncTest(
             'Npm ci and publish',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'npm';
                 mockTask(testDir, join('ci', 'npmCi'));
                 mockTask(testDir, join('ci', 'ciNpmPublish'));
@@ -626,10 +626,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Maven Tests', (): void => {
+    describe('Maven Tests', async (): Promise<void> => {
         runSyncTest(
             'Maven',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'maven';
                 mockTask(testDir, 'build');
                 mockTask(testDir, 'publish');
@@ -649,10 +649,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Gradle Tests', (): void => {
+    describe('Gradle Tests', async (): Promise<void> => {
         runSyncTest(
             'Gradle',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'gradle';
                 mockTask(testDir, join('gradle-example', 'build'));
                 mockTask(testDir, join('gradle-example', 'publish'));
@@ -665,7 +665,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
         runSyncTest(
             'Gradle CI',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'gradle';
                 mockTask(testDir, join('gradle-example-ci', 'build'));
                 mockTask(testDir, join('gradle-example-ci', 'publish'));
@@ -678,10 +678,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Go Tests', (): void => {
+    describe('Go Tests', async (): Promise<void> => {
         runSyncTest(
             'Go',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'go';
                 mockTask(testDir, 'build');
                 mockTask(testDir, 'goPublish');
@@ -695,10 +695,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('NuGet Tests', (): void => {
+    describe('NuGet Tests', async (): Promise<void> => {
         runSyncTest(
             'NuGet restore',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'nuget';
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
@@ -709,7 +709,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
         runSyncTest(
             'NuGet push',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'nuget';
                 mockTask(testDir, 'push');
                 mockTask(testDir, 'publish');
@@ -722,10 +722,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Dotnet Tests', (): void => {
+    describe('Dotnet Tests', async (): Promise<void> => {
         runSyncTest(
             'Dotnet restore',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'dotnet';
                 mockTask(testDir, 'restore');
                 mockTask(testDir, 'publish');
@@ -736,7 +736,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
         runSyncTest(
             'Dotnet push',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'dotnet';
                 mockTask(testDir, 'push');
                 mockTask(testDir, 'publish');
@@ -750,7 +750,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         // Run a restore using the custom command task.
         runSyncTest(
             'Dotnet custom restore',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'dotnet';
                 mockTask(testDir, 'custom');
                 mockTask(testDir, 'publish');
@@ -761,10 +761,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Docker Tests', (): void => {
+    describe('Docker Tests', async (): Promise<void> => {
         runSyncTest(
             'Docker push, pull and scan',
-            (): void => {
+            async (): Promise<void> => {
                 assert.ok(TestUtils.platformDockerDomain, 'Tests are missing environment variable: ADO_JFROG_PLATFORM_DOCKER_DOMAIN');
 
                 const testDir: string = 'docker';
@@ -795,10 +795,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Collect Issues Tests', (): void => {
+    describe('Collect Issues Tests', async (): Promise<void> => {
         runSyncTest(
             'Collect Issues',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'collectIssues';
                 mockTask(testDir, 'collect');
                 mockTask(testDir, 'publish');
@@ -810,7 +810,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Collect Issues from file',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'collectIssues';
                 mockTask(testDir, 'collectFromFile');
                 mockTask(testDir, 'publishFromFile');
@@ -821,10 +821,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Conan Task Tests', (): void => {
+    describe('Conan Task Tests', async (): Promise<void> => {
         runSyncTest(
             'Conan Custom Command',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomCommand');
             },
@@ -833,7 +833,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Custom Command With Working Dir',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomCommandWithWorkingDir');
             },
@@ -842,7 +842,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Custom Invalid Command',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomInvalidCommand', true);
             },
@@ -851,7 +851,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Custom Command With Build Info',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanCustomCommandWithBuildInfo');
             },
@@ -860,7 +860,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Add Remote',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanAddRemote');
             },
@@ -869,7 +869,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Add Remote With Purge',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanAddRemoteWithPurge');
             },
@@ -878,7 +878,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Create And Upload',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanAddRemote');
                 mockTask(testDir, 'conanCreate');
@@ -889,7 +889,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Create And Upload in Release',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanAddRemote');
                 mockTask(testDir, 'conanCreate');
@@ -900,7 +900,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Install',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanInstall');
             },
@@ -909,7 +909,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Add Config',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanConfigInstall');
             },
@@ -918,7 +918,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Conan Publish Build Info',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'conanTask';
                 mockTask(testDir, 'conanAddRemote');
                 mockTask(testDir, 'conanCreate');
@@ -931,10 +931,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Pip Tests', (): void => {
+    describe('Pip Tests', async (): Promise<void> => {
         runSyncTest(
             'Pip Install',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'pip';
                 mockTask(testDir, 'install');
                 mockTask(testDir, 'publish');
@@ -945,7 +945,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
-    describe('Distribution Tests', (): void => {
+    describe('Distribution Tests', async (): Promise<void> => {
         let rbName: string;
         let rbVersion: string;
         before(function (): void {
@@ -959,7 +959,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
 
         runSyncTest(
             'Distribution',
-            (): void => {
+            async (): Promise<void> => {
                 const testDir: string = 'distribution';
                 mockTask(testDir, 'upload');
                 mockTask(testDir, 'create');
@@ -999,14 +999,14 @@ function distributionCleanUp(rbName: string, rbVersion: string): void {
  * @param testFunc (Function) - The test logic
  * @param skip (Boolean, Optional) - True if test should be skipped
  */
-function runSyncTest(description: string, testFunc: () => void | Promise<void>, skip?: boolean): void {
+function runSyncTest(description: string, testFunc: () => void, skip?: boolean): void {
     if (skip) {
         it.skip(description);
         return;
     }
 
-    it(description, async (done): Promise<void> => {
-        await testFunc();
+    it(description, (done): void => {
+        testFunc();
         done();
     }).timeout(1000000); // 10 minutes
 }
@@ -1037,12 +1037,12 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  * @param taskName (String) - The '.js' file
  * @param shouldFail (Boolean, Optional) - True if the task supposed to fail
  */
-async function mockTask(testDir: string, taskName: string, shouldFail?: boolean): Promise<void> {
+function mockTask(testDir: string, taskName: string, shouldFail?: boolean): void {
     const taskPath: string = join(__dirname, 'resources', testDir, taskName + '.js');
     // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
     const taskJsonDummy: string = join(__dirname, 'resources', 'task.json');
     const mockRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
-    await mockRunner.runAsync();
+    mockRunner.run(); // Using deprecated but synchronous run() method from version 4.12.0
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
     assert.ok(shouldFail ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
 }
