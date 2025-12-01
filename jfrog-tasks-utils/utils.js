@@ -10,7 +10,7 @@ const semver = require('semver');
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const defaultJfrogCliVersion = '2.81.0';
+const defaultJfrogCliVersion = '2.85.0';
 
 /**
  * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
@@ -32,7 +32,7 @@ const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
 const minSupportedOidcCliVersion = '2.75.0';
-const pluginVersion = '2.12.2';
+const pluginVersion = '2.13.0';
 const buildAgent = 'jfrog-azure-devops-extension';
 
 /**
@@ -436,7 +436,15 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     // This is done by the exchange command and not the config to export
     // username and access token params for further use by the users.
     if (oidcProviderName) {
-        serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir);
+        // we need platform url for oidc token exchange
+        let platformUrl = serviceUrl;
+        if (serviceUrl.endsWith('/xray')) {
+            platformUrl = serviceUrl.replace('/xray', '');
+        }
+        if (serviceUrl.endsWith('/artifactory')) {
+            platformUrl = serviceUrl.replace('/artifactory', '');
+        }
+        serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
     }
 
     if (serviceAccessToken) {
