@@ -436,15 +436,15 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     // This is done by the exchange command and not the config to export
     // username and access token params for further use by the users.
     if (oidcProviderName) {
-        // we need artifactory url for oidc token exchange
-        let artifactoryUrl = serviceUrl;
+        // we need platform url for oidc token exchange
+        let platformUrl = serviceUrl;
         if (serviceUrl.endsWith('/xray')) {
-            artifactoryUrl = serviceUrl.replace('/xray', '');
+            platformUrl = serviceUrl.replace('/xray', '');
         }
         if (serviceUrl.endsWith('/artifactory')) {
-            artifactoryUrl = serviceUrl.replace('/artifactory', '');
+            platformUrl = serviceUrl.replace('/artifactory', '');
         }
-        serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, artifactoryUrl, oidcProviderName, cliPath, buildDir);
+        serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
     }
 
     if (serviceAccessToken) {
