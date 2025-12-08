@@ -1,8 +1,37 @@
 import * as utils from '@jfrog/tasks-utils';
 import * as tl from 'azure-pipelines-task-lib/task';
+import * as path from 'path';
+import * as os from 'os';
 
 const cliAuditCommand: string = 'audit';
 let serverId: string;
+
+/**
+ * Publishes JFrog logs as a pipeline artifact for debugging purposes.
+ * Useful for accessing JAS scanner logs (analyzerManagerLogs, etc.)
+ */
+function publishJFrogLogs(): void {
+    try {
+        const publishLogs: boolean = tl.getBoolInput('publishLogs', false);
+        if (!publishLogs) {
+            return;
+        }
+        const jfrogHome: string = process.env.JFROG_CLI_HOME_DIR || path.join(os.homedir(), '.jfrog');
+        const logsPath: string = path.join(jfrogHome, 'logs');
+        if (tl.exist(logsPath)) {
+            // Create unique artifact name using BuildId and JobAttempt
+            const buildId: string = tl.getVariable('Build.BuildId') || 'unknown';
+            const jobAttempt: string = tl.getVariable('System.JobAttempt') || '1';
+            const artifactName: string = `jfrog-audit-logs-${buildId}-${jobAttempt}`;
+            tl.debug(`Publishing JFrog logs from: ${logsPath}`);
+            tl.command('artifact.upload', { containerfolder: 'jfrog-audit-logs', artifactname: artifactName }, logsPath);
+        } else {
+            tl.warning(`JFrog logs directory not found at: ${logsPath}`);
+        }
+    } catch (err) {
+        tl.warning(`Failed to publish JFrog logs: ${err}`);
+    }
+}
 
 function RunTaskCbk(cliPath: string): void {
     const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) ?? '';
@@ -41,6 +70,7 @@ function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): v
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);
     } finally {
+        publishJFrogLogs();
         utils.taskDefaultCleanup(cliPath, buildDir, [serverId]);
     }
 }
