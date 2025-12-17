@@ -16,7 +16,7 @@ import { execSync } from 'child_process';
 
 let tasksOutput: string;
 
-describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
+describe('JFrog Artifactory Extension Tests', (): void => {
     let repoKeys: any;
     before(function (): void {
         this.timeout(120000); // 2 minutes timer for the before hook only.
@@ -40,7 +40,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         TestUtils.cleanUpAllTests();
     });
 
-    describe('Unit Tests', async (): Promise<void> => {
+    describe('Unit Tests', (): void => {
         console.log('OS:', os.type());
         runSyncTest(
             'Mask password',
@@ -87,7 +87,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
 
                 jfrogUtils
                     .downloadCli()
-                    .then(async (): Promise<void> => {
+                    .then((): void => {
                         tunnel.close();
                         process.env.HTTP_PROXY = '';
                         done(cliDownloadedWithProxy ? '' : new Error('CLI downloaded without using the proxy server'));
@@ -223,7 +223,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
          */
         runSyncTest(
             'Conan Utils - Get Cli Partials Build Dir',
-            async (): Promise<void> => {
+            (): void => {
                 testGetCliPartialsBuildDir();
             },
             TestUtils.isSkipTest('unit'),
@@ -231,7 +231,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
 
         runSyncTest(
             'Conan Utils - Init build details partial and verify consistency in timestamp',
-            async (): Promise<void> => {
+            (): void => {
                 testInitCliPartialsBuildDir();
             },
             TestUtils.isSkipTest('unit'),
@@ -247,7 +247,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('JFrog CLI Task Tests', async (): Promise<void> => {
+    describe('JFrog CLI Task Tests', (): void => {
         runSyncTest(
             'JFrog CLI Task Test',
             async (): Promise<void> => {
@@ -266,7 +266,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Tools Installer Tests', async (): Promise<void> => {
+    describe('Tools Installer Tests', (): void => {
         runSyncTest(
             'Download CLI',
             async (): Promise<void> => {
@@ -299,7 +299,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Upload and Download Tests', async (): Promise<void> => {
+    describe('Upload and Download Tests', (): void => {
         runSyncTest(
             'Upload and download',
             async (): Promise<void> => {
@@ -420,7 +420,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Move Copy Delete Tests', async (): Promise<void> => {
+    describe('Move Copy Delete Tests', (): void => {
         runSyncTest(
             'Move Copy Delete',
             async (): Promise<void> => {
@@ -436,7 +436,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Publish Build Info Tests', async (): Promise<void> => {
+    describe('Publish Build Info Tests', (): void => {
         runSyncTest(
             'Publish build info',
             async (): Promise<void> => {
@@ -500,7 +500,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Build Promotion Tests', async (): Promise<void> => {
+    describe('Build Promotion Tests', (): void => {
         runSyncTest(
             'Build promotion',
             async (): Promise<void> => {
@@ -532,7 +532,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Discard Builds Tests', async (): Promise<void> => {
+    describe('Discard Builds Tests', (): void => {
         runSyncTest(
             'Discard builds',
             async (): Promise<void> => {
@@ -568,7 +568,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Properties Tests', async (): Promise<void> => {
+    describe('Properties Tests', (): void => {
         runSyncTest(
             'Set properties',
             async (): Promise<void> => {
@@ -595,7 +595,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Npm Tests', async (): Promise<void> => {
+    describe('Npm Tests', (): void => {
         runSyncTest(
             'Npm install and publish',
             async (): Promise<void> => {
@@ -626,7 +626,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Maven Tests', async (): Promise<void> => {
+    describe('Maven Tests', (): void => {
         runSyncTest(
             'Maven',
             async (): Promise<void> => {
@@ -649,7 +649,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Gradle Tests', async (): Promise<void> => {
+    describe('Gradle Tests', (): void => {
         runSyncTest(
             'Gradle',
             async (): Promise<void> => {
@@ -678,7 +678,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Go Tests', async (): Promise<void> => {
+    describe('Go Tests', (): void => {
         runSyncTest(
             'Go',
             async (): Promise<void> => {
@@ -695,7 +695,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('NuGet Tests', async (): Promise<void> => {
+    describe('NuGet Tests', (): void => {
         runSyncTest(
             'NuGet restore',
             async (): Promise<void> => {
@@ -722,7 +722,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Dotnet Tests', async (): Promise<void> => {
+    describe('Dotnet Tests', (): void => {
         runSyncTest(
             'Dotnet restore',
             async (): Promise<void> => {
@@ -761,7 +761,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Docker Tests', async (): Promise<void> => {
+    describe('Docker Tests', (): void => {
         runSyncTest(
             'Docker push, pull and scan',
             async (): Promise<void> => {
@@ -795,7 +795,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Collect Issues Tests', async (): Promise<void> => {
+    describe('Collect Issues Tests', (): void => {
         runSyncTest(
             'Collect Issues',
             async (): Promise<void> => {
@@ -821,7 +821,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Conan Task Tests', async (): Promise<void> => {
+    describe('Conan Task Tests', (): void => {
         runSyncTest(
             'Conan Custom Command',
             async (): Promise<void> => {
@@ -931,7 +931,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Pip Tests', async (): Promise<void> => {
+    describe('Pip Tests', (): void => {
         runSyncTest(
             'Pip Install',
             async (): Promise<void> => {
@@ -945,7 +945,7 @@ describe('JFrog Artifactory Extension Tests', async (): Promise<void> => {
         );
     });
 
-    describe('Distribution Tests', async (): Promise<void> => {
+    describe('Distribution Tests', (): void => {
         let rbName: string;
         let rbVersion: string;
         before(function (): void {
