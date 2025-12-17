@@ -81,7 +81,18 @@ function clean(cwd, cleanPackage) {
     sync(join(cwd, 'node_modules'));
     sync(join(cwd, 'package-lock.json'));
     if (cleanPackage) {
-        sync(join(cwd, '*.tgz'));
+        // rimraf v6 doesn't support wildcards directly on Windows, so find files first
+        try {
+            const files = fs.readdirSync(cwd);
+            files.forEach((file) => {
+                if (file.endsWith('.tgz')) {
+                    sync(join(cwd, file));
+                }
+            });
+        } catch (err) {
+            // Directory doesn't exist or can't be read, ignore
+            console.warn('Directory doesn\'t exist or can\'t be read, ignoring: ' + cwd);
+        }
     }
 }
 

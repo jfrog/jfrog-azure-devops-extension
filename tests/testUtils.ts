@@ -144,11 +144,11 @@ export function cleanToolCache(): void {
 
 export function cleanUpAllTests(): void {
     if (fs.existsSync(testDataDir)) {
-        rimraf(testDataDir, (err: Error | null | undefined): void => {
-            if (err) {
-                console.warn('Tests cleanup issue: ' + err);
-            }
-        });
+        try {
+            rimraf.sync(testDataDir);
+        } catch (err) {
+            console.warn('Tests cleanup issue: ' + err);
+        }
     }
     deleteTestRepositories();
 }
