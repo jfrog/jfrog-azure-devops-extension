@@ -437,13 +437,7 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     // username and access token params for further use by the users.
     if (oidcProviderName) {
         // we need platform url for oidc token exchange
-        let platformUrl = serviceUrl;
-        if (serviceUrl.endsWith('/xray')) {
-            platformUrl = serviceUrl.replace('/xray', '');
-        }
-        if (serviceUrl.endsWith('/artifactory')) {
-            platformUrl = serviceUrl.replace('/artifactory', '');
-        }
+        let platformUrl = tl.getEndpointAuthorizationParameter(service, 'jfrogPlatformUrl', true);
         serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
     }
 
