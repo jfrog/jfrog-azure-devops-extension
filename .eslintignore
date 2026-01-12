@@ -14,3 +14,4 @@ pipBuild.js
 tests.js
 testUtils.js
 docker.js
+utilsTests.js
