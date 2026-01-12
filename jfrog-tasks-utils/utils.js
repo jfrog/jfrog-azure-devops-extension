@@ -118,6 +118,7 @@ module.exports = {
     jfrogCliToolName: jfrogCliToolName,
     isServerIdEnvSupported: isServerIdEnvSupported,
     setJdkHomeForJavaTasks: setJdkHomeForJavaTasks,
+    parsePlatformUrlFromServiceUrl: parsePlatformUrlFromServiceUrl,
 };
 
 /**
@@ -437,7 +438,15 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     // username and access token params for further use by the users.
     if (oidcProviderName) {
         // we need platform url for oidc token exchange
-        let platformUrl = tl.getEndpointAuthorizationParameter(service, 'jfrogPlatformUrl', true);
+        let platformUrl = "";
+        try {
+            platformUrl = tl.getEndpointAuthorizationParameter(service, 'jfrogPlatformUrl', true);
+        } catch (error) {
+            console.warn('Failed to get platform url from field: ' + error+"\nparsing from url instead");
+        }
+        if (!platformUrl || !platformUrl.trim()) {
+            platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
+        }
         serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
     }
 
@@ -951,6 +960,26 @@ function isToolExists(toolName) {
 
 function stripTrailingSlash(str) {
     return str.endsWith('/') ? str.slice(0, -1) : str;
+}
+
+/**
+ * Parse platform URL from a service URL by stripping service-specific suffixes.
+ * Handles URLs ending with /xray, /artifactory, or /distribution (case-insensitive).
+ *
+ * @param serviceUrl - The service URL to parse (e.g., 'https://example.jfrog.io/artifactory')
+ * @returns The platform URL with the service suffix removed
+ */
+function parsePlatformUrlFromServiceUrl(serviceUrl) {
+    const suffixes = ['/xray', '/artifactory', '/distribution'];
+    const url = new URL(serviceUrl);
+    for (const suffix of suffixes) {
+        if (url.pathname.endsWith(suffix)) {
+            url.pathname = url.pathname.replace(suffix, '');
+            break;
+        }
+    }
+    // Remove trailing slash
+    return url.toString().replace(/\/$/, '');
 }
 
 /**

@@ -52,5 +52,6 @@ declare module '@jfrog/tasks-utils' {
         cliPath: string,
         buildDir: string,
     ): string;
+    export function parsePlatformUrlFromServiceUrl(serviceUrl: string): string;
     export { taskSelectedCliVersionEnv };
 }
