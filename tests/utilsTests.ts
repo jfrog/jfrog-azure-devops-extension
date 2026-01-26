@@ -4,6 +4,21 @@ import * as assert from 'assert';
 // Use require to get the actual module with latest exports
 import * as jfrogUtils from '@jfrog/tasks-utils';
 
+// Type declarations for the new exported functions
+declare module '@jfrog/tasks-utils' {
+    export function syncRequestWithRetry(
+        method: string,
+        url: string,
+        options?: object,
+        maxRetries?: number,
+        retryDelay?: number,
+    ): { statusCode: number; getBody(encoding: string): string };
+    export function isCliBinaryAvailable(version: string): boolean;
+    export function fetchLatestCliVersion(): string;
+    export const defaultJfrogCliVersion: string;
+    export const fallbackCliVersion: string;
+}
+
 /**
  * Simulates the platformUrl resolution logic from utils.js lines 441-449:
  *
@@ -132,6 +147,98 @@ describe('Utils Unit Tests', (): void => {
                 jfrogUtils.parsePlatformUrlFromServiceUrl('https://artifactory.com/jfrog/artifactory'),
                 'https://artifactory.com/jfrog',
             );
+        });
+    });
+
+    describe('syncRequestWithRetry', (): void => {
+        it('should return response on successful request (2xx)', (): void => {
+            const response = jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/200', { timeout: 5000 });
+            assert.strictEqual(response.statusCode, 200);
+        });
+
+        it('should return response on 4xx client error without retry', (): void => {
+            const response = jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/404', { timeout: 5000 });
+            assert.strictEqual(response.statusCode, 404);
+        });
+
+        it('should throw error after retries exhausted on 5xx server error', (): void => {
+            assert.throws(
+                (): void => {
+                    jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/503', { timeout: 5000 }, 2, 100);
+                },
+                /Server error 503 after 2 retries/,
+            );
+        });
+
+        it('should throw error on network failure after retries', (): void => {
+            assert.throws(
+                (): void => {
+                    jfrogUtils.syncRequestWithRetry('GET', 'https://invalid.domain.that.does.not.exist.example', { timeout: 1000 }, 2, 100);
+                },
+                Error,
+            );
+        });
+    });
+
+    describe('isCliBinaryAvailable', (): void => {
+        it('should return true for a known valid CLI version', (): void => {
+            // Use a known stable version that should always be available
+            const result = jfrogUtils.isCliBinaryAvailable('2.50.0');
+            assert.strictEqual(result, true);
+        });
+
+        it('should return false for a non-existent CLI version', (): void => {
+            const result = jfrogUtils.isCliBinaryAvailable('0.0.1');
+            assert.strictEqual(result, false);
+        });
+
+        it('should return false for an invalid version format', (): void => {
+            const result = jfrogUtils.isCliBinaryAvailable('invalid-version');
+            assert.strictEqual(result, false);
+        });
+    });
+
+    describe('fetchLatestCliVersion', (): void => {
+        it('should return a valid semver version string', (): void => {
+            const version = jfrogUtils.fetchLatestCliVersion();
+            // Version should match semver pattern (e.g., "2.89.0")
+            assert.match(version, /^\d+\.\d+\.\d+$/);
+        });
+
+        it('should return version >= 2.50.0 (reasonable minimum)', (): void => {
+            const version = jfrogUtils.fetchLatestCliVersion();
+            const [major, minor] = version.split('.').map(Number);
+            assert.ok(major >= 2, `Major version ${major} should be >= 2`);
+            if (major === 2) {
+                assert.ok(minor >= 50, `Minor version ${minor} should be >= 50 for major version 2`);
+            }
+        });
+    });
+
+    describe('defaultJfrogCliVersion', (): void => {
+        it('should be initialized with a valid version', (): void => {
+            assert.ok(jfrogUtils.defaultJfrogCliVersion, 'defaultJfrogCliVersion should be defined');
+            assert.match(jfrogUtils.defaultJfrogCliVersion, /^\d+\.\d+\.\d+$/);
+        });
+
+        it('should match the result of fetchLatestCliVersion', (): void => {
+            // Since defaultJfrogCliVersion is set at module load, it should match fetchLatestCliVersion
+            // unless there was a failure (in which case both would use fallback)
+            const fetchedVersion = jfrogUtils.fetchLatestCliVersion();
+            assert.strictEqual(jfrogUtils.defaultJfrogCliVersion, fetchedVersion);
+        });
+    });
+
+    describe('fallbackCliVersion', (): void => {
+        it('should be a valid semver version string', (): void => {
+            assert.ok(jfrogUtils.fallbackCliVersion, 'fallbackCliVersion should be defined');
+            assert.match(jfrogUtils.fallbackCliVersion, /^\d+\.\d+\.\d+$/);
+        });
+
+        it('should have an available binary on releases.jfrog.io', (): void => {
+            // The fallback version should always have its binary available
+            const result = jfrogUtils.isCliBinaryAvailable(jfrogUtils.fallbackCliVersion);
+            assert.strictEqual(result, true, `Fallback version ${jfrogUtils.fallbackCliVersion} should have available binary`);
         });
     });
 });
