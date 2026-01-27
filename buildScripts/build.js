@@ -91,7 +91,7 @@ function clean(cwd, cleanPackage) {
             });
         } catch (err) {
             // Directory doesn't exist or can't be read, ignore
-            console.warn('Directory doesn\'t exist or can\'t be read, ignoring: ' + cwd);
+            console.warn("Directory doesn't exist or can't be read, ignoring: " + cwd);
         }
     }
 }

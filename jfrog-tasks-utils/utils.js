@@ -438,11 +438,11 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     // username and access token params for further use by the users.
     if (oidcProviderName) {
         // we need platform url for oidc token exchange
-        let platformUrl = "";
+        let platformUrl = '';
         try {
             platformUrl = tl.getEndpointAuthorizationParameter(service, 'jfrogPlatformUrl', true);
         } catch (error) {
-            console.warn('Failed to get platform url from field: ' + error+"\nparsing from url instead");
+            console.warn('Failed to get platform url from field: ' + error + '\nparsing from url instead');
         }
         if (!platformUrl || !platformUrl.trim()) {
             platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
