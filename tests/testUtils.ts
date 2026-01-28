@@ -2,7 +2,7 @@ import * as mockRun from 'azure-pipelines-task-lib/mock-run';
 import * as tl from 'azure-pipelines-task-lib/task';
 import { join, basename } from 'path';
 import * as fs from 'fs-extra';
-import rimraf from 'rimraf';
+import { rimrafSync } from 'rimraf';
 import * as syncRequest from 'sync-request';
 import * as assert from 'assert';
 import NullWritable from 'null-writable';
@@ -114,7 +114,7 @@ export function runTaskForService(testMain: string, variables: any, inputs: any)
 
 export function recreateTestDataDir(): void {
     if (fs.existsSync(testDataDir)) {
-        rimraf.sync(testDataDir);
+        rimrafSync(testDataDir);
     }
     fs.mkdirSync(testDataDir);
 }
@@ -145,7 +145,7 @@ export function cleanToolCache(): void {
 export function cleanUpAllTests(): void {
     if (fs.existsSync(testDataDir)) {
         try {
-            rimraf.sync(testDataDir);
+            rimrafSync(testDataDir);
         } catch (err) {
             console.warn('Tests cleanup issue: ' + err);
         }
