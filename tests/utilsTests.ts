@@ -152,12 +152,12 @@ describe('Utils Unit Tests', (): void => {
 
     describe('syncRequestWithRetry', (): void => {
         it('should return response on successful request (2xx)', (): void => {
-            const response = jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/200', { timeout: 5000 });
+            const response: { statusCode: number } = jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/200', { timeout: 5000 });
             assert.strictEqual(response.statusCode, 200);
         });
 
         it('should return response on 4xx client error without retry', (): void => {
-            const response = jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/404', { timeout: 5000 });
+            const response: { statusCode: number } = jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/404', { timeout: 5000 });
             assert.strictEqual(response.statusCode, 404);
         });
 
@@ -183,31 +183,31 @@ describe('Utils Unit Tests', (): void => {
     describe('isCliBinaryAvailable', (): void => {
         it('should return true for a known valid CLI version', (): void => {
             // Use a known stable version that should always be available
-            const result = jfrogUtils.isCliBinaryAvailable('2.50.0');
+            const result: boolean = jfrogUtils.isCliBinaryAvailable('2.50.0');
             assert.strictEqual(result, true);
         });
 
         it('should return false for a non-existent CLI version', (): void => {
-            const result = jfrogUtils.isCliBinaryAvailable('0.0.1');
+            const result: boolean = jfrogUtils.isCliBinaryAvailable('0.0.1');
             assert.strictEqual(result, false);
         });
 
         it('should return false for an invalid version format', (): void => {
-            const result = jfrogUtils.isCliBinaryAvailable('invalid-version');
+            const result: boolean = jfrogUtils.isCliBinaryAvailable('invalid-version');
             assert.strictEqual(result, false);
         });
     });
 
     describe('fetchLatestCliVersion', (): void => {
         it('should return a valid semver version string', (): void => {
-            const version = jfrogUtils.fetchLatestCliVersion();
+            const version: string = jfrogUtils.fetchLatestCliVersion();
             // Version should match semver pattern (e.g., "2.89.0")
             assert.match(version, /^\d+\.\d+\.\d+$/);
         });
 
         it('should return version >= 2.50.0 (reasonable minimum)', (): void => {
-            const version = jfrogUtils.fetchLatestCliVersion();
-            const [major, minor] = version.split('.').map(Number);
+            const version: string = jfrogUtils.fetchLatestCliVersion();
+            const [major, minor]: number[] = version.split('.').map(Number);
             assert.ok(major >= 2, `Major version ${major} should be >= 2`);
             if (major === 2) {
                 assert.ok(minor >= 50, `Minor version ${minor} should be >= 50 for major version 2`);
@@ -224,7 +224,7 @@ describe('Utils Unit Tests', (): void => {
         it('should match the result of fetchLatestCliVersion', (): void => {
             // Since defaultJfrogCliVersion is set at module load, it should match fetchLatestCliVersion
             // unless there was a failure (in which case both would use fallback)
-            const fetchedVersion = jfrogUtils.fetchLatestCliVersion();
+            const fetchedVersion: string = jfrogUtils.fetchLatestCliVersion();
             assert.strictEqual(jfrogUtils.defaultJfrogCliVersion, fetchedVersion);
         });
     });
@@ -237,7 +237,7 @@ describe('Utils Unit Tests', (): void => {
 
         it('should have an available binary on releases.jfrog.io', (): void => {
             // The fallback version should always have its binary available
-            const result = jfrogUtils.isCliBinaryAvailable(jfrogUtils.fallbackCliVersion);
+            const result: boolean = jfrogUtils.isCliBinaryAvailable(jfrogUtils.fallbackCliVersion);
             assert.strictEqual(result, true, `Fallback version ${jfrogUtils.fallbackCliVersion} should have available binary`);
         });
     });
