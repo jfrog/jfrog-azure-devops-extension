@@ -10,7 +10,117 @@ const semver = require('semver');
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const defaultJfrogCliVersion = '2.85.0';
+const fallbackCliVersion = '2.89.0';
+let defaultJfrogCliVersion = null;
+
+/**
+ * Executes an HTTP request with retry logic for 5xx errors.
+ * @param {string} method - HTTP method (GET, POST, etc.)
+ * @param {string} url - Request URL
+ * @param {object} options - Request options (timeout, headers, etc.)
+ * @param {number} maxRetries - Maximum number of retry attempts (default: 3)
+ * @param {number} retryDelay - Delay between retries in ms (default: 1000)
+ * @returns {object} Response object from syncRequest on success
+ * @throws {Error} If all retries fail (network errors or 5xx responses)
+ */
+function syncRequestWithRetry(method, url, options = {}, maxRetries = 3, retryDelay = 1000) {
+    let errorToThrow = null;
+    let lastResponse = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const response = syncRequest(method, url, options);
+            // Retry on 5xx server errors
+            if (response?.statusCode >= 500 && response?.statusCode < 600) {
+                console.warn(`Attempt ${attempt}/${maxRetries}: Server error ${response?.statusCode} for ${url}`);
+                lastResponse = response;
+            } else {
+                return response;
+            }
+        } catch (err) {
+            console.warn(`Attempt ${attempt}/${maxRetries}: Request failed for ${url} - ${err?.message}`);
+            errorToThrow = err;
+        }
+
+        if (attempt < maxRetries) {
+            // Blocking delay before retry
+            const waitUntil = Date.now() + retryDelay;
+            while (Date.now() < waitUntil) { /* wait */ }
+        }
+    }
+
+    // All retries exhausted - throw error for both network failures and 5xx responses
+    if (errorToThrow) {
+        throw errorToThrow;
+    }
+    if (lastResponse) {
+        throw new Error(`Server error ${lastResponse.statusCode} after ${maxRetries} retries for ${url}`);
+    }
+}
+
+/**
+ * Checks if the CLI binary exists on releases.jfrog.io for the given version.
+ * @param {string} version - The CLI version to check
+ * @returns {boolean} True if binary exists, false otherwise
+ */
+function isCliBinaryAvailable(version) {
+    const binaryUrl = `https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/${version}/${cliPackage}/${fileName}`;
+    try {
+        console.log('Verifying CLI binary availability at: ' + binaryUrl);
+        const res = syncRequestWithRetry('HEAD', binaryUrl, { timeout: 5000 });
+        return res?.statusCode === 200;
+    } catch (err) {
+        console.warn('Failed to verify CLI binary availability: ' + err?.message);
+        return false;
+    }
+}
+
+/**
+ * Fetches the latest available JFrog CLI version from GitHub releases with retry mechanism.
+ * Validates that the binary is available on releases.jfrog.io before returning.
+ * If the latest release binary isn't available, falls back to the previous release.
+ * Called once during module initialization. Result is cached in defaultJfrogCliVersion.
+ * @returns {string} The CLI version (e.g., '2.89.0') or fallback if fetch fails or no binary available
+ */
+function fetchLatestCliVersion() {
+    try {
+        console.log('Fetching JFrog CLI releases from https://api.github.com/repos/jfrog/jfrog-cli/releases');
+        const res = syncRequestWithRetry('GET', 'https://api.github.com/repos/jfrog/jfrog-cli/releases?per_page=3', {
+            headers: { 'User-Agent': 'jfrog-azure-devops-extension' },
+            timeout: 5000,
+        });
+        if (res.statusCode === 200) {
+            const releases = JSON.parse(res.getBody('utf8'));
+            console.log('Fetched ' + releases?.length ?? 0 + ' JFrog CLI releases');
+
+            if (!releases || releases.length === 0) {
+                console.warn('No JFrog CLI releases found, using fallback: ' + fallbackCliVersion);
+                return fallbackCliVersion;
+            }
+
+            // Try each release until we find one with an available binary
+            for (const release of releases) {
+                const version = release?.name;
+                console.log('Checking CLI version: ' + version);
+
+                if (version && isCliBinaryAvailable(version)) {
+                    console.log('CLI binary verified available for version: ' + version);
+                    return version;
+                }
+                console.warn('CLI binary not yet available for version: ' + version);
+            }
+            console.warn('No CLI binaries available for last 3 releases, using fallback: ' + fallbackCliVersion);
+            return fallbackCliVersion;
+        }
+        console.warn('Unexpected status code: ' + res.statusCode + ', using fallback version: ' + fallbackCliVersion);
+    } catch (err) {
+        console.warn('Failed to fetch JFrog CLI releases, due to error: ' + err?.message + ', using fallback: ' + fallbackCliVersion);
+    }
+    return fallbackCliVersion;
+}
+
+// Fetch and cache the CLI version during module initialization
+defaultJfrogCliVersion = fetchLatestCliVersion();
 
 /**
  * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
@@ -69,6 +179,9 @@ const jfrogCliConfigUseCommand = 'c use';
 let runTaskCbk = null;
 
 module.exports = {
+    syncRequestWithRetry: syncRequestWithRetry,
+    isCliBinaryAvailable: isCliBinaryAvailable,
+    fetchLatestCliVersion: fetchLatestCliVersion,
     executeCliTask: executeCliTask,
     executeCliCommand: executeCliCommand,
     downloadCli: downloadCli,
@@ -112,6 +225,7 @@ module.exports = {
     configureDefaultXrayServer: configureDefaultXrayServer,
     minCustomCliVersion: minCustomCliVersion,
     defaultJfrogCliVersion: defaultJfrogCliVersion,
+    fallbackCliVersion: fallbackCliVersion,
     pipelineRequestedCliVersionEnv: pipelineRequestedCliVersionEnv,
     taskSelectedCliVersionEnv: taskSelectedCliVersionEnv,
     extractorsRemoteEnv: extractorsRemoteEnv,

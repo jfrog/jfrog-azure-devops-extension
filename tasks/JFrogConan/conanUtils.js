@@ -1,7 +1,8 @@
 const tl = require('azure-pipelines-task-lib/task');
 const { v4: uuid } = require('uuid');
-const tmpdir = require('os').tmpdir;
-const EOL = require('os').EOL;
+const os = require('os');
+const tmpdir = os.tmpdir;
+const EOL = os.EOL;
 const fs = require('fs-extra');
 const join = require('path').join;
 const createHash = require('crypto').createHash;
@@ -14,7 +15,23 @@ const BUILD_INFO_BUILD_NAME = 'name';
 const BUILD_INFO_BUILD_NUMBER = 'number';
 const BUILD_INFO_BUILD_STARTED = 'started';
 const BUILD_INFO_FILE_NAME = 'generatedBuildInfo';
-const BUILD_TEMP_PATH = 'jfrog/builds';
+
+/**
+ * Get the JFrog CLI build temp directory path segments.
+ * On Windows: jfrog-<COMPUTERNAME>/<USERNAME>
+ * On macOS/Linux: jfrog-<USERNAME>
+ * @returns {string[]} Array of path segments to join
+ */
+function getJfrogBuildDirSegments() {
+    const username = os.userInfo().username;
+    if (process.platform === 'win32') {
+        // On Windows, the CLI uses: jfrog-<COMPUTERNAME>/<USERNAME>/builds
+        const hostname = os.hostname();
+        return [`jfrog-${hostname}`, username];
+    }
+    // On macOS/Linux: jfrog-<USERNAME>/builds
+    return [`jfrog-${username}`];
+}
 
 /**
  * Execute Artifactory Conan Task
@@ -441,7 +458,10 @@ function readTimestampFromBuildPartialDetailsFile(buildDetailsFile) {
 function getCliPartialsBuildDir(buildName, buildNumber) {
     const buildId = buildName + '_' + buildNumber + '_' + '';
     const hexId = createHash('sha256').update(buildId).digest('hex');
-    return join(tmpdir(), BUILD_TEMP_PATH, hexId);
+    // Use separate path segments to ensure correct path separators on all platforms
+    // On Windows: <tmpdir>/jfrog-<COMPUTERNAME>/<USERNAME>/builds/<hash>
+    // On macOS/Linux: <tmpdir>/jfrog-<USERNAME>/builds/<hash>
+    return join(tmpdir(), ...getJfrogBuildDirSegments(), 'builds', hexId);
 }
 
 module.exports = {
