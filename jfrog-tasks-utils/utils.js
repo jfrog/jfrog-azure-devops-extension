@@ -31,14 +31,16 @@ function syncRequestWithRetry(method, url, options = {}, maxRetries = 3, retryDe
         try {
             const response = syncRequest(method, url, options);
             // Retry on 5xx server errors
-            if (response?.statusCode >= 500 && response?.statusCode < 600) {
-                console.warn(`Attempt ${attempt}/${maxRetries}: Server error ${response?.statusCode} for ${url}`);
+            const statusCode = response && response.statusCode;
+            if (statusCode >= 500 && statusCode < 600) {
+                console.warn(`Attempt ${attempt}/${maxRetries}: Server error ${statusCode} for ${url}`);
                 lastResponse = response;
             } else {
                 return response;
             }
         } catch (err) {
-            console.warn(`Attempt ${attempt}/${maxRetries}: Request failed for ${url} - ${err?.message}`);
+            const errMessage = err && err.message;
+            console.warn(`Attempt ${attempt}/${maxRetries}: Request failed for ${url} - ${errMessage}`);
             errorToThrow = err;
         }
 
@@ -68,9 +70,9 @@ function isCliBinaryAvailable(version) {
     try {
         console.log('Verifying CLI binary availability at: ' + binaryUrl);
         const res = syncRequestWithRetry('HEAD', binaryUrl, { timeout: 5000 });
-        return res?.statusCode === 200;
+        return res && res.statusCode === 200;
     } catch (err) {
-        console.warn('Failed to verify CLI binary availability: ' + err?.message);
+        console.warn('Failed to verify CLI binary availability: ' + (err && err.message));
         return false;
     }
 }
@@ -91,7 +93,7 @@ function fetchLatestCliVersion() {
         });
         if (res.statusCode === 200) {
             const releases = JSON.parse(res.getBody('utf8'));
-            console.log('Fetched ' + releases?.length ?? 0 + ' JFrog CLI releases');
+            console.log('Fetched ' + (releases ? releases.length : 0) + ' JFrog CLI releases');
 
             if (!releases || releases.length === 0) {
                 console.warn('No JFrog CLI releases found, using fallback: ' + fallbackCliVersion);
@@ -100,7 +102,7 @@ function fetchLatestCliVersion() {
 
             // Try each release until we find one with an available binary
             for (const release of releases) {
-                const version = release?.name;
+                const version = release && release.name;
                 console.log('Checking CLI version: ' + version);
 
                 if (version && isCliBinaryAvailable(version)) {
@@ -114,7 +116,7 @@ function fetchLatestCliVersion() {
         }
         console.warn('Unexpected status code: ' + res.statusCode + ', using fallback version: ' + fallbackCliVersion);
     } catch (err) {
-        console.warn('Failed to fetch JFrog CLI releases, due to error: ' + err?.message + ', using fallback: ' + fallbackCliVersion);
+        console.warn('Failed to fetch JFrog CLI releases, due to error: ' + (err && err.message) + ', using fallback: ' + fallbackCliVersion);
     }
     return fallbackCliVersion;
 }
