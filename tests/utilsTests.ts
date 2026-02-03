@@ -6,7 +6,7 @@ import * as jfrogUtils from '@jfrog/tasks-utils';
 
 /**
  * Simulates the platformUrl resolution logic from utils.js lines 441-449:
- *
+ * 
  * let platformUrl = "";
  * try {
  *     platformUrl = tl.getEndpointAuthorizationParameter(service, 'jfrogPlatformUrl', true);
@@ -16,13 +16,17 @@ import * as jfrogUtils from '@jfrog/tasks-utils';
  * if (!platformUrl || !platformUrl.trim()) {
  *     platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
  * }
- *
+ * 
  * @param getEndpointResult - Simulated result from tl.getEndpointAuthorizationParameter
  * @param shouldThrow - Whether the call should throw an error
  * @param serviceUrl - The service URL to parse from if platformUrl is not available
  * @returns The resolved platform URL
  */
-function simulatePlatformUrlResolution(getEndpointResult: string | undefined | null, shouldThrow: boolean, serviceUrl: string): string {
+function simulatePlatformUrlResolution(
+    getEndpointResult: string | undefined | null,
+    shouldThrow: boolean,
+    serviceUrl: string,
+): string {
     let platformUrl: string | undefined | null = '';
     try {
         if (shouldThrow) {
@@ -85,27 +89,45 @@ describe('Utils Unit Tests', (): void => {
 
     describe('parsePlatformUrlFromServiceUrl', (): void => {
         it('should strip /artifactory suffix', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/artifactory'), 'https://example.jfrog.io');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/artifactory'),
+                'https://example.jfrog.io',
+            );
         });
 
         it('should strip /xray suffix', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/xray'), 'https://example.jfrog.io');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/xray'),
+                'https://example.jfrog.io',
+            );
         });
 
         it('should strip /distribution suffix', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/distribution'), 'https://example.jfrog.io');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/distribution'),
+                'https://example.jfrog.io',
+            );
         });
 
         it('should handle case-insensitive matching for /Artifactory', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/Artifactory'), 'https://example.jfrog.io');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/Artifactory'),
+                'https://example.jfrog.io',
+            );
         });
 
         it('should handle case-insensitive matching for /XRAY', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/XRAY'), 'https://example.jfrog.io');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/XRAY'),
+                'https://example.jfrog.io',
+            );
         });
 
         it('should return URL as-is when no known suffix', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/other'), 'https://example.jfrog.io/other');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/other'),
+                'https://example.jfrog.io/other',
+            );
         });
 
         it('should handle URL with port', (): void => {
@@ -116,11 +138,17 @@ describe('Utils Unit Tests', (): void => {
         });
 
         it('should handle URL with trailing slash on suffix', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/artifactory/'), 'https://example.jfrog.io');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.jfrog.io/artifactory/'),
+                'https://example.jfrog.io',
+            );
         });
 
         it('should handle URL with path prefix', (): void => {
-            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.com/jfrog/artifactory'), 'https://example.com/jfrog');
+            assert.strictEqual(
+                jfrogUtils.parsePlatformUrlFromServiceUrl('https://example.com/jfrog/artifactory'),
+                'https://example.com/jfrog',
+            );
         });
 
         it('should handle URL without any prefix', (): void => {
@@ -128,10 +156,7 @@ describe('Utils Unit Tests', (): void => {
         });
 
         it('should handle hostnames as well', (): void => {
-            assert.strictEqual(
-                jfrogUtils.parsePlatformUrlFromServiceUrl('https://artifactory.com/jfrog/artifactory'),
-                'https://artifactory.com/jfrog',
-            );
+            assert.strictEqual(jfrogUtils.parsePlatformUrlFromServiceUrl('https://artifactory.com/jfrog/artifactory'), 'https://artifactory.com/jfrog');
         });
     });
 });
