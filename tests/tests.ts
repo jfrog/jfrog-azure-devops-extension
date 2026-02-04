@@ -54,7 +54,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                             repoKeys.repo1 +
                             '/' +
                             ' --url=' +
-                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_URL ?? '') +
+                            jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_URL + 'artifactory') +
                             ' --user=' +
                             jfrogUtils.quote(process.env.ADO_JFROG_PLATFORM_USERNAME ?? '') +
                             ' --password=' +
@@ -1279,18 +1279,6 @@ function testInitCliPartialsBuildDir(): void {
     runBuildCommand('bc', testsBuildName, testBuildNumber);
 }
 
-function getJfrogCliPath(): string {
-    const versions: string[] = toolLib.findLocalToolVersions('jf');
-    if (versions.length === 0) {
-        // Fallback to PATH-based execution if CLI is not in tool cache
-        return 'jf';
-    }
-    const cliDir: string = toolLib.findLocalTool('jf', versions[0]);
-    const executableName: string = process.platform.startsWith('win') ? 'jf.exe' : 'jf';
-    return join(cliDir, executableName);
-}
-
 function runBuildCommand(command: string, buildName: string, buildNumber: string): void {
-    const cliPath: string = getJfrogCliPath();
-    jfrogUtils.executeCliCommand(cliPath + ' rt ' + command + ' "' + buildName + '" ' + buildNumber, TestUtils.testDataDir);
+    jfrogUtils.executeCliCommand('jf rt ' + command + ' "' + buildName + '" ' + buildNumber, TestUtils.testDataDir);
 }

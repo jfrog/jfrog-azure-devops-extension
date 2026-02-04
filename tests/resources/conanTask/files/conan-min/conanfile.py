@@ -14,8 +14,7 @@ class ConanminConan(ConanFile):
     exports_sources = "src/*"
 
     def requirements(self):
-        # Using fmt - a header-only library that avoids CMake compatibility issues
-        self.requires("fmt/[>=8.0.1]")
+        self.requires("boost/[>=1.77]")
 
     def build(self):
         cmake = CMake(self)
