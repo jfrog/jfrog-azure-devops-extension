@@ -141,7 +141,7 @@ const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
 const minSupportedOidcCliVersion = '2.75.0';
-const pluginVersion = '2.12.6';
+const pluginVersion = '2.12.7';
 const buildAgent = 'jfrog-azure-devops-extension';
 
 /**
