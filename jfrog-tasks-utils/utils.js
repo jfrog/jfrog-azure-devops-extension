@@ -11,7 +11,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const fallbackCliVersion = '2.89.0';
-let defaultJfrogCliVersion = null;
+let defaultJfrogCliVersion = '2.89.0';
 
 /**
  * Executes an HTTP request with retry logic for 5xx errors.
@@ -120,9 +120,6 @@ function fetchLatestCliVersion() {
     }
     return fallbackCliVersion;
 }
-
-// Fetch and cache the CLI version during module initialization
-defaultJfrogCliVersion = fetchLatestCliVersion();
 
 /**
  * Safely constructs the JFrog tools directory path, handling potential issues with Agent.ToolsDirectory
