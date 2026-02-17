@@ -16,7 +16,7 @@
         "Patch": "7"
     },
     "demands": [],
-    "minimumAgentVersion": "1.89.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog Audit",
     "inputs": [
         {
@@ -99,13 +99,13 @@
         }
     ],
     "execution": {
-        "Node10": {
-            "target": "audit.js",
-            "workingDirectory": "$(currentDirectory)"
-        },
         "Node20_1": {
             "target": "audit.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node24": {
+            "target": "audit.js",
+            "target": "$(currentDirectory)"
         }
     }
 }

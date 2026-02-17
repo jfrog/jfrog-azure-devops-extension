@@ -16,7 +16,7 @@
         "Minor": "12",
         "Patch": "7"
     },
-    "minimumAgentVersion": "1.83.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog Discard Builds",
     "inputs": [
         {
@@ -85,11 +85,11 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "discardBuilds.js",
             "workingDirectory": "$(currentDirectory)"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "discardBuilds.js",
             "workingDirectory": "$(currentDirectory)"
         }

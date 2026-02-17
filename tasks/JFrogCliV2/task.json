@@ -16,7 +16,7 @@
         "Patch": "7"
     },
     "demands": [],
-    "minimumAgentVersion": "1.89.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog CLI V2",
     "inputs": [
         {
@@ -66,11 +66,11 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "jfrogCliRun.js",
             "workingDirectory": "$(currentDirectory)"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "jfrogCliRun.js",
             "workingDirectory": "$(currentDirectory)"
         }

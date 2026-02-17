@@ -16,7 +16,7 @@
         "Minor": "12",
         "Patch": "7"
     },
-    "minimumAgentVersion": "1.83.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog Collect Build Issues",
     "inputs": [
         {
@@ -93,11 +93,11 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "collectIssues.js",
             "workingDirectory": "$(currentDirectory)"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "collectIssues.js",
             "workingDirectory": "$(currentDirectory)"
         }

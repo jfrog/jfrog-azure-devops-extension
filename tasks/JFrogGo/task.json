@@ -16,7 +16,7 @@
         "Patch": "7"
     },
     "demands": [],
-    "minimumAgentVersion": "1.91.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog Go $(command)",
     "groups": [
         {
@@ -174,10 +174,10 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "goBuild.js"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "goBuild.js"
         }
     }

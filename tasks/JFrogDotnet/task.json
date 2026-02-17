@@ -16,7 +16,7 @@
         "Patch": "7"
     },
     "demands": [],
-    "minimumAgentVersion": "2.115.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog .NET $(command)",
     "groups": [
         {
@@ -228,11 +228,11 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "dotnetBuild.js",
             "workingDirectory": "$(currentDirectory)"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "dotnetBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }

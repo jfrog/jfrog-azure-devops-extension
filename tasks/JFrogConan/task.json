@@ -16,7 +16,7 @@
         "Minor": "12",
         "Patch": "7"
     },
-    "minimumAgentVersion": "1.83.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "Conan $(conanCommand)",
     "groups": [
         {
@@ -221,10 +221,10 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "conanBuild.js"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "conanBuild.js"
         }
     }
