@@ -9,17 +9,25 @@ on:
   # Triggers the workflow on labeled PRs only.
   pull_request_target:
     types: [ labeled ]
+  # Run on PR when this workflow file changes (to validate workflow changes on the same PR).
+  pull_request:
+    types: [ opened, synchronize ]
+    paths:
+      - '.github/workflows/tests.yml'
+
 # Ensures that only the latest commit is running for each PR at a time.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   Tests:
-    if: contains(github.event.pull_request.labels.*.name, 'safe to test') || github.event_name == 'push'
+    name: ${{ matrix.os }} Node ${{ matrix.node-version }}
+    if: contains(github.event.pull_request.labels.*.name, 'safe to test') || github.event_name == 'push' || github.event_name == 'pull_request'
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu, windows ]
+        node-version: [ '16', '20', '24' ]
         include:
           - os: windows
             extraSkipTests: ",conan"
@@ -28,12 +36,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
 
       - name: Install Conan
         run: pip install "conan<2" -q
