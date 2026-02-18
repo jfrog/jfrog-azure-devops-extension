@@ -15,11 +15,13 @@ concurrency:
   cancel-in-progress: true
 jobs:
   Tests:
+    name: ${{ matrix.os }} Node ${{ matrix.node-version }}
     if: contains(github.event.pull_request.labels.*.name, 'safe to test') || github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu, windows ]
+        node-version: [ '16', '20', '24' ]
         include:
           - os: windows
             extraSkipTests: ",conan"
@@ -33,7 +35,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
 
       - name: Install Conan
         run: pip install "conan<2" -q
