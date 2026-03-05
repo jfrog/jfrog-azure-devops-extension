@@ -28,9 +28,7 @@ function RunTaskCbk(cliPath: string): void {
         }
         case 'Scan': {
             serverId = utils.configureDefaultXrayServer('xray_docker_scan', cliPath, defaultWorkDir);
-            if (tl.getBoolInput('allowFailBuild', false)) {
-                cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
-            }
+            cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
 
             if (tl.getBoolInput('allowBypassArchiveLimits', false)) {
                 cliCommand = utils.addBoolParam(cliCommand, 'allowBypassArchiveLimits', 'bypass-archive-limits');
