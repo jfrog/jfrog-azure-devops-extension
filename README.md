@@ -59,6 +59,8 @@ The *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog
     - [JFrog Docker Tasks](#JFrog-Docker-tasks)
         - [Pushing and Pulling Docker Images to and from Artifactory](#Pushing-and-Pulling-Docker-Images-to-and-from-Artifactory)
         - [Scanning Local Docker Images with JFrog Xray](#Scanning-Local-Docker-Images-with-JFrog-Xray)
+    - [JFrog Helm Tasks](#JFrog-Helm-tasks)
+        - [Pushing and Pulling Helm Charts using JFrog CLI](#Pushing-and-Pulling-Helm-Charts-using-JFrog-CLI)
     - [JFrog Distribution](#Managing-and-Distributing-Release-Bundles)
         - [JFrog Distribution Task](#JFrog-Distribution-V2-Task)
     - [Contributions](#Contribution)
@@ -472,6 +474,19 @@ Multiple commands example:
       jf terraform publish --namespace=example --provider=aws --tag=v0.0.1
 ```
 
+Helm chart push example:
+
+```YAML
+- task: JfrogCliV2@1
+  inputs:
+    jfrogPlatformConnection: 'JFrog Platform V2'
+    command: |
+      jf helm registry login mycompany.jfrog.io
+      jf helm package ./mychart --build-name=$(Build.DefinitionName) --build-number=$(Build.BuildNumber)
+      jf helm push mychart-0.1.0.tgz oci://mycompany.jfrog.io/helm-local --build-name=$(Build.DefinitionName) --build-number=$(Build.BuildNumber)
+      jf rt build-publish $(Build.DefinitionName) $(Build.BuildNumber)
+```
+
 </details>
 
 
@@ -861,6 +876,10 @@ For more information about Go repositories,
 see [Artifactory Go Repositories](https://jfrog.com/help/r/jfrog-artifactory-documentation/go-registry)
 </details>
 
+> **Helm:** There is no dedicated JFrog Helm task. To run Helm operations (package, push, pull), use the
+> [JFrog CLI V2](#JFrog-CLI-V2-Task) task with `jf helm` commands. You must call `jf helm registry login`
+> before push or pull operations. See [JFrog Helm Tasks](#JFrog-Helm-tasks) for examples.
+
 
 <br>
 
@@ -1216,6 +1235,56 @@ You do this by configuring the task to use:
     threads: '3'
     skipLogin: false
 ```
+
+</details>
+
+
+<br>
+
+## JFrog Helm tasks
+
+<details>
+  <summary>
+
+#### Pushing and Pulling Helm Charts using JFrog CLI
+</summary>
+
+Container registries — including Helm OCI repositories — require authentication before you can perform push and pull
+operations from an Azure pipeline. When using the **JFrog CLI V2** task for Helm operations, you must include
+`jf helm registry login` in your pipeline script before running push or pull commands.
+
+##### Helm Registry Login
+
+Use `jf helm registry login` to authenticate with an OCI-compatible Helm chart registry in Artifactory.
+The command uses the connection details provided by the selected *JFrog Platform* service connection,
+so there is no need to pass credentials explicitly.
+
+```YAML
+- task: JfrogCliV2@1
+  inputs:
+    jfrogPlatformConnection: 'JFrog Platform V2'
+    command: |
+      jf helm registry login mycompany.jfrog.io
+      jf helm package ./mychart --build-name=$(Build.DefinitionName) --build-number=$(Build.BuildNumber)
+      jf helm push mychart-0.1.0.tgz oci://mycompany.jfrog.io/helm-local --build-name=$(Build.DefinitionName) --build-number=$(Build.BuildNumber)
+      jf rt build-publish $(Build.DefinitionName) $(Build.BuildNumber)
+```
+
+##### Pull a Helm Chart
+
+```YAML
+- task: JfrogCliV2@1
+  inputs:
+    jfrogPlatformConnection: 'JFrog Platform V2'
+    command: |
+      jf helm registry login mycompany.jfrog.io
+      jf helm pull oci://mycompany.jfrog.io/helm-local/mychart --version 1.0.0
+```
+
+> **Note:** `jf helm registry login` must be called before any `jf helm push` or `jf helm pull` operation.
+> The same requirement applies to `jf docker login` for Docker operations. Helm 3.8+ is required for OCI registry support.
+
+For more information about Helm and JFrog CLI, see [jf helm](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)
 
 </details>
 
