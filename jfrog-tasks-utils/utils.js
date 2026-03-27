@@ -460,7 +460,8 @@ function getProxyConfiguration() {
     const config = {
         proxy: {
             proxyUrl: proxyUrl,
-            proxyAuth: proxyUsername && proxyPassword ? `${proxyUsername}:${proxyPassword}` : undefined,
+            proxyUsername: proxyUsername || undefined,
+            proxyPassword: proxyPassword || undefined,
             proxyBypassHosts: proxyBypassHosts ? JSON.parse(proxyBypassHosts) : undefined,
         },
     };
