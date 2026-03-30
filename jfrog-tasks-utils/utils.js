@@ -445,27 +445,40 @@ function debugLogIDToken(oidcToken) {
 /**
  * Builds HTTP request options with proxy configuration.
  * Checks Azure DevOps agent proxy variables first, then falls back to
- * typed-rest-client's automatic detection of HTTP_PROXY/HTTPS_PROXY env vars.
+ * HTTPS_PROXY / HTTP_PROXY environment variables.
  * @returns {object} Request options for typed-rest-client HttpClient
  */
 function getProxyConfiguration() {
-    const proxyUrl = tl.getVariable('Agent.ProxyUrl');
+    let proxyUrl = tl.getVariable('Agent.ProxyUrl');
+    let proxyUsername;
+    let proxyPassword;
+    let proxyBypassHosts;
+
+    if (proxyUrl) {
+        tl.debug('Using proxy from Agent.ProxyUrl: ' + proxyUrl);
+        proxyUsername = tl.getVariable('Agent.ProxyUsername');
+        proxyPassword = tl.getVariable('Agent.ProxyPassword');
+        const bypassList = tl.getVariable('Agent.ProxyBypassList');
+        proxyBypassHosts = bypassList ? JSON.parse(bypassList) : undefined;
+    } else {
+        proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+        if (proxyUrl) {
+            tl.debug('Using proxy from environment variable: ' + proxyUrl);
+        }
+    }
+
     if (!proxyUrl) {
         return {};
     }
-    tl.debug('Using proxy from Agent.ProxyUrl: ' + proxyUrl);
-    const proxyUsername = tl.getVariable('Agent.ProxyUsername');
-    const proxyPassword = tl.getVariable('Agent.ProxyPassword');
-    const proxyBypassHosts = tl.getVariable('Agent.ProxyBypassList');
-    const config = {
+
+    return {
         proxy: {
             proxyUrl: proxyUrl,
             proxyUsername: proxyUsername || undefined,
             proxyPassword: proxyPassword || undefined,
-            proxyBypassHosts: proxyBypassHosts ? JSON.parse(proxyBypassHosts) : undefined,
+            proxyBypassHosts: proxyBypassHosts || undefined,
         },
     };
-    return config;
 }
 
 async function fetchAzureOidcToken(serviceConnectionID) {

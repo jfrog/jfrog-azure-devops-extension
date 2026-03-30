@@ -1,3 +1,4 @@
+/* eslint-env node */
 const tl = require('azure-pipelines-task-lib/task');
 const jfrogUtils = require('../jfrog-tasks-utils/utils.js');
 const assert = require('assert');
@@ -22,6 +23,10 @@ function clearProxyVars() {
     tl.setVariable('Agent.ProxyUsername', '');
     tl.setVariable('Agent.ProxyPassword', '');
     tl.setVariable('Agent.ProxyBypassList', '');
+    delete process.env.HTTPS_PROXY;
+    delete process.env.https_proxy;
+    delete process.env.HTTP_PROXY;
+    delete process.env.http_proxy;
 }
 
 console.log('\nProxy Configuration Tests\n');
@@ -83,6 +88,46 @@ runTest('Handles HTTPS proxy URL', () => {
     const config = jfrogUtils.getProxyConfiguration();
     assert.strictEqual(config.proxy.proxyUrl, 'https://secureproxy:443');
     clearProxyVars();
+});
+
+runTest('Falls back to HTTPS_PROXY env var when Agent.ProxyUrl is not set', () => {
+    clearProxyVars();
+    process.env.HTTPS_PROXY = 'http://envproxy:8100';
+    const config = jfrogUtils.getProxyConfiguration();
+    assert.strictEqual(config.proxy.proxyUrl, 'http://envproxy:8100');
+    assert.strictEqual(config.proxy.proxyUsername, undefined);
+    clearProxyVars();
+});
+
+runTest('Falls back to HTTP_PROXY env var when HTTPS_PROXY is not set', () => {
+    clearProxyVars();
+    process.env.HTTP_PROXY = 'http://httpproxy:3128';
+    const config = jfrogUtils.getProxyConfiguration();
+    assert.strictEqual(config.proxy.proxyUrl, 'http://httpproxy:3128');
+    clearProxyVars();
+});
+
+runTest('Falls back to lowercase https_proxy env var', () => {
+    clearProxyVars();
+    process.env.https_proxy = 'http://lowercaseproxy:9090';
+    const config = jfrogUtils.getProxyConfiguration();
+    assert.strictEqual(config.proxy.proxyUrl, 'http://lowercaseproxy:9090');
+    clearProxyVars();
+});
+
+runTest('Agent.ProxyUrl takes priority over HTTPS_PROXY env var', () => {
+    clearProxyVars();
+    tl.setVariable('Agent.ProxyUrl', 'http://agentproxy:3128');
+    process.env.HTTPS_PROXY = 'http://envproxy:8100';
+    const config = jfrogUtils.getProxyConfiguration();
+    assert.strictEqual(config.proxy.proxyUrl, 'http://agentproxy:3128');
+    clearProxyVars();
+});
+
+runTest('Returns empty object when no proxy is configured anywhere', () => {
+    clearProxyVars();
+    const config = jfrogUtils.getProxyConfiguration();
+    assert.deepStrictEqual(config, {});
 });
 
 console.log(`\nResults: ${passed} passed, ${failed} failed\n`);
