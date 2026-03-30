@@ -4,7 +4,7 @@ import * as assert from 'assert';
 // Use require to get the actual module with latest exports
 import * as jfrogUtils from '@jfrog/tasks-utils';
 
-// Type declarations for the new exported functions
+// Type declarations for exports not yet in the installed package's utils.d.ts
 declare module '@jfrog/tasks-utils' {
     export function syncRequestWithRetry(
         method: string,

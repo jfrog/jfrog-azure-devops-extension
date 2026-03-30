@@ -69,8 +69,6 @@ declare module '@jfrog/tasks-utils' {
     export function singleQuote(str: string): string;
     export function syncRequestWithRetry(method: string, url: string, options?: object, maxRetries?: number, retryDelay?: number): object;
     export const minCustomCliVersion: string;
-    export let defaultJfrogCliVersion: string;
-    export const fallbackCliVersion: string;
     export const pipelineRequestedCliVersionEnv: string;
     export const taskSelectedCliVersionEnv: string;
     export const extractorsRemoteEnv: string;
