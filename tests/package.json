@@ -8,7 +8,7 @@
     "main": "testUtils.ts",
     "dependencies": {
         "@jfrog/tasks-utils": "file:../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz",
-        "azure-pipelines-task-lib": "5.2.1",
+        "azure-pipelines-task-lib": "^5.2.8",
         "fs-extra": "11.2.0",
         "js-yaml": "^4.1.1",
         "path": "^0.12.7"
@@ -17,7 +17,7 @@
         "@types/fs-extra": "^11.0.1",
         "@types/mocha": "^10.0.1",
         "@types/node": "^20.4.5",
-        "mocha": "^10.2.0",
+        "mocha": "^11.7.5",
         "node-tunnel": "^4.0.1",
         "null-writable": "^1.0.5",
         "rimraf": "^6.1.2",
@@ -26,5 +26,9 @@
     },
     "scripts": {
         "test": "npm i && mocha -r ts-node/register tests.ts -t 1000000"
+    },
+    "overrides": {
+        "serialize-javascript": ">=7.0.5",
+        "diff": ">=8.0.3"
     }
 }
