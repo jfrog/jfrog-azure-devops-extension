@@ -48,7 +48,9 @@ function syncRequestWithRetry(method, url, options = {}, maxRetries = 3, retryDe
         if (attempt < maxRetries) {
             // Blocking delay before retry
             const waitUntil = Date.now() + retryDelay;
-            while (Date.now() < waitUntil) { /* wait */ }
+            while (Date.now() < waitUntil) {
+                /* wait */
+            }
         }
     }
 
@@ -220,7 +222,9 @@ module.exports = {
     configureArtifactoryCliServer: configureArtifactoryCliServer,
     configureJfrogCliServer: configureJfrogCliServer,
     configureDefaultJfrogServer: configureDefaultJfrogServer,
+    forwardProxyToEnv: forwardProxyToEnv,
     getProxyConfiguration: getProxyConfiguration,
+    fetchAzureOidcToken: fetchAzureOidcToken,
     configureDefaultArtifactoryServer: configureDefaultArtifactoryServer,
     configureDefaultDistributionServer: configureDefaultDistributionServer,
     configureDefaultXrayServer: configureDefaultXrayServer,
@@ -248,6 +252,9 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     process.env.JFROG_CLI_OFFER_CONFIG = 'false';
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     process.env.CI = 'true';
+
+    // Forward Azure DevOps proxy settings to environment variables
+    forwardProxyToEnv();
 
     if (!cliVersion) {
         // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
@@ -443,6 +450,43 @@ function debugLogIDToken(oidcToken) {
 }
 
 /**
+ * Forwards Azure DevOps proxy configuration to environment variables.
+ * Sets HTTP_PROXY and HTTPS_PROXY if they are not already set, allowing
+ * JFrog CLI and other tools to use the proxy configuration.
+ */
+function forwardProxyToEnv() {
+    let proxyUrl = tl.getVariable('Agent.ProxyUrl');
+    if (!proxyUrl) {
+        return;
+    }
+
+    // Build proxy URL with auth if provided
+    let proxyUsername = tl.getVariable('Agent.ProxyUsername');
+    let proxyPassword = tl.getVariable('Agent.ProxyPassword');
+    if (proxyUsername && proxyPassword) {
+        try {
+            let parsed = new URL(proxyUrl);
+            parsed.username = proxyUsername;
+            parsed.password = proxyPassword;
+            proxyUrl = parsed.toString();
+        } catch (e) {
+            tl.warning('Failed to parse proxy URL: ' + e.message);
+            return;
+        }
+    }
+
+    // Only set if not already present — don't override explicit user config
+    if (!process.env.HTTP_PROXY && !process.env.http_proxy) {
+        process.env.HTTP_PROXY = proxyUrl;
+        tl.debug('Set HTTP_PROXY from Agent.ProxyUrl');
+    }
+    if (!process.env.HTTPS_PROXY && !process.env.https_proxy) {
+        process.env.HTTPS_PROXY = proxyUrl;
+        tl.debug('Set HTTPS_PROXY from Agent.ProxyUrl');
+    }
+}
+
+/**
  * Builds HTTP request options with proxy configuration.
  * Checks Azure DevOps agent proxy variables first, then falls back to
  * HTTPS_PROXY / HTTP_PROXY environment variables.
@@ -459,7 +503,12 @@ function getProxyConfiguration() {
         proxyUsername = tl.getVariable('Agent.ProxyUsername');
         proxyPassword = tl.getVariable('Agent.ProxyPassword');
         const bypassList = tl.getVariable('Agent.ProxyBypassList');
-        proxyBypassHosts = bypassList ? JSON.parse(bypassList) : undefined;
+        try {
+            proxyBypassHosts = bypassList ? JSON.parse(bypassList) : undefined;
+        } catch (e) {
+            tl.warning('Failed to parse Agent.ProxyBypassList as JSON: ' + e.message);
+            proxyBypassHosts = undefined;
+        }
     } else {
         proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
         if (proxyUrl) {

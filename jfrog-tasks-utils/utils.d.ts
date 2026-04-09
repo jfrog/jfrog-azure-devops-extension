@@ -45,6 +45,7 @@ declare module '@jfrog/tasks-utils' {
         repoResolver: string,
         repoDeploy: string,
     ): string[];
+    export function forwardProxyToEnv(): void;
     export function getProxyConfiguration(): object;
     export function setJdkHomeForJavaTasks(): void;
     export function fetchAzureOidcToken(serviceConnectionID: string): Promise<string>;

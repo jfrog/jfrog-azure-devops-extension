@@ -17,6 +17,7 @@ declare module '@jfrog/tasks-utils' {
     export function fetchLatestCliVersion(): string;
     export const defaultJfrogCliVersion: string;
     export const fallbackCliVersion: string;
+    export function fetchAzureOidcToken(serviceConnectionID: string): Promise<string>;
 }
 
 /**
@@ -162,21 +163,15 @@ describe('Utils Unit Tests', (): void => {
         });
 
         it('should throw error after retries exhausted on 5xx server error', (): void => {
-            assert.throws(
-                (): void => {
-                    jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/503', { timeout: 5000 }, 2, 100);
-                },
-                /Server error 503 after 2 retries/,
-            );
+            assert.throws((): void => {
+                jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/503', { timeout: 5000 }, 2, 100);
+            }, /Server error 503 after 2 retries/);
         });
 
         it('should throw error on network failure after retries', (): void => {
-            assert.throws(
-                (): void => {
-                    jfrogUtils.syncRequestWithRetry('GET', 'https://invalid.domain.that.does.not.exist.example', { timeout: 1000 }, 2, 100);
-                },
-                Error,
-            );
+            assert.throws((): void => {
+                jfrogUtils.syncRequestWithRetry('GET', 'https://invalid.domain.that.does.not.exist.example', { timeout: 1000 }, 2, 100);
+            }, Error);
         });
     });
 
@@ -239,6 +234,67 @@ describe('Utils Unit Tests', (): void => {
             // The fallback version should always have its binary available
             const result: boolean = jfrogUtils.isCliBinaryAvailable(jfrogUtils.fallbackCliVersion);
             assert.strictEqual(result, true, `Fallback version ${jfrogUtils.fallbackCliVersion} should have available binary`);
+        });
+    });
+
+    describe('fetchAzureOidcToken', (): void => {
+        /**
+         * Simulates the OIDC token response-handling logic from fetchAzureOidcToken
+         * (the part after the HTTP call is made), so we can unit-test it without
+         * a real Azure DevOps endpoint.
+         */
+        async function simulateOidcTokenResponse(statusCode: number, responseBody: string): Promise<string> {
+            if (statusCode !== 200) {
+                throw new Error(`OIDC token request failed: HTTP ${statusCode}\nBody: ${responseBody}`);
+            }
+            const body: { oidcToken?: string } = JSON.parse(responseBody);
+            if (!body.oidcToken) {
+                throw new Error('OIDC token not found in response body.');
+            }
+            return body.oidcToken;
+        }
+
+        it('should throw when System.AccessToken is not available', async (): Promise<void> => {
+            // System.AccessToken is not set in the test environment, so this should throw immediately.
+            await assert.rejects(
+                (): Promise<string> => jfrogUtils.fetchAzureOidcToken('test-service-connection-id'),
+                /System\.AccessToken is not available/,
+            );
+        });
+
+        it('should throw on non-200 HTTP response (simulated)', async (): Promise<void> => {
+            await assert.rejects((): Promise<string> => simulateOidcTokenResponse(403, 'Forbidden'), /OIDC token request failed: HTTP 403/);
+        });
+
+        it('should throw on 500 HTTP response (simulated)', async (): Promise<void> => {
+            await assert.rejects(
+                (): Promise<string> => simulateOidcTokenResponse(500, 'Internal Server Error'),
+                /OIDC token request failed: HTTP 500/,
+            );
+        });
+
+        it('should throw when oidcToken is absent from response body (simulated)', async (): Promise<void> => {
+            await assert.rejects(
+                (): Promise<string> => simulateOidcTokenResponse(200, JSON.stringify({ someOtherField: 'value' })),
+                /OIDC token not found in response body/,
+            );
+        });
+
+        it('should throw when oidcToken is empty string in response body (simulated)', async (): Promise<void> => {
+            await assert.rejects(
+                (): Promise<string> => simulateOidcTokenResponse(200, JSON.stringify({ oidcToken: '' })),
+                /OIDC token not found in response body/,
+            );
+        });
+
+        it('should return the oidcToken on a successful 200 response (simulated)', async (): Promise<void> => {
+            const token: string = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.test';
+            const result: string = await simulateOidcTokenResponse(200, JSON.stringify({ oidcToken: token }));
+            assert.strictEqual(result, token);
+        });
+
+        it('should throw when response body is not valid JSON (simulated)', async (): Promise<void> => {
+            await assert.rejects((): Promise<string> => simulateOidcTokenResponse(200, 'not-json'), SyntaxError);
         });
     });
 });
