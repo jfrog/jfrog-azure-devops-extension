@@ -720,7 +720,9 @@ function addStringParam(cliCommand, inputParam, cliParam, require) {
 
 function addBoolParam(cliCommand, inputParam, cliParam) {
     let val = tl.getBoolInput(inputParam, false);
-    cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
+    if (val !== undefined) {
+        cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + val);
+    }
     return cliCommand;
 }
 
