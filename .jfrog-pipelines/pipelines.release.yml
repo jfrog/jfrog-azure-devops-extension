@@ -57,7 +57,7 @@ pipelines:
 
             # Run install, audit and create
             - npm i --unsafe-perm
-            - jf audit --fail=false
+            - jf audit --fail=false --sca --secrets --iac
             - npm run create
 
             # Verify vsix file is larger than 15M
