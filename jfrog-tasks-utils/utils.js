@@ -470,8 +470,9 @@ function forwardProxyToEnv() {
             parsed.password = proxyPassword;
             proxyUrl = parsed.toString();
         } catch (e) {
-            tl.warning('Failed to parse proxy URL: ' + e.message);
-            return;
+            tl.warning('Failed to parse proxy URL, credentials will not be included: ' + e.message);
+            // Fall through with the original URL (without credentials) so proxy
+            // support is not lost entirely due to a malformed URL.
         }
     }
 
@@ -490,6 +491,15 @@ function forwardProxyToEnv() {
  * Builds HTTP request options with proxy configuration.
  * Checks Azure DevOps agent proxy variables first, then falls back to
  * HTTPS_PROXY / HTTP_PROXY environment variables.
+ *
+ * Dual-source note: when Agent.ProxyUrl is set, this function reads it directly
+ * for the typed-rest-client request (OIDC token fetch). forwardProxyToEnv()
+ * separately forwards Agent.ProxyUrl into HTTP_PROXY / HTTPS_PROXY so that
+ * JFrog CLI and other child processes pick it up. If a user has also set
+ * HTTP_PROXY manually (and it differs from Agent.ProxyUrl), typed-rest-client
+ * will use Agent.ProxyUrl while JFrog CLI will use the existing env var — by
+ * design, since forwardProxyToEnv() never overrides a pre-existing env var.
+ *
  * @returns {object} Request options for typed-rest-client HttpClient
  */
 function getProxyConfiguration() {
@@ -545,7 +555,7 @@ async function fetchAzureOidcToken(serviceConnectionID) {
 
     const url = `${uri}${teamPrjID}/_apis/distributedtask/hubs/${hub}/plans/${planID}/jobs/${jobID}/oidctoken?api-version=${apiVersion}&serviceConnectionId=${serviceConnectionID}`;
 
-    const requestOptions = getProxyConfiguration();
+    const requestOptions = { ...getProxyConfiguration(), socketTimeout: 30000 };
     const httpClient = new httpm.HttpClient(buildAgent, [new credentialsHandler.BearerCredentialHandler(token, false)], requestOptions);
     tl.debug('Requesting OIDC token from: ' + url);
     const response = await httpClient.post(url, JSON.stringify({}), {

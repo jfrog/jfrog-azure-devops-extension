@@ -211,14 +211,16 @@ runTest('forwardProxyToEnv does not override existing lowercase https_proxy', ()
     clearProxyVars();
 });
 
-runTest('forwardProxyToEnv handles invalid proxy URL gracefully', () => {
+runTest('forwardProxyToEnv falls back to original URL when parse fails (no credentials)', () => {
     clearProxyVars();
     tl.setVariable('Agent.ProxyUrl', 'not-a-valid-url');
     tl.setVariable('Agent.ProxyUsername', 'user');
     tl.setVariable('Agent.ProxyPassword', 'pass');
     jfrogUtils.forwardProxyToEnv();
-    assert.strictEqual(process.env.HTTP_PROXY, undefined);
-    assert.strictEqual(process.env.HTTPS_PROXY, undefined);
+    // URL parsing fails so credentials cannot be embedded, but the original
+    // URL is still forwarded so proxy support is not lost entirely.
+    assert.strictEqual(process.env.HTTP_PROXY, 'not-a-valid-url');
+    assert.strictEqual(process.env.HTTPS_PROXY, 'not-a-valid-url');
     clearProxyVars();
 });
 
