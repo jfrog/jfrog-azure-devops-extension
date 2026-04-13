@@ -27,7 +27,7 @@ function RunJfrogCliCommand(RunTaskCbk) {
     utils.executeCliTask(RunTaskCbk, cliVersion);
 }
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -47,7 +47,7 @@ function RunTaskCbk(cliPath) {
     process.env.JFROG_CLI_BUILD_NUMBER = tl.getVariable('Build.BuildNumber');
 
     serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
-    utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
+    await utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
 
     let cliCommandsList = tl.getInput('command', true).split('\n');
     try {

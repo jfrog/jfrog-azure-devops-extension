@@ -4,6 +4,7 @@ const { join, sep, isAbsolute } = require('path');
 const execSync = require('child_process').execSync;
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
+const httpm = require('typed-rest-client/HttpClient');
 const findJavaHome = require('azure-pipelines-tasks-java-common/java-common').findJavaHome;
 const syncRequest = require('sync-request');
 const semver = require('semver');
@@ -47,7 +48,9 @@ function syncRequestWithRetry(method, url, options = {}, maxRetries = 3, retryDe
         if (attempt < maxRetries) {
             // Blocking delay before retry
             const waitUntil = Date.now() + retryDelay;
-            while (Date.now() < waitUntil) { /* wait */ }
+            while (Date.now() < waitUntil) {
+                /* wait */
+            }
         }
     }
 
@@ -219,6 +222,9 @@ module.exports = {
     configureArtifactoryCliServer: configureArtifactoryCliServer,
     configureJfrogCliServer: configureJfrogCliServer,
     configureDefaultJfrogServer: configureDefaultJfrogServer,
+    forwardProxyToEnv: forwardProxyToEnv,
+    getProxyConfiguration: getProxyConfiguration,
+    fetchAzureOidcToken: fetchAzureOidcToken,
     configureDefaultArtifactoryServer: configureDefaultArtifactoryServer,
     configureDefaultDistributionServer: configureDefaultDistributionServer,
     configureDefaultXrayServer: configureDefaultXrayServer,
@@ -247,6 +253,9 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     process.env.CI = 'true';
 
+    // Forward Azure DevOps proxy settings to environment variables
+    forwardProxyToEnv();
+
     if (!cliVersion) {
         // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
         cliVersion = tl.getVariable(pipelineRequestedCliVersionEnv) || defaultJfrogCliVersion;
@@ -259,8 +268,8 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
 
     runTaskCbk = runTaskFunc;
     getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion)
-        .then((cliPath) => {
-            runCbk(cliPath);
+        .then(async (cliPath) => {
+            await runCbk(cliPath);
             collectEnvVarsIfNeeded(cliPath);
         })
         .catch((error) => tl.setResult(tl.TaskResult.Failed, 'Error occurred while executing task: ' + error));
@@ -387,8 +396,25 @@ function maskSecrets(str) {
         .replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
-function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(jfrogService, '--url', serverId, cliPath, buildDir);
+async function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
+    let oidcProviderName = tl.getEndpointAuthorizationParameter(jfrogService, 'oidcProviderName', true);
+    let oidcAccessToken;
+
+    if (oidcProviderName) {
+        let serviceUrl = tl.getEndpointUrl(jfrogService, false);
+        let platformUrl = '';
+        try {
+            platformUrl = tl.getEndpointAuthorizationParameter(jfrogService, 'jfrogPlatformUrl', true);
+        } catch (error) {
+            console.warn('Failed to get platform url from field: ' + error + '\nparsing from url instead');
+        }
+        if (!platformUrl || !platformUrl.trim()) {
+            platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
+        }
+        oidcAccessToken = await exchangeOidcTokenAndSetStepVariables(jfrogService, platformUrl, oidcProviderName, cliPath, buildDir);
+    }
+
+    return configureSpecificCliServer(jfrogService, '--url', serverId, cliPath, buildDir, oidcAccessToken);
 }
 
 function configureArtifactoryCliServer(artifactoryService, serverId, cliPath, buildDir) {
@@ -423,7 +449,98 @@ function debugLogIDToken(oidcToken) {
     console.debug('OIDC Token Audience: ', oidcClaims.aud);
 }
 
-function fetchAzureOidcToken(serviceConnectionID) {
+/**
+ * Forwards Azure DevOps proxy configuration to environment variables.
+ * Sets HTTP_PROXY and HTTPS_PROXY if they are not already set, allowing
+ * JFrog CLI and other tools to use the proxy configuration.
+ */
+function forwardProxyToEnv() {
+    let proxyUrl = tl.getVariable('Agent.ProxyUrl');
+    if (!proxyUrl) {
+        return;
+    }
+
+    // Build proxy URL with auth if provided
+    let proxyUsername = tl.getVariable('Agent.ProxyUsername');
+    let proxyPassword = tl.getVariable('Agent.ProxyPassword');
+    if (proxyUsername && proxyPassword) {
+        try {
+            let parsed = new URL(proxyUrl);
+            parsed.username = proxyUsername;
+            parsed.password = proxyPassword;
+            proxyUrl = parsed.toString();
+        } catch (e) {
+            tl.warning('Failed to parse proxy URL, credentials will not be included: ' + e.message);
+            // Fall through with the original URL (without credentials) so proxy
+            // support is not lost entirely due to a malformed URL.
+        }
+    }
+
+    // Only set if not already present — don't override explicit user config
+    if (!process.env.HTTP_PROXY && !process.env.http_proxy) {
+        process.env.HTTP_PROXY = proxyUrl;
+        tl.debug('Set HTTP_PROXY from Agent.ProxyUrl');
+    }
+    if (!process.env.HTTPS_PROXY && !process.env.https_proxy) {
+        process.env.HTTPS_PROXY = proxyUrl;
+        tl.debug('Set HTTPS_PROXY from Agent.ProxyUrl');
+    }
+}
+
+/**
+ * Builds HTTP request options with proxy configuration.
+ * Checks Azure DevOps agent proxy variables first, then falls back to
+ * HTTPS_PROXY / HTTP_PROXY environment variables.
+ *
+ * Dual-source note: when Agent.ProxyUrl is set, this function reads it directly
+ * for the typed-rest-client request (OIDC token fetch). forwardProxyToEnv()
+ * separately forwards Agent.ProxyUrl into HTTP_PROXY / HTTPS_PROXY so that
+ * JFrog CLI and other child processes pick it up. If a user has also set
+ * HTTP_PROXY manually (and it differs from Agent.ProxyUrl), typed-rest-client
+ * will use Agent.ProxyUrl while JFrog CLI will use the existing env var — by
+ * design, since forwardProxyToEnv() never overrides a pre-existing env var.
+ *
+ * @returns {object} Request options for typed-rest-client HttpClient
+ */
+function getProxyConfiguration() {
+    let proxyUrl = tl.getVariable('Agent.ProxyUrl');
+    let proxyUsername;
+    let proxyPassword;
+    let proxyBypassHosts;
+
+    if (proxyUrl) {
+        tl.debug('Using proxy from Agent.ProxyUrl: ' + proxyUrl);
+        proxyUsername = tl.getVariable('Agent.ProxyUsername');
+        proxyPassword = tl.getVariable('Agent.ProxyPassword');
+        const bypassList = tl.getVariable('Agent.ProxyBypassList');
+        try {
+            proxyBypassHosts = bypassList ? JSON.parse(bypassList) : undefined;
+        } catch (e) {
+            tl.warning('Failed to parse Agent.ProxyBypassList as JSON: ' + e.message);
+            proxyBypassHosts = undefined;
+        }
+    } else {
+        proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+        if (proxyUrl) {
+            tl.debug('Using proxy from environment variable: ' + proxyUrl);
+        }
+    }
+
+    if (!proxyUrl) {
+        return {};
+    }
+
+    return {
+        proxy: {
+            proxyUrl: proxyUrl,
+            proxyUsername: proxyUsername || undefined,
+            proxyPassword: proxyPassword || undefined,
+            proxyBypassHosts: proxyBypassHosts || undefined,
+        },
+    };
+}
+
+async function fetchAzureOidcToken(serviceConnectionID) {
     const uri = tl.getVariable('System.CollectionUri');
     const teamPrjID = tl.getVariable('System.TeamProjectId');
     const hub = tl.getVariable('System.HostType');
@@ -438,18 +555,21 @@ function fetchAzureOidcToken(serviceConnectionID) {
 
     const url = `${uri}${teamPrjID}/_apis/distributedtask/hubs/${hub}/plans/${planID}/jobs/${jobID}/oidctoken?api-version=${apiVersion}&serviceConnectionId=${serviceConnectionID}`;
 
-    const res = syncRequest('POST', url, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
+    const requestOptions = { ...getProxyConfiguration(), socketTimeout: 30000 };
+    const httpClient = new httpm.HttpClient(buildAgent, [new credentialsHandler.BearerCredentialHandler(token, false)], requestOptions);
+    tl.debug('Requesting OIDC token from: ' + url);
+    const response = await httpClient.post(url, JSON.stringify({}), {
+        'Content-Type': 'application/json',
     });
 
-    if (res.statusCode !== 200) {
-        throw new Error(`OIDC token request failed: HTTP ${res.statusCode}\nBody: ${res.getBody('utf8')}`);
+    const statusCode = response.message.statusCode;
+    const responseBody = await response.readBody();
+
+    if (statusCode !== 200) {
+        throw new Error(`OIDC token request failed: HTTP ${statusCode}\nBody: ${responseBody}`);
     }
     /** @type {{ oidcToken?: string }} */
-    const body = JSON.parse(res.getBody('utf8'));
+    const body = JSON.parse(responseBody);
     if (!body.oidcToken) {
         throw new Error('OIDC token not found in response body.');
     }
@@ -457,7 +577,7 @@ function fetchAzureOidcToken(serviceConnectionID) {
     return body.oidcToken;
 }
 
-function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
+async function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
     // First validate supported CLI version
     let cliVersion = getCliVersion(cliPath);
     if (semver.lt(cliVersion, '2.75.0')) {
@@ -470,7 +590,7 @@ function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderN
     }
     let oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
     const repoName = tl.getVariable('Build.Repository.Name');
-    const idToken = fetchAzureOidcToken(service);
+    const idToken = await fetchAzureOidcToken(service);
 
     // Build the CLI command
     let cliCommand = cliJoin(
@@ -535,33 +655,14 @@ function extractAccessTokenAndUsername(output) {
     throw new Error('Failed to extract AccessToken or Username from the output.');
 }
 
-function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir) {
+function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir, oidcAccessToken) {
     let serviceUrl = tl.getEndpointUrl(service, false);
     let serviceUser = tl.getEndpointAuthorizationParameter(service, 'username', true);
     let servicePassword = tl.getEndpointAuthorizationParameter(service, 'password', true);
-    let serviceAccessToken = tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
-    let oidcProviderName = tl.getEndpointAuthorizationParameter(service, 'oidcProviderName', true);
+    let serviceAccessToken = oidcAccessToken || tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
     let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
     let stdinSecret;
     let secretInStdinSupported = isStdinSecretSupported();
-
-    // In the case of OIDC, we exchange tokens via the CLI
-    // and populate the access token to the CLI config.
-    // This is done by the exchange command and not the config to export
-    // username and access token params for further use by the users.
-    if (oidcProviderName) {
-        // we need platform url for oidc token exchange
-        let platformUrl = '';
-        try {
-            platformUrl = tl.getEndpointAuthorizationParameter(service, 'jfrogPlatformUrl', true);
-        } catch (error) {
-            console.warn('Failed to get platform url from field: ' + error + '\nparsing from url instead');
-        }
-        if (!platformUrl || !platformUrl.trim()) {
-            platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
-        }
-        serviceAccessToken = exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
-    }
 
     if (serviceAccessToken) {
         // Add access-token if required.
@@ -587,12 +688,12 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
  * @param workDir - Working directory.
  * @returns {boolean} - Whether the server was configured or not.
  */
-function configureDefaultJfrogServer(serverId, cliPath, workDir) {
+async function configureDefaultJfrogServer(serverId, cliPath, workDir) {
     let jfrogPlatformService = tl.getInput('jfrogPlatformConnection', false);
     if (!jfrogPlatformService) {
         return false;
     }
-    configureJfrogCliServer(jfrogPlatformService, serverId, cliPath, workDir);
+    await configureJfrogCliServer(jfrogPlatformService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
     return true;
 }
@@ -789,10 +890,10 @@ function getCliVersion(cliPath) {
     return String.fromCharCode.apply(null, res).split(' ')[2].trim();
 }
 
-function runCbk(cliPath) {
+async function runCbk(cliPath) {
     console.log('Running jfrog-cli from ' + cliPath);
     logCliVersionAndSetSelected(cliPath);
-    runTaskCbk(cliPath);
+    await runTaskCbk(cliPath);
 }
 
 function createCliDirs() {
