@@ -453,6 +453,8 @@ function debugLogIDToken(oidcToken) {
  * Forwards Azure DevOps proxy configuration to environment variables.
  * Sets HTTP_PROXY and HTTPS_PROXY if they are not already set, allowing
  * JFrog CLI and other tools to use the proxy configuration.
+ * Also sets NO_PROXY from Agent.ProxyBypassList if not already set, so that
+ * internal hosts are not routed through the proxy.
  */
 function forwardProxyToEnv() {
     let proxyUrl = tl.getVariable('Agent.ProxyUrl');
@@ -476,14 +478,36 @@ function forwardProxyToEnv() {
         }
     }
 
-    // Only set if not already present — don't override explicit user config
+    // Only set if not already present — don't override explicit user config.
+    let forwarded = false;
     if (!process.env.HTTP_PROXY && !process.env.http_proxy) {
         process.env.HTTP_PROXY = proxyUrl;
+        forwarded = true;
         tl.debug('Set HTTP_PROXY from Agent.ProxyUrl');
     }
     if (!process.env.HTTPS_PROXY && !process.env.https_proxy) {
         process.env.HTTPS_PROXY = proxyUrl;
+        forwarded = true;
         tl.debug('Set HTTPS_PROXY from Agent.ProxyUrl');
+    }
+
+    // Only forward the bypass list if we actually wrote at least one proxy var.
+    // If the user already had their own proxy env vars, the agent's bypass list
+    // belongs to the agent's proxy — not theirs — and should not be injected.
+    if (!forwarded) {
+        return;
+    }
+    const bypassList = tl.getVariable('Agent.ProxyBypassList');
+    if (bypassList && !process.env.NO_PROXY && !process.env.no_proxy) {
+        try {
+            const hosts = JSON.parse(bypassList);
+            if (Array.isArray(hosts) && hosts.length > 0) {
+                process.env.NO_PROXY = hosts.join(',');
+                tl.debug('Set NO_PROXY from Agent.ProxyBypassList: ' + process.env.NO_PROXY);
+            }
+        } catch (e) {
+            tl.warning('Failed to parse Agent.ProxyBypassList for NO_PROXY: ' + e.message);
+        }
     }
 }
 

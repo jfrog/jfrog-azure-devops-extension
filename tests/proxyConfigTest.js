@@ -27,6 +27,8 @@ function clearProxyVars() {
     delete process.env.https_proxy;
     delete process.env.HTTP_PROXY;
     delete process.env.http_proxy;
+    delete process.env.NO_PROXY;
+    delete process.env.no_proxy;
 }
 
 console.log('\nProxy Configuration Tests\n');
@@ -223,6 +225,69 @@ runTest('forwardProxyToEnv falls back to original URL when parse fails (no crede
     assert.strictEqual(process.env.HTTPS_PROXY, 'not-a-valid-url');
     clearProxyVars();
 });
+
+runTest('forwardProxyToEnv sets NO_PROXY from Agent.ProxyBypassList', () => {
+    clearProxyVars();
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["localhost","*.internal.corp"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.HTTP_PROXY, 'http://myproxy:8080');
+    assert.strictEqual(process.env.NO_PROXY, 'localhost,*.internal.corp');
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv does not override existing NO_PROXY', () => {
+    clearProxyVars();
+    process.env.NO_PROXY = 'existing.host';
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["localhost"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, 'existing.host');
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv does not override existing lowercase no_proxy', () => {
+    clearProxyVars();
+    process.env.no_proxy = 'existing.host';
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["localhost"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.no_proxy, 'existing.host');
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv does not set NO_PROXY when Agent.ProxyBypassList is empty', () => {
+    clearProxyVars();
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '[]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv warns and skips NO_PROXY when Agent.ProxyBypassList is invalid JSON', () => {
+    clearProxyVars();
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', 'not-valid-json');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv does not set NO_PROXY when user already has HTTP_PROXY and HTTPS_PROXY set', () => {
+    clearProxyVars();
+    process.env.HTTP_PROXY = 'http://user-proxy:9090';
+    process.env.HTTPS_PROXY = 'http://user-proxy:9090';
+    tl.setVariable('Agent.ProxyUrl', 'http://agent-proxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["internal.host"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    assert.strictEqual(process.env.HTTP_PROXY, 'http://user-proxy:9090');
+    assert.strictEqual(process.env.HTTPS_PROXY, 'http://user-proxy:9090');
+    clearProxyVars();
+});
+
 
 console.log(`\nResults: ${passed} passed, ${failed} failed\n`);
 process.exit(failed > 0 ? 1 : 0);
