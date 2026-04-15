@@ -246,6 +246,17 @@ runTest('forwardProxyToEnv does not override existing NO_PROXY', () => {
     clearProxyVars();
 });
 
+runTest('forwardProxyToEnv does not override existing lowercase no_proxy', () => {
+    clearProxyVars();
+    process.env.no_proxy = 'existing.host';
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["localhost"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.no_proxy, 'existing.host');
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    clearProxyVars();
+});
+
 runTest('forwardProxyToEnv does not set NO_PROXY when Agent.ProxyBypassList is empty', () => {
     clearProxyVars();
     tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
@@ -266,8 +277,6 @@ runTest('forwardProxyToEnv warns and skips NO_PROXY when Agent.ProxyBypassList i
 
 runTest('forwardProxyToEnv does not set NO_PROXY when user already has HTTP_PROXY and HTTPS_PROXY set', () => {
     clearProxyVars();
-    // User has their own proxy — our function should not forward the agent's bypass list
-    // because it belongs to the agent's proxy, not the user's
     process.env.HTTP_PROXY = 'http://user-proxy:9090';
     process.env.HTTPS_PROXY = 'http://user-proxy:9090';
     tl.setVariable('Agent.ProxyUrl', 'http://agent-proxy:8080');
@@ -275,6 +284,33 @@ runTest('forwardProxyToEnv does not set NO_PROXY when user already has HTTP_PROX
     jfrogUtils.forwardProxyToEnv();
     assert.strictEqual(process.env.NO_PROXY, undefined);
     assert.strictEqual(process.env.HTTP_PROXY, 'http://user-proxy:9090');
+    assert.strictEqual(process.env.HTTPS_PROXY, 'http://user-proxy:9090');
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv does not set NO_PROXY when user has HTTP_PROXY but not HTTPS_PROXY (partial)', () => {
+    clearProxyVars();
+    // Partial case: user has their own HTTP proxy, agent sets HTTPS proxy.
+    // NO_PROXY must not be injected — it applies universally and would
+    // incorrectly bypass the user's HTTP proxy for internal.host.
+    process.env.HTTP_PROXY = 'http://user-proxy:9090';
+    tl.setVariable('Agent.ProxyUrl', 'http://agent-proxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["internal.host"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    assert.strictEqual(process.env.HTTP_PROXY, 'http://user-proxy:9090');
+    assert.strictEqual(process.env.HTTPS_PROXY, 'http://agent-proxy:8080');
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv does not set NO_PROXY when user has HTTPS_PROXY but not HTTP_PROXY (partial)', () => {
+    clearProxyVars();
+    process.env.HTTPS_PROXY = 'http://user-proxy:9090';
+    tl.setVariable('Agent.ProxyUrl', 'http://agent-proxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["internal.host"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    assert.strictEqual(process.env.HTTP_PROXY, 'http://agent-proxy:8080');
     assert.strictEqual(process.env.HTTPS_PROXY, 'http://user-proxy:9090');
     clearProxyVars();
 });
