@@ -485,6 +485,20 @@ function forwardProxyToEnv() {
         process.env.HTTPS_PROXY = proxyUrl;
         tl.debug('Set HTTPS_PROXY from Agent.ProxyUrl');
     }
+
+    // Forward bypass list as NO_PROXY so internal hosts are not routed through the proxy
+    const bypassList = tl.getVariable('Agent.ProxyBypassList');
+    if (bypassList && !process.env.NO_PROXY && !process.env.no_proxy) {
+        try {
+            const hosts = JSON.parse(bypassList);
+            if (Array.isArray(hosts) && hosts.length > 0) {
+                process.env.NO_PROXY = hosts.join(',');
+                tl.debug('Set NO_PROXY from Agent.ProxyBypassList: ' + process.env.NO_PROXY);
+            }
+        } catch (e) {
+            tl.warning('Failed to parse Agent.ProxyBypassList for NO_PROXY: ' + e.message);
+        }
+    }
 }
 
 /**
