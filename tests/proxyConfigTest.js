@@ -264,5 +264,20 @@ runTest('forwardProxyToEnv warns and skips NO_PROXY when Agent.ProxyBypassList i
     clearProxyVars();
 });
 
+runTest('forwardProxyToEnv does not set NO_PROXY when user already has HTTP_PROXY and HTTPS_PROXY set', () => {
+    clearProxyVars();
+    // User has their own proxy — our function should not forward the agent's bypass list
+    // because it belongs to the agent's proxy, not the user's
+    process.env.HTTP_PROXY = 'http://user-proxy:9090';
+    process.env.HTTPS_PROXY = 'http://user-proxy:9090';
+    tl.setVariable('Agent.ProxyUrl', 'http://agent-proxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["internal.host"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, undefined);
+    assert.strictEqual(process.env.HTTP_PROXY, 'http://user-proxy:9090');
+    assert.strictEqual(process.env.HTTPS_PROXY, 'http://user-proxy:9090');
+    clearProxyVars();
+});
+
 console.log(`\nResults: ${passed} passed, ${failed} failed\n`);
 process.exit(failed > 0 ? 1 : 0);

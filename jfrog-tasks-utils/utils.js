@@ -476,17 +476,28 @@ function forwardProxyToEnv() {
         }
     }
 
-    // Only set if not already present — don't override explicit user config
+    // Only set if not already present — don't override explicit user config.
+    // Track whether we actually wrote either var so we only inject NO_PROXY
+    // when it corresponds to the proxy we forwarded, not a pre-existing one.
+    let forwarded = false;
     if (!process.env.HTTP_PROXY && !process.env.http_proxy) {
         process.env.HTTP_PROXY = proxyUrl;
+        forwarded = true;
         tl.debug('Set HTTP_PROXY from Agent.ProxyUrl');
     }
     if (!process.env.HTTPS_PROXY && !process.env.https_proxy) {
         process.env.HTTPS_PROXY = proxyUrl;
+        forwarded = true;
         tl.debug('Set HTTPS_PROXY from Agent.ProxyUrl');
     }
 
-    // Forward bypass list as NO_PROXY so internal hosts are not routed through the proxy
+    // Forward bypass list as NO_PROXY only if we actually wrote HTTP_PROXY or
+    // HTTPS_PROXY above. If the user already had their own proxy env vars set,
+    // the agent's bypass list belongs to the agent's proxy — not theirs — and
+    // injecting it could incorrectly bypass their proxy for unrelated hosts.
+    if (!forwarded) {
+        return;
+    }
     const bypassList = tl.getVariable('Agent.ProxyBypassList');
     if (bypassList && !process.env.NO_PROXY && !process.env.no_proxy) {
         try {
