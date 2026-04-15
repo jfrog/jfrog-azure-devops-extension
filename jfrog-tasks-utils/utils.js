@@ -453,6 +453,8 @@ function debugLogIDToken(oidcToken) {
  * Forwards Azure DevOps proxy configuration to environment variables.
  * Sets HTTP_PROXY and HTTPS_PROXY if they are not already set, allowing
  * JFrog CLI and other tools to use the proxy configuration.
+ * Also sets NO_PROXY from Agent.ProxyBypassList if not already set, so that
+ * internal hosts are not routed through the proxy.
  */
 function forwardProxyToEnv() {
     let proxyUrl = tl.getVariable('Agent.ProxyUrl');
@@ -477,8 +479,6 @@ function forwardProxyToEnv() {
     }
 
     // Only set if not already present — don't override explicit user config.
-    // Track whether we actually wrote either var so we only inject NO_PROXY
-    // when it corresponds to the proxy we forwarded, not a pre-existing one.
     let forwarded = false;
     if (!process.env.HTTP_PROXY && !process.env.http_proxy) {
         process.env.HTTP_PROXY = proxyUrl;
@@ -491,10 +491,9 @@ function forwardProxyToEnv() {
         tl.debug('Set HTTPS_PROXY from Agent.ProxyUrl');
     }
 
-    // Forward bypass list as NO_PROXY only if we actually wrote HTTP_PROXY or
-    // HTTPS_PROXY above. If the user already had their own proxy env vars set,
-    // the agent's bypass list belongs to the agent's proxy — not theirs — and
-    // injecting it could incorrectly bypass their proxy for unrelated hosts.
+    // Only forward the bypass list if we actually wrote at least one proxy var.
+    // If the user already had their own proxy env vars, the agent's bypass list
+    // belongs to the agent's proxy — not theirs — and should not be injected.
     if (!forwarded) {
         return;
     }
