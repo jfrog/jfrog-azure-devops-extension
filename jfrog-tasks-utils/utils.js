@@ -253,9 +253,6 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     process.env.CI = 'true';
 
-    // Forward Azure DevOps proxy settings to environment variables
-    forwardProxyToEnv();
-
     if (!cliVersion) {
         // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
         cliVersion = tl.getVariable(pipelineRequestedCliVersionEnv) || defaultJfrogCliVersion;
