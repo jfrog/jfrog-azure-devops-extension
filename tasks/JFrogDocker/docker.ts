@@ -1,11 +1,19 @@
 import * as utils from '@jfrog/tasks-utils';
 import * as tl from 'azure-pipelines-task-lib/task';
 
-const cliDockerCommand: string = 'docker';
 let serverId: string;
 
+function isPodman(): boolean {
+    try {
+        const result: string = tl.execSync('docker', ['version']).stdout || '';
+        tl.debug('docker version output: ' + result);
+        return /podman/i.test(result);
+    } catch {
+        return false;
+    }
+}
+
 function RunTaskCbk(cliPath: string): void {
-    // Validate docker exists on agent
     if (!utils.isToolExists('docker')) {
         tl.setResult(tl.TaskResult.Failed, 'Agent is missing required tool: docker.');
         return;
@@ -18,7 +26,17 @@ function RunTaskCbk(cliPath: string): void {
     }
     const imageName: string = tl.getInput('imageName', true) ?? '';
     const command: string = tl.getInput('command', true) ?? '';
-    let cliCommand: string = utils.cliJoin(cliPath, cliDockerCommand, command.toLowerCase(), utils.quote(imageName));
+    if (isPodman()) {
+        // Route 'jf docker' subcommands through Podman inside the CLI.
+        // The CLI reads this env var and will: invoke the 'podman' binary for push/pull/login,
+        // skip the Docker daemon SDK call (no /var/run/docker.sock required), and resolve the
+        // target repo via Artifactory's X-Artifactory-Docker-Registry header — which works for
+        // path, subdomain, and port-based (reverse proxy) repository layouts.
+        // Requires JFrog CLI >= <version-with-JFROG_CLI_CONTAINER_MANAGER-support>.
+        process.env['JFROG_CLI_CONTAINER_MANAGER'] = 'podman';
+        tl.debug('Podman detected. Setting JFROG_CLI_CONTAINER_MANAGER=podman.');
+    }
+    let cliCommand: string = utils.cliJoin(cliPath, 'docker', command.toLowerCase(), utils.quote(imageName));
     switch (command) {
         case 'Push':
         case 'Pull': {
