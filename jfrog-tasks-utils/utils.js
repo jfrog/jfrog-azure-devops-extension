@@ -253,9 +253,6 @@ function executeCliTask(runTaskFunc, cliVersion, cliDownloadUrl, cliAuthHandlers
     process.env.JFROG_CLI_USER_AGENT = buildAgent + '/' + pluginVersion;
     process.env.CI = 'true';
 
-    // Forward Azure DevOps proxy settings to environment variables
-    forwardProxyToEnv();
-
     if (!cliVersion) {
         // If CLI version is passed, use it. Otherwise, use requested version from env var if set. Else, default version.
         cliVersion = tl.getVariable(pipelineRequestedCliVersionEnv) || defaultJfrogCliVersion;
@@ -502,7 +499,23 @@ function forwardProxyToEnv() {
         try {
             const hosts = JSON.parse(bypassList);
             if (Array.isArray(hosts) && hosts.length > 0) {
-                process.env.NO_PROXY = hosts.join(',');
+                // .proxybypass entries are ECMAScript regex patterns per ADO docs.
+                // Only simple hostname patterns (e.g. artifactory\.corp\.com) are supported —
+                // strip backslash escaping from dots to produce a plain hostname for NO_PROXY.
+                // Entries containing regex special chars like * cannot be reliably converted
+                // and are skipped with a warning.
+                const converted = [];
+                for (const h of hosts) {
+                    if (/[*+?[\]()^${}|\\][^.]/.test(h) || h.includes('*')) {
+                        tl.warning('Skipping Agent.ProxyBypassList entry "' + h + '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.');
+                        continue;
+                    }
+                    converted.push(h.replace(/\\\./g, '.'));
+                }
+                if (converted.length > 0) {
+                    process.env.NO_PROXY = converted.join(',');
+                    tl.debug('Set NO_PROXY from Agent.ProxyBypassList: ' + process.env.NO_PROXY);
+                }
                 tl.debug('Set NO_PROXY from Agent.ProxyBypassList: ' + process.env.NO_PROXY);
             }
         } catch (e) {

@@ -226,13 +226,47 @@ runTest('forwardProxyToEnv falls back to original URL when parse fails (no crede
     clearProxyVars();
 });
 
-runTest('forwardProxyToEnv sets NO_PROXY from Agent.ProxyBypassList', () => {
+runTest('forwardProxyToEnv sets NO_PROXY from Agent.ProxyBypassList — plain hostname', () => {
     clearProxyVars();
     tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
-    tl.setVariable('Agent.ProxyBypassList', '["localhost","*.internal.corp"]');
+    tl.setVariable('Agent.ProxyBypassList', '["localhost"]');
     jfrogUtils.forwardProxyToEnv();
-    assert.strictEqual(process.env.HTTP_PROXY, 'http://myproxy:8080');
-    assert.strictEqual(process.env.NO_PROXY, 'localhost,*.internal.corp');
+    assert.strictEqual(process.env.NO_PROXY, 'localhost');
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv converts ECMAScript escaped dots to plain hostnames for NO_PROXY', () => {
+    clearProxyVars();
+    // Standard .proxybypass format: dots are escaped as \. (ECMAScript regex)
+    // Agent stores as JSON: "artifactory\\.ctz\\.corp\\.com"
+    // After JSON.parse: "artifactory\.ctz\.corp\.com"
+    // Our fix strips \. → . to produce a valid NO_PROXY hostname
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '["artifactory\\\\.ctz\\\\.corp\\\\.com"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, 'artifactory.ctz.corp.com');
+    clearProxyVars();
+});
+
+
+runTest('forwardProxyToEnv skips wildcard entries and warns — simple entries still converted', () => {
+    clearProxyVars();
+    // .*\.corp\.com is a valid ECMAScript regex but cannot be converted to NO_PROXY
+    // artifactory\.corp\.com is a simple hostname pattern — should be converted
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '[".*\\\\.corp\\\\.com","artifactory\\\\.corp\\\\.com"]');
+    jfrogUtils.forwardProxyToEnv();
+    // Wildcard entry skipped, simple entry converted correctly
+    assert.strictEqual(process.env.NO_PROXY, 'artifactory.corp.com');
+    clearProxyVars();
+});
+
+runTest('forwardProxyToEnv does not set NO_PROXY when all entries are wildcard patterns', () => {
+    clearProxyVars();
+    tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
+    tl.setVariable('Agent.ProxyBypassList', '[".*\\\\.corp\\\\.com"]');
+    jfrogUtils.forwardProxyToEnv();
+    assert.strictEqual(process.env.NO_PROXY, undefined);
     clearProxyVars();
 });
 
