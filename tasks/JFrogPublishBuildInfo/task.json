@@ -14,7 +14,7 @@
     "version": {
         "Major": "1",
         "Minor": "12",
-        "Patch": "9"
+        "Patch": "10"
     },
     "minimumAgentVersion": "1.83.0",
     "instanceNameFormat": "JFrog Publish Build Info",
