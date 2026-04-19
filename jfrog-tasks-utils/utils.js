@@ -617,10 +617,7 @@ async function fetchAzureOidcToken(serviceConnectionID) {
 async function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
     // First validate supported CLI version
     let cliVersion = getCliVersion(cliPath);
-    if (semver.lt(cliVersion, '2.75.0')) {
-        throw new Error('CLI version too low');
-    }
-    if (cliVersion < minSupportedOidcCliVersion) {
+    if (semver.lt(cliVersion, minSupportedOidcCliVersion)) {
         throw new Error(
             `The CLI version ${cliVersion} is not supported for OIDC token exchange. Minimum required version is ${minSupportedOidcCliVersion}.`,
         );
