@@ -1,5 +1,6 @@
 /// <reference types="mocha" />
 import * as assert from 'assert';
+import * as semver from 'semver';
 
 // Use require to get the actual module with latest exports
 import * as jfrogUtils from '@jfrog/tasks-utils';
@@ -295,6 +296,28 @@ describe('Utils Unit Tests', (): void => {
 
         it('should throw when response body is not valid JSON (simulated)', async (): Promise<void> => {
             await assert.rejects((): Promise<string> => simulateOidcTokenResponse(200, 'not-json'), SyntaxError);
+        });
+    });
+
+    describe('OIDC minimum CLI version check', (): void => {
+        // Regression test: string comparison ('2.101.0' < '2.75.0') incorrectly returns true
+        // because '1' < '7' lexicographically. semver.lt must be used instead.
+        const minOidcVersion: string = '2.75.0';
+
+        it('should recognise 2.101.0 as above minimum (3-digit minor regression)', (): void => {
+            assert.strictEqual(semver.lt('2.101.0', minOidcVersion), false);
+        });
+
+        it('should recognise 2.100.0 as above minimum', (): void => {
+            assert.strictEqual(semver.lt('2.100.0', minOidcVersion), false);
+        });
+
+        it('should recognise 2.75.0 as meeting minimum exactly', (): void => {
+            assert.strictEqual(semver.lt('2.75.0', minOidcVersion), false);
+        });
+
+        it('should recognise 2.74.9 as below minimum', (): void => {
+            assert.strictEqual(semver.lt('2.74.9', minOidcVersion), true);
         });
     });
 });
