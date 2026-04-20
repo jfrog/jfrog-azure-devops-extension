@@ -96,6 +96,14 @@
             "required": true,
             "visibleRule": "watchesSource!=none",
             "helpMarkDown": "Unset if you don't wish the audit process to exit with code 3, if a violation matching an Xray policy is found, and the policy includes a 'Fail Build' rule."
+        },
+        {
+            "name": "publishLogs",
+            "type": "boolean",
+            "label": "Publish execution logs to azure artifact",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "When enabled, publishes .jfrog/logs directory as a pipeline artifact for debugging. Includes JAS scanner logs (analyzerManagerLogs)."
         }
     ],
     "execution": {
