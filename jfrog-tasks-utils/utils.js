@@ -393,37 +393,42 @@ function maskSecrets(str) {
         .replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
-async function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
-    let oidcProviderName = tl.getEndpointAuthorizationParameter(jfrogService, 'oidcProviderName', true);
-    let oidcAccessToken;
-
-    if (oidcProviderName) {
-        let serviceUrl = tl.getEndpointUrl(jfrogService, false);
-        let platformUrl = '';
-        try {
-            platformUrl = tl.getEndpointAuthorizationParameter(jfrogService, 'jfrogPlatformUrl', true);
-        } catch (error) {
-            console.warn('Failed to get platform url from field: ' + error + '\nparsing from url instead');
-        }
-        if (!platformUrl || !platformUrl.trim()) {
-            platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
-        }
-        oidcAccessToken = await exchangeOidcTokenAndSetStepVariables(jfrogService, platformUrl, oidcProviderName, cliPath, buildDir);
+async function fetchOidcTokenIfConfigured(service, cliPath, buildDir) {
+    const oidcProviderName = tl.getEndpointAuthorizationParameter(service, 'oidcProviderName', true);
+    if (!oidcProviderName) {
+        return undefined;
     }
+    const serviceUrl = tl.getEndpointUrl(service, false);
+    let platformUrl = '';
+    try {
+        platformUrl = tl.getEndpointAuthorizationParameter(service, 'jfrogPlatformUrl', true);
+    } catch (error) {
+        console.warn('Failed to get platform url from field: ' + error + '\nparsing from url instead');
+    }
+    if (!platformUrl || !platformUrl.trim()) {
+        platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
+    }
+    return exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
+}
 
+async function configureJfrogCliServer(jfrogService, serverId, cliPath, buildDir) {
+    const oidcAccessToken = await fetchOidcTokenIfConfigured(jfrogService, cliPath, buildDir);
     return configureSpecificCliServer(jfrogService, '--url', serverId, cliPath, buildDir, oidcAccessToken);
 }
 
-function configureArtifactoryCliServer(artifactoryService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(artifactoryService, '--artifactory-url', serverId, cliPath, buildDir);
+async function configureArtifactoryCliServer(artifactoryService, serverId, cliPath, buildDir) {
+    const oidcAccessToken = await fetchOidcTokenIfConfigured(artifactoryService, cliPath, buildDir);
+    return configureSpecificCliServer(artifactoryService, '--artifactory-url', serverId, cliPath, buildDir, oidcAccessToken);
 }
 
-function configureDistributionCliServer(distributionService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(distributionService, '--distribution-url', serverId, cliPath, buildDir);
+async function configureDistributionCliServer(distributionService, serverId, cliPath, buildDir) {
+    const oidcAccessToken = await fetchOidcTokenIfConfigured(distributionService, cliPath, buildDir);
+    return configureSpecificCliServer(distributionService, '--distribution-url', serverId, cliPath, buildDir, oidcAccessToken);
 }
 
-function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
-    return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir);
+async function configureXrayCliServer(xrayService, serverId, cliPath, buildDir) {
+    const oidcAccessToken = await fetchOidcTokenIfConfigured(xrayService, cliPath, buildDir);
+    return configureSpecificCliServer(xrayService, '--xray-url', serverId, cliPath, buildDir, oidcAccessToken);
 }
 
 /**
@@ -738,10 +743,10 @@ async function configureDefaultJfrogServer(serverId, cliPath, workDir) {
  * @param cliPath - Path to JFrog CLI executable.
  * @param workDir - Working directory.
  */
-function configureDefaultArtifactoryServer(usageType, cliPath, workDir) {
+async function configureDefaultArtifactoryServer(usageType, cliPath, workDir) {
     let artifactoryService = tl.getInput('artifactoryConnection', true);
     const serverId = assembleUniqueServerId(usageType);
-    configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
+    await configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
     return serverId;
 }
@@ -752,10 +757,10 @@ function configureDefaultArtifactoryServer(usageType, cliPath, workDir) {
  * @param cliPath - Path to JFrog CLI executable.
  * @param workDir - Working directory.
  */
-function configureDefaultDistributionServer(usageType, cliPath, workDir) {
+async function configureDefaultDistributionServer(usageType, cliPath, workDir) {
     let distributionService = tl.getInput('distributionConnection', true);
     const serverId = assembleUniqueServerId(usageType);
-    configureDistributionCliServer(distributionService, serverId, cliPath, workDir);
+    await configureDistributionCliServer(distributionService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
     return serverId;
 }
@@ -766,10 +771,10 @@ function configureDefaultDistributionServer(usageType, cliPath, workDir) {
  * @param cliPath - Path to JFrog CLI executable.
  * @param workDir - Working directory.
  */
-function configureDefaultXrayServer(usageType, cliPath, workDir) {
+async function configureDefaultXrayServer(usageType, cliPath, workDir) {
     let xrayService = tl.getInput('xrayConnection', true);
     const serverId = assembleUniqueServerId(usageType);
-    configureXrayCliServer(xrayService, serverId, cliPath, workDir);
+    await configureXrayCliServer(xrayService, serverId, cliPath, workDir);
     useCliServer(serverId, cliPath, workDir);
     return serverId;
 }
@@ -1265,14 +1270,14 @@ function assembleUniqueServerId(usageType) {
  * @param repoDeploy - Repository to use for deploying. Pass a falsy value to skip.
  * @returns {string[]}
  */
-function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand, repoResolver, repoDeploy) {
+async function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand, repoResolver, repoDeploy) {
     let cliCommand = cliJoin(cliPath, configCommand);
     let serverIdResolve;
     let serverIdDeploy;
     if (repoResolver) {
         // Configure Artifactory resolver server.
         const usageType = cmd + tl.getInput('command', true) + '_resolver';
-        serverIdResolve = configureDefaultArtifactoryServer(usageType, cliPath, requiredWorkDir);
+        serverIdResolve = await configureDefaultArtifactoryServer(usageType, cliPath, requiredWorkDir);
 
         // Add serverId and repo to config command.
         cliCommand = cliJoin(cliCommand, '--server-id-resolve=' + quote(serverIdResolve));
@@ -1281,7 +1286,7 @@ function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand,
     if (repoDeploy) {
         // Configure Artifactory deployer server.
         const usageType = cmd + tl.getInput('command', true) + '_deployer';
-        serverIdDeploy = configureDefaultArtifactoryServer(usageType, cliPath, requiredWorkDir);
+        serverIdDeploy = await configureDefaultArtifactoryServer(usageType, cliPath, requiredWorkDir);
 
         // Add serverId and repo to config command.
         cliCommand = cliJoin(cliCommand, '--server-id-deploy=' + quote(serverIdDeploy));

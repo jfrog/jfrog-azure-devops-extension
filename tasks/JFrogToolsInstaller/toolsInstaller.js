@@ -25,7 +25,7 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     utils.executeCliTask(RunTaskCbk, cliVersion, downloadUrl, authHandlers);
 }
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let installExtractors = tl.getBoolInput('installExtractors');
     if (!installExtractors) {
         tl.setResult(tl.TaskResult.Succeeded, 'Tools installed successfully.');
@@ -43,7 +43,7 @@ function RunTaskCbk(cliPath) {
     // Config a temporary serverId for maven and Gradle extractors download:
     let serverId;
     try {
-        serverId = utils.configureDefaultArtifactoryServer('extractors_resolver', cliPath, workDir);
+        serverId = await utils.configureDefaultArtifactoryServer('extractors_resolver', cliPath, workDir);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;

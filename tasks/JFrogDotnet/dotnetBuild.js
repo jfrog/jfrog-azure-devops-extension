@@ -8,14 +8,14 @@ const cliUploadCommand = 'rt u';
 const dotnetConfigCommand = 'dotnetc';
 
 // The .NET Core CLI is included in all Azure-hosted agents
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let dotnetCommand = tl.getInput('command', true);
     switch (dotnetCommand) {
         case 'restore':
             performDotnetRestore(cliPath);
             break;
         case 'push':
-            performDotnetNugetPush(cliPath);
+            await performDotnetNugetPush(cliPath);
             break;
         case 'custom':
             performDotnetCustomCommand(cliPath);
@@ -50,7 +50,7 @@ function performDotnetCustomCommand(cliPath) {
     performDotnetCommand(cliPath, 'dotnet ' + customCommand);
 }
 
-function performDotnetNugetPush(cliPath) {
+async function performDotnetNugetPush(cliPath) {
     let buildDir = tl.getVariable('System.DefaultWorkingDirectory');
     let targetPath = tl.getInput('targetDeployRepo', true);
     let relativeTargetPath = tl.getInput('targetDeployPath');
@@ -60,7 +60,7 @@ function performDotnetNugetPush(cliPath) {
 
     let nupkgPath = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
     let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), utils.quote(targetPath));
-    let serverId = utils.configureDefaultArtifactoryServer('dotnet_nuget_push', cliPath, buildDir);
+    let serverId = await utils.configureDefaultArtifactoryServer('dotnet_nuget_push', cliPath, buildDir);
     uploadCommand = utils.addServerIdOption(uploadCommand, serverId);
     uploadCommand = utils.cliJoin(uploadCommand, '--flat=' + utils.quote('true'));
     executeCliCommand(uploadCommand, buildDir, cliPath, [serverId]);
@@ -83,7 +83,7 @@ function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
     let cliCommand = utils.cliJoin(cliPath, dotnetConfigCommand);
 
     // Create serverId
-    const resolverServerId = utils.configureDefaultArtifactoryServer('dotnet_resolver', cliPath, requiredWorkDir);
+    const resolverServerId = await utils.configureDefaultArtifactoryServer('dotnet_resolver', cliPath, requiredWorkDir);
 
     // Add serverId and repo to config command
     cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(resolverServerId));

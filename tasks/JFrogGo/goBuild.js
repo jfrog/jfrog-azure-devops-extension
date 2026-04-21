@@ -9,7 +9,7 @@ const resolutionRepoInputName = 'resolutionRepo';
 const deploymentRepoInputName = 'targetRepo';
 let configuredServerIdsArray;
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -31,25 +31,25 @@ function RunTaskCbk(cliPath) {
         case 'build':
         case 'test':
         case 'get': {
-            performGoCommand(inputCommand, cliPath, requiredWorkDir);
+            await performGoCommand(inputCommand, cliPath, requiredWorkDir);
             break;
         }
         case 'custom': {
             let customCommand = tl.getInput('customCommand', true);
-            performGoCommand(customCommand, cliPath, requiredWorkDir);
+            await performGoCommand(customCommand, cliPath, requiredWorkDir);
             break;
         }
         case 'publish': {
-            performGoPublishCommand(cliPath, requiredWorkDir);
+            await performGoPublishCommand(cliPath, requiredWorkDir);
             break;
         }
     }
 }
 
-function performGoCommand(goCommand, cliPath, requiredWorkDir) {
+async function performGoCommand(goCommand, cliPath, requiredWorkDir) {
     // Create config file and configure cli server
     try {
-        performGoConfig(cliPath, requiredWorkDir, resolutionRepoInputName, null);
+        await performGoConfig(cliPath, requiredWorkDir, resolutionRepoInputName, null);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;
@@ -71,15 +71,15 @@ function performGoCommand(goCommand, cliPath, requiredWorkDir) {
  * @param repoResolve - Resolution repo input name, null if not needed.
  * @param repoDeploy - Deployment repo input name, null if not needed.
  */
-function performGoConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
-    configuredServerIdsArray = utils.createBuildToolConfigFile(cliPath, 'go', requiredWorkDir, cliGoConfigCommand, repoResolve, repoDeploy);
+async function performGoConfig(cliPath, requiredWorkDir, repoResolve, repoDeploy) {
+    configuredServerIdsArray = await utils.createBuildToolConfigFile(cliPath, 'go', requiredWorkDir, cliGoConfigCommand, repoResolve, repoDeploy);
 }
 
-function performGoPublishCommand(cliPath, requiredWorkDir) {
+async function performGoPublishCommand(cliPath, requiredWorkDir) {
     let version = tl.getInput('version', false);
 
     try {
-        performGoConfig(cliPath, requiredWorkDir, null, deploymentRepoInputName);
+        await performGoConfig(cliPath, requiredWorkDir, null, deploymentRepoInputName);
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex);
         return;

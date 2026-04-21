@@ -6,7 +6,7 @@ const fs = require('fs');
 const cliCollectIssuesCommand = 'rt bag';
 let serverId;
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -35,7 +35,7 @@ function RunTaskCbk(cliPath) {
         return;
     }
 
-    serverId = utils.configureDefaultArtifactoryServer('collect_issues', cliPath, requiredWorkDir);
+    serverId = await utils.configureDefaultArtifactoryServer('collect_issues', cliPath, requiredWorkDir);
 
     let cliCommand = utils.cliJoin(
         cliPath,

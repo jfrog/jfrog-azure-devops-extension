@@ -4,13 +4,13 @@ const utils = require('@jfrog/tasks-utils/utils.js');
 const cliDiscardCommand = 'rt bdi';
 let serverId;
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
         return;
     }
-    serverId = utils.configureDefaultArtifactoryServer('discard_build', cliPath, workDir);
+    serverId = await utils.configureDefaultArtifactoryServer('discard_build', cliPath, workDir);
 
     let buildName = tl.getInput('buildName', true);
 
