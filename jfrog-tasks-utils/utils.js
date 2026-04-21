@@ -11,7 +11,7 @@ const semver = require('semver');
 const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
-const fallbackCliVersion = '2.89.0';
+const fallbackCliVersion = '2.99.0';
 let defaultJfrogCliVersion = '2.102.0';
 
 /**
