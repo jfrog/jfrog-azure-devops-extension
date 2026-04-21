@@ -12,7 +12,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const fallbackCliVersion = '2.99.0';
-let defaultJfrogCliVersion = '2.101.0';
+let defaultJfrogCliVersion = '2.102.0';
 
 /**
  * Executes an HTTP request with retry logic for 5xx errors.
@@ -144,7 +144,7 @@ const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
 const minSupportedOidcCliVersion = '2.75.0';
-const pluginVersion = '2.13.0';
+const pluginVersion = '2.14.0';
 const buildAgent = 'jfrog-azure-devops-extension';
 
 /**
