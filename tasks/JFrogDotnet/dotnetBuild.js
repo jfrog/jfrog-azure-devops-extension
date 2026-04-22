@@ -12,42 +12,42 @@ async function RunTaskCbk(cliPath) {
     let dotnetCommand = tl.getInput('command', true);
     switch (dotnetCommand) {
         case 'restore':
-            performDotnetRestore(cliPath);
+            await performDotnetRestore(cliPath);
             break;
         case 'push':
             await performDotnetNugetPush(cliPath);
             break;
         case 'custom':
-            performDotnetCustomCommand(cliPath);
+            await performDotnetCustomCommand(cliPath);
             break;
     }
 }
 
-function performDotnetRestore(cliPath) {
-    performDotnetCommand(cliPath, cliDotnetCoreRestoreCommand);
+async function performDotnetRestore(cliPath) {
+    await performDotnetCommand(cliPath, cliDotnetCoreRestoreCommand);
 }
 
-function performDotnetCommand(cliPath, commandName) {
+async function performDotnetCommand(cliPath, commandName) {
     let sourcesPattern = tl.getInput('rootPath');
     let filesList = solutionPathUtil.resolveFilterSpec(sourcesPattern, tl.getVariable('System.DefaultWorkingDirectory') || process.cwd());
     // A source file is a solution or csproj file.
-    filesList.forEach((sourceFile) => {
+    for (const sourceFile of filesList) {
         let sourcePath;
         if (!fs.lstatSync(sourceFile).isDirectory()) {
             sourcePath = dirname(sourceFile);
         } else {
             sourcePath = sourceFile;
         }
-        let resolverServerId = performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
+        let resolverServerId = await performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
         let dotnetArguments = buildDotnetCliArgs();
         let dotnetCommand = utils.cliJoin(cliPath, commandName, dotnetArguments);
         executeCliCommand(dotnetCommand, sourcePath, cliPath, [resolverServerId]);
-    });
+    }
 }
 
-function performDotnetCustomCommand(cliPath) {
+async function performDotnetCustomCommand(cliPath) {
     let customCommand = tl.getInput('customCommand');
-    performDotnetCommand(cliPath, 'dotnet ' + customCommand);
+    await performDotnetCommand(cliPath, 'dotnet ' + customCommand);
 }
 
 async function performDotnetNugetPush(cliPath) {
@@ -79,7 +79,7 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) 
 }
 
 // Create dotnet config
-function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
+async function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
     let cliCommand = utils.cliJoin(cliPath, dotnetConfigCommand);
 
     // Create serverId

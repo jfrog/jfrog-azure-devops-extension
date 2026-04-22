@@ -28,11 +28,10 @@ async function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
  */
 async function downloadAndRunNuget(cliPath, nugetCommand) {
     console.log('NuGet not found in Path. Downloading...');
-    toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe').then((downloadPath) => {
-        fs.chmodSync(downloadPath, 0o555);
-        toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
-        await addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
-    });
+    const downloadPath = await toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe');
+    fs.chmodSync(downloadPath, 0o555);
+    toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
+    await addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
 }
 
 // This triggered after downloading the CLI.
@@ -66,7 +65,7 @@ async function exec(cliPath, nugetCommand) {
         // Perform restore command.
         let solutionPattern = tl.getInput('solutionPath');
         let filesList = solutionPathUtil.resolveFilterSpec(solutionPattern, tl.getVariable('System.DefaultWorkingDirectory') || process.cwd());
-        filesList.forEach((solutionFile) => {
+        for (const solutionFile of filesList) {
             let solutionPath;
             if (!fs.lstatSync(solutionFile).isDirectory()) {
                 solutionPath = dirname(solutionFile);
@@ -75,9 +74,9 @@ async function exec(cliPath, nugetCommand) {
             }
             let nugetArguments = addNugetArgsToCommands();
             nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
-            let resolverServerId = performNugetConfig(cliPath, solutionPath, 'targetResolveRepo');
+            let resolverServerId = await performNugetConfig(cliPath, solutionPath, 'targetResolveRepo');
             runNuGet(nugetCommandCli, solutionPath, cliPath, [resolverServerId]);
-        });
+        }
     } else {
         // Perform push command.
         let targetPath = tl.getInput('targetDeployRepo', true);
@@ -107,7 +106,7 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerIdsArray) 
 }
 
 // Create nuget config
-function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
+async function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
     let cliCommand = utils.cliJoin(cliPath, nugetConfigCommand);
 
     // Create serverId

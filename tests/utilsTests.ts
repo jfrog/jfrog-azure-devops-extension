@@ -320,4 +320,34 @@ describe('Utils Unit Tests', (): void => {
             assert.strictEqual(semver.lt('2.74.9', minOidcVersion), true);
         });
     });
+
+    // Regression guard for https://github.com/jfrog/jfrog-azure-devops-extension/issues/608 :
+    // the silent OIDC failure was caused by configureArtifactoryCliServer,
+    // configureDistributionCliServer, and configureXrayCliServer no longer invoking
+    // the OIDC exchange after the proxy-support refactor in PR #593. Catches any future
+    // refactor that moves OIDC out of one of the four configure paths.
+    describe('OIDC exchange wiring across connection types (regression for #608)', (): void => {
+        it('every configure*CliServer function calls fetchOidcTokenIfConfigured', (): void => {
+            const utilsPath: string = require.resolve('@jfrog/tasks-utils/utils.js');
+            const src: string = require('fs').readFileSync(utilsPath, 'utf8');
+
+            const wrappers: readonly string[] = [
+                'configureJfrogCliServer',
+                'configureArtifactoryCliServer',
+                'configureDistributionCliServer',
+                'configureXrayCliServer',
+            ];
+
+            for (const name of wrappers) {
+                const re: RegExp = new RegExp(`function\\s+${name}\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\n\\}`, 'm');
+                const match: RegExpMatchArray | null = src.match(re);
+                assert.ok(match, `${name} not found in utils.js`);
+                assert.match(
+                    match![1],
+                    /fetchOidcTokenIfConfigured\s*\(/,
+                    `${name} must call fetchOidcTokenIfConfigured — regression of issue #608`,
+                );
+            }
+        });
+    });
 });

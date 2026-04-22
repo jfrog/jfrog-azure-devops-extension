@@ -31,12 +31,14 @@ declare module '@jfrog/tasks-utils' {
     export function appendBuildFlagsToCliCommand(cliCommand: string): string;
     export function isToolExists(tool: string): boolean;
     export function removeExtractorsDownloadVariables(cliPath: string, workDir: string): void;
-    export function configureArtifactoryCliServer(artifactoryService: string, serverId: string, cliPath: string, buildDir: string): void;
+    export function configureArtifactoryCliServer(artifactoryService: string, serverId: string, cliPath: string, buildDir: string): Promise<void>;
+    export function configureDistributionCliServer(distributionService: string, serverId: string, cliPath: string, buildDir: string): Promise<void>;
+    export function configureXrayCliServer(xrayService: string, serverId: string, cliPath: string, buildDir: string): Promise<void>;
     export function configureJfrogCliServer(jfrogService: string, serverId: string, cliPath: string, buildDir: string): Promise<void>;
     export function configureDefaultJfrogServer(serverId: string, cliPath: string, workDir: string): Promise<boolean>;
-    export function configureDefaultArtifactoryServer(usageType: string, cliPath: string, workDir: string): string;
-    export function configureDefaultDistributionServer(usageType: string, cliPath: string, workDir: string): string;
-    export function configureDefaultXrayServer(usageType: string, cliPath: string, workDir: string): string;
+    export function configureDefaultArtifactoryServer(usageType: string, cliPath: string, workDir: string): Promise<string>;
+    export function configureDefaultDistributionServer(usageType: string, cliPath: string, workDir: string): Promise<string>;
+    export function configureDefaultXrayServer(usageType: string, cliPath: string, workDir: string): Promise<string>;
     export function createBuildToolConfigFile(
         cliPath: string,
         cmd: string,
@@ -44,7 +46,8 @@ declare module '@jfrog/tasks-utils' {
         configCommand: string,
         repoResolver: string,
         repoDeploy: string,
-    ): string[];
+    ): Promise<string[]>;
+    export function fetchOidcTokenIfConfigured(service: string, cliPath: string, buildDir: string): Promise<string | undefined>;
     export function forwardProxyToEnv(): void;
     export function getProxyConfiguration(): object;
     export function setJdkHomeForJavaTasks(): void;
