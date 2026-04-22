@@ -1,5 +1,7 @@
 /// <reference types="mocha" />
 import * as assert from 'assert';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as semver from 'semver';
 
 // Use require to get the actual module with latest exports
@@ -328,8 +330,8 @@ describe('Utils Unit Tests', (): void => {
     // refactor that moves OIDC out of one of the four configure paths.
     describe('OIDC exchange wiring across connection types (regression for #608)', (): void => {
         it('every configure*CliServer function calls fetchOidcTokenIfConfigured', (): void => {
-            const utilsPath: string = require.resolve('@jfrog/tasks-utils/utils.js');
-            const src: string = require('fs').readFileSync(utilsPath, 'utf8');
+            const utilsPath: string = path.join(__dirname, 'node_modules', '@jfrog', 'tasks-utils', 'utils.js');
+            const src: string = fs.readFileSync(utilsPath, 'utf8');
 
             const wrappers: readonly string[] = [
                 'configureJfrogCliServer',
