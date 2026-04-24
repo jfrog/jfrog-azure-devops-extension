@@ -4,12 +4,12 @@ import * as tl from 'azure-pipelines-task-lib/task';
 const cliAuditCommand: string = 'audit';
 let serverId: string;
 
-function RunTaskCbk(cliPath: string): void {
+async function RunTaskCbk(cliPath: string): Promise<void> {
     const inputWorkingDirectory: string = tl.getInput('workingDirectory', false) ?? '';
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') ?? process.cwd();
     const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
 
-    serverId = utils.configureDefaultXrayServer('xray_audit', cliPath, sourcePath);
+    serverId = await utils.configureDefaultXrayServer('xray_audit', cliPath, sourcePath);
 
     let auditCommand: string = utils.cliJoin(cliPath, cliAuditCommand);
     auditCommand = utils.addServerIdOption(auditCommand, serverId);

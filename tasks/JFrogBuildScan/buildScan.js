@@ -4,7 +4,7 @@ const utils = require('@jfrog/tasks-utils/utils.js');
 const cliXrayBuildScanCommand = 'bs';
 let serverId;
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!workDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -14,7 +14,7 @@ function RunTaskCbk(cliPath) {
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
 
-    serverId = utils.configureDefaultXrayServer('xray_build_scan', cliPath, workDir);
+    serverId = await utils.configureDefaultXrayServer('xray_build_scan', cliPath, workDir);
 
     let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber));
     cliCommand = utils.addBoolParam(cliCommand, 'vuln', 'vuln');

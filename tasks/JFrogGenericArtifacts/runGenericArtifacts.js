@@ -12,7 +12,7 @@ const cliCopyCommand = 'rt cp';
 const cliDeleteArtifactsCommand = 'rt del';
 let serverId;
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let defaultWorkDir = tl.getVariable('System.DefaultWorkingDirectory');
     if (!defaultWorkDir) {
         tl.setResult(tl.TaskResult.Failed, 'Failed getting default working directory.');
@@ -29,7 +29,7 @@ function RunTaskCbk(cliPath) {
     // The 'connection' input parameter is used by Artifact Source Download and cannot be renamed due to Azure limitations.
     let artifactoryService = tl.getInput('connection', true);
     serverId = utils.assembleUniqueServerId('generic');
-    utils.configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
+    await utils.configureArtifactoryCliServer(artifactoryService, serverId, cliPath, workDir);
 
     // Decide if the task runs as generic or artifact-source download.
     let definition = tl.getInput('definition', false);

@@ -9,38 +9,38 @@ const cliRbdCommand: string = 'ds rbd';
 const cliRbdelCommand: string = 'ds rbdel';
 let serverId: string;
 
-function RunTaskCbk(cliPath: string): void {
+async function RunTaskCbk(cliPath: string): Promise<void> {
     const workDir: string = getWorkDir();
     const rbCommand: string = tl.getInput('command', true) ?? '';
     switch (rbCommand) {
         case 'create':
-            performRbCreate(cliPath, workDir);
+            await performRbCreate(cliPath, workDir);
             break;
         case 'update':
-            performRbUpdate(cliPath, workDir);
+            await performRbUpdate(cliPath, workDir);
             break;
         case 'sign':
-            performRbSign(cliPath, workDir);
+            await performRbSign(cliPath, workDir);
             break;
         case 'distribute':
-            performRbDistribute(cliPath, workDir);
+            await performRbDistribute(cliPath, workDir);
             break;
         case 'delete':
-            performRbDelete(cliPath, workDir);
+            await performRbDelete(cliPath, workDir);
             break;
     }
 }
 
-function performRbCreate(cliPath: string, workDir: string): void {
-    performRbCreateUpdate(cliPath, workDir, cliRbcCommand);
+async function performRbCreate(cliPath: string, workDir: string): Promise<void> {
+    await performRbCreateUpdate(cliPath, workDir, cliRbcCommand);
 }
 
-function performRbUpdate(cliPath: string, workDir: string): void {
-    performRbCreateUpdate(cliPath, workDir, cliRbuCommand);
+async function performRbUpdate(cliPath: string, workDir: string): Promise<void> {
+    await performRbCreateUpdate(cliPath, workDir, cliRbuCommand);
 }
 
-function performRbCreateUpdate(cliPath: string, workDir: string, cliCommandName: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliCommandName, workDir);
+async function performRbCreateUpdate(cliPath: string, workDir: string, cliCommandName: string): Promise<void> {
+    let cliCommand: string = await getCliCmdBase(cliPath, cliCommandName, workDir);
 
     const specPath: string = join(workDir, 'rbSpec' + Date.now() + '.json');
     cliCommand = utils.handleSpecFile(cliCommand, specPath);
@@ -66,8 +66,8 @@ function performRbCreateUpdate(cliPath: string, workDir: string, cliCommandName:
     execCli(cliPath, workDir, cliCommand, true, true);
 }
 
-function performRbSign(cliPath: string, workDir: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliRbsCommand, workDir);
+async function performRbSign(cliPath: string, workDir: string): Promise<void> {
+    let cliCommand: string = await getCliCmdBase(cliPath, cliRbsCommand, workDir);
 
     cliCommand = utils.addStringParam(cliCommand, 'passphrase', 'passphrase', false);
 
@@ -78,8 +78,8 @@ function performRbSign(cliPath: string, workDir: string): void {
     execCli(cliPath, workDir, cliCommand, false, true);
 }
 
-function performRbDistribute(cliPath: string, workDir: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliRbdCommand, workDir);
+async function performRbDistribute(cliPath: string, workDir: string): Promise<void> {
+    let cliCommand: string = await getCliCmdBase(cliPath, cliRbdCommand, workDir);
     try {
         const filePath: string = getDistRulesFilePath(workDir);
         cliCommand = utils.cliJoin(cliCommand, '--dist-rules=' + utils.quote(filePath));
@@ -96,8 +96,8 @@ function performRbDistribute(cliPath: string, workDir: string): void {
     execCli(cliPath, workDir, cliCommand, true, true);
 }
 
-function performRbDelete(cliPath: string, workDir: string): void {
-    let cliCommand: string = getCliCmdBase(cliPath, cliRbdelCommand, workDir);
+async function performRbDelete(cliPath: string, workDir: string): Promise<void> {
+    let cliCommand: string = await getCliCmdBase(cliPath, cliRbdelCommand, workDir);
     try {
         const filePath: string = getDistRulesFilePath(workDir);
         cliCommand = utils.cliJoin(cliCommand, '--dist-rules=' + utils.quote(filePath));
@@ -157,11 +157,11 @@ function getWorkDir(): string {
  * @param cliCommandName - Command name to run, including prefix.
  * @param workDir - Working directory.
  */
-function getCliCmdBase(cliPath: string, cliCommandName: string, workDir: string): string {
+async function getCliCmdBase(cliPath: string, cliCommandName: string, workDir: string): Promise<string> {
     const rbName: string = tl.getInput('rbName', true) ?? '';
     const rbVersion: string = tl.getInput('rbVersion', true) ?? '';
     const cliCommand: string = utils.cliJoin(cliPath, cliCommandName, rbName, rbVersion);
-    serverId = utils.configureDefaultDistributionServer('distribution_' + cliCommandName.replace(' ', '_'), cliPath, workDir);
+    serverId = await utils.configureDefaultDistributionServer('distribution_' + cliCommandName.replace(' ', '_'), cliPath, workDir);
     return utils.addServerIdOption(cliCommand, serverId);
 }
 

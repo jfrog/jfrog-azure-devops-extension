@@ -17,48 +17,47 @@ const nugetConfigCommand = 'nugetc';
  * @param nugetCommand - The NuGet command that configured for the task
  * @param nugetVersion - The NuGet version to add to Path.
  */
-function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
+async function addToPathAndExec(cliPath, nugetCommand, nugetVersion) {
     let toolPath = toolLib.findLocalTool(NUGET_TOOL_NAME, nugetVersion);
     toolLib.prependPath(toolPath);
-    exec(cliPath, nugetCommand);
+    await exec(cliPath, nugetCommand);
 }
 
 /**
  * Download NuGet version, adds to the path and executes.
  */
-function downloadAndRunNuget(cliPath, nugetCommand) {
+async function downloadAndRunNuget(cliPath, nugetCommand) {
     console.log('NuGet not found in Path. Downloading...');
-    toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe').then((downloadPath) => {
-        fs.chmodSync(downloadPath, 0o555);
-        toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
-        addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
-    });
+    const downloadPath = await toolLib.downloadTool('https://dist.nuget.org/win-x86-commandline/v' + NUGET_VERSION + '/nuget.exe');
+    fs.chmodSync(downloadPath, 0o555);
+    toolLib.cacheFile(downloadPath, NUGET_EXE_FILENAME, NUGET_TOOL_NAME, NUGET_VERSION);
+    await addToPathAndExec(cliPath, nugetCommand, NUGET_VERSION);
 }
 
 // This triggered after downloading the CLI.
 // First we will check for NuGet in the Env Path. If exists, this one will be used.
 // Secondly, we will check the local cache and use the latest version in the caceh.
 // If not exists in the cache, we will download the NuGet executable from NuGet
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let nugetCommand = tl.getInput('command', true);
     let nugetExec = tl.which('nuget', false);
     if (!nugetExec && nugetCommand.localeCompare('restore') === 0) {
         let localVersions = toolLib.findLocalToolVersions(NUGET_TOOL_NAME);
         if (localVersions === undefined || localVersions.length === 0) {
-            downloadAndRunNuget(cliPath, nugetCommand);
+            await downloadAndRunNuget(cliPath, nugetCommand);
         } else {
             console.log('The following version/s ' + localVersions + ' were found on the build agent');
-            addToPathAndExec(cliPath, nugetCommand, localVersions[localVersions.length - 1]);
+            await addToPathAndExec(cliPath, nugetCommand, localVersions[localVersions.length - 1]);
         }
     } else {
-        exec(cliPath, nugetCommand);
+        await exec(cliPath, nugetCommand);
     }
 }
 
 utils.executeCliTask(RunTaskCbk);
 
 // Executing JFrog CLI with NuGet
-function exec(cliPath, nugetCommand) {
+async function exec(cliPath, nugetCommand) {
     let buildDir = tl.getVariable('System.DefaultWorkingDirectory');
     // Get configured parameters
     let nugetCommandCli;
@@ -66,7 +65,7 @@ function exec(cliPath, nugetCommand) {
         // Perform restore command.
         let solutionPattern = tl.getInput('solutionPath');
         let filesList = solutionPathUtil.resolveFilterSpec(solutionPattern, tl.getVariable('System.DefaultWorkingDirectory') || process.cwd());
-        filesList.forEach((solutionFile) => {
+        for (const solutionFile of filesList) {
             let solutionPath;
             if (!fs.lstatSync(solutionFile).isDirectory()) {
                 solutionPath = dirname(solutionFile);
@@ -75,9 +74,9 @@ function exec(cliPath, nugetCommand) {
             }
             let nugetArguments = addNugetArgsToCommands();
             nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
-            let resolverServerId = performNugetConfig(cliPath, solutionPath, 'targetResolveRepo');
+            let resolverServerId = await performNugetConfig(cliPath, solutionPath, 'targetResolveRepo');
             runNuGet(nugetCommandCli, solutionPath, cliPath, [resolverServerId]);
-        });
+        }
     } else {
         // Perform push command.
         let targetPath = tl.getInput('targetDeployRepo', true);
@@ -87,7 +86,7 @@ function exec(cliPath, nugetCommand) {
         }
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
         nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(pathToNupkg), utils.quote(targetPath));
-        const deployerServerId = utils.configureDefaultArtifactoryServer('nuget_deployer', cliPath, buildDir);
+        const deployerServerId = await utils.configureDefaultArtifactoryServer('nuget_deployer', cliPath, buildDir);
         nugetCommandCli = utils.addServerIdOption(nugetCommandCli, deployerServerId);
         nugetCommandCli = utils.cliJoin(nugetCommandCli, '--flat=' + utils.quote('true'));
         runNuGet(nugetCommandCli, buildDir, cliPath, [deployerServerId]);
@@ -107,11 +106,11 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerIdsArray) 
 }
 
 // Create nuget config
-function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
+async function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
     let cliCommand = utils.cliJoin(cliPath, nugetConfigCommand);
 
     // Create serverId
-    const resolverServerId = utils.configureDefaultArtifactoryServer('nuget_resolver', cliPath, requiredWorkDir);
+    const resolverServerId = await utils.configureDefaultArtifactoryServer('nuget_resolver', cliPath, requiredWorkDir);
 
     // Add serverId and repo to config command
     cliCommand = utils.cliJoin(cliCommand, '--server-id-resolve=' + utils.quote(resolverServerId));

@@ -4,7 +4,7 @@ import * as tl from 'azure-pipelines-task-lib/task';
 const cliDockerCommand: string = 'docker';
 let serverId: string;
 
-function RunTaskCbk(cliPath: string): void {
+async function RunTaskCbk(cliPath: string): Promise<void> {
     // Validate docker exists on agent
     if (!utils.isToolExists('docker')) {
         tl.setResult(tl.TaskResult.Failed, 'Agent is missing required tool: docker.');
@@ -22,12 +22,12 @@ function RunTaskCbk(cliPath: string): void {
     switch (command) {
         case 'Push':
         case 'Pull': {
-            serverId = utils.configureDefaultArtifactoryServer('docker_' + command, cliPath, defaultWorkDir);
+            serverId = await utils.configureDefaultArtifactoryServer('docker_' + command, cliPath, defaultWorkDir);
             cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
             break;
         }
         case 'Scan': {
-            serverId = utils.configureDefaultXrayServer('xray_docker_scan', cliPath, defaultWorkDir);
+            serverId = await utils.configureDefaultXrayServer('xray_docker_scan', cliPath, defaultWorkDir);
             cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
 
             if (tl.getBoolInput('allowBypassArchiveLimits', false)) {

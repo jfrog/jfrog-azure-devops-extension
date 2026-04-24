@@ -5,7 +5,7 @@ const join = require('path').join;
 const cliBuildPublishCommand = 'rt bp';
 let serverId;
 
-function RunTaskCbk(cliPath) {
+async function RunTaskCbk(cliPath) {
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
@@ -15,7 +15,7 @@ function RunTaskCbk(cliPath) {
     }
 
     // Get input parameters
-    serverId = utils.configureDefaultArtifactoryServer('build_publish', cliPath, workDir);
+    serverId = await utils.configureDefaultArtifactoryServer('build_publish', cliPath, workDir);
     let excludeEnvVars = tl.getInput('excludeEnvVars', false);
 
     let cliCommand = utils.cliJoin(
