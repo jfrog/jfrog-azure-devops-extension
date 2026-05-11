@@ -391,7 +391,7 @@ This requires you to fill in the following inputs:
 | Description (optional)       | A short of the purpose of this ServiceConnection                                                       |
 
 
-A sample configuration would look like this:
+A sample configuration would look like this testing: 
 
 ![oidc-service-connection.png](images/oidc-service-connection.png)
 
