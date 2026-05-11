@@ -1,0 +1,207 @@
+# Sanity test pipeline for the JFrog Azure DevOps Extension.
+#
+# PURPOSE
+# -------
+# This pipeline is the automated replacement for the manual sanity test
+# described in the release guide.  It is triggered by the GitHub Actions
+# workflow (.github/workflows/e2e-plugin-tests.yml) after a fresh build of
+# the extension is published and installed into the dev ADO organisation.
+#
+# WHAT IT TESTS
+# -------------
+# The pipeline covers the most-critical non-OIDC task flows so that a basic
+# regression is caught before the developer even opens a PR:
+#
+#   1. JFrogToolsInstaller  - download & cache JFrog CLI
+#   2. JFrogGenericArtifacts (Upload)  - upload a test file (configureArtifactoryCliServer)
+#   3. JFrogGenericArtifacts (Download) - download it back
+#   4. JFrogMaven  - full Maven resolve + deploy (configureArtifactoryCliServer)
+#   5. JFrogPublishBuildInfo  - publish build info  (configureDefaultArtifactoryServer)
+#   6. JFrogDiscardBuilds  - clean up (configureDefaultArtifactoryServer)
+#
+# ONE-TIME ADO SETUP (done once per team dev org)
+# ------------------------------------------------
+#   1. In your ADO organisation, create a "JFrog Platform" service connection.
+#      Name it exactly: jfrog-sanity-connection
+#      Point it to a test/dev JFrog Platform instance.
+#
+#   2. In that Artifactory instance, create these repositories:
+#        Generic (local) : sanity-generic-local
+#        Maven (local)   : sanity-libs-release-local, sanity-libs-snapshot-local
+#        Maven (remote)  : sanity-libs-release   (proxy: https://repo.maven.apache.org/maven2)
+#                          sanity-libs-snapshot  (proxy: https://repo.maven.apache.org/maven2)
+#
+#   3. Create a GitHub service connection named: github-jfrog-public
+#      Set it to read from https://github.com/jfrog/project-examples (public, read-only).
+#
+#   4. Import this YAML file as a pipeline in ADO.
+#      Note the pipeline Definition ID and store it in GitHub secret ADO_SANITY_PIPELINE_ID.
+#
+# TRACEABILITY
+# ------------
+# GitHub Actions passes GH_PR_NUMBER and GH_COMMIT_SHA as pipeline variables
+# so every ADO run can be correlated back to the exact PR and commit.
+
+trigger: none   # Only triggered via REST API from GitHub Actions.
+
+parameters:
+  - name: serviceConnection
+    displayName: 'JFrog Platform Service Connection'
+    type: string
+    default: 'jfrog-sanity-connection'
+
+  - name: githubConnection
+    displayName: 'GitHub Service Connection (public repos)'
+    type: string
+    default: 'github-jfrog-public'
+
+variables:
+  # Passed in by GitHub Actions via the pipeline run API variables field.
+  GH_PR_NUMBER:  $[coalesce(variables['GH_PR_NUMBER'],  '0')]
+  GH_COMMIT_SHA: $[coalesce(variables['GH_COMMIT_SHA'], 'unknown')]
+  BUILD_NAME:    'sanity-pr$(GH_PR_NUMBER)-$(Build.BuildId)'
+  BUILD_NUMBER:  '$(Build.BuildNumber)'
+
+pool:
+  vmImage: 'ubuntu-22.04'
+
+resources:
+  repositories:
+    # Public repo containing the Maven example project.
+    # No credentials needed — it is a public repository.
+    - repository: projectExamples
+      type: github
+      endpoint: ${{ parameters.githubConnection }}
+      name: jfrog/project-examples
+      ref: refs/heads/master
+
+steps:
+  # ------------------------------------------------------------------ #
+  # 0. Identify the build                                               #
+  # ------------------------------------------------------------------ #
+  - script: |
+      echo "##[section]Sanity test triggered by GitHub PR #$(GH_PR_NUMBER) — commit $(GH_COMMIT_SHA)"
+      echo "Build name : $(BUILD_NAME)"
+      echo "Build number: $(BUILD_NUMBER)"
+    displayName: 'Print traceability info'
+
+  # ------------------------------------------------------------------ #
+  # 1. Install JFrog CLI                                                #
+  #    Verifies: JFrogToolsInstaller task works end-to-end.            #
+  # ------------------------------------------------------------------ #
+  - task: JFrogToolsInstaller@1
+    displayName: 'Install JFrog CLI'
+    inputs:
+      artifactoryConnection: ${{ parameters.serviceConnection }}
+      cliInstallationRepo: 'jfrog-cli-remote'
+      # 'LATEST' downloads whichever CLI version is configured as default
+      # in the extension. Override here if you need a specific version.
+      installJFrogCli: true
+
+  # ------------------------------------------------------------------ #
+  # 2-3. Generic upload + download                                      #
+  #      Verifies: configureArtifactoryCliServer (direct) path.        #
+  # ------------------------------------------------------------------ #
+  - checkout: self
+    displayName: 'Checkout extension repo (for test file)'
+
+  - script: echo "sanity test file — PR $(GH_PR_NUMBER) — $(GH_COMMIT_SHA)" > /tmp/sanity.txt
+    displayName: 'Create test file'
+
+  - task: JFrogGenericArtifacts@1
+    displayName: 'Upload test file'
+    inputs:
+      command: Upload
+      connection: ${{ parameters.serviceConnection }}
+      specSource: taskConfiguration
+      fileSpec: |
+        {
+          "files": [{
+            "pattern": "/tmp/sanity.txt",
+            "target":  "sanity-generic-local/sanity-pr$(GH_PR_NUMBER)/"
+          }]
+        }
+      collectBuildInfo: true
+      buildName: '$(BUILD_NAME)'
+      buildNumber: '$(BUILD_NUMBER)'
+      includeEnvVars: false
+
+  - task: JFrogGenericArtifacts@1
+    displayName: 'Download test file back'
+    inputs:
+      command: Download
+      connection: ${{ parameters.serviceConnection }}
+      specSource: taskConfiguration
+      fileSpec: |
+        {
+          "files": [{
+            "pattern": "sanity-generic-local/sanity-pr$(GH_PR_NUMBER)/sanity.txt",
+            "target":  "/tmp/sanity-downloaded/"
+          }]
+        }
+      collectBuildInfo: true
+      buildName: '$(BUILD_NAME)'
+      buildNumber: '$(BUILD_NUMBER)'
+
+  - script: |
+      if diff /tmp/sanity.txt /tmp/sanity-downloaded/sanity-pr$(GH_PR_NUMBER)/sanity.txt; then
+        echo "Upload/download round-trip: PASSED"
+      else
+        echo "Upload/download round-trip: FAILED — files differ"
+        exit 1
+      fi
+    displayName: 'Verify download matches upload'
+
+  # ------------------------------------------------------------------ #
+  # 4. Maven build (resolve + deploy)                                   #
+  #    Verifies: configureArtifactoryCliServer used by Maven task.     #
+  # ------------------------------------------------------------------ #
+  - checkout: projectExamples
+    displayName: 'Checkout project-examples (Maven POM)'
+
+  - task: JavaToolInstaller@0
+    displayName: 'Install Java 11'
+    inputs:
+      versionSpec: '11'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+
+  - task: JFrogMaven@1
+    displayName: 'Maven: resolve from Artifactory, deploy to Artifactory'
+    inputs:
+      mavenPOMFile: 'project-examples/maven-examples/maven-example/pom.xml'
+      goals: 'install -DskipTests'
+      artifactoryResolverService: ${{ parameters.serviceConnection }}
+      targetResolveReleaseRepo:   'sanity-libs-release'
+      targetResolveSnapshotRepo:  'sanity-libs-snapshot'
+      artifactoryDeployService:   ${{ parameters.serviceConnection }}
+      targetDeployReleaseRepo:    'sanity-libs-release-local'
+      targetDeploySnapshotRepo:   'sanity-libs-snapshot-local'
+      collectBuildInfo: true
+      buildName:   '$(BUILD_NAME)'
+      buildNumber: '$(BUILD_NUMBER)'
+      includeEnvVars: false
+
+  # ------------------------------------------------------------------ #
+  # 5. Publish Build Info                                               #
+  #    Verifies: configureDefaultArtifactoryServer path.               #
+  # ------------------------------------------------------------------ #
+  - task: JFrogPublishBuildInfo@1
+    displayName: 'Publish Build Info'
+    inputs:
+      artifactoryConnection: ${{ parameters.serviceConnection }}
+      buildName:   '$(BUILD_NAME)'
+      buildNumber: '$(BUILD_NUMBER)'
+      excludeEnvVars: '*password*;*psw*;*secret*;*key*;*token*;*auth*'
+
+  # ------------------------------------------------------------------ #
+  # 6. Discard old builds (cleanup)                                     #
+  #    Verifies: JFrogDiscardBuilds task + configureDefaultArtifactoryServer #
+  # ------------------------------------------------------------------ #
+  - task: JFrogDiscardBuilds@1
+    displayName: 'Discard old sanity builds (keep last 5)'
+    inputs:
+      artifactoryConnection: ${{ parameters.serviceConnection }}
+      buildName: 'sanity-pr$(GH_PR_NUMBER)-*'
+      maxBuilds: 5
+    continueOnError: true   # cleanup failure should not fail the sanity run

@@ -1,0 +1,158 @@
+# End-to-end plugin tests — the automated equivalent of the manual sanity
+# process described in the release guide.
+#
+# FLOW
+# ----
+#   1. build-and-install  : Build .vsix from the PR branch, publish it to a
+#                           private ADO publisher, install it in the dev org.
+#   2. sanity-tests       : Trigger the ADO sanity pipeline
+#                           (.pipelines/ado-sanity-pipeline.yml) in parallel.
+#                           Covers: ToolsInstaller, GenericArtifacts, Maven,
+#                           PublishBuildInfo, DiscardBuilds.
+#   3. oidc-tests         : Trigger the OIDC test pipeline in parallel.
+#                           Covers all task types with OIDC + non-OIDC auth.
+#
+# REQUIRED GITHUB SECRETS
+# -----------------------
+#   ADO_E2E_ORG              ADO organisation name (publisher host + test host)
+#   ADO_E2E_PAT              PAT with scopes:
+#                              • Marketplace: Publish + Manage
+#                              • Build: Read + Execute
+#                              • Project and Team: Read
+#   ADO_SANITY_PROJECT       ADO project containing the sanity pipeline
+#   ADO_SANITY_PIPELINE_ID   Definition ID of .pipelines/ado-sanity-pipeline.yml
+#   ADO_OIDC_PROJECT         ADO project containing the OIDC test pipeline
+#   ADO_OIDC_PIPELINE_ID     Definition ID of the OIDC test pipeline
+#
+# ONE-TIME SETUP (per dev org — done once, not per PR)
+# ----------------------------------------------------
+#   1. Create a Marketplace publisher: https://aka.ms/vsm-create-publisher
+#      Name it exactly "<ADO_E2E_ORG>-private"
+#   2. Import .pipelines/ado-sanity-pipeline.yml into ADO as a pipeline.
+#      Note the definition ID → set as ADO_SANITY_PIPELINE_ID secret.
+#   3. Create the OIDC test pipeline (see docs/oidc-test-setup.md).
+#      Note the definition ID → set as ADO_OIDC_PIPELINE_ID secret.
+
+name: E2E Plugin Tests
+
+on:
+  # Run automatically when a PR receives the "safe to test" label.
+  pull_request_target:
+    types: [labeled]
+  # Allow manual triggering from the Actions UI for debugging.
+  workflow_dispatch:
+    inputs:
+      timeout_minutes:
+        description: 'Max minutes to wait for each ADO pipeline (default: 60)'
+        required: false
+        default: '60'
+      skip_oidc:
+        description: 'Skip OIDC tests (true/false)'
+        required: false
+        default: 'false'
+
+# Only one E2E run at a time — prevents two PRs racing to install into
+# the same dev org simultaneously.
+concurrency:
+  group: e2e-plugin-tests
+  cancel-in-progress: false
+
+# ======================================================================
+# JOB 1 — Build the extension and install it into the dev ADO org.
+# All subsequent jobs depend on this one completing successfully.
+# ======================================================================
+jobs:
+  build-and-install:
+    name: '1. Build → Publish → Install'
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'safe to test') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Install and build extension
+        # build.js installs all task node_modules and compiles TypeScript.
+        run: npm install --no-fund
+
+      - name: Publish private extension and install into dev org
+        # Sets a traceable version: 0.<PR_NUMBER>.<RUN_NUMBER>
+        # so the installed .vsix can be correlated to this exact PR run.
+        env:
+          ADO_ARTIFACTORY_DEVELOPER: ${{ secrets.ADO_E2E_ORG }}
+          ADO_ARTIFACTORY_API_KEY: ${{ secrets.ADO_E2E_PAT }}
+          EXTENSION_VERSION_OVERRIDE: "0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }}"
+        run: bash buildScripts/publish-private.sh
+
+      - name: Print installed version for traceability
+        run: |
+          echo "Extension version 0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }} installed into org ${{ secrets.ADO_E2E_ORG }}"
+          echo "PR     : #${{ github.event.pull_request.number }}"
+          echo "Commit : ${{ github.event.pull_request.head.sha || github.sha }}"
+
+  # ======================================================================
+  # JOB 2 — Sanity tests (non-OIDC, mirrors manual release sanity check).
+  # Runs in parallel with Job 3 after Job 1 completes.
+  # ======================================================================
+  sanity-tests:
+    name: '2. Sanity Tests (Maven + BuildInfo)'
+    needs: build-and-install
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout (for trigger script)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Trigger ADO sanity pipeline and wait for result
+        # The sanity pipeline (.pipelines/ado-sanity-pipeline.yml) tests:
+        #   JFrogToolsInstaller, GenericArtifacts (upload+download),
+        #   JFrogMaven (resolve+deploy), PublishBuildInfo, DiscardBuilds.
+        env:
+          ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
+          ADO_PROJECT: ${{ secrets.ADO_SANITY_PROJECT }}
+          ADO_PIPELINE_ID: ${{ secrets.ADO_SANITY_PIPELINE_ID }}
+          ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
+          GH_PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
+          GH_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          TIMEOUT_MINUTES: ${{ github.event.inputs.timeout_minutes || '60' }}
+        run: bash buildScripts/trigger-ado-pipeline.sh
+
+  # ======================================================================
+  # JOB 3 — OIDC tests (all task types with OIDC + non-OIDC regression).
+  # Runs in parallel with Job 2 after Job 1 completes.
+  # ======================================================================
+  oidc-tests:
+    name: '3. OIDC Tests (all task types)'
+    needs: build-and-install
+    if: ${{ github.event.inputs.skip_oidc != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout (for trigger script)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Trigger ADO OIDC test pipeline and wait for result
+        # The OIDC pipeline covers:
+        #   A1-A12: all task types with OIDC service connections
+        #   D1-D5:  non-OIDC regression guard (API token + basic auth)
+        #   I1:     multi-task chain (GenericArtifacts + PublishBuildInfo + Audit)
+        env:
+          ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
+          ADO_PROJECT: ${{ secrets.ADO_OIDC_PROJECT }}
+          ADO_PIPELINE_ID: ${{ secrets.ADO_OIDC_PIPELINE_ID }}
+          ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
+          GH_PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
+          GH_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          TIMEOUT_MINUTES: ${{ github.event.inputs.timeout_minutes || '60' }}
+        run: bash buildScripts/trigger-ado-pipeline.sh
