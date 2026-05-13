@@ -91,6 +91,12 @@ jobs:
           # ~65MB due to a known node_modules bloat regression tracked separately.
           # Marketplace will still enforce its own size limit at upload time.
           SKIP_VSIX_SIZE_CHECK: 'true'
+          # Use a distinct extension id for the private CI publish to avoid
+          # Marketplace's permanent record of the public id "jfrog-azure-devops-extension"
+          # rejecting our private creates with "The extension already exists".
+          # Tasks inside the .vsix are referenced by GUID so this is transparent
+          # to the pipeline test stages.
+          EXTENSION_ID_OVERRIDE: 'jfrog-azure-devops-extension-e2e'
         run: bash buildScripts/publish-private.sh
 
       - name: Print installed version for traceability
