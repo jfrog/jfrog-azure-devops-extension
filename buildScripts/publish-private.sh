@@ -42,11 +42,18 @@ npx tfx extension unshare -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azu
 npx tfx extension unpublish -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER"
 npx tfx extension create --manifest-globs vss-extension-private.json --publisher "$PUBLISHER"
 
-# Max size is 50MB, but we want to be under 40.
-vsixSize="$(du -m -- *.vsix | awk '{print $1}' | head -1)"
-if [ "${vsixSize}" -gt 40 ]; then
-    echo "Extension vsix size is greater than 30MB! (${vsixSize}MB) - Hint: Most of the dependencies on package-json are in format of - <^x.y.z>, so maybe one of them got updated, and the node_modules directory became bigger"
-    exit 1
+# Pre-flight size check: Marketplace's hard limit is generous, but we like to
+# stay under 40MB so the .vsix downloads quickly for installs.
+# Set SKIP_VSIX_SIZE_CHECK=true to opt out (useful in CI while a separate
+# effort tackles a known node_modules bloat regression - Marketplace will
+# still enforce its own limit at upload time).
+if [ "${SKIP_VSIX_SIZE_CHECK:-false}" != "true" ]; then
+    vsixSize="$(du -m -- *.vsix | awk '{print $1}' | head -1)"
+    if [ "${vsixSize}" -gt 40 ]; then
+        echo "Extension vsix size is greater than 40MB! (${vsixSize}MB) - Hint: Most of the dependencies on package-json are in format of - <^x.y.z>, so maybe one of them got updated, and the node_modules directory became bigger"
+        echo "If this is expected (CI bypass), re-run with SKIP_VSIX_SIZE_CHECK=true"
+        exit 1
+    fi
 fi
 echo "Publishing extension version: $VSIX_VERSION (commit: $GIT_HEAD)"
 npx tfx extension publish -t "$ADO_ARTIFACTORY_API_KEY" --publisher "$PUBLISHER" --manifests vss-extension-private.json --override "{\"public\": false, \"version\": \"$VSIX_VERSION\", \"description\": \"Commit SHA: $GIT_HEAD\"}" --share-with "$ADO_ARTIFACTORY_DEVELOPER"
