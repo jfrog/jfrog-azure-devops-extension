@@ -43,7 +43,22 @@ cp vss-extension.json vss-extension-private.json
 # value silently wins, causing publishes to land in (or conflict with) the
 # wrong publisher. Editing the JSON in-place removes that ambiguity.
 sed -i.bak "s/\"publisher\": *\"[^\"]*\"/\"publisher\": \"$PUBLISHER\"/" vss-extension-private.json
+
+# Optionally override the extension id. Marketplace appears to keep a
+# permanent record of every (publisher, id) pair it has ever seen - even
+# after `tfx extension unpublish` returns success and the publisher UI
+# shows nothing, subsequent attempts to (re)create the same id fail with
+# "The extension already exists". Letting CI publish under a distinct id
+# (e.g. "jfrog-azure-devops-extension-e2e") sidesteps this entirely.
+# Tasks inside the .vsix are referenced by their own GUIDs, not by the
+# extension id, so this is safe.
+EXTENSION_ID="jfrog-azure-devops-extension"
+if [ -n "${EXTENSION_ID_OVERRIDE:-}" ]; then
+    EXTENSION_ID="$EXTENSION_ID_OVERRIDE"
+    sed -i.bak "s/\"id\": *\"jfrog-azure-devops-extension\"/\"id\": \"$EXTENSION_ID\"/" vss-extension-private.json
+fi
 rm -f vss-extension-private.json.bak
+export EXTENSION_ID
 
 # `tfx extension unpublish` removes the extension entirely from Marketplace.
 # We used to call it before every publish to keep the publisher tidy, but
@@ -54,8 +69,8 @@ rm -f vss-extension-private.json.bak
 # Set REPUBLISH_FROM_SCRATCH=true to restore the old behaviour for one-off
 # manual cleanups.
 if [ "${REPUBLISH_FROM_SCRATCH:-false}" = "true" ]; then
-    npx tfx extension unshare -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER" --unshare-with "$ADO_ARTIFACTORY_DEVELOPER" 2>/dev/null || true
-    npx tfx extension unpublish -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER" || true
+    npx tfx extension unshare -t "$ADO_ARTIFACTORY_API_KEY" --extension-id "$EXTENSION_ID" --publisher "$PUBLISHER" --unshare-with "$ADO_ARTIFACTORY_DEVELOPER" 2>/dev/null || true
+    npx tfx extension unpublish -t "$ADO_ARTIFACTORY_API_KEY" --extension-id "$EXTENSION_ID" --publisher "$PUBLISHER" || true
     MARKETPLACE_DELETE_WAIT_SECONDS="${MARKETPLACE_DELETE_WAIT_SECONDS:-60}"
     echo "Waiting ${MARKETPLACE_DELETE_WAIT_SECONDS}s for Marketplace to fully process the unpublish..."
     sleep "$MARKETPLACE_DELETE_WAIT_SECONDS"
@@ -95,7 +110,7 @@ while : ; do
     sleep "$PUBLISH_RETRY_WAIT_SECONDS"
     attempt=$((attempt + 1))
 done
-npx tfx extension install --publisher "$PUBLISHER" --extension-id jfrog-azure-devops-extension --service-url https://"$ADO_ARTIFACTORY_DEVELOPER".visualstudio.com -t "$ADO_ARTIFACTORY_API_KEY"
+npx tfx extension install --publisher "$PUBLISHER" --extension-id "$EXTENSION_ID" --service-url https://"$ADO_ARTIFACTORY_DEVELOPER".visualstudio.com -t "$ADO_ARTIFACTORY_API_KEY"
 
 rm -- *.vsix
 rm vss-extension-private.json
