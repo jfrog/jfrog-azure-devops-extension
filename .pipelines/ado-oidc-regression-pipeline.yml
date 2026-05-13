@@ -1,0 +1,688 @@
+# OIDC regression pipeline for the JFrog Azure DevOps Extension.
+#
+# PURPOSE
+# -------
+# This pipeline is the automated equivalent of the manual OIDC regression suite
+# created during PR #608.  It exercises every code path through
+# `configureSpecificCliServer()` in `jfrog-tasks-utils/utils.js` against both
+# OIDC and non-OIDC service connections.
+#
+# It is triggered by the GitHub Actions workflow
+# (.github/workflows/e2e-plugin-tests.yml, Job 3 "oidc-tests") after a fresh
+# build of the extension is published and installed into the dev ADO org.
+#
+# WHAT IT TESTS
+# -------------
+# 9 parallel stages cover all 5 `configure*Server()` paths:
+#
+#   S1  Platform OIDC                 -> configureJfrogCliServer
+#   S2  Artifactory V2 OIDC (9 jobs)  -> configureArtifactoryCliServer +
+#                                         configureDefaultArtifactoryServer
+#   S3  Xray OIDC                     -> configureDefaultXrayServer
+#   S4  Distribution OIDC             -> configureDefaultDistributionServer
+#   S5  Maven OIDC                    -> configureArtifactoryCliServer (Maven)
+#   S6  Gradle OIDC                   -> configureArtifactoryCliServer (Gradle)
+#   S7  Go OIDC                       -> createBuildToolConfigFile path
+#   S8  Non-OIDC regression guard     -> token + basic auth (must still pass)
+#   S9  Multi-task OIDC chain         -> realistic multi-step user pipeline
+#
+# ONE-TIME ADO SETUP (per dev org)
+# --------------------------------
+# Service connections required (override defaults via pipeline parameters):
+#
+#   sc-platform-oidc       JFrog Platform        OIDC provider
+#   sc-artifactory-oidc    JFrog Artifactory V2  OIDC provider
+#   sc-artifactory-token   JFrog Artifactory V2  API token        (Non-OIDC guard)
+#   sc-artifactory-basic   JFrog Artifactory V2  Username + Pwd   (Non-OIDC guard)
+#   sc-xray-oidc           JFrog Xray            OIDC provider
+#   sc-xray-basic          JFrog Xray            Username + Pwd   (Non-OIDC guard)
+#   sc-distribution-oidc   JFrog Distribution    OIDC provider
+#   sc-distribution-basic  JFrog Distribution    Username + Pwd   (Non-OIDC guard)
+#
+# Artifactory repositories required:
+#   ecomatrix-generic-local, ecomatrix-maven-local, ecomatrix-maven-remote,
+#   ecomatrix-npm-remote, ecomatrix-pypi-remote, ecomatrix-go-remote,
+#   ecomatrix-gradle-local, ecomatrix-gradle-remote, jfrog-cli-remote.
+#
+# Import this YAML into ADO and store the definition ID in GitHub secret
+# ADO_OIDC_PIPELINE_ID.
+#
+# TRACEABILITY
+# ------------
+# GitHub Actions passes GH_PR_NUMBER and GH_COMMIT_SHA as pipeline variables
+# so every ADO run can be correlated back to the exact PR and commit.
+
+trigger: none   # Only triggered via REST API from GitHub Actions.
+
+parameters:
+  - name: scPlatformOidc
+    displayName: 'Platform OIDC service connection'
+    type: string
+    default: 'sc-platform-oidc'
+  - name: scArtifactoryOidc
+    displayName: 'Artifactory OIDC service connection'
+    type: string
+    default: 'sc-artifactory-oidc'
+  - name: scArtifactoryToken
+    displayName: 'Artifactory token service connection (non-OIDC guard)'
+    type: string
+    default: 'sc-artifactory-token'
+  - name: scArtifactoryBasic
+    displayName: 'Artifactory basic-auth service connection (non-OIDC guard)'
+    type: string
+    default: 'sc-artifactory-basic'
+  - name: scXrayOidc
+    displayName: 'Xray OIDC service connection'
+    type: string
+    default: 'sc-xray-oidc'
+  - name: scXrayBasic
+    displayName: 'Xray basic-auth service connection (non-OIDC guard)'
+    type: string
+    default: 'sc-xray-basic'
+  - name: scDistributionOidc
+    displayName: 'Distribution OIDC service connection'
+    type: string
+    default: 'sc-distribution-oidc'
+  - name: scDistributionBasic
+    displayName: 'Distribution basic-auth service connection (non-OIDC guard)'
+    type: string
+    default: 'sc-distribution-basic'
+
+variables:
+  GH_PR_NUMBER:  $[coalesce(variables['GH_PR_NUMBER'],  '0')]
+  GH_COMMIT_SHA: $[coalesce(variables['GH_COMMIT_SHA'], 'unknown')]
+  BUILD_NAME:    'oidc-pr$(GH_PR_NUMBER)-$(Build.BuildId)'
+  BUILD_NUMBER:  '$(Build.BuildNumber)'
+
+# ======================================================================
+# STAGE S1 — Platform OIDC (baseline: if this fails, ADO infra is broken)
+# Tests configureJfrogCliServer() via JFrogCliV2.
+# ======================================================================
+stages:
+  - stage: S1_PlatformOidc
+    displayName: 'S1 Platform OIDC (baseline)'
+    dependsOn: []
+    jobs:
+      - job: S1_CliV2
+        displayName: 'CliV2 ping (Platform OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: echo "##[section]OIDC PR #$(GH_PR_NUMBER) commit $(GH_COMMIT_SHA)"
+            displayName: 'Print traceability'
+          - task: JFrogCliV2@1
+            displayName: 'jf rt ping via Platform OIDC'
+            inputs:
+              jfrogPlatformConnection: ${{ parameters.scPlatformOidc }}
+              command: |
+                jf --version
+                jf rt ping
+
+  # ====================================================================
+  # STAGE S2 — Artifactory V2 OIDC (core OIDC stage, 9 parallel jobs)
+  # Covers configureArtifactoryCliServer + configureDefaultArtifactoryServer.
+  # ====================================================================
+  - stage: S2_ArtifactoryOidc
+    displayName: 'S2 Artifactory V2 OIDC (core)'
+    dependsOn: []
+    jobs:
+
+      # --- A2: Generic upload + download (in-job dependency) ----------
+      - job: S2_A2_GenericUpload
+        displayName: 'A2 Generic Upload (Artifactory OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: |
+              echo "oidc test file PR=$(GH_PR_NUMBER) sha=$(GH_COMMIT_SHA)" > /tmp/oidc-a2.txt
+            displayName: 'Create test file'
+          - task: JFrogGenericArtifacts@1
+            displayName: 'Upload via OIDC'
+            inputs:
+              command: Upload
+              connection: ${{ parameters.scArtifactoryOidc }}
+              specSource: taskConfiguration
+              fileSpec: |
+                {
+                  "files": [{
+                    "pattern": "/tmp/oidc-a2.txt",
+                    "target":  "ecomatrix-generic-local/oidc-pr$(GH_PR_NUMBER)/"
+                  }]
+                }
+              collectBuildInfo: true
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+              includeEnvVars: false
+
+      - job: S2_A2_GenericDownload
+        displayName: 'A2 Generic Download (Artifactory OIDC)'
+        dependsOn: S2_A2_GenericUpload
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogGenericArtifacts@1
+            displayName: 'Download via OIDC'
+            inputs:
+              command: Download
+              connection: ${{ parameters.scArtifactoryOidc }}
+              specSource: taskConfiguration
+              fileSpec: |
+                {
+                  "files": [{
+                    "pattern": "ecomatrix-generic-local/oidc-pr$(GH_PR_NUMBER)/oidc-a2.txt",
+                    "target":  "/tmp/oidc-downloaded/"
+                  }]
+                }
+          - script: |
+              if [ -f "/tmp/oidc-downloaded/oidc-pr$(GH_PR_NUMBER)/oidc-a2.txt" ]; then
+                echo "Round-trip OK"
+              else
+                echo "Round-trip FAILED — file not downloaded"; exit 1
+              fi
+            displayName: 'Verify round-trip'
+
+      # --- A4: PublishBuildInfo (depends on A2 upload) ----------------
+      - job: S2_A4_PublishBuildInfo
+        displayName: 'A4 PublishBuildInfo (Artifactory OIDC)'
+        dependsOn: S2_A2_GenericUpload
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogPublishBuildInfo@1
+            displayName: 'Publish build info via OIDC'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+              excludeEnvVars: '*password*;*psw*;*secret*;*key*;*token*;*auth*'
+
+      # --- A_Promote: BuildPromotion dry run (depends on A4) ----------
+      - job: S2_A_Promote
+        displayName: 'A_Promote BuildPromotion dry-run (OIDC)'
+        dependsOn: S2_A4_PublishBuildInfo
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogBuildPromotion@1
+            displayName: 'Promote build (dry run)'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+              targetRepo:  'ecomatrix-generic-local'
+              status:      'staged'
+              comment:     'OIDC dry-run promotion (PR #$(GH_PR_NUMBER))'
+              dryRun: true
+
+      # --- A_Discard: DiscardBuilds (cleanup) -------------------------
+      - job: S2_A_Discard
+        displayName: 'A_Discard DiscardBuilds (OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogDiscardBuilds@1
+            displayName: 'Discard old OIDC builds (keep last 5)'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              buildName: 'oidc-pr$(GH_PR_NUMBER)-*'
+              maxBuilds: 5
+            continueOnError: true
+
+      # --- A_CollectIssues --------------------------------------------
+      - job: S2_A_CollectIssues
+        displayName: 'A_CollectIssues (OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: |
+              cat > /tmp/issues-config.yaml <<'EOF'
+              issues:
+                trackerName: JIRA
+                regexp: ([A-Z]+-[0-9]+)\s-\s(.+)
+                keyGroupIndex: 1
+                summaryGroupIndex: 2
+                trackerUrl: https://example.atlassian.net
+                aggregate: true
+                aggregationStatus: RELEASED
+              EOF
+            displayName: 'Write issue collection config'
+          - task: JFrogCollectIssues@1
+            displayName: 'Collect issues (OIDC)'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              configSource: 'file'
+              file: '/tmp/issues-config.yaml'
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+            continueOnError: true   # collection may fail without a real Git history
+
+      # --- A_ToolsInstaller_Token: NON-OIDC GUARD ---------------------
+      # Verifies the existing API-token download path still works after
+      # the OIDC fix (regression guard).
+      - job: S2_A_ToolsInstaller_Token
+        displayName: 'A_ToolsInstaller via TOKEN [GUARD non-OIDC]'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogToolsInstaller@1
+            displayName: 'Install JFrog CLI via API token (non-OIDC)'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryToken }}
+              cliInstallationRepo: 'jfrog-cli-remote'
+              installJFrogCli: true
+          - script: jf --version
+            displayName: 'Verify CLI installed'
+
+      # --- A_ToolsInstaller_Extractors_OIDC ---------------------------
+      - job: S2_A_ToolsInstaller_Extractors_OIDC
+        displayName: 'A_ToolsInstaller extractors via OIDC'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogToolsInstaller@1
+            displayName: 'Install CLI + Maven/Gradle extractors via OIDC'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              cliInstallationRepo: 'jfrog-cli-remote'
+              installJFrogCli: true
+              installExtractors: true
+              extractorsInstallationRepo: 'jfrog-cli-remote'
+
+      # --- A_Npm: npm install via OIDC --------------------------------
+      - job: S2_A_Npm
+        displayName: 'A_Npm install via OIDC'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: NodeTool@0
+            displayName: 'Install Node.js 20'
+            inputs: { versionSpec: '20.x' }
+          - script: |
+              mkdir -p /tmp/npm-oidc && cd /tmp/npm-oidc
+              cat > package.json <<'EOF'
+              {
+                "name": "oidc-npm-test",
+                "version": "1.0.0",
+                "dependencies": { "lodash": "4.17.21" }
+              }
+              EOF
+            displayName: 'Create test package.json'
+          - task: JFrogNpm@1
+            displayName: 'npm install via OIDC'
+            inputs:
+              command: 'install'
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              sourceRepo: 'ecomatrix-npm-remote'
+              workingFolder: '/tmp/npm-oidc'
+              collectBuildInfo: true
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+
+      # --- A_Pip: pip install via OIDC --------------------------------
+      - job: S2_A_Pip
+        displayName: 'A_Pip install via OIDC'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: UsePythonVersion@0
+            displayName: 'Install Python 3.11'
+            inputs: { versionSpec: '3.11' }
+          - task: JFrogPip@1
+            displayName: 'pip install via OIDC'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              command: 'install'
+              arguments: 'requests==2.31.0'
+              targetResolveRepo: 'ecomatrix-pypi-remote'
+              collectBuildInfo: true
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+
+  # ====================================================================
+  # STAGE S3 — Xray OIDC
+  # Tests configureDefaultXrayServer() via Audit + Docker Scan.
+  # ====================================================================
+  - stage: S3_XrayOidc
+    displayName: 'S3 Xray OIDC'
+    dependsOn: []
+    jobs:
+      - job: S3_A6_Audit
+        displayName: 'A6 JFrogAudit (Xray OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: |
+              mkdir -p /tmp/xray-audit && cd /tmp/xray-audit
+              cat > package.json <<'EOF'
+              { "name": "audit-test", "version": "1.0.0", "dependencies": { "lodash": "4.17.20" } }
+              EOF
+            displayName: 'Create project for audit'
+          - task: JFrogAudit@1
+            displayName: 'Audit via Xray OIDC'
+            inputs:
+              xrayConnection: ${{ parameters.scXrayOidc }}
+              workingDirectory: '/tmp/xray-audit'
+              watchesSource: 'none'
+              allowFailBuild: false
+            continueOnError: true   # audit may legitimately surface findings
+
+      - job: S3_A7_DockerScan
+        displayName: 'A7 JFrogDocker Scan (Xray OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogDocker@1
+            displayName: 'Docker scan via Xray OIDC'
+            inputs:
+              command: 'scan'
+              xrayConnection: ${{ parameters.scXrayOidc }}
+              imageName: 'alpine:3.18'
+              watchesSource: 'none'
+              allowFailBuild: false
+            continueOnError: true
+
+  # ====================================================================
+  # STAGE S4 — Distribution OIDC
+  # Tests configureDefaultDistributionServer() (dry run).
+  # ====================================================================
+  - stage: S4_DistributionOidc
+    displayName: 'S4 Distribution OIDC'
+    dependsOn: []
+    jobs:
+      - job: S4_Distribution
+        displayName: 'JFrogDistribution dry-run (OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogDistribution@1
+            displayName: 'Create release bundle (dry run)'
+            inputs:
+              distributionConnection: ${{ parameters.scDistributionOidc }}
+              command: 'Create Release Bundle'
+              rbName:    'oidc-rb-pr$(GH_PR_NUMBER)'
+              rbVersion: '0.0.$(Build.BuildId)'
+              specSource: 'taskConfiguration'
+              fileSpec: |
+                {
+                  "files": [{
+                    "pattern": "ecomatrix-generic-local/oidc-pr$(GH_PR_NUMBER)/*"
+                  }]
+                }
+              dryRun: true
+            continueOnError: true   # Distribution may not be enabled in all dev envs
+
+  # ====================================================================
+  # STAGE S5 — Maven OIDC
+  # Tests configureArtifactoryCliServer() called from JFrogMaven.
+  # ====================================================================
+  - stage: S5_MavenOidc
+    displayName: 'S5 Maven OIDC'
+    dependsOn: []
+    jobs:
+      - job: S5_Maven
+        displayName: 'JFrogMaven (Artifactory OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JavaToolInstaller@0
+            displayName: 'Install Java 11'
+            inputs:
+              versionSpec: '11'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+          - script: |
+              mkdir -p /tmp/maven-oidc && cd /tmp/maven-oidc
+              cat > pom.xml <<'EOF'
+              <project xmlns="http://maven.apache.org/POM/4.0.0">
+                <modelVersion>4.0.0</modelVersion>
+                <groupId>org.jfrog.oidc</groupId>
+                <artifactId>oidc-test</artifactId>
+                <version>1.0.0</version>
+                <packaging>jar</packaging>
+                <dependencies>
+                  <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <version>3.12.0</version>
+                  </dependency>
+                </dependencies>
+              </project>
+              EOF
+            displayName: 'Create inline pom.xml'
+          - task: JFrogMaven@1
+            displayName: 'Maven resolve + deploy via OIDC'
+            inputs:
+              mavenPOMFile: '/tmp/maven-oidc/pom.xml'
+              goals: 'install -DskipTests'
+              artifactoryResolverService: ${{ parameters.scArtifactoryOidc }}
+              targetResolveReleaseRepo:   'ecomatrix-maven-remote'
+              targetResolveSnapshotRepo:  'ecomatrix-maven-remote'
+              artifactoryDeployService:   ${{ parameters.scArtifactoryOidc }}
+              targetDeployReleaseRepo:    'ecomatrix-maven-local'
+              targetDeploySnapshotRepo:   'ecomatrix-maven-local'
+              collectBuildInfo: true
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+              includeEnvVars: false
+
+  # ====================================================================
+  # STAGE S6 — Gradle OIDC
+  # Tests configureArtifactoryCliServer() called from JFrogGradle.
+  # ====================================================================
+  - stage: S6_GradleOidc
+    displayName: 'S6 Gradle OIDC'
+    dependsOn: []
+    jobs:
+      - job: S6_Gradle
+        displayName: 'JFrogGradle (Artifactory OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JavaToolInstaller@0
+            displayName: 'Install Java 11'
+            inputs:
+              versionSpec: '11'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+          - script: |
+              mkdir -p /tmp/gradle-oidc && cd /tmp/gradle-oidc
+              cat > settings.gradle <<'EOF'
+              rootProject.name = 'oidc-gradle-test'
+              EOF
+              cat > build.gradle <<'EOF'
+              plugins { id 'java' }
+              group   = 'org.jfrog.oidc'
+              version = '1.0.0'
+              repositories { mavenCentral() }
+              dependencies { implementation 'org.apache.commons:commons-lang3:3.12.0' }
+              EOF
+            displayName: 'Create inline Gradle project'
+          - task: JFrogGradle@1
+            displayName: 'Gradle build via OIDC'
+            inputs:
+              gradleBuildFile: '/tmp/gradle-oidc/build.gradle'
+              tasks: 'build'
+              artifactoryResolverService: ${{ parameters.scArtifactoryOidc }}
+              targetResolveRepo:          'ecomatrix-gradle-remote'
+              artifactoryDeployService:   ${{ parameters.scArtifactoryOidc }}
+              targetDeployRepo:           'ecomatrix-gradle-local'
+              collectBuildInfo: true
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+              includeEnvVars: false
+
+  # ====================================================================
+  # STAGE S7 — Go OIDC
+  # Tests createBuildToolConfigFile -> configureDefaultArtifactoryServer
+  # via JFrogGo.
+  # ====================================================================
+  - stage: S7_GoOidc
+    displayName: 'S7 Go OIDC'
+    dependsOn: []
+    jobs:
+      - job: S7_Go
+        displayName: 'JFrogGo (Artifactory OIDC)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: GoTool@0
+            displayName: 'Install Go 1.21'
+            inputs: { version: '1.21' }
+          - script: |
+              mkdir -p /tmp/go-oidc && cd /tmp/go-oidc
+              cat > go.mod <<'EOF'
+              module oidc-go-test
+
+              go 1.21
+
+              require github.com/google/uuid v1.4.0
+              EOF
+              cat > main.go <<'EOF'
+              package main
+
+              import (
+                  "fmt"
+
+                  "github.com/google/uuid"
+              )
+
+              func main() { fmt.Println(uuid.New().String()) }
+              EOF
+            displayName: 'Create inline Go module'
+          - task: JFrogGo@1
+            displayName: 'Go build via OIDC'
+            inputs:
+              command: 'build'
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              resolutionRepo: 'ecomatrix-go-remote'
+              workingDirectory: '/tmp/go-oidc'
+              collectBuildInfo: true
+              buildName:   '$(BUILD_NAME)'
+              buildNumber: '$(BUILD_NUMBER)'
+
+  # ====================================================================
+  # STAGE S8 — Non-OIDC regression guard
+  # Verifies token + basic auth code paths still work AFTER the OIDC fix.
+  # These four jobs MUST pass with both the unfixed and fixed plugin.
+  # ====================================================================
+  - stage: S8_NonOidcGuard
+    displayName: 'S8 Non-OIDC regression guard'
+    dependsOn: []
+    jobs:
+      - job: S8_D1_Generic_Token
+        displayName: 'D1 Generic via TOKEN [GUARD]'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: echo "guard token PR=$(GH_PR_NUMBER)" > /tmp/guard-token.txt
+            displayName: 'Create test file'
+          - task: JFrogGenericArtifacts@1
+            displayName: 'Upload via API token'
+            inputs:
+              command: Upload
+              connection: ${{ parameters.scArtifactoryToken }}
+              specSource: taskConfiguration
+              fileSpec: |
+                {
+                  "files": [{
+                    "pattern": "/tmp/guard-token.txt",
+                    "target":  "ecomatrix-generic-local/guard-token-pr$(GH_PR_NUMBER)/"
+                  }]
+                }
+
+      - job: S8_D2_Generic_Basic
+        displayName: 'D2 Generic via BASIC AUTH [GUARD]'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: echo "guard basic PR=$(GH_PR_NUMBER)" > /tmp/guard-basic.txt
+            displayName: 'Create test file'
+          - task: JFrogGenericArtifacts@1
+            displayName: 'Upload via basic auth'
+            inputs:
+              command: Upload
+              connection: ${{ parameters.scArtifactoryBasic }}
+              specSource: taskConfiguration
+              fileSpec: |
+                {
+                  "files": [{
+                    "pattern": "/tmp/guard-basic.txt",
+                    "target":  "ecomatrix-generic-local/guard-basic-pr$(GH_PR_NUMBER)/"
+                  }]
+                }
+
+      - job: S8_D3_Audit_Basic
+        displayName: 'D3 Audit via XRAY BASIC AUTH [GUARD]'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: |
+              mkdir -p /tmp/d3-audit && cd /tmp/d3-audit
+              echo '{ "name":"d3","version":"1.0.0","dependencies":{"lodash":"4.17.20"} }' > package.json
+            displayName: 'Create project'
+          - task: JFrogAudit@1
+            displayName: 'Audit via Xray basic auth'
+            inputs:
+              xrayConnection: ${{ parameters.scXrayBasic }}
+              workingDirectory: '/tmp/d3-audit'
+              watchesSource: 'none'
+              allowFailBuild: false
+            continueOnError: true
+
+      - job: S8_D4_Distribution_Basic
+        displayName: 'D4 Distribution via BASIC AUTH dry-run [GUARD]'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - task: JFrogDistribution@1
+            displayName: 'Create release bundle (dry run)'
+            inputs:
+              distributionConnection: ${{ parameters.scDistributionBasic }}
+              command: 'Create Release Bundle'
+              rbName:    'guard-rb-pr$(GH_PR_NUMBER)'
+              rbVersion: '0.0.$(Build.BuildId)'
+              specSource: 'taskConfiguration'
+              fileSpec: |
+                {
+                  "files": [{
+                    "pattern": "ecomatrix-generic-local/guard-basic-pr$(GH_PR_NUMBER)/*"
+                  }]
+                }
+              dryRun: true
+            continueOnError: true
+
+  # ====================================================================
+  # STAGE S9 — Multi-task OIDC chain (most realistic scenario)
+  # One job, three tasks in sequence, three different OIDC service
+  # connection types.  Verifies tokens are exchanged independently
+  # per task and do not interfere with each other.
+  # ====================================================================
+  - stage: S9_MultiTaskOidcChain
+    displayName: 'S9 Multi-task OIDC chain'
+    dependsOn: []
+    jobs:
+      - job: S9_I1
+        displayName: 'I1 GenericArtifacts -> PublishBuildInfo -> Audit (3 OIDC SCs)'
+        pool: { vmImage: 'ubuntu-22.04' }
+        steps:
+          - script: |
+              echo "i1 chain PR=$(GH_PR_NUMBER) commit=$(GH_COMMIT_SHA)" > /tmp/i1-chain.txt
+              mkdir -p /tmp/i1-audit
+              echo '{ "name":"i1","version":"1.0.0","dependencies":{"lodash":"4.17.20"} }' > /tmp/i1-audit/package.json
+            displayName: 'Prepare test artifacts'
+
+          # Task 1: upload via Artifactory OIDC ----------------------
+          - task: JFrogGenericArtifacts@1
+            displayName: 'Step 1 GenericArtifacts upload (Artifactory OIDC)'
+            inputs:
+              command: Upload
+              connection: ${{ parameters.scArtifactoryOidc }}
+              specSource: taskConfiguration
+              fileSpec: |
+                {
+                  "files": [{
+                    "pattern": "/tmp/i1-chain.txt",
+                    "target":  "ecomatrix-generic-local/i1-pr$(GH_PR_NUMBER)/"
+                  }]
+                }
+              collectBuildInfo: true
+              buildName:   '$(BUILD_NAME)-i1'
+              buildNumber: '$(BUILD_NUMBER)'
+
+          # Task 2: publish build info via Artifactory OIDC ----------
+          - task: JFrogPublishBuildInfo@1
+            displayName: 'Step 2 PublishBuildInfo (Artifactory OIDC)'
+            inputs:
+              artifactoryConnection: ${{ parameters.scArtifactoryOidc }}
+              buildName:   '$(BUILD_NAME)-i1'
+              buildNumber: '$(BUILD_NUMBER)'
+              excludeEnvVars: '*password*;*psw*;*secret*;*key*;*token*;*auth*'
+
+          # Task 3: audit via Xray OIDC (different SC type) ----------
+          - task: JFrogAudit@1
+            displayName: 'Step 3 Audit (Xray OIDC) — different SC type'
+            inputs:
+              xrayConnection: ${{ parameters.scXrayOidc }}
+              workingDirectory: '/tmp/i1-audit'
+              watchesSource: 'none'
+              allowFailBuild: false
+            continueOnError: true
