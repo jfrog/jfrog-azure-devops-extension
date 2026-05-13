@@ -38,8 +38,29 @@ export VSIX_VERSION
 
 cp vss-extension.json vss-extension-private.json
 
-npx tfx extension unshare -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER" --unshare-with "$ADO_ARTIFACTORY_DEVELOPER" 2>/dev/null
-npx tfx extension unpublish -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER"
+# Force the manifest to use the private publisher. tfx's --publisher flag
+# is meant to override the manifest, but in some versions the manifest's
+# value silently wins, causing publishes to land in (or conflict with) the
+# wrong publisher. Editing the JSON in-place removes that ambiguity.
+sed -i.bak "s/\"publisher\": *\"[^\"]*\"/\"publisher\": \"$PUBLISHER\"/" vss-extension-private.json
+rm -f vss-extension-private.json.bak
+
+# `tfx extension unpublish` removes the extension entirely from Marketplace.
+# We used to call it before every publish to keep the publisher tidy, but
+# Marketplace's API leaves a tombstoned record after unpublish that the next
+# `publish` call cannot overwrite (returns "The extension already exists"
+# even though the publisher UI shows nothing). Skipping unpublish lets the
+# extension stay in place and `publish` simply adds a new version each run.
+# Set REPUBLISH_FROM_SCRATCH=true to restore the old behaviour for one-off
+# manual cleanups.
+if [ "${REPUBLISH_FROM_SCRATCH:-false}" = "true" ]; then
+    npx tfx extension unshare -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER" --unshare-with "$ADO_ARTIFACTORY_DEVELOPER" 2>/dev/null || true
+    npx tfx extension unpublish -t "$ADO_ARTIFACTORY_API_KEY" --extension-id jfrog-azure-devops-extension --publisher "$PUBLISHER" || true
+    MARKETPLACE_DELETE_WAIT_SECONDS="${MARKETPLACE_DELETE_WAIT_SECONDS:-60}"
+    echo "Waiting ${MARKETPLACE_DELETE_WAIT_SECONDS}s for Marketplace to fully process the unpublish..."
+    sleep "$MARKETPLACE_DELETE_WAIT_SECONDS"
+fi
+
 npx tfx extension create --manifest-globs vss-extension-private.json --publisher "$PUBLISHER"
 
 # Pre-flight size check: Marketplace's hard limit is generous, but we like to
@@ -56,7 +77,24 @@ if [ "${SKIP_VSIX_SIZE_CHECK:-false}" != "true" ]; then
     fi
 fi
 echo "Publishing extension version: $VSIX_VERSION (commit: $GIT_HEAD)"
-npx tfx extension publish -t "$ADO_ARTIFACTORY_API_KEY" --publisher "$PUBLISHER" --manifests vss-extension-private.json --override "{\"public\": false, \"version\": \"$VSIX_VERSION\", \"description\": \"Commit SHA: $GIT_HEAD\"}" --share-with "$ADO_ARTIFACTORY_DEVELOPER"
+# Retry publish up to 3 times: the previous unpublish + sleep usually clears
+# the eventual-consistency window, but if Marketplace still returns "The
+# extension already exists" we wait longer and retry.
+PUBLISH_MAX_ATTEMPTS="${PUBLISH_MAX_ATTEMPTS:-3}"
+PUBLISH_RETRY_WAIT_SECONDS="${PUBLISH_RETRY_WAIT_SECONDS:-45}"
+attempt=1
+while : ; do
+    if npx tfx extension publish -t "$ADO_ARTIFACTORY_API_KEY" --publisher "$PUBLISHER" --manifests vss-extension-private.json --override "{\"public\": false, \"version\": \"$VSIX_VERSION\", \"description\": \"Commit SHA: $GIT_HEAD\"}" --share-with "$ADO_ARTIFACTORY_DEVELOPER"; then
+        break
+    fi
+    if [ "$attempt" -ge "$PUBLISH_MAX_ATTEMPTS" ]; then
+        echo "Publish failed after ${attempt} attempts. Giving up."
+        exit 1
+    fi
+    echo "Publish attempt ${attempt} failed. Waiting ${PUBLISH_RETRY_WAIT_SECONDS}s before retry..."
+    sleep "$PUBLISH_RETRY_WAIT_SECONDS"
+    attempt=$((attempt + 1))
+done
 npx tfx extension install --publisher "$PUBLISHER" --extension-id jfrog-azure-devops-extension --service-url https://"$ADO_ARTIFACTORY_DEVELOPER".visualstudio.com -t "$ADO_ARTIFACTORY_API_KEY"
 
 rm -- *.vsix
