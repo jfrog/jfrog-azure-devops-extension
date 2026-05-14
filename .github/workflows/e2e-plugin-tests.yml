@@ -81,8 +81,11 @@ jobs:
         run: npm install --no-fund
 
       - name: Publish private extension and install into dev org
-        # Sets a traceable version: 0.<PR_NUMBER>.<RUN_NUMBER>
-        # so the installed .vsix can be correlated to this exact PR run.
+        # Each CI run uses a unique extension id (e2e-r<RUN>) and a traceable
+        # version (0.<PR>.<RUN>). The script publishes to a private Marketplace
+        # publisher, uninstalls any previous run's stale extension from the
+        # dev org (to avoid task-GUID conflicts), and then installs the new
+        # extension.
         env:
           ADO_ARTIFACTORY_DEVELOPER: ${{ secrets.ADO_E2E_ORG }}
           ADO_ARTIFACTORY_API_KEY: ${{ secrets.ADO_E2E_PAT }}
@@ -91,17 +94,20 @@ jobs:
           # ~65MB due to a known node_modules bloat regression tracked separately.
           # Marketplace will still enforce its own size limit at upload time.
           SKIP_VSIX_SIZE_CHECK: 'true'
-          # Use a distinct extension id for the private CI publish to avoid
-          # Marketplace's permanent record of the public id "jfrog-azure-devops-extension"
-          # rejecting our private creates with "The extension already exists".
-          # Tasks inside the .vsix are referenced by GUID so this is transparent
-          # to the pipeline test stages.
-          EXTENSION_ID_OVERRIDE: 'jfrog-azure-devops-extension-e2e'
+          # Per-run unique extension id. Marketplace permanently retains a
+          # tombstone of every (publisher, id) pair it has ever seen, so a
+          # static id fails with "The extension already exists" on every run
+          # after the first. Using r<RUN_NUMBER> guarantees a fresh id each
+          # time. The publisher accumulates one extension per run; periodic
+          # cleanup is tracked separately.
+          EXTENSION_ID_OVERRIDE: "jfrog-ext-e2e-r${{ github.run_number }}"
         run: bash buildScripts/publish-private.sh
 
       - name: Print installed version for traceability
         run: |
-          echo "Extension version 0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }} installed into org ${{ secrets.ADO_E2E_ORG }}"
+          echo "Extension id    : jfrog-ext-e2e-r${{ github.run_number }}"
+          echo "Extension ver   : 0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }}"
+          echo "Installed in org: ${{ secrets.ADO_E2E_ORG }}"
           echo "PR     : #${{ github.event.pull_request.number }}"
           echo "Commit : ${{ github.event.pull_request.head.sha || github.sha }}"
 
