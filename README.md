@@ -1456,6 +1456,10 @@ To build and run the extension sources, please follow these steps:
 After the build process is completed, you'll find the `vsix` file in the project directory.
 The `vsix` file can be loaded into Azure DevOps and TFS.
 
+> Maintainers: PRs can also be exercised end-to-end by adding the `safe to test`
+> label, which runs `.github/workflows/e2e-plugin-tests.yml` against a dev ADO
+> organisation.
+
 </details>
 
 <details>
