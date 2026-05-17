@@ -1,24 +1,47 @@
 # End-to-end plugin tests — the automated equivalent of the manual sanity
 # process described in the release guide.
 #
-# FLOW
-# ----
-#   1. build-and-install  : Build .vsix from the PR branch, publish it to a
-#                           private ADO publisher, install it in the dev org.
-#   2. sanity-tests       : Trigger the ADO sanity pipeline
-#                           (.pipelines/ado-sanity-pipeline.yml) in parallel.
-#                           Covers: ToolsInstaller, GenericArtifacts, Maven,
-#                           PublishBuildInfo, DiscardBuilds.
-#   3. oidc-tests         : Trigger the OIDC test pipeline in parallel.
-#                           Covers all task types with OIDC + non-OIDC auth.
+# FLOW (hybrid manual + automated)
+# --------------------------------
+#   1. build                  : Build .vsix from the PR branch and upload it
+#                               as a workflow artifact. Embeds clear, one-click
+#                               install instructions into the run summary.
+#
+#   2. (MANUAL) install       : You download the .vsix from the run page and
+#                               upload it via the Marketplace UI. Roughly 3
+#                               minutes, only required when you actually want
+#                               to test the PR's code changes against the
+#                               dev org. Re-trigger the workflow afterwards
+#                               (or just let jobs 3/4 run — they always test
+#                               whatever is currently installed).
+#
+#   3. sanity-tests           : Trigger the ADO sanity pipeline
+#                               (.pipelines/ado-sanity-pipeline.yml).
+#                               Covers: ToolsInstaller, GenericArtifacts,
+#                               Maven, PublishBuildInfo, DiscardBuilds.
+#
+#   4. oidc-tests             : Trigger the OIDC test pipeline.
+#                               Covers all task types with OIDC + non-OIDC.
+#
+# WHY THE HYBRID?
+# ---------------
+# Publishing the .vsix to the Marketplace + installing it into the dev org
+# is doable from CI, but Microsoft's Marketplace has several long-standing
+# quirks (eventual consistency on unpublish, permanent tombstoning of
+# (publisher, extension-id) pairs, async validation that races install)
+# that make it unreliable to drive from a tight CI loop. Doing the publish
+# step manually from the UI is reliable, takes ~3 minutes, and only needs
+# to happen when you actually want to test new task code. The ADO test
+# pipelines themselves run automatically against whatever is installed.
 #
 # REQUIRED GITHUB SECRETS
 # -----------------------
 #   ADO_E2E_ORG              ADO organisation name (publisher host + test host)
 #   ADO_E2E_PAT              PAT with scopes:
-#                              • Marketplace: Publish + Manage
 #                              • Build: Read + Execute
 #                              • Project and Team: Read
+#                            (Marketplace scopes no longer needed in CI —
+#                             you publish via the UI.)
 #   ADO_SANITY_PROJECT       ADO project containing the sanity pipeline
 #   ADO_SANITY_PIPELINE_ID   Definition ID of .pipelines/ado-sanity-pipeline.yml
 #   ADO_OIDC_PROJECT         ADO project containing the OIDC test pipeline
@@ -50,25 +73,34 @@ on:
         description: 'Skip OIDC tests (true/false)'
         required: false
         default: 'false'
+      skip_pipelines:
+        description: 'Only build the .vsix, do not trigger ADO pipelines'
+        required: false
+        default: 'false'
 
-# Only one E2E run at a time — prevents two PRs racing to install into
-# the same dev org simultaneously.
+# Only one E2E run at a time — prevents two PRs racing to trigger the same
+# ADO pipeline simultaneously (which the dev org's parallel-job quota
+# would queue anyway).
 concurrency:
   group: e2e-plugin-tests
   cancel-in-progress: false
 
 # ======================================================================
-# JOB 1 — Build the extension and install it into the dev ADO org.
-# All subsequent jobs depend on this one completing successfully.
+# JOB 1 — Build the .vsix from the PR branch and upload as artifact.
+# This also validates that the PR compiles cleanly end-to-end.
 # ======================================================================
 jobs:
-  build-and-install:
-    name: '1. Build → Publish → Install'
+  build:
+    name: '1. Build .vsix'
     if: |
       contains(github.event.pull_request.labels.*.name, 'safe to test') ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
+
+    outputs:
+      vsix_version: ${{ steps.build_vsix.outputs.vsix_version }}
+      vsix_name: ${{ steps.build_vsix.outputs.vsix_name }}
 
     steps:
       - name: Checkout PR branch
@@ -76,42 +108,98 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Install and build extension
+      - name: Install dependencies and compile
         # build.js installs all task node_modules and compiles TypeScript.
+        # A failure here is a real PR failure (broken build).
         run: npm install --no-fund
 
-      - name: Publish private extension and install into dev org
-        # Sets a traceable version: 0.<PR_NUMBER>.<RUN_NUMBER>
-        # so the installed .vsix can be correlated to this exact PR run.
+      - name: Package .vsix
+        id: build_vsix
         env:
-          ADO_ARTIFACTORY_DEVELOPER: ${{ secrets.ADO_E2E_ORG }}
-          ADO_ARTIFACTORY_API_KEY: ${{ secrets.ADO_E2E_PAT }}
-          EXTENSION_VERSION_OVERRIDE: "0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }}"
-          # Bypass the local 40MB pre-flight size check. The build is currently
-          # ~65MB due to a known node_modules bloat regression tracked separately.
-          # Marketplace will still enforce its own size limit at upload time.
-          SKIP_VSIX_SIZE_CHECK: 'true'
-          # Use a distinct extension id for the private CI publish to avoid
-          # Marketplace's permanent record of the public id "jfrog-azure-devops-extension"
-          # rejecting our private creates with "The extension already exists".
-          # Tasks inside the .vsix are referenced by GUID so this is transparent
-          # to the pipeline test stages.
-          EXTENSION_ID_OVERRIDE: 'jfrog-azure-devops-extension-e2e'
-        run: bash buildScripts/publish-private.sh
-
-      - name: Print installed version for traceability
+          # Traceable version so we can correlate the installed extension
+          # back to this exact PR run.
+          VSIX_VERSION: "0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }}"
+          # The publisher placeholder doesn't matter for the build step —
+          # Marketplace UI will let us pick the real publisher at upload time.
+          PUBLISHER_PLACEHOLDER: 'e2e-build'
         run: |
-          echo "Extension version 0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }} installed into org ${{ secrets.ADO_E2E_ORG }}"
-          echo "PR     : #${{ github.event.pull_request.number }}"
-          echo "Commit : ${{ github.event.pull_request.head.sha || github.sha }}"
+          set -euo pipefail
+          cp vss-extension.json vss-extension-e2e.json
+          # Rewrite publisher in the manifest copy so tfx is happy.
+          sed -i.bak "s/\"publisher\": *\"[^\"]*\"/\"publisher\": \"$PUBLISHER_PLACEHOLDER\"/" vss-extension-e2e.json
+          rm -f vss-extension-e2e.json.bak
+
+          npx tfx extension create \
+            --manifest-globs vss-extension-e2e.json \
+            --publisher "$PUBLISHER_PLACEHOLDER" \
+            --override "{\"public\": false, \"version\": \"$VSIX_VERSION\"}"
+
+          vsix_path="$(ls -1 ./*.vsix | head -1)"
+          vsix_name="$(basename "$vsix_path")"
+          echo "vsix_name=$vsix_name"     >> "$GITHUB_OUTPUT"
+          echo "vsix_version=$VSIX_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Built: $vsix_path ($(du -m "$vsix_path" | cut -f1)MB)"
+
+      - name: Upload .vsix as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jfrog-ext-vsix-${{ github.run_number }}
+          path: '*.vsix'
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Write install instructions to job summary
+        env:
+          VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
+          VSIX_NAME:    ${{ steps.build_vsix.outputs.vsix_name }}
+          ADO_ORG:      ${{ secrets.ADO_E2E_ORG }}
+        run: |
+          {
+            echo "## Manual install step (≈3 min, only when testing PR code)"
+            echo ""
+            echo "**This PR built:** \`$VSIX_NAME\` (version $VSIX_VERSION)"
+            echo ""
+            echo "If you want the ADO test pipelines (jobs 2 & 3) to actually exercise this PR's code, do the following before re-running the workflow. If you skip this step the pipelines still run, but against whatever .vsix was installed previously."
+            echo ""
+            echo "1. **Download the .vsix** from the *Artifacts* section at the bottom of this run page (artifact: \`jfrog-ext-vsix-${{ github.run_number }}\`)."
+            echo "2. **Upload it** at https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private → \`New extension\` → \`Azure DevOps\` → drop the .vsix."
+            echo "3. **Share it with the dev org**: click the extension → \`Share/Unshare\` → add \`${ADO_ORG}\`."
+            echo "4. **Install it in the dev org**: open the shared extension page in https://dev.azure.com/${ADO_ORG} → \`Get it free\` → install into the test project."
+            echo "5. **Re-run this workflow** (or just let jobs 2/3 continue — they test whatever is currently installed)."
+            echo ""
+            echo "If the same extension id already exists in your private publisher, upload still works — Marketplace treats it as a new version and shared orgs auto-pick it up within a couple of minutes."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Print install instructions to log
+        env:
+          VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
+          ADO_ORG:      ${{ secrets.ADO_E2E_ORG }}
+        run: |
+          cat <<EOF
+          ============================================================
+            BUILD OK — version $VSIX_VERSION
+          ============================================================
+            To exercise THIS PR's code in jobs 2 & 3, manually:
+              1. Download the 'jfrog-ext-vsix-${{ github.run_number }}'
+                 artifact from this run page.
+              2. Upload it at:
+                 https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private
+              3. Share with org '${ADO_ORG}' and install in the
+                 test project.
+              4. Re-run this workflow if you want the pipelines to
+                 pick up the freshly installed version.
+          ============================================================
+          EOF
 
   # ======================================================================
   # JOB 2 — Sanity tests (non-OIDC, mirrors manual release sanity check).
+  # Runs against whatever .vsix is currently installed in the dev org.
   # Runs in parallel with Job 3 after Job 1 completes.
   # ======================================================================
   sanity-tests:
     name: '2. Sanity Tests (Maven + BuildInfo)'
-    needs: build-and-install
+    needs: build
+    if: ${{ github.event.inputs.skip_pipelines != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -137,12 +225,13 @@ jobs:
 
   # ======================================================================
   # JOB 3 — OIDC tests (all task types with OIDC + non-OIDC regression).
+  # Runs against whatever .vsix is currently installed in the dev org.
   # Runs in parallel with Job 2 after Job 1 completes.
   # ======================================================================
   oidc-tests:
     name: '3. OIDC Tests (all task types)'
-    needs: build-and-install
-    if: ${{ github.event.inputs.skip_oidc != 'true' }}
+    needs: build
+    if: ${{ github.event.inputs.skip_pipelines != 'true' && github.event.inputs.skip_oidc != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
