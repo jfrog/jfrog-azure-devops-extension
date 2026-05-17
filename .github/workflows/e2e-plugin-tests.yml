@@ -124,6 +124,17 @@ jobs:
           # destination publisher don't match exactly, so we cannot use a
           # generic placeholder here.
           PUBLISHER: "${{ secrets.ADO_E2E_ORG }}-private"
+          # Bake a distinct extension id into the .vsix so the upload doesn't
+          # collide with Marketplace's permanent record of the public id
+          # "jfrog-azure-devops-extension" (which gets tombstoned forever in
+          # every publisher that has ever hosted it, blocking subsequent
+          # creates with "The extension already exists"). Tasks inside the
+          # .vsix are referenced by their own GUIDs so a different extension
+          # id is transparent to the ADO pipelines that consume them.
+          # Override via the ADO_E2E_EXTENSION_ID secret if this id ever gets
+          # tombstoned in your publisher — pick any unused string, e.g.
+          # "jfrog-azure-devops-extension-e2etest-v2".
+          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
         run: |
           set -euo pipefail
           if [ -z "${PUBLISHER:-}" ] || [ "$PUBLISHER" = "-private" ]; then
@@ -131,9 +142,10 @@ jobs:
             exit 1
           fi
           cp vss-extension.json vss-extension-e2e.json
-          # Rewrite publisher in the manifest copy so the resulting .vsix can
-          # be uploaded straight to the matching Marketplace publisher.
+          # Rewrite publisher + id in the manifest copy so the resulting .vsix
+          # can be uploaded straight to the matching Marketplace publisher.
           sed -i.bak "s/\"publisher\": *\"[^\"]*\"/\"publisher\": \"$PUBLISHER\"/" vss-extension-e2e.json
+          sed -i.bak "s/\"id\": *\"jfrog-azure-devops-extension\"/\"id\": \"$EXTENSION_ID\"/" vss-extension-e2e.json
           rm -f vss-extension-e2e.json.bak
 
           npx tfx extension create \
@@ -145,7 +157,8 @@ jobs:
           vsix_name="$(basename "$vsix_path")"
           echo "vsix_name=$vsix_name"     >> "$GITHUB_OUTPUT"
           echo "vsix_version=$VSIX_VERSION" >> "$GITHUB_OUTPUT"
-          echo "Built: $vsix_path ($(du -m "$vsix_path" | cut -f1)MB) — publisher=$PUBLISHER"
+          echo "extension_id=$EXTENSION_ID" >> "$GITHUB_OUTPUT"
+          echo "Built: $vsix_path ($(du -m "$vsix_path" | cut -f1)MB) — publisher=$PUBLISHER id=$EXTENSION_ID"
 
       - name: Upload .vsix as workflow artifact
         uses: actions/upload-artifact@v4
@@ -159,42 +172,48 @@ jobs:
         env:
           VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
           VSIX_NAME:    ${{ steps.build_vsix.outputs.vsix_name }}
+          EXTENSION_ID: ${{ steps.build_vsix.outputs.extension_id }}
           ADO_ORG:      ${{ secrets.ADO_E2E_ORG }}
         run: |
           {
             echo "## Manual install step (≈3 min, only when testing PR code)"
             echo ""
-            echo "**This PR built:** \`$VSIX_NAME\` (version $VSIX_VERSION)"
+            echo "**This PR built:** \`$VSIX_NAME\` (version \`$VSIX_VERSION\`, extension id \`$EXTENSION_ID\`)"
             echo ""
-            echo "If you want the ADO test pipelines (jobs 2 & 3) to actually exercise this PR's code, do the following before re-running the workflow. If you skip this step the pipelines still run, but against whatever .vsix was installed previously."
+            echo "If you want the ADO test pipelines (jobs 2 & 3) to actually exercise this PR's code, do the following. If you skip this step the pipelines still run, but against whatever .vsix was installed previously."
             echo ""
-            echo "1. **Download the .vsix** from the *Artifacts* section at the bottom of this run page (artifact: \`jfrog-ext-vsix-${{ github.run_number }}\`)."
-            echo "2. **Upload it** at https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private → \`New extension\` → \`Azure DevOps\` → drop the .vsix."
-            echo "3. **Share it with the dev org**: click the extension → \`Share/Unshare\` → add \`${ADO_ORG}\`."
-            echo "4. **Install it in the dev org**: open the shared extension page in https://dev.azure.com/${ADO_ORG} → \`Get it free\` → install into the test project."
-            echo "5. **Re-run this workflow** (or just let jobs 2/3 continue — they test whatever is currently installed)."
+            echo "1. **Download the .vsix** from the *Artifacts* section at the bottom of this run page (artifact: \`jfrog-ext-vsix-${{ github.run_number }}\`). It downloads as a .zip wrapper — unzip it to get the actual .vsix."
+            echo "2. **Upload to your publisher** at https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private"
+            echo "   - **First time uploading this extension id:** click \`+ New extension\` → \`Azure DevOps\` → drop the .vsix."
+            echo "   - **Subsequent uploads (extension already shows in the publisher row):** click the row's \`···\` menu → \`Update\` → drop the new .vsix. The version is auto-bumped per CI run so updates land cleanly."
+            echo "3. **Share with the dev org:** \`···\` → \`Share/Unshare\` → add \`${ADO_ORG}\`. (Only needed once per extension id.)"
+            echo "4. **Install in the dev org:** open https://${ADO_ORG}.visualstudio.com → Settings → Extensions → the shared extension → \`Get it free\` → install into the test project. (Only needed once per extension id.)"
+            echo "5. **Re-run jobs 2 & 3** from this run page if you want them to test the just-uploaded .vsix; otherwise let them finish against whatever was installed before."
             echo ""
-            echo "If the same extension id already exists in your private publisher, upload still works — Marketplace treats it as a new version and shared orgs auto-pick it up within a couple of minutes."
+            echo "If you still see \`The extension already exists\` on step 2, the id \`$EXTENSION_ID\` has been tombstoned in your publisher. Set the \`ADO_E2E_EXTENSION_ID\` repository secret to any unused string (e.g. \`$EXTENSION_ID-v2\`) and re-run the workflow — the next .vsix will use the new id."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Print install instructions to log
         env:
           VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
+          EXTENSION_ID: ${{ steps.build_vsix.outputs.extension_id }}
           ADO_ORG:      ${{ secrets.ADO_E2E_ORG }}
         run: |
           cat <<EOF
           ============================================================
-            BUILD OK — version $VSIX_VERSION
+            BUILD OK — version=$VSIX_VERSION id=$EXTENSION_ID
           ============================================================
             To exercise THIS PR's code in jobs 2 & 3, manually:
               1. Download the 'jfrog-ext-vsix-${{ github.run_number }}'
-                 artifact from this run page.
-              2. Upload it at:
+                 artifact from this run page; unzip to get the .vsix.
+              2. Upload at:
                  https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private
+                 (use 'New extension' the first time, '... -> Update'
+                  on the row afterwards.)
               3. Share with org '${ADO_ORG}' and install in the
-                 test project.
-              4. Re-run this workflow if you want the pipelines to
-                 pick up the freshly installed version.
+                 test project (only on first upload).
+              4. Re-run jobs 2 & 3 from this run page to pick up the
+                 freshly installed version.
           ============================================================
           EOF
 
