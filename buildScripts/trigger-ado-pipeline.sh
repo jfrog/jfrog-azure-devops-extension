@@ -38,7 +38,12 @@ echo "=============================================="
 # ------------------------------------------------------------------
 # Trigger the pipeline run
 # ------------------------------------------------------------------
-RUN_RESPONSE=$(curl -sf -X POST \
+# Capture HTTP status separately so we can diagnose 401/403/404 etc.
+# instead of getting an opaque "curl request failed" message.
+RESPONSE_FILE=$(mktemp)
+trap 'rm -f "$RESPONSE_FILE"' EXIT
+
+HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" -X POST \
     "${API_BASE}/pipelines/${ADO_PIPELINE_ID}/runs?api-version=7.1" \
     -H "${AUTH_HEADER}" \
     -H "Content-Type: application/json" \
@@ -47,10 +52,24 @@ RUN_RESPONSE=$(curl -sf -X POST \
             \"GH_PR_NUMBER\":   { \"value\": \"${GH_PR_NUMBER}\",  \"isSecret\": false },
             \"GH_COMMIT_SHA\":  { \"value\": \"${GH_COMMIT_SHA}\", \"isSecret\": false }
           }
-        }" || echo "CURL_FAILED")
+        }" || echo "000")
 
-if [ "$RUN_RESPONSE" = "CURL_FAILED" ] || [ -z "$RUN_RESPONSE" ]; then
-    echo "ERROR: curl request to trigger pipeline failed."
+RUN_RESPONSE="$(cat "$RESPONSE_FILE")"
+
+if [ "$HTTP_STATUS" != "200" ]; then
+    echo "ERROR: Pipeline trigger failed."
+    echo "  HTTP status : ${HTTP_STATUS}"
+    echo "  Endpoint    : ${API_BASE}/pipelines/${ADO_PIPELINE_ID}/runs?api-version=7.1"
+    echo "  Response    :"
+    echo "${RUN_RESPONSE}" | head -c 2000
+    echo ""
+    case "${HTTP_STATUS}" in
+        000) echo "  Hint: network/DNS failure — ADO_ORG '${ADO_ORG}' may be wrong (used in URL host)." ;;
+        401) echo "  Hint: PAT is invalid, expired, or for a different organization. Regenerate ADO_E2E_PAT." ;;
+        403) echo "  Hint: PAT lacks scopes. Required: Build (Read & Execute) + Project and Team (Read)." ;;
+        404) echo "  Hint: Project '${ADO_PROJECT}' or pipeline definition id '${ADO_PIPELINE_ID}' not found in org '${ADO_ORG}'." ;;
+        *)   echo "  Hint: see the response body above for the ADO error message." ;;
+    esac
     exit 1
 fi
 
@@ -58,8 +77,8 @@ RUN_ID=$(echo "$RUN_RESPONSE"   | jq -r '.id   // empty')
 RUN_URL=$(echo "$RUN_RESPONSE"  | jq -r '._links.web.href // empty')
 
 if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
-    echo "ERROR: Failed to parse run ID from response:"
-    echo "$RUN_RESPONSE"
+    echo "ERROR: trigger returned HTTP 200 but no run id was parsed from the response:"
+    echo "$RUN_RESPONSE" | head -c 2000
     exit 1
 fi
 
