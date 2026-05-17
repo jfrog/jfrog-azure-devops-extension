@@ -119,26 +119,33 @@ jobs:
           # Traceable version so we can correlate the installed extension
           # back to this exact PR run.
           VSIX_VERSION: "0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }}"
-          # The publisher placeholder doesn't matter for the build step —
-          # Marketplace UI will let us pick the real publisher at upload time.
-          PUBLISHER_PLACEHOLDER: 'e2e-build'
+          # Bake the real destination publisher into the .vsix at build time.
+          # Marketplace rejects uploads if the manifest publisher and the
+          # destination publisher don't match exactly, so we cannot use a
+          # generic placeholder here.
+          PUBLISHER: "${{ secrets.ADO_E2E_ORG }}-private"
         run: |
           set -euo pipefail
+          if [ -z "${PUBLISHER:-}" ] || [ "$PUBLISHER" = "-private" ]; then
+            echo "ERROR: ADO_E2E_ORG secret is not set — cannot bake publisher into .vsix." >&2
+            exit 1
+          fi
           cp vss-extension.json vss-extension-e2e.json
-          # Rewrite publisher in the manifest copy so tfx is happy.
-          sed -i.bak "s/\"publisher\": *\"[^\"]*\"/\"publisher\": \"$PUBLISHER_PLACEHOLDER\"/" vss-extension-e2e.json
+          # Rewrite publisher in the manifest copy so the resulting .vsix can
+          # be uploaded straight to the matching Marketplace publisher.
+          sed -i.bak "s/\"publisher\": *\"[^\"]*\"/\"publisher\": \"$PUBLISHER\"/" vss-extension-e2e.json
           rm -f vss-extension-e2e.json.bak
 
           npx tfx extension create \
             --manifest-globs vss-extension-e2e.json \
-            --publisher "$PUBLISHER_PLACEHOLDER" \
+            --publisher "$PUBLISHER" \
             --override "{\"public\": false, \"version\": \"$VSIX_VERSION\"}"
 
           vsix_path="$(ls -1 ./*.vsix | head -1)"
           vsix_name="$(basename "$vsix_path")"
           echo "vsix_name=$vsix_name"     >> "$GITHUB_OUTPUT"
           echo "vsix_version=$VSIX_VERSION" >> "$GITHUB_OUTPUT"
-          echo "Built: $vsix_path ($(du -m "$vsix_path" | cut -f1)MB)"
+          echo "Built: $vsix_path ($(du -m "$vsix_path" | cut -f1)MB) — publisher=$PUBLISHER"
 
       - name: Upload .vsix as workflow artifact
         uses: actions/upload-artifact@v4
