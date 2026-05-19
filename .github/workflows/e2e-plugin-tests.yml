@@ -113,35 +113,45 @@ jobs:
         # A failure here is a real PR failure (broken build).
         run: npm install --no-fund
 
-      - name: Rewrite task GUIDs for private build
-        # The public JFrog extension installed in the dev org uses the same
-        # task GUIDs as our source tree. ADO rejects installing a second
-        # extension that re-uses any task GUID ("already been uploaded by
-        # extension 'jfrog-azure-devops-extension'"). We replace every task
-        # GUID with a deterministic UUID v5 (namespace=our extension id +
-        # original GUID) so the private build has stable, unique GUIDs that
-        # never clash with the public extension, and are identical on every
-        # CI run (same branch → same GUIDs → installed extension's tasks
-        # are always found by the ADO pipeline YAML).
+      - name: Rewrite task GUIDs and names for private build
+        # The public JFrog extension uses the same task GUIDs and names as
+        # our source tree. Installing both in the same ADO org causes two
+        # problems:
+        #   1. Marketplace rejects publishing a .vsix whose task GUIDs are
+        #      already owned by another extension ("already been uploaded by
+        #      extension 'jfrog-azure-devops-extension'").
+        #   2. ADO rejects queuing a pipeline run when two installed
+        #      extensions export tasks with the same name ("task name
+        #      JFrogToolsInstaller is ambiguous").
+        # We fix both by rewriting every task.json:
+        #   • id   → deterministic UUIDv5 (namespace + original GUID)
+        #             stable across CI runs; unique vs the public extension.
+        #   • name → original name + "E2E" suffix
+        #             e.g. JFrogToolsInstaller → JFrogToolsInstallerE2E
+        #             The .pipelines/ado-*.yml files reference the E2E names
+        #             so the test pipelines always target this private build,
+        #             never the public one.
         run: |
           set -euo pipefail
           python3 - <<'PYEOF'
-          import json, uuid, glob, os
+          import json, uuid, glob
 
           # Fixed namespace — changing this would change all GUIDs.
           NS = uuid.UUID('e2e1a2b3-c4d5-6789-abcd-ef0123456789')
 
-          for path in sorted(glob.glob('tasks/*/task.json')):
+          paths = sorted(glob.glob('tasks/*/task.json'))
+          for path in paths:
               data = json.load(open(path))
-              orig = data.get('id', '')
-              if not orig:
+              orig_id   = data.get('id',   '')
+              orig_name = data.get('name', '')
+              if not orig_id:
                   continue
-              new_guid = str(uuid.uuid5(NS, orig))
-              data['id'] = new_guid
+              data['id']   = str(uuid.uuid5(NS, orig_id))
+              data['name'] = orig_name + 'E2E'
               json.dump(data, open(path, 'w'), indent=2)
-              print(f"  {orig}  →  {new_guid}  ({path})")
+              print(f"  {orig_name}  →  {data['name']}  |  {orig_id}  →  {data['id']}  ({path})")
 
-          print(f"Rewrote {len(glob.glob('tasks/*/task.json'))} task GUIDs.")
+          print(f"Rewrote {len(paths)} task GUIDs and names.")
           PYEOF
 
       - name: Package .vsix
