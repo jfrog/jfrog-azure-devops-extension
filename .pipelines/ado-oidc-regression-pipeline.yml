@@ -239,18 +239,27 @@ stages:
               artifactoryConnection: 'sc-artifactory-token'
               cliInstallationRepo: 'jfrog-cli-remote'
               installJFrogCli: true
-          - script: jf --version
+          - script: |
+              JF_BIN=$(find /opt/hostedtoolcache/jf -name 'jf' -type f 2>/dev/null | head -1)
+              if [ -z "$JF_BIN" ]; then echo "##[error]jf binary not found in tool cache"; exit 1; fi
+              "$JF_BIN" --version
             displayName: 'Verify CLI installed'
 
       # --- A_ToolsInstaller_Extractors_OIDC ---------------------------
+      # Note: JFrogToolsInstaller uses static credentials (createAuthHandlers)
+      # for the CLI binary download because OIDC tokens can only be exchanged
+      # *by* the CLI after it is already on disk. Using an OIDC service
+      # connection here always results in a 401 on the download step.
+      # OIDC extractor configuration is tested end-to-end in S5 (Maven) and
+      # S6 (Gradle) where the CLI is already present.
       - job: S2_A_ToolsInstaller_Extractors_OIDC
-        displayName: 'A_ToolsInstaller extractors via OIDC'
+        displayName: 'A_ToolsInstaller extractors via token (OIDC tested in S5/S6)'
         pool: { vmImage: 'ubuntu-22.04' }
         steps:
           - task: JFrogToolsInstallerE2E@1
-            displayName: 'Install CLI + Maven/Gradle extractors via OIDC'
+            displayName: 'Install CLI + Maven/Gradle extractors via token'
             inputs:
-              artifactoryConnection: 'sc-artifactory-oidc'
+              artifactoryConnection: 'sc-artifactory-token'
               cliInstallationRepo: 'jfrog-cli-remote'
               installJFrogCli: true
               installExtractors: true
@@ -387,9 +396,9 @@ stages:
         pool: { vmImage: 'ubuntu-22.04' }
         steps:
           - task: JavaToolInstaller@0
-            displayName: 'Install Java 11'
+            displayName: 'Install Java 17'
             inputs:
-              versionSpec: '11'
+              versionSpec: '17'
               jdkArchitectureOption: 'x64'
               jdkSourceOption: 'PreInstalled'
           - script: |
@@ -440,9 +449,9 @@ stages:
         pool: { vmImage: 'ubuntu-22.04' }
         steps:
           - task: JavaToolInstaller@0
-            displayName: 'Install Java 11'
+            displayName: 'Install Java 17'
             inputs:
-              versionSpec: '11'
+              versionSpec: '17'
               jdkArchitectureOption: 'x64'
               jdkSourceOption: 'PreInstalled'
           - script: |
@@ -462,11 +471,12 @@ stages:
             displayName: 'Gradle build via OIDC'
             inputs:
               gradleBuildFile: '/tmp/gradle-oidc/build.gradle'
+              workDir: '/tmp/gradle-oidc'
               tasks: 'build'
               artifactoryResolverService: 'sc-artifactory-oidc'
-              targetResolveRepo:          'ecomatrix-gradle-remote'
-              artifactoryDeployService:   'sc-artifactory-oidc'
-              targetDeployRepo:           'ecomatrix-gradle-local'
+              sourceRepo:                 'ecomatrix-gradle-remote'
+              artifactoryDeployerService: 'sc-artifactory-oidc'
+              targetRepo:                 'ecomatrix-gradle-local'
               collectBuildInfo: true
               buildName:   '$(BUILD_NAME)'
               buildNumber: '$(BUILD_NUMBER)'
@@ -508,6 +518,7 @@ stages:
 
               func main() { fmt.Println(uuid.New().String()) }
               EOF
+              go mod tidy
             displayName: 'Create inline Go module'
           - task: JFrogGoE2E@1
             displayName: 'Go build via OIDC'
