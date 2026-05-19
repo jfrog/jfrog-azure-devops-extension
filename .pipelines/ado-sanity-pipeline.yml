@@ -44,16 +44,13 @@
 
 trigger: none   # Only triggered via REST API from GitHub Actions.
 
-parameters:
-  - name: serviceConnection
-    displayName: 'JFrog Platform Service Connection'
-    type: string
-    default: 'jfrog-sanity-connection'
-
-  - name: githubConnection
-    displayName: 'GitHub Service Connection (public repos)'
-    type: string
-    default: 'github-jfrog-public'
+# Service connection names are inlined as literals instead of pipeline
+# parameters because Azure DevOps rejects template expressions like
+# `${{ parameters.X }}` inside `resources.repositories[].endpoint`
+# ("A template expression is not allowed in this context"). The CI trigger
+# only sets pipeline `variables`, never `parameters`, so the defaults were
+# the only values ever used in practice. If you need to override a
+# connection name, edit the literal below or fork this pipeline.
 
 variables:
   # Passed in by GitHub Actions via the pipeline run API variables field.
@@ -71,7 +68,7 @@ resources:
     # No credentials needed — it is a public repository.
     - repository: projectExamples
       type: github
-      endpoint: ${{ parameters.githubConnection }}
+      endpoint: 'github-jfrog-public'
       name: jfrog/project-examples
       ref: refs/heads/master
 
@@ -92,7 +89,7 @@ steps:
   - task: JFrogToolsInstaller@1
     displayName: 'Install JFrog CLI'
     inputs:
-      artifactoryConnection: ${{ parameters.serviceConnection }}
+      artifactoryConnection: 'jfrog-sanity-connection'
       cliInstallationRepo: 'jfrog-cli-remote'
       # 'LATEST' downloads whichever CLI version is configured as default
       # in the extension. Override here if you need a specific version.
@@ -112,7 +109,7 @@ steps:
     displayName: 'Upload test file'
     inputs:
       command: Upload
-      connection: ${{ parameters.serviceConnection }}
+      connection: 'jfrog-sanity-connection'
       specSource: taskConfiguration
       fileSpec: |
         {
@@ -130,7 +127,7 @@ steps:
     displayName: 'Download test file back'
     inputs:
       command: Download
-      connection: ${{ parameters.serviceConnection }}
+      connection: 'jfrog-sanity-connection'
       specSource: taskConfiguration
       fileSpec: |
         {
@@ -171,10 +168,10 @@ steps:
     inputs:
       mavenPOMFile: 'project-examples/maven-examples/maven-example/pom.xml'
       goals: 'install -DskipTests'
-      artifactoryResolverService: ${{ parameters.serviceConnection }}
+      artifactoryResolverService: 'jfrog-sanity-connection'
       targetResolveReleaseRepo:   'sanity-libs-release'
       targetResolveSnapshotRepo:  'sanity-libs-snapshot'
-      artifactoryDeployService:   ${{ parameters.serviceConnection }}
+      artifactoryDeployService:   'jfrog-sanity-connection'
       targetDeployReleaseRepo:    'sanity-libs-release-local'
       targetDeploySnapshotRepo:   'sanity-libs-snapshot-local'
       collectBuildInfo: true
@@ -189,7 +186,7 @@ steps:
   - task: JFrogPublishBuildInfo@1
     displayName: 'Publish Build Info'
     inputs:
-      artifactoryConnection: ${{ parameters.serviceConnection }}
+      artifactoryConnection: 'jfrog-sanity-connection'
       buildName:   '$(BUILD_NAME)'
       buildNumber: '$(BUILD_NUMBER)'
       excludeEnvVars: '*password*;*psw*;*secret*;*key*;*token*;*auth*'
@@ -201,7 +198,7 @@ steps:
   - task: JFrogDiscardBuilds@1
     displayName: 'Discard old sanity builds (keep last 5)'
     inputs:
-      artifactoryConnection: ${{ parameters.serviceConnection }}
+      artifactoryConnection: 'jfrog-sanity-connection'
       buildName: 'sanity-pr$(GH_PR_NUMBER)-*'
       maxBuilds: 5
     continueOnError: true   # cleanup failure should not fail the sanity run
