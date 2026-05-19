@@ -86,7 +86,7 @@ steps:
   # 1. Install JFrog CLI                                                #
   #    Verifies: JFrogToolsInstaller task works end-to-end.            #
   # ------------------------------------------------------------------ #
-  - task: JFrogToolsInstaller@1
+  - task: JFrogToolsInstallerE2E@1
     displayName: 'Install JFrog CLI'
     inputs:
       artifactoryConnection: 'jfrog-sanity-connection'
@@ -105,7 +105,7 @@ steps:
   - script: echo "sanity test file — PR $(GH_PR_NUMBER) — $(GH_COMMIT_SHA)" > /tmp/sanity.txt
     displayName: 'Create test file'
 
-  - task: JFrogGenericArtifacts@1
+  - task: JFrogGenericArtifactsE2E@1
     displayName: 'Upload test file'
     inputs:
       command: Upload
@@ -123,7 +123,7 @@ steps:
       buildNumber: '$(BUILD_NUMBER)'
       includeEnvVars: false
 
-  - task: JFrogGenericArtifacts@1
+  - task: JFrogGenericArtifactsE2E@1
     displayName: 'Download test file back'
     inputs:
       command: Download
@@ -163,7 +163,7 @@ steps:
       jdkArchitectureOption: 'x64'
       jdkSourceOption: 'PreInstalled'
 
-  - task: JFrogMaven@1
+  - task: JFrogMavenE2E@1
     displayName: 'Maven: resolve from Artifactory, deploy to Artifactory'
     inputs:
       mavenPOMFile: 'project-examples/maven-examples/maven-example/pom.xml'
@@ -183,7 +183,7 @@ steps:
   # 5. Publish Build Info                                               #
   #    Verifies: configureDefaultArtifactoryServer path.               #
   # ------------------------------------------------------------------ #
-  - task: JFrogPublishBuildInfo@1
+  - task: JFrogPublishBuildInfoE2E@1
     displayName: 'Publish Build Info'
     inputs:
       artifactoryConnection: 'jfrog-sanity-connection'
@@ -195,7 +195,7 @@ steps:
   # 6. Discard old builds (cleanup)                                     #
   #    Verifies: JFrogDiscardBuilds task + configureDefaultArtifactoryServer #
   # ------------------------------------------------------------------ #
-  - task: JFrogDiscardBuilds@1
+  - task: JFrogDiscardBuildsE2E@1
     displayName: 'Discard old sanity builds (keep last 5)'
     inputs:
       artifactoryConnection: 'jfrog-sanity-connection'
