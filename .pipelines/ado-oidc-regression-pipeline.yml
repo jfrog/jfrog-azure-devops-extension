@@ -83,7 +83,8 @@ stages:
         displayName: 'CliV2 ping (Platform OIDC)'
         pool: { vmImage: 'ubuntu-22.04' }
         steps:
-          - script: echo "##[section]OIDC PR #$(GH_PR_NUMBER) commit $(GH_COMMIT_SHA)"
+          - script: |
+              echo "OIDC PR #$GH_PR_NUMBER commit $GH_COMMIT_SHA"
             displayName: 'Print traceability'
           - task: JfrogCliV2E2E@1
             displayName: 'jf rt ping via Platform OIDC'
