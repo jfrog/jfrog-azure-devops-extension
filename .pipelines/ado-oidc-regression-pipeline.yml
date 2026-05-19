@@ -83,7 +83,7 @@ stages:
         steps:
           - script: echo "##[section]OIDC PR #$(GH_PR_NUMBER) commit $(GH_COMMIT_SHA)"
             displayName: 'Print traceability'
-          - task: JFrogCliV2E2E@1
+          - task: JfrogCliV2E2E@1
             displayName: 'jf rt ping via Platform OIDC'
             inputs:
               jfrogPlatformConnection: 'sc-platform-oidc'
