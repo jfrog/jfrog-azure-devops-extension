@@ -53,9 +53,10 @@ trigger: none   # Only triggered via REST API from GitHub Actions.
 # connection name, edit the literal below or fork this pipeline.
 
 variables:
-  # Passed in by GitHub Actions via the pipeline run API variables field.
-  GH_PR_NUMBER:  $[coalesce(variables['GH_PR_NUMBER'],  '0')]
-  GH_COMMIT_SHA: $[coalesce(variables['GH_COMMIT_SHA'], 'unknown')]
+  # Defaults — overridden at queue time by the GitHub Actions trigger script.
+  # These must also be marked "Settable at queue time" in the pipeline UI.
+  GH_PR_NUMBER:  '0'
+  GH_COMMIT_SHA: 'unknown'
   BUILD_NAME:    'sanity-pr$(GH_PR_NUMBER)-$(Build.BuildId)'
   BUILD_NUMBER:  '$(Build.BuildNumber)'
 
