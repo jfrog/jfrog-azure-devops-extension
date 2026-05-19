@@ -62,16 +62,6 @@ variables:
 pool:
   vmImage: 'ubuntu-22.04'
 
-resources:
-  repositories:
-    # Public repo containing the Maven example project.
-    # No credentials needed — it is a public repository.
-    - repository: projectExamples
-      type: github
-      endpoint: 'github-jfrog-public'
-      name: jfrog/project-examples
-      ref: refs/heads/master
-
 steps:
   # ------------------------------------------------------------------ #
   # 0. Identify the build                                               #
@@ -152,9 +142,28 @@ steps:
   # ------------------------------------------------------------------ #
   # 4. Maven build (resolve + deploy)                                   #
   #    Verifies: configureArtifactoryCliServer used by Maven task.     #
+  #    pom.xml is inlined to avoid a GitHub service connection to the  #
+  #    jfrog org (which requires SAML SSO authorization).              #
   # ------------------------------------------------------------------ #
-  - checkout: projectExamples
-    displayName: 'Checkout project-examples (Maven POM)'
+  - script: |
+      mkdir -p /tmp/maven-sanity
+      cat > /tmp/maven-sanity/pom.xml <<'EOF'
+      <project xmlns="http://maven.apache.org/POM/4.0.0">
+        <modelVersion>4.0.0</modelVersion>
+        <groupId>org.jfrog.sanity</groupId>
+        <artifactId>sanity-test</artifactId>
+        <version>1.0.0</version>
+        <packaging>jar</packaging>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+          </dependency>
+        </dependencies>
+      </project>
+      EOF
+    displayName: 'Create inline pom.xml'
 
   - task: JavaToolInstaller@0
     displayName: 'Install Java 11'
@@ -166,7 +175,7 @@ steps:
   - task: JFrogMavenE2E@1
     displayName: 'Maven: resolve from Artifactory, deploy to Artifactory'
     inputs:
-      mavenPOMFile: 'project-examples/maven-examples/maven-example/pom.xml'
+      mavenPOMFile: '/tmp/maven-sanity/pom.xml'
       goals: 'install -DskipTests'
       artifactoryResolverService: 'jfrog-sanity-connection'
       targetResolveReleaseRepo:   'sanity-libs-release'
