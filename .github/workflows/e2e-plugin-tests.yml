@@ -113,6 +113,37 @@ jobs:
         # A failure here is a real PR failure (broken build).
         run: npm install --no-fund
 
+      - name: Rewrite task GUIDs for private build
+        # The public JFrog extension installed in the dev org uses the same
+        # task GUIDs as our source tree. ADO rejects installing a second
+        # extension that re-uses any task GUID ("already been uploaded by
+        # extension 'jfrog-azure-devops-extension'"). We replace every task
+        # GUID with a deterministic UUID v5 (namespace=our extension id +
+        # original GUID) so the private build has stable, unique GUIDs that
+        # never clash with the public extension, and are identical on every
+        # CI run (same branch → same GUIDs → installed extension's tasks
+        # are always found by the ADO pipeline YAML).
+        run: |
+          set -euo pipefail
+          python3 - <<'PYEOF'
+          import json, uuid, glob, os
+
+          # Fixed namespace — changing this would change all GUIDs.
+          NS = uuid.UUID('e2e1a2b3-c4d5-6789-abcd-ef0123456789')
+
+          for path in sorted(glob.glob('tasks/*/task.json')):
+              data = json.load(open(path))
+              orig = data.get('id', '')
+              if not orig:
+                  continue
+              new_guid = str(uuid.uuid5(NS, orig))
+              data['id'] = new_guid
+              json.dump(data, open(path, 'w'), indent=2)
+              print(f"  {orig}  →  {new_guid}  ({path})")
+
+          print(f"Rewrote {len(glob.glob('tasks/*/task.json'))} task GUIDs.")
+          PYEOF
+
       - name: Package .vsix
         id: build_vsix
         env:
