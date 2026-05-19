@@ -154,7 +154,10 @@ jobs:
           # Marketplace rejects uploads if the manifest publisher and the
           # destination publisher don't match exactly, so we cannot use a
           # generic placeholder here.
-          PUBLISHER: "${{ secrets.ADO_E2E_ORG }}-private"
+          # ADO_E2E_PUBLISHER_ORG lets you decouple the Marketplace publisher
+          # org from the ADO test-run org (ADO_E2E_ORG). If not set, falls
+          # back to ADO_E2E_ORG (the original behaviour for single-org setups).
+          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
           # Bake a distinct extension id into the .vsix so the upload doesn't
           # collide with Marketplace's permanent record of the public id
           # "jfrog-azure-devops-extension" (which gets tombstoned forever in
