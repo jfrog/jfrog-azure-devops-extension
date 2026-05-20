@@ -212,6 +212,22 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+      - name: Publish .vsix to Marketplace
+        if: ${{ secrets.ADO_E2E_MARKETPLACE_PAT != '' }}
+        env:
+          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
+        run: |
+          set -euo pipefail
+          vsix_path="$(ls -1 ./*.vsix | head -1)"
+          echo "Publishing $vsix_path to Marketplace..."
+          npx tfx extension publish \
+            --vsix "$vsix_path" \
+            --token "$MARKETPLACE_PAT"
+          echo "Published successfully."
+          echo "Waiting 90s for Marketplace async validation and ADO extension cache to propagate..."
+          sleep 90
+          echo "Done waiting — ADO pipelines will now run against the freshly published extension."
+
       - name: Write install instructions to job summary
         env:
           VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
@@ -274,6 +290,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      - name: Wait for Marketplace extension to propagate
+        run: |
+          echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
+          sleep 420
+          echo "Done — triggering ADO sanity pipeline now."
+
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
         with:
@@ -306,6 +328,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      - name: Wait for Marketplace extension to propagate
+        run: |
+          echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
+          sleep 420
+          echo "Done — triggering ADO OIDC pipeline now."
+
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
         with:
