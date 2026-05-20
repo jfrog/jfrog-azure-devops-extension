@@ -323,8 +323,11 @@ jobs:
           if [ "$INSTALLED" = "$EXPECTED_VERSION" ]; then
             echo "  MATCH — tests will run against the current PR build."
           else
-            echo "  MISMATCH — tests will run against $INSTALLED, NOT this PR build."
-            echo "  This is expected if the publish step was skipped or is still propagating."
+            echo "  MISMATCH — Marketplace has $INSTALLED but expected $EXPECTED_VERSION."
+            echo "  The publish step may have been skipped, or propagation took longer than 7 minutes."
+            echo "  Stopping to avoid running tests against a stale build."
+            echo "============================================================"
+            exit 1
           fi
           echo "============================================================"
 
@@ -392,8 +395,11 @@ jobs:
           if [ "$INSTALLED" = "$EXPECTED_VERSION" ]; then
             echo "  MATCH — tests will run against the current PR build."
           else
-            echo "  MISMATCH — tests will run against $INSTALLED, NOT this PR build."
-            echo "  This is expected if the publish step was skipped or is still propagating."
+            echo "  MISMATCH — Marketplace has $INSTALLED but expected $EXPECTED_VERSION."
+            echo "  The publish step may have been skipped, or propagation took longer than 7 minutes."
+            echo "  Stopping to avoid running tests against a stale build."
+            echo "============================================================"
+            exit 1
           fi
           echo "============================================================"
 
