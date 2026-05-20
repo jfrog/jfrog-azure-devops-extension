@@ -291,6 +291,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      - name: Print extension version being tested
+        run: |
+          echo "============================================================"
+          echo "  Extension version under test: ${{ needs.build.outputs.vsix_version }}"
+          echo "============================================================"
+
       - name: Wait for Marketplace extension to propagate
         run: |
           echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
@@ -329,6 +335,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      - name: Print extension version being tested
+        run: |
+          echo "============================================================"
+          echo "  Extension version under test: ${{ needs.build.outputs.vsix_version }}"
+          echo "============================================================"
+
       - name: Wait for Marketplace extension to propagate
         run: |
           echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
