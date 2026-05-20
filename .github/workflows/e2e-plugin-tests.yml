@@ -103,29 +103,6 @@ jobs:
       vsix_name: ${{ steps.build_vsix.outputs.vsix_name }}
 
     steps:
-      - name: Check current Marketplace version (pre-build)
-        env:
-          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
-          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
-          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
-        run: |
-          if [ -z "${MARKETPLACE_PAT:-}" ]; then
-            echo "ADO_E2E_MARKETPLACE_PAT not set — skipping pre-build version check."
-            exit 0
-          fi
-          TFX_OUT=$(npx --yes tfx-cli extension show \
-            --publisher "$PUBLISHER" \
-            --extension-id "$EXTENSION_ID" \
-            --token "$MARKETPLACE_PAT" 2>&1 || true)
-          echo "tfx output:"
-          echo "$TFX_OUT"
-          CURRENT=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')" 2>/dev/null || echo 'not-found')
-          if [ "$CURRENT" = "not-found" ]; then
-            echo "ERROR: Could not retrieve extension version from Marketplace. Check MARKETPLACE_PAT and publisher/extension-id."
-            exit 1
-          fi
-          echo "Current Marketplace version (before this build): $CURRENT"
-
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
