@@ -291,6 +291,12 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      - name: Wait for Marketplace extension to propagate
+        run: |
+          echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
+          sleep 420
+          echo "Done — proceeding to version check."
+
       - name: Verify extension version on Marketplace
         env:
           MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
@@ -332,12 +338,6 @@ print(versions[0]['version'] if versions else 'not-found')
             echo "  This is expected if the publish step was skipped or is still propagating."
           fi
           echo "============================================================"
-
-      - name: Wait for Marketplace extension to propagate
-        run: |
-          echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
-          sleep 420
-          echo "Done — triggering ADO sanity pipeline now."
 
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
@@ -371,6 +371,12 @@ print(versions[0]['version'] if versions else 'not-found')
     timeout-minutes: 60
 
     steps:
+      - name: Wait for Marketplace extension to propagate
+        run: |
+          echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
+          sleep 420
+          echo "Done — proceeding to version check."
+
       - name: Verify extension version on Marketplace
         env:
           MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
@@ -412,12 +418,6 @@ print(versions[0]['version'] if versions else 'not-found')
             echo "  This is expected if the publish step was skipped or is still propagating."
           fi
           echo "============================================================"
-
-      - name: Wait for Marketplace extension to propagate
-        run: |
-          echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
-          sleep 420
-          echo "Done — triggering ADO OIDC pipeline now."
 
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
