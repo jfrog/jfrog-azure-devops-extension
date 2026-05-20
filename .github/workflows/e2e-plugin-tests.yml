@@ -222,7 +222,8 @@ jobs:
           echo "Publishing $vsix_path to Marketplace..."
           npx tfx extension publish \
             --vsix "$vsix_path" \
-            --token "$MARKETPLACE_PAT"
+            --token "$MARKETPLACE_PAT" \
+            --no-wait-validation
           echo "Published successfully."
           echo "Waiting 90s for Marketplace async validation and ADO extension cache to propagate..."
           sleep 90
