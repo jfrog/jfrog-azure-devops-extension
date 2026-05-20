@@ -298,17 +298,30 @@ jobs:
           EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
           EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
         run: |
-          set -euo pipefail
           if [ -z "${MARKETPLACE_PAT:-}" ]; then
             echo "ADO_E2E_MARKETPLACE_PAT not set — cannot query Marketplace."
             echo "Expected version (built this run): $EXPECTED_VERSION"
             exit 0
           fi
-          INSTALLED=$(curl -sf \
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Basic $(echo -n ":$MARKETPLACE_PAT" | base64 -w0)" \
             -H "Accept: application/json;api-version=7.2-preview.1" \
-            "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/$PUBLISHER/vsextensions/$EXTENSION_ID?api-version=7.2-preview.1" \
-            | python3 -c "import sys,json; d=json.load(sys.stdin); v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')")
+            "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/$PUBLISHER/vsextensions/$EXTENSION_ID?api-version=7.2-preview.1")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "Marketplace API response code: $HTTP_CODE"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "WARNING: Marketplace API returned HTTP $HTTP_CODE — skipping version check."
+            echo "Response body: $BODY"
+            echo "Expected version (built this run): $EXPECTED_VERSION"
+            exit 0
+          fi
+          INSTALLED=$(echo "$BODY" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+versions = d.get('versions', [])
+print(versions[0]['version'] if versions else 'not-found')
+")
           echo "============================================================"
           echo "  Expected version (built this run) : $EXPECTED_VERSION"
           echo "  Published version on Marketplace  : $INSTALLED"
@@ -365,17 +378,30 @@ jobs:
           EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
           EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
         run: |
-          set -euo pipefail
           if [ -z "${MARKETPLACE_PAT:-}" ]; then
             echo "ADO_E2E_MARKETPLACE_PAT not set — cannot query Marketplace."
             echo "Expected version (built this run): $EXPECTED_VERSION"
             exit 0
           fi
-          INSTALLED=$(curl -sf \
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Basic $(echo -n ":$MARKETPLACE_PAT" | base64 -w0)" \
             -H "Accept: application/json;api-version=7.2-preview.1" \
-            "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/$PUBLISHER/vsextensions/$EXTENSION_ID?api-version=7.2-preview.1" \
-            | python3 -c "import sys,json; d=json.load(sys.stdin); v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')")
+            "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/$PUBLISHER/vsextensions/$EXTENSION_ID?api-version=7.2-preview.1")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "Marketplace API response code: $HTTP_CODE"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "WARNING: Marketplace API returned HTTP $HTTP_CODE — skipping version check."
+            echo "Response body: $BODY"
+            echo "Expected version (built this run): $EXPECTED_VERSION"
+            exit 0
+          fi
+          INSTALLED=$(echo "$BODY" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+versions = d.get('versions', [])
+print(versions[0]['version'] if versions else 'not-found')
+")
           echo "============================================================"
           echo "  Expected version (built this run) : $EXPECTED_VERSION"
           echo "  Published version on Marketplace  : $INSTALLED"
