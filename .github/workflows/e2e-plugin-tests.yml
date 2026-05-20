@@ -213,7 +213,7 @@ jobs:
           if-no-files-found: error
 
       - name: Publish .vsix to Marketplace
-        if: ${{ secrets.ADO_E2E_MARKETPLACE_PAT != '' }}
+        if: ${{ env.MARKETPLACE_PAT != '' }}
         env:
           MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
         run: |
