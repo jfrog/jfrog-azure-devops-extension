@@ -119,20 +119,7 @@ jobs:
             --token "$MARKETPLACE_PAT" 2>&1 || true)
           echo "tfx output:"
           echo "$TFX_OUT"
-          CURRENT=$(echo "$TFX_OUT" | python3 -c "
-import sys, json
-raw = sys.stdin.read()
-start = raw.find('{')
-if start < 0:
-    print('not-found')
-    sys.exit(0)
-try:
-    d = json.loads(raw[start:])
-    v = d.get('versions', [])
-    print(v[0]['version'] if v else 'not-found')
-except Exception as e:
-    print('not-found')
-" 2>/dev/null || echo 'not-found')
+          CURRENT=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')" 2>/dev/null || echo 'not-found')
           if [ "$CURRENT" = "not-found" ]; then
             echo "ERROR: Could not retrieve extension version from Marketplace. Check MARKETPLACE_PAT and publisher/extension-id."
             exit 1
@@ -351,20 +338,7 @@ except Exception as e:
             --token "$MARKETPLACE_PAT" 2>&1 || true)
           echo "tfx output:"
           echo "$TFX_OUT"
-          INSTALLED=$(echo "$TFX_OUT" | python3 -c "
-import sys, json
-raw = sys.stdin.read()
-start = raw.find('{')
-if start < 0:
-    print('not-found')
-    sys.exit(0)
-try:
-    d = json.loads(raw[start:])
-    v = d.get('versions', [])
-    print(v[0]['version'] if v else 'not-found')
-except Exception:
-    print('not-found')
-" 2>/dev/null || echo 'not-found')
+          INSTALLED=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')" 2>/dev/null || echo 'not-found')
           [ -z "$INSTALLED" ] && INSTALLED='not-found'
           echo "============================================================"
           echo "  Expected version (built this run) : $EXPECTED_VERSION"
@@ -433,20 +407,7 @@ except Exception:
             --token "$MARKETPLACE_PAT" 2>&1 || true)
           echo "tfx output:"
           echo "$TFX_OUT"
-          INSTALLED=$(echo "$TFX_OUT" | python3 -c "
-import sys, json
-raw = sys.stdin.read()
-start = raw.find('{')
-if start < 0:
-    print('not-found')
-    sys.exit(0)
-try:
-    d = json.loads(raw[start:])
-    v = d.get('versions', [])
-    print(v[0]['version'] if v else 'not-found')
-except Exception:
-    print('not-found')
-" 2>/dev/null || echo 'not-found')
+          INSTALLED=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')" 2>/dev/null || echo 'not-found')
           [ -z "$INSTALLED" ] && INSTALLED='not-found'
           echo "============================================================"
           echo "  Expected version (built this run) : $EXPECTED_VERSION"
