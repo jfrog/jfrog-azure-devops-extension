@@ -314,8 +314,8 @@ jobs:
             -H "Authorization: Basic $(echo -n ":$MARKETPLACE_PAT" | base64 -w0)" \
             -H "Content-Type: application/json" \
             -H "Accept: application/json;api-version=7.2-preview.1" \
-            -d "{\"filters\":[{\"criteria\":[{\"filterType\":7,\"value\":\"$PUBLISHER.$EXTENSION_ID\"}]}],\"flags\":514}" \
-            "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery")
+            -d "{\"filters\":[{\"criteria\":[{\"filterType\":7,\"value\":\"$PUBLISHER.$EXTENSION_ID\"}]}],\"flags\":513}" \
+            "https://marketplace.visualstudio.com/_apis/gallery/extensionquery")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | sed '$d')
           echo "Marketplace API response code: $HTTP_CODE"
@@ -392,8 +392,8 @@ jobs:
             -H "Authorization: Basic $(echo -n ":$MARKETPLACE_PAT" | base64 -w0)" \
             -H "Content-Type: application/json" \
             -H "Accept: application/json;api-version=7.2-preview.1" \
-            -d "{\"filters\":[{\"criteria\":[{\"filterType\":7,\"value\":\"$PUBLISHER.$EXTENSION_ID\"}]}],\"flags\":514}" \
-            "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery")
+            -d "{\"filters\":[{\"criteria\":[{\"filterType\":7,\"value\":\"$PUBLISHER.$EXTENSION_ID\"}]}],\"flags\":513}" \
+            "https://marketplace.visualstudio.com/_apis/gallery/extensionquery")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | sed '$d')
           echo "Marketplace API response code: $HTTP_CODE"
