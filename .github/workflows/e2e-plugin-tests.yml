@@ -291,10 +291,33 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Print extension version being tested
+      - name: Verify extension version on Marketplace
+        env:
+          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
+          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
+          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
+          EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
         run: |
+          set -euo pipefail
+          if [ -z "${MARKETPLACE_PAT:-}" ]; then
+            echo "ADO_E2E_MARKETPLACE_PAT not set — cannot query Marketplace."
+            echo "Expected version (built this run): $EXPECTED_VERSION"
+            exit 0
+          fi
+          INSTALLED=$(curl -sf \
+            -H "Authorization: Basic $(echo -n ":$MARKETPLACE_PAT" | base64 -w0)" \
+            -H "Accept: application/json;api-version=7.2-preview.1" \
+            "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/$PUBLISHER/vsextensions/$EXTENSION_ID?api-version=7.2-preview.1" \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')")
           echo "============================================================"
-          echo "  Extension version under test: ${{ needs.build.outputs.vsix_version }}"
+          echo "  Expected version (built this run) : $EXPECTED_VERSION"
+          echo "  Published version on Marketplace  : $INSTALLED"
+          if [ "$INSTALLED" = "$EXPECTED_VERSION" ]; then
+            echo "  MATCH — tests will run against the current PR build."
+          else
+            echo "  MISMATCH — tests will run against $INSTALLED, NOT this PR build."
+            echo "  This is expected if the publish step was skipped or is still propagating."
+          fi
           echo "============================================================"
 
       - name: Wait for Marketplace extension to propagate
@@ -335,10 +358,33 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Print extension version being tested
+      - name: Verify extension version on Marketplace
+        env:
+          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
+          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
+          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
+          EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
         run: |
+          set -euo pipefail
+          if [ -z "${MARKETPLACE_PAT:-}" ]; then
+            echo "ADO_E2E_MARKETPLACE_PAT not set — cannot query Marketplace."
+            echo "Expected version (built this run): $EXPECTED_VERSION"
+            exit 0
+          fi
+          INSTALLED=$(curl -sf \
+            -H "Authorization: Basic $(echo -n ":$MARKETPLACE_PAT" | base64 -w0)" \
+            -H "Accept: application/json;api-version=7.2-preview.1" \
+            "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/$PUBLISHER/vsextensions/$EXTENSION_ID?api-version=7.2-preview.1" \
+            | python3 -c "import sys,json; d=json.load(sys.stdin); v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')")
           echo "============================================================"
-          echo "  Extension version under test: ${{ needs.build.outputs.vsix_version }}"
+          echo "  Expected version (built this run) : $EXPECTED_VERSION"
+          echo "  Published version on Marketplace  : $INSTALLED"
+          if [ "$INSTALLED" = "$EXPECTED_VERSION" ]; then
+            echo "  MATCH — tests will run against the current PR build."
+          else
+            echo "  MISMATCH — tests will run against $INSTALLED, NOT this PR build."
+            echo "  This is expected if the publish step was skipped or is still propagating."
+          fi
           echo "============================================================"
 
       - name: Wait for Marketplace extension to propagate
