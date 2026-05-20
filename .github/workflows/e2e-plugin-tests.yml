@@ -322,12 +322,7 @@ jobs:
             echo "Expected version (built this run): $EXPECTED_VERSION"
             exit 0
           fi
-          INSTALLED=$(echo "$BODY" | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-versions = d.get('versions', [])
-print(versions[0]['version'] if versions else 'not-found')
-")
+          INSTALLED=$(echo "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')")
           echo "============================================================"
           echo "  Expected version (built this run) : $EXPECTED_VERSION"
           echo "  Published version on Marketplace  : $INSTALLED"
@@ -402,12 +397,7 @@ print(versions[0]['version'] if versions else 'not-found')
             echo "Expected version (built this run): $EXPECTED_VERSION"
             exit 0
           fi
-          INSTALLED=$(echo "$BODY" | python3 -c "
-import sys, json
-d = json.load(sys.stdin)
-versions = d.get('versions', [])
-print(versions[0]['version'] if versions else 'not-found')
-")
+          INSTALLED=$(echo "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')")
           echo "============================================================"
           echo "  Expected version (built this run) : $EXPECTED_VERSION"
           echo "  Published version on Marketplace  : $INSTALLED"
