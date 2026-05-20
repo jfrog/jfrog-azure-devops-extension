@@ -73,6 +73,16 @@ steps:
       echo "Build number: $(BUILD_NUMBER)"
     displayName: 'Print traceability info'
 
+  - script: |
+      TASK_JSON=$(find "$AGENT_WORKFOLDER" -name 'task.json' -path '*JFrogToolsInstallerE2E*' 2>/dev/null | head -1)
+      if [ -n "$TASK_JSON" ]; then
+        VERSION=$(python3 -c "import json; d=json.load(open('$TASK_JSON')); v=d['version']; print(f\"{v['Major']}.{v['Minor']}.{v['Patch']}\")")
+        echo "##[section]JFrog extension task version: $VERSION"
+      else
+        echo "##[warning]Could not determine extension version from task cache."
+      fi
+    displayName: 'Print installed extension version'
+
   # ------------------------------------------------------------------ #
   # 1. Install JFrog CLI                                                #
   #    Verifies: JFrogToolsInstaller task works end-to-end.            #

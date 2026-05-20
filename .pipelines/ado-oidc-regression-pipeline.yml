@@ -86,6 +86,15 @@ stages:
           - script: |
               echo "OIDC PR #$GH_PR_NUMBER commit $GH_COMMIT_SHA"
             displayName: 'Print traceability'
+          - script: |
+              TASK_JSON=$(find "$AGENT_WORKFOLDER" -name 'task.json' -path '*JFrogToolsInstallerE2E*' 2>/dev/null | head -1)
+              if [ -n "$TASK_JSON" ]; then
+                VERSION=$(python3 -c "import json; d=json.load(open('$TASK_JSON')); v=d['version']; print(f\"{v['Major']}.{v['Minor']}.{v['Patch']}\")")
+                echo "##[section]JFrog extension task version: $VERSION"
+              else
+                echo "##[warning]Could not determine extension version from task cache."
+              fi
+            displayName: 'Print installed extension version'
           - task: JfrogCliV2E2E@1
             displayName: 'jf rt ping via Platform OIDC'
             inputs:
