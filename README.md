@@ -268,8 +268,8 @@ To enable TLS 1.2 on TFS:
 
 ## Using OpenID Connect (OIDC) Authentication
 
-Using OpenID Connect (OIDC) to authenticate your pipelines eliminates the need for long lived static credentials providing a whole range of [security and practical benefits](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-integration-benefits).   
-You can read more about the [JFrog OpenID Connection Integration](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-integration) in the documentation.
+Using OpenID Connect (OIDC) to authenticate your pipelines eliminates the need for long lived static credentials providing a whole range of [security and practical benefits](https://docs.jfrog.com/administration/docs/openid-connect-integration#openid-connect-integration-benefits).   
+You can read more about the [JFrog OpenID Connection Integration](https://docs.jfrog.com/administration/docs/openid-connect-integration) in the documentation.
 
 Setting up OpenID Connect has 3 separate parts:
 - Setting up an OpenID Connect Integration inside of the JFrog Platform.
