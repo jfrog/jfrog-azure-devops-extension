@@ -7,7 +7,7 @@ set -eu
 #   ADO_ORG         - Azure DevOps organization name (e.g. vigneshc0742)
 #   ADO_PROJECT     - Azure DevOps project name     (e.g. ecomatrix-test)
 #   ADO_PIPELINE_ID - Pipeline definition ID         (e.g. 63)
-#   ADO_PAT         - PAT with Build Read+Execute and Project Read scopes only
+#   ADO_PAT         - PAT with Build Read+Execute and Project Read scopes
 #
 # Optional environment variables:
 #   GH_PR_NUMBER    - GitHub PR number passed into pipeline as a variable (default: 0)
