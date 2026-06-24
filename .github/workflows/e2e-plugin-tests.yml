@@ -212,23 +212,6 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-      - name: Publish .vsix to Marketplace
-        if: ${{ env.MARKETPLACE_PAT != '' }}
-        env:
-          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
-        run: |
-          set -euo pipefail
-          vsix_path="$(ls -1 ./*.vsix | head -1)"
-          echo "Publishing $vsix_path to Marketplace..."
-          npx tfx extension publish \
-            --vsix "$vsix_path" \
-            --token "$MARKETPLACE_PAT" \
-            --no-wait-validation
-          echo "Published successfully."
-          echo "Waiting 90s for Marketplace async validation and ADO extension cache to propagate..."
-          sleep 90
-          echo "Done waiting — ADO pipelines will now run against the freshly published extension."
-
       - name: Write install instructions to job summary
         env:
           VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
