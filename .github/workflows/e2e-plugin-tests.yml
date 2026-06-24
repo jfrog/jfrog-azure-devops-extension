@@ -334,7 +334,7 @@ jobs:
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
 
       - name: Trigger ADO sanity pipeline and wait for result
         # The sanity pipeline (.pipelines/ado-sanity-pipeline.yml) tests:
@@ -406,7 +406,7 @@ jobs:
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
 
       - name: Trigger ADO OIDC test pipeline and wait for result
         # The OIDC pipeline covers:
