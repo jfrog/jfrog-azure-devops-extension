@@ -6,10 +6,7 @@
     "author": "JFrog",
     "category": "Tool",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#Executing-JFrog-CLI-Commands)",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "14",
@@ -24,8 +21,8 @@
             "type": "connectedService:jfrogPlatformService",
             "label": "JFrog Platform service connection",
             "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "JFrog Platform service connection to use in the command."
+            "required": false,
+            "helpMarkDown": "JFrog Platform service connection to use in the command. Required unless 'Configuration Name' is provided to reuse an existing JFrog CLI configuration."
         },
         {
             "name": "useCustomVersion",
@@ -63,6 +60,47 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
+        },
+        {
+            "name": "configurationName",
+            "type": "string",
+            "label": "Configuration Name",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Reuse an existing JFrog CLI configuration by name instead of creating a new one from 'JFrog Platform service connection'. The named configuration must already exist in the JFrog CLI's config store (for example, created by a previous run of this task with 'Keep Configuration' enabled)."
+        },
+        {
+            "name": "registerInPath",
+            "type": "boolean",
+            "label": "Add JFrog CLI to PATH",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Add the JFrog CLI executable's directory to the agent's PATH, so subsequent steps in the pipeline job can call 'jf' directly."
+        },
+        {
+            "name": "keepConfig",
+            "type": "boolean",
+            "label": "Keep Configuration",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Skip removing the JFrog CLI configuration when this task completes, so it can be reused by later steps via 'Configuration Name'. Use the 'JFROG_CLI_CONFIG_NAME' variable set by this task to reference it, and run a teardown task with 'Configuration Name' set and 'Keep Configuration' disabled to remove it at the end of the pipeline."
+        },
+        {
+            "name": "enablePackageAlias",
+            "type": "boolean",
+            "label": "Enable Package Alias (Ghost Frog)",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Install JFrog CLI's package-alias shims (requires JFrog CLI 2.93.0 or later), which transparently route native build tool commands (npm, mvn, gradle, dotnet, nuget, pip, go, docker, etc.) through 'jf' for the rest of the pipeline job. Requires 'Add JFrog CLI to PATH' to be enabled."
+        },
+        {
+            "name": "packageAliasTools",
+            "type": "string",
+            "label": "Package Alias Tools",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "enablePackageAlias = true",
+            "helpMarkDown": "Comma-separated list of tools to enable package aliasing for (e.g. 'npm,dotnet'). Leave empty to enable all supported tools."
         }
     ],
     "execution": {
