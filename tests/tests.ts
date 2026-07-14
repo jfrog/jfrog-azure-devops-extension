@@ -8,6 +8,7 @@ import * as syncRequest from 'sync-request';
 import * as TestUtils from './testUtils';
 import { platformDockerDomain } from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
+import * as taskLib from 'azure-pipelines-task-lib/task';
 import * as assert from 'assert';
 import * as os from 'os';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
@@ -105,6 +106,76 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                 assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a/b/c', 'a/b/c'), 'jf rt u a/b/c a/b/c');
                 assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\bc', 'a\bc'), 'jf rt u a\bc a\bc');
                 assert.strictEqual(jfrogUtils.cliJoin('jf', 'rt', 'u', 'a\\bc\\', 'a\\bc\\'), 'jf rt u a\\bc\\ a\\bc\\');
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'OIDC CLI download builds a Bearer handler from the exchanged token',
+            async (): Promise<void> => {
+                // Regression: JFrogToolsInstaller downloaded the CLI anonymously for OIDC
+                // service connections (createAuthHandlers returned []), causing HTTP 401.
+                // It must instead perform an OIDC token exchange and authenticate the
+                // download with the resulting access token.
+                const anyTl: any = taskLib;
+                const origGetParam: unknown = anyTl.getEndpointAuthorizationParameter;
+                const origGetUrl: unknown = anyTl.getEndpointUrl;
+                try {
+                    anyTl.getEndpointUrl = (): string => 'https://example.jfrog.io/artifactory';
+                    anyTl.getEndpointAuthorizationParameter = (id: string, key: string): string | undefined => {
+                        const params: { [k: string]: string } = {
+                            oidcProviderName: 'my-azure-oidc',
+                            oidcAudience: 'api://AzureADTokenExchange',
+                            jfrogPlatformUrl: 'https://example.jfrog.io',
+                        };
+                        return params[key];
+                    };
+                    let exchanged: { service: string; platformUrl: string; providerName: string } | undefined;
+                    const fakeExchange: (service: string, platformUrl: string, providerName: string) => Promise<string> = async (
+                        service: string,
+                        platformUrl: string,
+                        providerName: string,
+                    ): Promise<string> => {
+                        exchanged = { service, platformUrl, providerName };
+                        return 'EXCHANGED_ACCESS_TOKEN';
+                    };
+                    const handlers: any[] = await (jfrogUtils as any).createCliDownloadAuthHandlers('svc', fakeExchange);
+                    assert.strictEqual(handlers.length, 1, 'expected exactly one auth handler');
+                    assert.strictEqual(handlers[0].constructor.name, 'BearerCredentialHandler', 'expected a Bearer handler');
+                    assert.strictEqual(handlers[0].token, 'EXCHANGED_ACCESS_TOKEN', 'Bearer handler must carry the exchanged token');
+                    assert.ok(exchanged, 'OIDC exchange must be invoked');
+                    assert.strictEqual(exchanged!.providerName, 'my-azure-oidc');
+                    assert.strictEqual(exchanged!.platformUrl, 'https://example.jfrog.io');
+                } finally {
+                    anyTl.getEndpointAuthorizationParameter = origGetParam;
+                    anyTl.getEndpointUrl = origGetUrl;
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'Non-OIDC CLI download uses static credentials without an exchange',
+            async (): Promise<void> => {
+                const anyTl: any = taskLib;
+                const origGetParam: unknown = anyTl.getEndpointAuthorizationParameter;
+                try {
+                    anyTl.getEndpointAuthorizationParameter = (id: string, key: string): string | undefined =>
+                        key === 'apitoken' ? 'STATIC_TOKEN' : undefined;
+                    let exchanged: boolean = false;
+                    const handlers: any[] = await (jfrogUtils as any).createCliDownloadAuthHandlers(
+                        'svc',
+                        async (): Promise<string> => {
+                            exchanged = true;
+                            return 'unused';
+                        },
+                    );
+                    assert.strictEqual(exchanged, false, 'must not perform an OIDC exchange for a token connection');
+                    assert.strictEqual(handlers[0].constructor.name, 'BearerCredentialHandler');
+                    assert.strictEqual(handlers[0].token, 'STATIC_TOKEN');
+                } finally {
+                    anyTl.getEndpointAuthorizationParameter = origGetParam;
+                }
             },
             TestUtils.isSkipTest('unit'),
         );
