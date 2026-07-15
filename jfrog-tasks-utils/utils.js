@@ -203,6 +203,8 @@ module.exports = {
     createAuthHandlers: createAuthHandlers,
     createCliDownloadAuthHandlers: createCliDownloadAuthHandlers,
     exchangeOidcTokenViaRest: exchangeOidcTokenViaRest,
+    isOidcConnection: isOidcConnection,
+    resolvePlatformUrl: resolvePlatformUrl,
     taskDefaultCleanup: taskDefaultCleanup,
     writeSpecContentToSpecPath: writeSpecContentToSpecPath,
     stripTrailingSlash: stripTrailingSlash,
@@ -337,6 +339,15 @@ function createAuthHandlers(serviceConnection) {
 }
 
 /**
+ * Returns whether the given service connection uses OIDC authentication.
+ * @param {string} serviceConnection - The service connection ID.
+ * @returns {boolean}
+ */
+function isOidcConnection(serviceConnection) {
+    return !!tl.getEndpointAuthorizationParameter(serviceConnection, 'oidcProviderName', true);
+}
+
+/**
  * Builds the authentication handlers used to download the JFrog CLI.
  *
  * For OIDC-based service connections the credential does not exist as a static
@@ -353,12 +364,11 @@ function createAuthHandlers(serviceConnection) {
  * @returns {Promise<Array>} Authentication handlers for the CLI download.
  */
 async function createCliDownloadAuthHandlers(serviceConnection, exchangeFn = exchangeOidcTokenViaRest) {
-    const oidcProviderName = tl.getEndpointAuthorizationParameter(serviceConnection, 'oidcProviderName', true);
-    if (!oidcProviderName) {
-        // Not an OIDC connection - use the existing static-credential handlers.
+    if (!isOidcConnection(serviceConnection)) {
         return createAuthHandlers(serviceConnection);
     }
     const platformUrl = resolvePlatformUrl(serviceConnection);
+    const oidcProviderName = tl.getEndpointAuthorizationParameter(serviceConnection, 'oidcProviderName', true);
     const accessToken = await exchangeFn(serviceConnection, platformUrl, oidcProviderName);
     return [new credentialsHandler.BearerCredentialHandler(accessToken, false)];
 }
@@ -448,10 +458,10 @@ function resolvePlatformUrl(service) {
 }
 
 async function fetchOidcTokenIfConfigured(service, cliPath, buildDir) {
-    const oidcProviderName = tl.getEndpointAuthorizationParameter(service, 'oidcProviderName', true);
-    if (!oidcProviderName) {
+    if (!isOidcConnection(service)) {
         return undefined;
     }
+    const oidcProviderName = tl.getEndpointAuthorizationParameter(service, 'oidcProviderName', true);
     const platformUrl = resolvePlatformUrl(service);
     return exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
 }

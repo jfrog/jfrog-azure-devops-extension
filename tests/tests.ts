@@ -113,10 +113,6 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         runSyncTest(
             'OIDC CLI download builds a Bearer handler from the exchanged token',
             async (): Promise<void> => {
-                // Regression: JFrogToolsInstaller downloaded the CLI anonymously for OIDC
-                // service connections (createAuthHandlers returned []), causing HTTP 401.
-                // It must instead perform an OIDC token exchange and authenticate the
-                // download with the resulting access token.
                 const anyTl: any = taskLib;
                 const origGetParam: unknown = anyTl.getEndpointAuthorizationParameter;
                 const origGetUrl: unknown = anyTl.getEndpointUrl;
@@ -131,15 +127,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                         return params[key];
                     };
                     let exchanged: { service: string; platformUrl: string; providerName: string } | undefined;
-                    const fakeExchange: (service: string, platformUrl: string, providerName: string) => Promise<string> = async (
-                        service: string,
-                        platformUrl: string,
-                        providerName: string,
-                    ): Promise<string> => {
+                    const fakeExchange = async (service: string, platformUrl: string, providerName: string): Promise<string> => {
                         exchanged = { service, platformUrl, providerName };
                         return 'EXCHANGED_ACCESS_TOKEN';
                     };
-                    const handlers: any[] = await (jfrogUtils as any).createCliDownloadAuthHandlers('svc', fakeExchange);
+                    const handlers: any[] = await jfrogUtils.createCliDownloadAuthHandlers('svc', fakeExchange);
                     assert.strictEqual(handlers.length, 1, 'expected exactly one auth handler');
                     assert.strictEqual(handlers[0].constructor.name, 'BearerCredentialHandler', 'expected a Bearer handler');
                     assert.strictEqual(handlers[0].token, 'EXCHANGED_ACCESS_TOKEN', 'Bearer handler must carry the exchanged token');
@@ -163,7 +155,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     anyTl.getEndpointAuthorizationParameter = (id: string, key: string): string | undefined =>
                         key === 'apitoken' ? 'STATIC_TOKEN' : undefined;
                     let exchanged: boolean = false;
-                    const handlers: any[] = await (jfrogUtils as any).createCliDownloadAuthHandlers(
+                    const handlers: any[] = await jfrogUtils.createCliDownloadAuthHandlers(
                         'svc',
                         async (): Promise<string> => {
                             exchanged = true;
@@ -175,6 +167,120 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     assert.strictEqual(handlers[0].token, 'STATIC_TOKEN');
                 } finally {
                     anyTl.getEndpointAuthorizationParameter = origGetParam;
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'OIDC exchange failure surfaces a clear error, not an unhandled rejection',
+            async (): Promise<void> => {
+                const anyTl: any = taskLib;
+                const origGetParam: unknown = anyTl.getEndpointAuthorizationParameter;
+                const origGetUrl: unknown = anyTl.getEndpointUrl;
+                try {
+                    anyTl.getEndpointUrl = (): string => 'https://example.jfrog.io/artifactory';
+                    anyTl.getEndpointAuthorizationParameter = (id: string, key: string): string | undefined => {
+                        const params: { [k: string]: string } = {
+                            oidcProviderName: 'my-azure-oidc',
+                            jfrogPlatformUrl: 'https://example.jfrog.io',
+                        };
+                        return params[key];
+                    };
+                    const failingExchange = async (): Promise<string> => {
+                        throw new Error('OIDC token exchange failed: HTTP 403\nBody: {"error":"forbidden"}');
+                    };
+                    await assert.rejects(
+                        () => jfrogUtils.createCliDownloadAuthHandlers('svc', failingExchange),
+                        (err: Error) => {
+                            assert.ok(err.message.includes('OIDC token exchange failed'), 'error must mention OIDC exchange failure');
+                            assert.ok(err.message.includes('403'), 'error must include the HTTP status');
+                            return true;
+                        },
+                    );
+                } finally {
+                    anyTl.getEndpointAuthorizationParameter = origGetParam;
+                    anyTl.getEndpointUrl = origGetUrl;
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'OIDC exchange returning no access_token surfaces a clear error',
+            async (): Promise<void> => {
+                const anyTl: any = taskLib;
+                const origGetParam: unknown = anyTl.getEndpointAuthorizationParameter;
+                const origGetUrl: unknown = anyTl.getEndpointUrl;
+                try {
+                    anyTl.getEndpointUrl = (): string => 'https://example.jfrog.io/artifactory';
+                    anyTl.getEndpointAuthorizationParameter = (id: string, key: string): string | undefined => {
+                        const params: { [k: string]: string } = {
+                            oidcProviderName: 'my-azure-oidc',
+                            jfrogPlatformUrl: 'https://example.jfrog.io',
+                        };
+                        return params[key];
+                    };
+                    const emptyTokenExchange = async (): Promise<string> => {
+                        throw new Error('OIDC token exchange response did not contain an access token.');
+                    };
+                    await assert.rejects(
+                        () => jfrogUtils.createCliDownloadAuthHandlers('svc', emptyTokenExchange),
+                        (err: Error) => {
+                            assert.ok(err.message.includes('did not contain an access token'), 'error must describe the missing token');
+                            return true;
+                        },
+                    );
+                } finally {
+                    anyTl.getEndpointAuthorizationParameter = origGetParam;
+                    anyTl.getEndpointUrl = origGetUrl;
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'Cached CLI never triggers the OIDC auth-handler provider',
+            async (): Promise<void> => {
+                const anyTl: any = taskLib;
+                const origGetParam: unknown = anyTl.getEndpointAuthorizationParameter;
+                const origGetUrl: unknown = anyTl.getEndpointUrl;
+                const origFindLocalTool: unknown = (toolLib as any).findLocalTool;
+                try {
+                    anyTl.getEndpointUrl = (): string => 'https://example.jfrog.io/artifactory';
+                    anyTl.getEndpointAuthorizationParameter = (id: string, key: string): string | undefined => {
+                        const params: { [k: string]: string } = { oidcProviderName: 'my-azure-oidc' };
+                        return params[key];
+                    };
+                    // Simulate a cache hit: findLocalTool returns a directory
+                    const cachedDir: string = join(__dirname, 'testData', 'jf', '2.111.0', os.arch());
+                    (toolLib as any).findLocalTool = (): string => cachedDir;
+
+                    let providerCalled: boolean = false;
+                    const authProvider = async (): Promise<any[]> => {
+                        providerCalled = true;
+                        return [];
+                    };
+
+                    const cliPath: string = await new Promise<string>((resolve, reject) => {
+                        jfrogUtils.executeCliTask(
+                            (path: string) => {
+                                resolve(path);
+                            },
+                            '2.111.0',
+                            'https://example.jfrog.io/artifactory/repo/2.111.0/jfrog-cli-linux-amd64/jf',
+                            authProvider,
+                        );
+                        // executeCliTask catches errors and sets task result; give it time
+                        setTimeout(() => reject(new Error('executeCliTask did not invoke callback within 5s')), 5000);
+                    });
+
+                    assert.strictEqual(providerCalled, false, 'auth provider must NOT be called when CLI is cached');
+                    assert.ok(cliPath.includes('jf'), 'resolved path must contain the CLI binary name');
+                } finally {
+                    anyTl.getEndpointAuthorizationParameter = origGetParam;
+                    anyTl.getEndpointUrl = origGetUrl;
+                    (toolLib as any).findLocalTool = origFindLocalTool;
                 }
             },
             TestUtils.isSkipTest('unit'),
