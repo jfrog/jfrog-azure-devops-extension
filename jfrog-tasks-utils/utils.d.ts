@@ -63,10 +63,7 @@ declare module '@jfrog/tasks-utils' {
     export function addTrailingSlashIfNeeded(str: string): string;
     export function buildCliArtifactoryDownloadUrl(rtUrl: string, repoName: string, cliVersion?: string): string;
     export function createAuthHandlers(serviceConnection: string): ifm.IRequestHandler[];
-    export function createCliDownloadAuthHandlers(
-        serviceConnection: string,
-        exchangeFn?: (service: string, platformUrl: string, oidcProviderName: string) => Promise<string>,
-    ): Promise<ifm.IRequestHandler[]>;
+    export function createCliDownloadAuthHandlers(serviceConnection: string, exchangeFn?: (service: string, platformUrl: string, oidcProviderName: string) => Promise<string>,): Promise<ifm.IRequestHandler[]>;
     export function exchangeOidcTokenViaRest(service: string, platformUrl: string, oidcProviderName: string): Promise<string>;
     export function isOidcConnection(serviceConnection: string): boolean;
     export function resolvePlatformUrl(service: string): string;
