@@ -127,7 +127,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                         return params[key];
                     };
                     let exchanged: { service: string; platformUrl: string; providerName: string } | undefined;
-                    const fakeExchange = async (service: string, platformUrl: string, providerName: string): Promise<string> => {
+                    const fakeExchange: (s: string, p: string, o: string) => Promise<string> = async (service: string, platformUrl: string, providerName: string): Promise<string> => {
                         exchanged = { service, platformUrl, providerName };
                         return 'EXCHANGED_ACCESS_TOKEN';
                     };
@@ -187,7 +187,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                         };
                         return params[key];
                     };
-                    const failingExchange = async (): Promise<string> => {
+                    const failingExchange: () => Promise<string> = async (): Promise<string> => {
                         throw new Error('OIDC token exchange failed: HTTP 403\nBody: {"error":"forbidden"}');
                     };
                     await assert.rejects(
@@ -221,7 +221,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                         };
                         return params[key];
                     };
-                    const emptyTokenExchange = async (): Promise<string> => {
+                    const emptyTokenExchange: () => Promise<string> = async (): Promise<string> => {
                         throw new Error('OIDC token exchange response did not contain an access token.');
                     };
                     await assert.rejects(
@@ -257,7 +257,7 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     (toolLib as any).findLocalTool = (): string => cachedDir;
 
                     let providerCalled: boolean = false;
-                    const authProvider = async (): Promise<any[]> => {
+                    const authProvider: () => Promise<any[]> = async (): Promise<any[]> => {
                         providerCalled = true;
                         return [];
                     };
