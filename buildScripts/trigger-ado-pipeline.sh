@@ -43,20 +43,53 @@ echo "=============================================="
 RESPONSE_FILE=$(mktemp)
 trap 'rm -f "$RESPONSE_FILE"' EXIT
 
-HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" -X POST \
-    "${API_BASE}/pipelines/${ADO_PIPELINE_ID}/runs?api-version=7.1" \
-    -H "${AUTH_HEADER}" \
-    -H "Content-Type: application/json" \
-    -d "{
-          \"variables\": {
-            \"GH_PR_NUMBER\":   { \"value\": \"${GH_PR_NUMBER}\",  \"isSecret\": false },
-            \"GH_COMMIT_SHA\":  { \"value\": \"${GH_COMMIT_SHA}\", \"isSecret\": false }
-          }
-        }" || echo "000")
+# A freshly (re)installed private extension is not immediately resolvable by
+# ADO's pipeline queue-time validator: it returns HTTP 400 with
+# "A task is missing. The pipeline references a task called '...E2E'" until the
+# org's task catalog catches up. This is an eventual-consistency lag, not a
+# real error, so retry the trigger for up to TRIGGER_RETRY_MINUTES, once per
+# minute, ONLY for that specific 400. All other statuses fail immediately.
+TRIGGER_RETRY_MINUTES="${TRIGGER_RETRY_MINUTES:-15}"
+TRIGGER_RETRY_INTERVAL_SECONDS="${TRIGGER_RETRY_INTERVAL_SECONDS:-60}"
+TRIGGER_DEADLINE=$(( $(date +%s) + TRIGGER_RETRY_MINUTES * 60 ))
+TRIGGER_ATTEMPT=0
 
-RUN_RESPONSE="$(cat "$RESPONSE_FILE")"
+while : ; do
+    TRIGGER_ATTEMPT=$(( TRIGGER_ATTEMPT + 1 ))
 
-if [ "$HTTP_STATUS" != "200" ]; then
+    HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" -X POST \
+        "${API_BASE}/pipelines/${ADO_PIPELINE_ID}/runs?api-version=7.1" \
+        -H "${AUTH_HEADER}" \
+        -H "Content-Type: application/json" \
+        -d "{
+              \"variables\": {
+                \"GH_PR_NUMBER\":   { \"value\": \"${GH_PR_NUMBER}\",  \"isSecret\": false },
+                \"GH_COMMIT_SHA\":  { \"value\": \"${GH_COMMIT_SHA}\", \"isSecret\": false }
+              }
+            }" || echo "000")
+
+    RUN_RESPONSE="$(cat "$RESPONSE_FILE")"
+
+    if [ "$HTTP_STATUS" = "200" ]; then
+        break
+    fi
+
+    # Retry only the transient "task is missing" 400 (extension still
+    # propagating in the org); every other failure is terminal.
+    if [ "$HTTP_STATUS" = "400" ] && printf '%s' "$RUN_RESPONSE" | grep -q "A task is missing"; then
+        if [ "$(date +%s)" -lt "$TRIGGER_DEADLINE" ]; then
+            echo "[$(date -u '+%H:%M:%S')] Trigger attempt ${TRIGGER_ATTEMPT}: HTTP 400 'A task is missing' — the E2E extension is still propagating in org '${ADO_ORG}'. Retrying in ${TRIGGER_RETRY_INTERVAL_SECONDS}s (up to ${TRIGGER_RETRY_MINUTES} min)..."
+            sleep "$TRIGGER_RETRY_INTERVAL_SECONDS"
+            continue
+        fi
+        echo "ERROR: Pipeline trigger still failing with 'A task is missing' after ${TRIGGER_RETRY_MINUTES} minutes."
+        echo "  The private E2E extension did not become resolvable in org '${ADO_ORG}' within the retry window."
+        echo "  Response    :"
+        echo "${RUN_RESPONSE}" | head -c 2000
+        echo ""
+        exit 1
+    fi
+
     echo "ERROR: Pipeline trigger failed."
     echo "  HTTP status : ${HTTP_STATUS}"
     echo "  Endpoint    : ${API_BASE}/pipelines/${ADO_PIPELINE_ID}/runs?api-version=7.1"
@@ -71,7 +104,7 @@ if [ "$HTTP_STATUS" != "200" ]; then
         *)   echo "  Hint: see the response body above for the ADO error message." ;;
     esac
     exit 1
-fi
+done
 
 RUN_ID=$(echo "$RUN_RESPONSE"   | jq -r '.id   // empty')
 RUN_URL=$(echo "$RUN_RESPONSE"  | jq -r '._links.web.href // empty')
