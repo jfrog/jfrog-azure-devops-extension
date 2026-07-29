@@ -391,7 +391,7 @@ This requires you to fill in the following inputs:
 | Description (optional)       | A short of the purpose of this ServiceConnection                                                       |
 
 
-A sample configuration would look like this testing 1: 
+A sample configuration would look like this:
 
 ![oidc-service-connection.png](images/oidc-service-connection.png)
 
@@ -413,7 +413,7 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
    inputs:
      targetType: 'inline'
      script: |
-            echo "OIDC Usernames (from output): $(oidc_user)"
+            echo "OIDC Username (from output): $(oidc_user)"
             echo "OIDC Token (from output): $(oidc_token)"
    displayName: 'Use OIDC Output Variables'
 ```
