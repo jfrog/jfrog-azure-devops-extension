@@ -9,6 +9,7 @@ import * as TestUtils from './testUtils';
 import { platformDockerDomain } from './testUtils';
 import * as toolLib from 'azure-pipelines-tool-lib/tool';
 import * as taskLib from 'azure-pipelines-task-lib/task';
+import * as httpm from 'typed-rest-client/HttpClient';
 import * as assert from 'assert';
 import * as os from 'os';
 import conanUtils from '../tasks/JFrogConan/conanUtils';
@@ -281,6 +282,151 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     anyTl.getEndpointAuthorizationParameter = origGetParam;
                     anyTl.getEndpointUrl = origGetUrl;
                     (toolLib as any).findLocalTool = origFindLocalTool;
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'exchangeOidcTokenViaRest posts the correct request and returns the access token',
+            async (): Promise<void> => {
+                const stub: ReturnType<typeof stubExchangeHttp> = stubExchangeHttp(
+                    200,
+                    JSON.stringify({ access_token: 'JFROG_ACCESS_TOKEN', username: 'agrasth' }),
+                );
+                try {
+                    const token: string = await jfrogUtils.exchangeOidcTokenViaRest('svc', 'https://example.jfrog.io', 'my-provider');
+                    assert.strictEqual(token, 'JFROG_ACCESS_TOKEN', 'must return the exchanged access token');
+
+                    const exchangeCall: { url: string; body: { [k: string]: string } } | undefined = stub.postCalls.find(
+                        (c: { url: string; body: { [k: string]: string } }) => c.url.indexOf('/access/api/v1/oidc/token') !== -1,
+                    );
+                    assert.ok(exchangeCall, 'must POST to the JFrog Access OIDC token endpoint');
+                    assert.strictEqual(exchangeCall!.url, 'https://example.jfrog.io/access/api/v1/oidc/token', 'exchange URL must be correct');
+                    assert.strictEqual(exchangeCall!.body.grant_type, 'urn:ietf:params:oauth:grant-type:token-exchange');
+                    assert.strictEqual(exchangeCall!.body.subject_token_type, 'urn:ietf:params:oauth:token-type:id_token');
+                    assert.strictEqual(exchangeCall!.body.subject_token, stub.adoToken, 'must forward the ADO ID token as subject_token');
+                    assert.strictEqual(exchangeCall!.body.provider_name, 'my-provider');
+                    assert.strictEqual(exchangeCall!.body.provider_type, 'Azure');
+                    assert.strictEqual(exchangeCall!.body.audience, 'api://AzureADTokenExchange');
+                    assert.strictEqual(stub.outputs['oidc_token'], 'JFROG_ACCESS_TOKEN', 'must publish the oidc_token output variable');
+                } finally {
+                    stub.restore();
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'exchangeOidcTokenViaRest throws a clear error on a non-200 JFrog response',
+            async (): Promise<void> => {
+                const stub: ReturnType<typeof stubExchangeHttp> = stubExchangeHttp(
+                    403,
+                    JSON.stringify({ errors: [{ code: 'FORBIDDEN', message: 'Forbidden' }] }),
+                );
+                try {
+                    await assert.rejects(
+                        () => jfrogUtils.exchangeOidcTokenViaRest('svc', 'https://example.jfrog.io', 'my-provider'),
+                        /OIDC token exchange failed: HTTP 403/,
+                    );
+                } finally {
+                    stub.restore();
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'exchangeOidcTokenViaRest throws when the JFrog response has no access_token',
+            async (): Promise<void> => {
+                const stub: ReturnType<typeof stubExchangeHttp> = stubExchangeHttp(200, JSON.stringify({ token_type: 'Bearer' }));
+                try {
+                    await assert.rejects(
+                        () => jfrogUtils.exchangeOidcTokenViaRest('svc', 'https://example.jfrog.io', 'my-provider'),
+                        /did not contain an access token/,
+                    );
+                } finally {
+                    stub.restore();
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'CLI download resolves a function auth-provider to an array before downloadTool (guards handlers.forEach regression)',
+            async (): Promise<void> => {
+                const anyToolLib: any = toolLib;
+                const savedFind: unknown = anyToolLib.findLocalTool;
+                const savedDownload: unknown = anyToolLib.downloadTool;
+                const savedCache: unknown = anyToolLib.cacheFile;
+                const cacheDir: string = fs.mkdtempSync(join(os.tmpdir(), 'jfdl-'));
+                fs.writeFileSync(join(cacheDir, TestUtils.isWindows() ? 'jf.exe' : 'jf'), '#!/bin/sh\necho\n');
+                let captured: unknown = 'UNSET';
+                try {
+                    anyToolLib.findLocalTool = (): string => ''; // force a download
+                    anyToolLib.downloadTool = (_url: string, _dest: unknown, handlers: unknown): Promise<string> => {
+                        captured = handlers;
+                        return Promise.resolve(join(cacheDir, 'download.bin'));
+                    };
+                    anyToolLib.cacheFile = (): Promise<string> => Promise.resolve(cacheDir);
+
+                    const provider: () => Promise<any[]> = async (): Promise<any[]> => [{ marker: 'RESOLVED' }];
+                    await new Promise<void>((resolve, reject) => {
+                        jfrogUtils.executeCliTask(
+                            (): void => resolve(),
+                            '2.111.0',
+                            'https://example.jfrog.io/artifactory/repo/2.111.0/jfrog-cli-linux-amd64/jf',
+                            provider,
+                        );
+                        setTimeout(() => reject(new Error('executeCliTask did not invoke callback within 5s')), 5000);
+                    });
+                    assert.ok(Array.isArray(captured), 'downloadTool must receive an ARRAY, not a function (guards this.handlers.forEach)');
+                    assert.strictEqual((captured as any[])[0].marker, 'RESOLVED', 'the resolved provider result must reach downloadTool');
+                } finally {
+                    anyToolLib.findLocalTool = savedFind;
+                    anyToolLib.downloadTool = savedDownload;
+                    anyToolLib.cacheFile = savedCache;
+                    fs.rmSync(cacheDir, { recursive: true, force: true });
+                }
+            },
+            TestUtils.isSkipTest('unit'),
+        );
+
+        runSyncTest(
+            'CLI download passes a plain array auth-handler through unchanged (backward compat)',
+            async (): Promise<void> => {
+                const anyToolLib: any = toolLib;
+                const savedFind: unknown = anyToolLib.findLocalTool;
+                const savedDownload: unknown = anyToolLib.downloadTool;
+                const savedCache: unknown = anyToolLib.cacheFile;
+                const cacheDir: string = fs.mkdtempSync(join(os.tmpdir(), 'jfdl-'));
+                fs.writeFileSync(join(cacheDir, TestUtils.isWindows() ? 'jf.exe' : 'jf'), '#!/bin/sh\necho\n');
+                let captured: unknown = 'UNSET';
+                try {
+                    anyToolLib.findLocalTool = (): string => '';
+                    anyToolLib.downloadTool = (_url: string, _dest: unknown, handlers: unknown): Promise<string> => {
+                        captured = handlers;
+                        return Promise.resolve(join(cacheDir, 'download.bin'));
+                    };
+                    anyToolLib.cacheFile = (): Promise<string> => Promise.resolve(cacheDir);
+
+                    const plainHandlers: any[] = [{ marker: 'PLAIN_ARRAY' }];
+                    await new Promise<void>((resolve, reject) => {
+                        jfrogUtils.executeCliTask(
+                            (): void => resolve(),
+                            '2.111.0',
+                            'https://example.jfrog.io/artifactory/repo/2.111.0/jfrog-cli-linux-amd64/jf',
+                            plainHandlers,
+                        );
+                        setTimeout(() => reject(new Error('executeCliTask did not invoke callback within 5s')), 5000);
+                    });
+                    assert.ok(Array.isArray(captured), 'downloadTool must receive the array');
+                    assert.strictEqual((captured as any[])[0].marker, 'PLAIN_ARRAY', 'existing array handlers must pass through unchanged');
+                } finally {
+                    anyToolLib.findLocalTool = savedFind;
+                    anyToolLib.downloadTool = savedDownload;
+                    anyToolLib.cacheFile = savedCache;
+                    fs.rmSync(cacheDir, { recursive: true, force: true });
                 }
             },
             TestUtils.isSkipTest('unit'),
@@ -1176,6 +1322,66 @@ function distributionCleanUp(rbName: string, rbVersion: string): void {
  * @param testFunc (Function) - The test logic
  * @param skip (Boolean, Optional) - True if test should be skipped
  */
+/**
+ * Stubs the shared task-lib + typed-rest-client HttpClient so the REAL
+ * exchangeOidcTokenViaRest can be exercised offline. The first POST (to the ADO
+ * `/oidctoken` endpoint, made by fetchAzureOidcToken) always returns a fake ADO
+ * ID token; the second POST (to JFrog Access) returns the provided status/body.
+ * Returns captured POST calls, published output variables, the fake ADO token,
+ * and a restore() to undo all stubbing.
+ */
+function stubExchangeHttp(
+    exchangeStatus: number,
+    exchangeBody: string,
+): {
+    postCalls: Array<{ url: string; body: { [k: string]: string } }>;
+    outputs: { [k: string]: string };
+    adoToken: string;
+    restore: () => void;
+} {
+    const anyTl: any = taskLib;
+    const anyHttp: any = httpm;
+    const savedGetVariable: unknown = anyTl.getVariable;
+    const savedGetParam: unknown = anyTl.getEndpointAuthorizationParameter;
+    const savedSetVariable: unknown = anyTl.setVariable;
+    const savedHttpClient: unknown = anyHttp.HttpClient;
+
+    const postCalls: Array<{ url: string; body: { [k: string]: string } }> = [];
+    const outputs: { [k: string]: string } = {};
+    const adoToken: string =
+        'h.' +
+        Buffer.from(JSON.stringify({ sub: 'sc://o/p/c', iss: 'https://vstoken', aud: 'api://AzureADTokenExchange' })).toString('base64') +
+        '.s';
+
+    anyTl.getVariable = (k: string): string | undefined =>
+        ({ 'System.AccessToken': 'ado-oauth', 'Build.Repository.Name': 'my-repo' } as { [k: string]: string })[k];
+    anyTl.getEndpointAuthorizationParameter = (): string | undefined => undefined;
+    anyTl.setVariable = (k: string, v: string): void => {
+        outputs[k] = v;
+    };
+    anyHttp.HttpClient = class {
+        async post(url: string, data: string): Promise<{ message: { statusCode: number }; readBody: () => Promise<string> }> {
+            postCalls.push({ url, body: JSON.parse(data) });
+            if (url.indexOf('/oidctoken') !== -1) {
+                return { message: { statusCode: 200 }, readBody: async (): Promise<string> => JSON.stringify({ oidcToken: adoToken }) };
+            }
+            return { message: { statusCode: exchangeStatus }, readBody: async (): Promise<string> => exchangeBody };
+        }
+    };
+
+    return {
+        postCalls,
+        outputs,
+        adoToken,
+        restore: (): void => {
+            anyTl.getVariable = savedGetVariable;
+            anyTl.getEndpointAuthorizationParameter = savedGetParam;
+            anyTl.setVariable = savedSetVariable;
+            anyHttp.HttpClient = savedHttpClient;
+        },
+    };
+}
+
 function runSyncTest(description: string, testFunc: () => void | Promise<void>, skip?: boolean): void {
     if (skip) {
         it.skip(description);
