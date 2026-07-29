@@ -15,13 +15,16 @@
 #                               (or just let jobs 3/4 run — they always test
 #                               whatever is currently installed).
 #
-#   3. sanity-tests           : Trigger the ADO sanity pipeline
-#                               (.pipelines/ado-sanity-pipeline.yml).
+#   3. sanity-tests           : Confirm *E2E tasks are installed in the ADO
+#                               org (fail fast), wait for Marketplace
+#                               propagation, then trigger the ADO sanity
+#                               pipeline (.pipelines/ado-sanity-pipeline.yml).
 #                               Covers: ToolsInstaller, GenericArtifacts,
 #                               Maven, PublishBuildInfo, DiscardBuilds.
 #
-#   4. oidc-tests             : Trigger the OIDC test pipeline.
-#                               Covers all task types with OIDC + non-OIDC.
+#   4. oidc-tests             : Same org-side gate as (3), then trigger the
+#                               OIDC test pipeline. Covers all task types
+#                               with OIDC + non-OIDC.
 #
 # WHY THE HYBRID?
 # ---------------
@@ -40,6 +43,9 @@
 #   ADO_E2E_PAT              PAT with scopes:
 #                              • Build: Read + Execute
 #                              • Project and Team: Read
+#                              • Agent Pools: Read
+#                                (needed for the org-side *E2E task check
+#                                 via _apis/distributedtask/tasks)
 #                            (Marketplace scopes no longer needed in CI —
 #                             you publish via the UI.)
 #   ADO_SANITY_PROJECT       ADO project containing the sanity pipeline
@@ -274,45 +280,94 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      # Fail fast if the private E2E extension is not installed in the ADO
+      # org. Marketplace presence alone is not enough — ADO rejects pipeline
+      # queue with HTTP 400 ("A task is missing ... JFrog*E2E") when the
+      # org has never accepted/installed the shared extension.
+      - name: Verify E2E tasks are installed in ADO org
+        env:
+          ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
+          ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
+          EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
+          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
+          # Core tasks referenced by .pipelines/ado-sanity-pipeline.yml.
+          # Presence of these names means the private E2E .vsix is installed;
+          # their absence is the exact cause of the HTTP 400 on trigger.
+          REQUIRED_TASKS: >-
+            JFrogToolsInstallerE2E
+            JFrogGenericArtifactsE2E
+            JFrogMavenE2E
+            JFrogPublishBuildInfoE2E
+            JFrogDiscardBuildsE2E
+        run: |
+          set -euo pipefail
+          if [ -z "${ADO_ORG:-}" ] || [ -z "${ADO_PAT:-}" ]; then
+            echo "ERROR: ADO_E2E_ORG / ADO_E2E_PAT secrets are required to query installed tasks." >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf '%s' ":${ADO_PAT}" | base64 | tr -d '\n')"
+          RESPONSE_FILE=$(mktemp)
+          HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
+            "https://dev.azure.com/${ADO_ORG}/_apis/distributedtask/tasks?api-version=7.1" \
+            -H "${AUTH_HEADER}" || echo "000")
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "ERROR: Failed to list tasks in org '${ADO_ORG}' (HTTP ${HTTP_STATUS})." >&2
+            head -c 1000 "$RESPONSE_FILE" >&2 || true
+            echo "" >&2
+            exit 1
+          fi
+          FOUND=$(python3 - "$RESPONSE_FILE" <<'PY'
+          import json, sys
+          data = json.load(open(sys.argv[1]))
+          names = sorted({t.get("name", "") for t in data.get("value", []) if t.get("name")})
+          for n in names:
+              if n.endswith("E2E"):
+                  print(n)
+          PY
+          )
+          echo "============================================================"
+          echo "  Org:              ${ADO_ORG}"
+          echo "  Built this run:   ${EXPECTED_VERSION}"
+          echo "  Extension id:     ${EXTENSION_ID}"
+          echo "  E2E tasks in org:"
+          if [ -z "$FOUND" ]; then
+            echo "    (none)"
+          else
+            echo "$FOUND" | sed 's/^/    /'
+          fi
+          MISSING=""
+          for task in $REQUIRED_TASKS; do
+            if ! printf '%s\n' "$FOUND" | grep -qx "$task"; then
+              MISSING="${MISSING} ${task}"
+            fi
+          done
+          if [ -n "$MISSING" ]; then
+            echo ""
+            echo "  MISSING required E2E tasks:${MISSING}"
+            echo "============================================================"
+            echo "ERROR: The private E2E extension is not installed in org '${ADO_ORG}'."
+            echo "Uploading the .vsix to Marketplace is not enough — the org must"
+            echo "accept the share and install the extension, or ADO will reject"
+            echo "pipeline triggers with HTTP 400 ('A task is missing ... *E2E')."
+            echo ""
+            echo "Fix (once per extension id):"
+            echo "  1. Download the .vsix artifact from job 1 of this run."
+            echo "  2. Upload/update at:"
+            echo "     https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private"
+            echo "  3. Share with org '${ADO_ORG}' (··· → Share/Unshare)."
+            echo "  4. Install: https://${ADO_ORG}.visualstudio.com → Settings →"
+            echo "     Extensions → shared extension → Get it free."
+            echo "  5. Re-run this job."
+            exit 1
+          fi
+          echo "  OK — required E2E tasks are installed; proceeding to trigger."
+          echo "============================================================"
+
       - name: Wait for Marketplace extension to propagate
         run: |
           echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
           sleep 420
-          echo "Done — proceeding to version check."
-
-      - name: Verify extension version on Marketplace
-        env:
-          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
-          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
-          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
-          EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
-        run: |
-          if [ -z "${MARKETPLACE_PAT:-}" ]; then
-            echo "ADO_E2E_MARKETPLACE_PAT not set — cannot query Marketplace."
-            echo "Expected version (built this run): $EXPECTED_VERSION"
-            exit 0
-          fi
-          TFX_OUT=$(npx --yes tfx-cli extension show \
-            --publisher "$PUBLISHER" \
-            --extension-id "$EXTENSION_ID" \
-            --token "$MARKETPLACE_PAT" 2>&1 || true)
-          echo "tfx output:"
-          echo "$TFX_OUT"
-          INSTALLED=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')" 2>/dev/null || echo 'not-found')
-          [ -z "$INSTALLED" ] && INSTALLED='not-found'
-          echo "============================================================"
-          echo "  Expected version (built this run) : $EXPECTED_VERSION"
-          echo "  Published version on Marketplace  : $INSTALLED"
-          if [ "$INSTALLED" = "$EXPECTED_VERSION" ]; then
-            echo "  MATCH — tests will run against the current PR build."
-          else
-            echo "  MISMATCH — Marketplace has $INSTALLED but expected $EXPECTED_VERSION."
-            echo "  The publish step may have been skipped, or propagation took longer than 7 minutes."
-            echo "  Stopping to avoid running tests against a stale build."
-            echo "============================================================"
-            exit 1
-          fi
-          echo "============================================================"
+          echo "Done — proceeding to pipeline trigger."
 
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
@@ -346,45 +401,92 @@ jobs:
     timeout-minutes: 60
 
     steps:
+      # Same gate as job 2: confirm the private E2E extension is installed
+      # in the ADO org before sleeping / triggering. See job 2 for rationale.
+      - name: Verify E2E tasks are installed in ADO org
+        env:
+          ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
+          ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
+          EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
+          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
+          # Core tasks referenced across .pipelines/ado-oidc-regression-pipeline.yml.
+          REQUIRED_TASKS: >-
+            JfrogCliV2E2E
+            JFrogToolsInstallerE2E
+            JFrogGenericArtifactsE2E
+            JFrogPublishBuildInfoE2E
+            JFrogMavenE2E
+            JFrogNpmE2E
+            JFrogAuditE2E
+        run: |
+          set -euo pipefail
+          if [ -z "${ADO_ORG:-}" ] || [ -z "${ADO_PAT:-}" ]; then
+            echo "ERROR: ADO_E2E_ORG / ADO_E2E_PAT secrets are required to query installed tasks." >&2
+            exit 1
+          fi
+          AUTH_HEADER="Authorization: Basic $(printf '%s' ":${ADO_PAT}" | base64 | tr -d '\n')"
+          RESPONSE_FILE=$(mktemp)
+          HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
+            "https://dev.azure.com/${ADO_ORG}/_apis/distributedtask/tasks?api-version=7.1" \
+            -H "${AUTH_HEADER}" || echo "000")
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "ERROR: Failed to list tasks in org '${ADO_ORG}' (HTTP ${HTTP_STATUS})." >&2
+            head -c 1000 "$RESPONSE_FILE" >&2 || true
+            echo "" >&2
+            exit 1
+          fi
+          FOUND=$(python3 - "$RESPONSE_FILE" <<'PY'
+          import json, sys
+          data = json.load(open(sys.argv[1]))
+          names = sorted({t.get("name", "") for t in data.get("value", []) if t.get("name")})
+          for n in names:
+              if n.endswith("E2E"):
+                  print(n)
+          PY
+          )
+          echo "============================================================"
+          echo "  Org:              ${ADO_ORG}"
+          echo "  Built this run:   ${EXPECTED_VERSION}"
+          echo "  Extension id:     ${EXTENSION_ID}"
+          echo "  E2E tasks in org:"
+          if [ -z "$FOUND" ]; then
+            echo "    (none)"
+          else
+            echo "$FOUND" | sed 's/^/    /'
+          fi
+          MISSING=""
+          for task in $REQUIRED_TASKS; do
+            if ! printf '%s\n' "$FOUND" | grep -qx "$task"; then
+              MISSING="${MISSING} ${task}"
+            fi
+          done
+          if [ -n "$MISSING" ]; then
+            echo ""
+            echo "  MISSING required E2E tasks:${MISSING}"
+            echo "============================================================"
+            echo "ERROR: The private E2E extension is not installed in org '${ADO_ORG}'."
+            echo "Uploading the .vsix to Marketplace is not enough — the org must"
+            echo "accept the share and install the extension, or ADO will reject"
+            echo "pipeline triggers with HTTP 400 ('A task is missing ... *E2E')."
+            echo ""
+            echo "Fix (once per extension id):"
+            echo "  1. Download the .vsix artifact from job 1 of this run."
+            echo "  2. Upload/update at:"
+            echo "     https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private"
+            echo "  3. Share with org '${ADO_ORG}' (··· → Share/Unshare)."
+            echo "  4. Install: https://${ADO_ORG}.visualstudio.com → Settings →"
+            echo "     Extensions → shared extension → Get it free."
+            echo "  5. Re-run this job."
+            exit 1
+          fi
+          echo "  OK — required E2E tasks are installed; proceeding to trigger."
+          echo "============================================================"
+
       - name: Wait for Marketplace extension to propagate
         run: |
           echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
           sleep 420
-          echo "Done — proceeding to version check."
-
-      - name: Verify extension version on Marketplace
-        env:
-          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
-          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
-          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
-          EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
-        run: |
-          if [ -z "${MARKETPLACE_PAT:-}" ]; then
-            echo "ADO_E2E_MARKETPLACE_PAT not set — cannot query Marketplace."
-            echo "Expected version (built this run): $EXPECTED_VERSION"
-            exit 0
-          fi
-          TFX_OUT=$(npx --yes tfx-cli extension show \
-            --publisher "$PUBLISHER" \
-            --extension-id "$EXTENSION_ID" \
-            --token "$MARKETPLACE_PAT" 2>&1 || true)
-          echo "tfx output:"
-          echo "$TFX_OUT"
-          INSTALLED=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')" 2>/dev/null || echo 'not-found')
-          [ -z "$INSTALLED" ] && INSTALLED='not-found'
-          echo "============================================================"
-          echo "  Expected version (built this run) : $EXPECTED_VERSION"
-          echo "  Published version on Marketplace  : $INSTALLED"
-          if [ "$INSTALLED" = "$EXPECTED_VERSION" ]; then
-            echo "  MATCH — tests will run against the current PR build."
-          else
-            echo "  MISMATCH — Marketplace has $INSTALLED but expected $EXPECTED_VERSION."
-            echo "  The publish step may have been skipped, or propagation took longer than 7 minutes."
-            echo "  Stopping to avoid running tests against a stale build."
-            echo "============================================================"
-            exit 1
-          fi
-          echo "============================================================"
+          echo "Done — proceeding to pipeline trigger."
 
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
