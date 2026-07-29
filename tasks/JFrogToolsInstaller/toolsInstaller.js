@@ -21,8 +21,11 @@ function InstallCliAndExecuteCliTask(RunTaskCbk) {
     // Set the requested CLI version env to download it now, and to use in succeeding tasks.
     tl.setVariable(utils.pipelineRequestedCliVersionEnv, cliVersion);
     let downloadUrl = utils.buildCliArtifactoryDownloadUrl(artifactoryUrl, cliInstallationRepo, cliVersion);
-    let authHandlers = utils.createAuthHandlers(artifactoryService);
-    utils.executeCliTask(RunTaskCbk, cliVersion, downloadUrl, authHandlers);
+    // Pass a provider (resolved lazily by executeCliTask only if a download is needed).
+    // For OIDC service connections this performs a CLI-independent OIDC token exchange so
+    // the CLI download itself is authenticated; other connection types use static credentials.
+    let authHandlersProvider = () => utils.createCliDownloadAuthHandlers(artifactoryService);
+    utils.executeCliTask(RunTaskCbk, cliVersion, downloadUrl, authHandlersProvider);
 }
 
 async function RunTaskCbk(cliPath) {
