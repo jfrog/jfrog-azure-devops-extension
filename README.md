@@ -1513,3 +1513,5 @@ export ADO_SKIP_TESTS=nuget,dotnet
 
 Please help us improve jfrog-azure-devops-extension by [reporting issues](https://github.com/jfrog/jfrog-azure-devops-extension/issues/new/choose) you encounter.
 
+
+<!-- Dummy PR to verify E2E Sanity/OIDC jobs are diff-independent (baseline off dev). Safe to close. -->
