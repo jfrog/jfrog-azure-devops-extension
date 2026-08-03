@@ -435,7 +435,7 @@ See [JFrog CLI - OIDC Token Exchange (`jf eot`)](https://jfrog.com/help/r/jfrog-
 
 #### JFrog CLI V2 Task
 </summary>
-
+testing
 The extension support a generic [JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli) task, named *JFrog CLI V2*,
 which allows executing *[JFrog CLI](https://jfrog.com/help/r/jfrog-cli/jfrog-cli)* commands.
 The command will use the connection details provided by the selected *JFrog Platform* service connection configured in
