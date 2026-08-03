@@ -12,7 +12,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const fallbackCliVersion = '2.99.0';
-let defaultJfrogCliVersion = '2.111.0';
+let defaultJfrogCliVersion = '2.117.0';
 
 /**
  * Executes an HTTP request with retry logic for 5xx errors.
