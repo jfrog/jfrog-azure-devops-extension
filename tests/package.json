@@ -22,7 +22,8 @@
         "null-writable": "^1.0.5",
         "rimraf": "^6.1.2",
         "sync-request": "^6.1.0",
-        "ts-node": "^10.9.1"
+        "ts-node": "^10.9.1",
+        "typescript": "^5.2.2"
     },
     "scripts": {
         "test": "npm i && mocha -r ts-node/register tests.ts -t 1000000"

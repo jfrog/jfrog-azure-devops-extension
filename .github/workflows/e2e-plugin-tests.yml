@@ -78,12 +78,12 @@ on:
         required: false
         default: 'false'
 
-# Only one E2E run at a time — prevents two PRs racing to trigger the same
-# ADO pipeline simultaneously (which the dev org's parallel-job quota
-# would queue anyway).
+# One E2E run at a time per PR. A new label-trigger on the same PR cancels
+# the previous queued/in-progress run so the latest commit is always tested.
+# Across different PRs, runs are independent and execute in parallel.
 concurrency:
-  group: e2e-plugin-tests
-  cancel-in-progress: false
+  group: e2e-plugin-tests-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 
 # ======================================================================
 # JOB 1 — Build the .vsix from the PR branch and upload as artifact.
@@ -212,23 +212,6 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-      - name: Publish .vsix to Marketplace
-        if: ${{ env.MARKETPLACE_PAT != '' }}
-        env:
-          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
-        run: |
-          set -euo pipefail
-          vsix_path="$(ls -1 ./*.vsix | head -1)"
-          echo "Publishing $vsix_path to Marketplace..."
-          npx tfx extension publish \
-            --vsix "$vsix_path" \
-            --token "$MARKETPLACE_PAT" \
-            --no-wait-validation
-          echo "Published successfully."
-          echo "Waiting 90s for Marketplace async validation and ADO extension cache to propagate..."
-          sleep 90
-          echo "Done waiting — ADO pipelines will now run against the freshly published extension."
-
       - name: Write install instructions to job summary
         env:
           VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
@@ -334,7 +317,7 @@ jobs:
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
 
       - name: Trigger ADO sanity pipeline and wait for result
         # The sanity pipeline (.pipelines/ado-sanity-pipeline.yml) tests:
@@ -406,7 +389,7 @@ jobs:
       - name: Checkout (for trigger script)
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
 
       - name: Trigger ADO OIDC test pipeline and wait for result
         # The OIDC pipeline covers:

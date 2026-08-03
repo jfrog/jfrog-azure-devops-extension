@@ -12,7 +12,7 @@ const fileName = getCliExecutableName();
 const jfrogCliToolName = 'jf';
 const cliPackage = 'jfrog-cli-' + getArchitecture();
 const fallbackCliVersion = '2.99.0';
-let defaultJfrogCliVersion = '2.103.0';
+let defaultJfrogCliVersion = '2.111.0';
 
 /**
  * Executes an HTTP request with retry logic for 5xx errors.
@@ -144,7 +144,7 @@ const minCustomCliVersion = '2.10.0';
 const minSupportedStdinSecretCliVersion = '2.36.0';
 const minSupportedServerIdEnvCliVersion = '2.37.0';
 const minSupportedOidcCliVersion = '2.75.0';
-const pluginVersion = '2.14.1';
+const pluginVersion = '2.14.2';
 const buildAgent = 'jfrog-azure-devops-extension';
 
 /**
@@ -201,6 +201,10 @@ module.exports = {
     isToolExists: isToolExists,
     buildCliArtifactoryDownloadUrl: buildCliArtifactoryDownloadUrl,
     createAuthHandlers: createAuthHandlers,
+    createCliDownloadAuthHandlers: createCliDownloadAuthHandlers,
+    exchangeOidcTokenViaRest: exchangeOidcTokenViaRest,
+    isOidcConnection: isOidcConnection,
+    resolvePlatformUrl: resolvePlatformUrl,
     taskDefaultCleanup: taskDefaultCleanup,
     writeSpecContentToSpecPath: writeSpecContentToSpecPath,
     stripTrailingSlash: stripTrailingSlash,
@@ -285,7 +289,11 @@ function getCliPath(cliDownloadUrl, cliAuthHandlers, cliVersion) {
         } else {
             const errMsg = generateDownloadCliErrorMessage(cliDownloadUrl, cliVersion);
             createCliDirs();
-            return downloadCli(cliDownloadUrl, cliAuthHandlers, cliVersion)
+            // cliAuthHandlers may be an array or a provider function returning a Promise<array>.
+            // Resolve it lazily here so that work such as an OIDC token exchange only happens
+            // when a download is actually required — never when the CLI is already cached.
+            return Promise.resolve(typeof cliAuthHandlers === 'function' ? cliAuthHandlers() : cliAuthHandlers)
+                .then((resolvedHandlers) => downloadCli(cliDownloadUrl, resolvedHandlers, cliVersion))
                 .then((cliPath) => resolve(cliPath))
                 .catch((error) => reject(errMsg + '\n' + error));
         }
@@ -328,6 +336,41 @@ function createAuthHandlers(serviceConnection) {
 
     // Use basic authentication.
     return [new credentialsHandler.BasicCredentialHandler(artifactoryUser, artifactoryPassword, false)];
+}
+
+/**
+ * Returns whether the given service connection uses OIDC authentication.
+ * @param {string} serviceConnection - The service connection ID.
+ * @returns {boolean}
+ */
+function isOidcConnection(serviceConnection) {
+    return !!tl.getEndpointAuthorizationParameter(serviceConnection, 'oidcProviderName', true);
+}
+
+/**
+ * Builds the authentication handlers used to download the JFrog CLI.
+ *
+ * For OIDC-based service connections the credential does not exist as a static
+ * token — it must be obtained through an OIDC token exchange. The CLI-based
+ * exchange (exchangeOidcTokenAndSetStepVariables) cannot be used here because the
+ * CLI is the very artifact being downloaded, so this performs a CLI-independent
+ * REST exchange (exchangeOidcTokenViaRest) and authenticates the download with the
+ * resulting access token. For all other connection types it falls back to the
+ * synchronous createAuthHandlers (access token / basic / anonymous).
+ *
+ * @param {string} serviceConnection - The Artifactory service connection ID.
+ * @param {(service: string, platformUrl: string, oidcProviderName: string) => Promise<string>} [exchangeFn]
+ *        - OIDC exchange implementation; injectable for testing. Defaults to exchangeOidcTokenViaRest.
+ * @returns {Promise<Array>} Authentication handlers for the CLI download.
+ */
+async function createCliDownloadAuthHandlers(serviceConnection, exchangeFn = exchangeOidcTokenViaRest) {
+    if (!isOidcConnection(serviceConnection)) {
+        return createAuthHandlers(serviceConnection);
+    }
+    const platformUrl = resolvePlatformUrl(serviceConnection);
+    const oidcProviderName = tl.getEndpointAuthorizationParameter(serviceConnection, 'oidcProviderName', true);
+    const accessToken = await exchangeFn(serviceConnection, platformUrl, oidcProviderName);
+    return [new credentialsHandler.BearerCredentialHandler(accessToken, false)];
 }
 
 function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
@@ -393,11 +436,14 @@ function maskSecrets(str) {
         .replace(/--access-token='.*?'/g, '--access-token=***');
 }
 
-async function fetchOidcTokenIfConfigured(service, cliPath, buildDir) {
-    const oidcProviderName = tl.getEndpointAuthorizationParameter(service, 'oidcProviderName', true);
-    if (!oidcProviderName) {
-        return undefined;
-    }
+/**
+ * Resolves the JFrog platform URL for a service connection. Prefers the explicit
+ * 'jfrogPlatformUrl' authorization parameter and falls back to parsing it from the
+ * service URL.
+ * @param {string} service - The service connection ID.
+ * @returns {string} The resolved platform URL.
+ */
+function resolvePlatformUrl(service) {
     const serviceUrl = tl.getEndpointUrl(service, false);
     let platformUrl = '';
     try {
@@ -408,6 +454,15 @@ async function fetchOidcTokenIfConfigured(service, cliPath, buildDir) {
     if (!platformUrl || !platformUrl.trim()) {
         platformUrl = parsePlatformUrlFromServiceUrl(serviceUrl);
     }
+    return platformUrl;
+}
+
+async function fetchOidcTokenIfConfigured(service, cliPath, buildDir) {
+    if (!isOidcConnection(service)) {
+        return undefined;
+    }
+    const oidcProviderName = tl.getEndpointAuthorizationParameter(service, 'oidcProviderName', true);
+    const platformUrl = resolvePlatformUrl(service);
     return exchangeOidcTokenAndSetStepVariables(service, platformUrl, oidcProviderName, cliPath, buildDir);
 }
 
@@ -617,6 +672,58 @@ async function fetchAzureOidcToken(serviceConnectionID) {
     }
     debugLogIDToken(body.oidcToken);
     return body.oidcToken;
+}
+
+/**
+ * Performs an OIDC token exchange WITHOUT the JFrog CLI, via a direct REST call to
+ * JFrog Access. Required by the JFrog Tools Installer, which must authenticate the
+ * CLI *download* itself — at that point the CLI does not yet exist, so the
+ * CLI-based exchange cannot be used. The request mirrors what `jf eot` sends for an
+ * Azure provider (grant_type / subject_token_type / subject_token / provider_name /
+ * provider_type / audience). The Azure DevOps identity mapping is matched on the ID
+ * token's subject claim, which is carried in subject_token.
+ *
+ * @param {string} service - The service connection ID.
+ * @param {string} platformUrl - The JFrog platform base URL.
+ * @param {string} oidcProviderName - The configured OIDC provider name.
+ * @returns {Promise<string>} The exchanged JFrog access token.
+ */
+async function exchangeOidcTokenViaRest(service, platformUrl, oidcProviderName) {
+    const oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
+    const idToken = await fetchAzureOidcToken(service);
+
+    const exchangeUrl = addTrailingSlashIfNeeded(platformUrl) + 'access/api/v1/oidc/token';
+    const requestBody = {
+        grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
+        subject_token_type: 'urn:ietf:params:oauth:token-type:id_token',
+        subject_token: idToken,
+        provider_name: oidcProviderName,
+        provider_type: 'Azure',
+        audience: oidcAudience,
+    };
+
+    const requestOptions = { ...getProxyConfiguration(), socketTimeout: 30000 };
+    const httpClient = new httpm.HttpClient(buildAgent, [], requestOptions);
+    tl.debug('Exchanging OIDC token via REST at: ' + exchangeUrl);
+    const response = await httpClient.post(exchangeUrl, JSON.stringify(requestBody), {
+        'Content-Type': 'application/json',
+    });
+
+    const statusCode = response.message.statusCode;
+    const responseBody = await response.readBody();
+    if (statusCode !== 200) {
+        throw new Error(`OIDC token exchange failed: HTTP ${statusCode}\nBody: ${responseBody}`);
+    }
+    /** @type {{ access_token?: string, username?: string }} */
+    const body = JSON.parse(responseBody);
+    if (!body.access_token) {
+        throw new Error('OIDC token exchange response did not contain an access token.');
+    }
+
+    // Publish outputs for parity with the CLI-based OIDC flow (downstream consumption / debug).
+    tl.setVariable(oidcUserOutputName, body.username || '', true);
+    tl.setVariable(oidcTokenOutputName, body.access_token, true);
+    return body.access_token;
 }
 
 async function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
