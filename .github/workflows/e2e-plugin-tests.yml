@@ -154,20 +154,60 @@ jobs:
           print(f"Rewrote {len(paths)} task GUIDs and names.")
           PYEOF
 
+      - name: Resolve next extension version
+        id: version
+        # Marketplace requires each publish of a (publisher, extension-id) to
+        # use a version strictly greater than the currently published one, and
+        # ADO only auto-updates to a higher version.
+        #
+        # Preferred (traceable) version is 0.<PR#>.<run_number>. But this e2e
+        # extension is shared across all runs and already has older publishes
+        # (e.g. 0.647.87), so a low PR/run can be <= what's live and get
+        # rejected. Strategy:
+        #   • candidate = 0.<PR#>.<run_number>
+        #   • query the version currently live on Marketplace
+        #   • if candidate  >  live  → publish candidate (keeps traceability)
+        #   • if candidate <= live   → take live and bump its patch (+1)
+        # When no Marketplace PAT is available we can't query, so we just emit
+        # the candidate (the publish step is skipped in that case anyway).
+        env:
+          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
+          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
+          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
+          PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          export CANDIDATE="0.${PR_NUMBER}.${RUN_NUMBER}"
+          export LIVE="0.0.0"
+          if [ -n "${MARKETPLACE_PAT:-}" ]; then
+            TFX_OUT=$(npx --yes tfx-cli extension show --publisher "$PUBLISHER" --extension-id "$EXTENSION_ID" --token "$MARKETPLACE_PAT" 2>&1 || true)
+            LIVE=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else '0.0.0')" 2>/dev/null || echo '0.0.0')
+            [ -z "$LIVE" ] && LIVE='0.0.0'
+            export LIVE
+          fi
+          echo "Live version on Marketplace : $LIVE"
+          echo "Candidate (0.PR.run)        : $CANDIDATE"
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import os
+          def parse(v):
+              parts = (str(v).split('.') + ['0', '0', '0'])[:3]
+              return [int(p) if p.isdigit() else 0 for p in parts]
+          cand = os.environ['CANDIDATE']
+          live = os.environ['LIVE']
+          c, l = parse(cand), parse(live)
+          final = cand if c > l else f"{l[0]}.{l[1]}.{l[2] + 1}"
+          print(f"vsix_version={final}")
+          PY
+          echo "Resolved version written to job output."
+
       - name: Package .vsix
         id: build_vsix
         env:
-          # Version must be strictly increasing for a single (publisher,
-          # extension-id) — Marketplace rejects re-publishing an equal/lower
-          # version, and ADO only auto-updates to a higher one. Since this
-          # extension id is shared across every E2E run/PR, a PR-number-based
-          # version would go backwards when an older PR runs after a newer one.
-          # github.run_number is globally monotonic per workflow, and
-          # github.run_attempt increments on "Re-run", so
-          # 0.<run_number>.<run_attempt> is always increasing — no collisions
-          # on re-runs (the exact bug that got auto-publish removed before).
-          # The PR number is still surfaced in the artifact name + job summary.
-          VSIX_VERSION: "0.${{ github.run_number }}.${{ github.run_attempt }}"
+          # Version resolved above: preferred 0.<PR#>.<run_number>, or a
+          # patch-bump of the live Marketplace version when that would
+          # otherwise be <= what's already published.
+          VSIX_VERSION: ${{ steps.version.outputs.vsix_version }}
           # Bake the real destination publisher into the .vsix at build time.
           # Marketplace rejects uploads if the manifest publisher and the
           # destination publisher don't match exactly, so we cannot use a
