@@ -62,6 +62,11 @@ on:
   # Run automatically when a PR receives the "safe to test" label.
   pull_request_target:
     types: [labeled]
+  # Run automatically when code lands on v2 — i.e. a PR is merged into v2 or
+  # something is pushed to it directly — so the release branch is validated
+  # post-merge (build + publish + sanity + OIDC against the merged code).
+  push:
+    branches: [v2]
   # Allow manual triggering from the Actions UI for debugging.
   workflow_dispatch:
     inputs:
@@ -94,7 +99,8 @@ jobs:
     name: '1. Build .vsix'
     if: |
       contains(github.event.pull_request.labels.*.name, 'safe to test') ||
-      github.event_name == 'workflow_dispatch'
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
