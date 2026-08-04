@@ -157,9 +157,17 @@ jobs:
       - name: Package .vsix
         id: build_vsix
         env:
-          # Traceable version so we can correlate the installed extension
-          # back to this exact PR run.
-          VSIX_VERSION: "0.${{ github.event.pull_request.number || 0 }}.${{ github.run_number }}"
+          # Version must be strictly increasing for a single (publisher,
+          # extension-id) — Marketplace rejects re-publishing an equal/lower
+          # version, and ADO only auto-updates to a higher one. Since this
+          # extension id is shared across every E2E run/PR, a PR-number-based
+          # version would go backwards when an older PR runs after a newer one.
+          # github.run_number is globally monotonic per workflow, and
+          # github.run_attempt increments on "Re-run", so
+          # 0.<run_number>.<run_attempt> is always increasing — no collisions
+          # on re-runs (the exact bug that got auto-publish removed before).
+          # The PR number is still surfaced in the artifact name + job summary.
+          VSIX_VERSION: "0.${{ github.run_number }}.${{ github.run_attempt }}"
           # Bake the real destination publisher into the .vsix at build time.
           # Marketplace rejects uploads if the manifest publisher and the
           # destination publisher don't match exactly, so we cannot use a
@@ -212,6 +220,59 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+      - name: Publish to Marketplace, share and install (auto-update the dev org)
+        # Fully automates what used to be the manual UI step: publish the
+        # freshly built .vsix to the private publisher, share it with the dev
+        # org, and ensure it is installed there. Once installed, ADO
+        # auto-updates the org to each new version on subsequent runs, so
+        # jobs 2 & 3 exercise THIS PR's code.
+        #
+        # Gated on ADO_E2E_MARKETPLACE_PAT: if the secret is absent the step
+        # is a no-op and the manual artifact-upload flow (below) still works.
+        # The version scheme (0.<run_number>.<run_attempt>) guarantees a
+        # strictly increasing version, so re-runs never hit the old
+        # "version must increase" failure.
+        env:
+          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
+          ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
+          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
+          EXTENSION_ID: ${{ steps.build_vsix.outputs.extension_id }}
+          VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MARKETPLACE_PAT:-}" ]; then
+            echo "ADO_E2E_MARKETPLACE_PAT not set — skipping auto-publish."
+            echo "The .vsix is available as a workflow artifact for manual upload."
+            exit 0
+          fi
+
+          vsix_path="$(ls -1 ./*.vsix | head -1)"
+          echo "Publishing $vsix_path (version $VSIX_VERSION) to publisher '$PUBLISHER' and sharing with org '$ADO_ORG'..."
+          npx tfx extension publish \
+            --vsix "$vsix_path" \
+            --token "$MARKETPLACE_PAT" \
+            --share-with "$ADO_ORG" \
+            --no-wait-validation
+          echo "Published and shared."
+
+          # Ensure the extension is installed in the org so ADO auto-updates to
+          # each new version. Idempotent: on subsequent runs it's already
+          # installed, so a non-zero exit here is non-fatal.
+          echo "Ensuring extension '$EXTENSION_ID' is installed in '$ADO_ORG'..."
+          if npx tfx extension install \
+            --publisher "$PUBLISHER" \
+            --extension-id "$EXTENSION_ID" \
+            --service-url "https://${ADO_ORG}.visualstudio.com" \
+            --token "$MARKETPLACE_PAT"; then
+            echo "Install/enable confirmed."
+          else
+            echo "Install returned non-zero (likely already installed) — continuing."
+          fi
+
+          echo "Waiting 90s for Marketplace async validation to settle before jobs 2 & 3 run their version check..."
+          sleep 90
+          echo "Done — ADO will auto-update to version $VSIX_VERSION."
+
       - name: Write install instructions to job summary
         env:
           VSIX_VERSION: ${{ steps.build_vsix.outputs.vsix_version }}
@@ -220,11 +281,11 @@ jobs:
           ADO_ORG:      ${{ secrets.ADO_E2E_ORG }}
         run: |
           {
-            echo "## Manual install step (≈3 min, only when testing PR code)"
+            echo "## Install (auto by default — manual steps are a fallback)"
             echo ""
             echo "**This PR built:** \`$VSIX_NAME\` (version \`$VSIX_VERSION\`, extension id \`$EXTENSION_ID\`)"
             echo ""
-            echo "If you want the ADO test pipelines (jobs 2 & 3) to actually exercise this PR's code, do the following. If you skip this step the pipelines still run, but against whatever .vsix was installed previously."
+            echo "When the \`ADO_E2E_MARKETPLACE_PAT\` secret is set, the *Publish to Marketplace* step already published, shared and installed this build, and ADO auto-updates the dev org — so jobs 2 & 3 test this PR's code automatically. The steps below are only needed if that secret is unset or the auto-publish step was skipped/failed."
             echo ""
             echo "1. **Download the .vsix** from the *Artifacts* section at the bottom of this run page (artifact: \`jfrog-ext-vsix-${{ github.run_number }}\`). It downloads as a .zip wrapper — unzip it to get the actual .vsix."
             echo "2. **Upload to your publisher** at https://marketplace.visualstudio.com/manage/publishers/${ADO_ORG}-private"
