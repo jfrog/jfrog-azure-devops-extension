@@ -16,7 +16,7 @@
         "Patch": "2"
     },
     "demands": [],
-    "minimumAgentVersion": "1.89.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog Gradle",
     "groups": [
         {
@@ -287,11 +287,11 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "gradleBuild.js",
             "workingDirectory": "$(currentDirectory)"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "gradleBuild.js",
             "workingDirectory": "$(currentDirectory)"
         }
