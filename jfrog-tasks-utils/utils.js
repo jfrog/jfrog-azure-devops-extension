@@ -165,7 +165,7 @@ const oidcUserOutputName = 'oidc_user';
 const oidcTokenOutputName = 'oidc_token';
 
 // Set by Tools Installer Task. This JFrog CLI version will be used in all tasks unless manual installation is used,
-// or a specific version was requested in a task. If not set, use the default CLI version.
+// or a specific version was requested in a task. If not set, use the default CLI version..
 const pipelineRequestedCliVersionEnv = 'JFROG_CLI_PIPELINE_REQUESTED_VERSION_AZURE';
 // The actual JFrog CLI version used in a task.
 const taskSelectedCliVersionEnv = 'JFROG_CLI_TASK_SELECTED_VERSION_AZURE';
