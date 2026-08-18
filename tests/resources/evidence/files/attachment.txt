@@ -1,0 +1,1 @@
+This is a local attachment file used in evidence tests.
