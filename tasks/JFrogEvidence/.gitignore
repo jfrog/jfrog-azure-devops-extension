@@ -1,0 +1,4 @@
+# Ignore ts outputs
+evidence.js.map
+evidence.d.ts
+evidence.js

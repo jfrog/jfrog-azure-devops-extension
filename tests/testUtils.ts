@@ -61,6 +61,7 @@ export const toolsInstaller: string = join(__dirname, '..', 'tasks', 'JFrogTools
 export const genericCli: string = join(__dirname, '..', 'tasks', 'JFrogCliV2', 'jfrogCliRun.js');
 export const pip: string = join(__dirname, '..', 'tasks', 'JFrogPip', 'pipBuild.js');
 export const distribution: string = join(__dirname, '..', 'tasks', 'JFrogDistribution', 'distribution.js');
+export const evidence: string = join(__dirname, '..', 'tasks', 'JFrogEvidence', 'evidence.js');
 
 export function initTests(): void {
     process.env.JFROG_CLI_REPORT_USAGE = 'false';

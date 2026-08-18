@@ -128,7 +128,11 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                         return params[key];
                     };
                     let exchanged: { service: string; platformUrl: string; providerName: string } | undefined;
-                    const fakeExchange: (s: string, p: string, o: string) => Promise<string> = async (service: string, platformUrl: string, providerName: string): Promise<string> => {
+                    const fakeExchange: (s: string, p: string, o: string) => Promise<string> = async (
+                        service: string,
+                        platformUrl: string,
+                        providerName: string,
+                    ): Promise<string> => {
                         exchanged = { service, platformUrl, providerName };
                         return 'EXCHANGED_ACCESS_TOKEN';
                     };
@@ -156,13 +160,10 @@ describe('JFrog Artifactory Extension Tests', (): void => {
                     anyTl.getEndpointAuthorizationParameter = (id: string, key: string): string | undefined =>
                         key === 'apitoken' ? 'STATIC_TOKEN' : undefined;
                     let exchanged: boolean = false;
-                    const handlers: any[] = await jfrogUtils.createCliDownloadAuthHandlers(
-                        'svc',
-                        async (): Promise<string> => {
-                            exchanged = true;
-                            return 'unused';
-                        },
-                    );
+                    const handlers: any[] = await jfrogUtils.createCliDownloadAuthHandlers('svc', async (): Promise<string> => {
+                        exchanged = true;
+                        return 'unused';
+                    });
                     assert.strictEqual(exchanged, false, 'must not perform an OIDC exchange for a token connection');
                     assert.strictEqual(handlers[0].constructor.name, 'BearerCredentialHandler');
                     assert.strictEqual(handlers[0].token, 'STATIC_TOKEN');
@@ -1306,6 +1307,30 @@ describe('JFrog Artifactory Extension Tests', (): void => {
             distributionCleanUp(rbName, rbVersion);
         });
     });
+
+    describe('Evidence Tests', (): void => {
+        runSyncTest(
+            'Create evidence on a repository path',
+            async (): Promise<void> => {
+                const testDir: string = 'evidence';
+                await mockTask(testDir, 'upload');
+                await mockTask(testDir, 'createOnPath');
+            },
+            TestUtils.isSkipTest('evidence'),
+        );
+
+        runSyncTest(
+            'Create evidence on a build with a local attachment',
+            async (): Promise<void> => {
+                const testDir: string = 'evidence';
+                await mockTask(testDir, 'buildUpload');
+                await mockTask(testDir, 'buildPublish');
+                await mockTask(testDir, 'createOnBuild');
+                deleteBuild('Evidence Test');
+            },
+            TestUtils.isSkipTest('evidence'),
+        );
+    });
 });
 
 function distributionCleanUp(rbName: string, rbVersion: string): void {
@@ -1354,7 +1379,7 @@ function stubExchangeHttp(
         '.s';
 
     anyTl.getVariable = (k: string): string | undefined =>
-        ({ 'System.AccessToken': 'ado-oauth', 'Build.Repository.Name': 'my-repo' } as { [k: string]: string })[k];
+        (({ 'System.AccessToken': 'ado-oauth', 'Build.Repository.Name': 'my-repo' }) as { [k: string]: string })[k];
     anyTl.getEndpointAuthorizationParameter = (): string | undefined => undefined;
     anyTl.setVariable = (k: string, v: string): void => {
         outputs[k] = v;
