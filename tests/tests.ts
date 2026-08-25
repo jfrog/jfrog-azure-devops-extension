@@ -589,6 +589,48 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
+    describe('JFrog CLI V2 Package Alias Tests', (): void => {
+        const testDir: string = 'jfrogCliV2PackageAlias';
+        const taskJsonDummy: string = join(__dirname, 'resources', 'task.json');
+
+        runSyncTest(
+            'Installs Package Alias shims and sets JFROG_CLI_GHOST_FROG when enabled',
+            async (): Promise<void> => {
+                const taskPath: string = join(__dirname, 'resources', testDir, 'enablePackageAlias.js');
+                const runner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
+                await runner.runAsync();
+                tasksOutput += runner.stderr + '\n' + runner.stdout;
+                assert.ok(runner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput);
+                assert.ok(runner.stdout.includes('package-alias install'), 'Expected a "package-alias install" command in task output.\n' + runner.stdout);
+                assert.ok(
+                    /##vso\[task\.setvariable variable=JFROG_CLI_GHOST_FROG;[^\]]*\]true/.test(runner.stdout),
+                    'Expected JFROG_CLI_GHOST_FROG to be set to true in task output.\n' + runner.stdout,
+                );
+            },
+            TestUtils.isSkipTest('generic'),
+        );
+
+        runSyncTest(
+            'Skips Package Alias with a warning (but still succeeds) on an unsupported CLI version',
+            async (): Promise<void> => {
+                const taskPath: string = join(__dirname, 'resources', testDir, 'packageAliasUnsupportedVersion.js');
+                const runner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(taskPath, taskJsonDummy);
+                await runner.runAsync();
+                tasksOutput += runner.stderr + '\n' + runner.stdout;
+                assert.ok(runner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput);
+                assert.ok(
+                    !runner.stdout.includes('package-alias install'),
+                    'Did not expect a "package-alias install" command in task output.\n' + runner.stdout,
+                );
+                assert.ok(
+                    (runner.stderr + runner.stdout).includes('Package Alias is not supported by JFrog CLI'),
+                    'Expected an unsupported-version warning in task output.\n' + runner.stderr + '\n' + runner.stdout,
+                );
+            },
+            TestUtils.isSkipTest('generic'),
+        );
+    });
+
     describe('Tools Installer Tests', (): void => {
         runSyncTest(
             'Download CLI',

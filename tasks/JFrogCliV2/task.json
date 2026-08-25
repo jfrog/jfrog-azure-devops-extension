@@ -63,6 +63,23 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
+        },
+        {
+            "name": "enablePackageAlias",
+            "type": "boolean",
+            "label": "Enable Package Alias (Ghost Frog)",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Install JFrog CLI's package-alias shims (requires JFrog CLI 2.93.0 or later), which transparently route native build tool commands (npm, mvn, gradle, dotnet, nuget, pip, go, docker, etc.) through 'jf' for the rest of the pipeline job."
+        },
+        {
+            "name": "packageAliasTools",
+            "type": "string",
+            "label": "Package Alias Tools",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "enablePackageAlias = true",
+            "helpMarkDown": "Comma-separated list of tools to enable package aliasing for (e.g. 'npm,dotnet'). Leave empty to enable all supported tools."
         }
     ],
     "execution": {

@@ -1,6 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 const fs = require('fs');
+const path = require('path');
 
 let serverId;
 RunJfrogCliCommand(RunTaskCbk);
@@ -49,6 +50,10 @@ async function RunTaskCbk(cliPath) {
     serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
     await utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
 
+    if (tl.getBoolInput('enablePackageAlias')) {
+        setUpPackageAlias(cliPath, requiredWorkDir);
+    }
+
     let cliCommandsList = tl.getInput('command', true).split('\n');
     try {
         for (let cliCommand of cliCommandsList) {
@@ -80,4 +85,28 @@ async function RunTaskCbk(cliPath) {
         utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
     }
     tl.setResult(tl.TaskResult.Succeeded, 'Command Succeeded.', cliPath);
+}
+
+/**
+ * Installs JFrog CLI's package-alias ('Ghost Frog') shims and registers them on PATH,
+ * so native build tool invocations for the rest of the pipeline job route through 'jf'.
+ */
+function setUpPackageAlias(cliPath, requiredWorkDir) {
+    let cliVersion = tl.getVariable(utils.taskSelectedCliVersionEnv);
+    if (utils.compareVersions(cliVersion, utils.minSupportedPackageAliasCliVersion) < 0) {
+        console.warn(
+            `Package Alias is not supported by JFrog CLI ${cliVersion}. Minimum required version is ${utils.minSupportedPackageAliasCliVersion}. Skipping.`,
+        );
+        return;
+    }
+    let packageAliasCommand = utils.cliJoin(cliPath, 'package-alias', 'install');
+    let packageAliasTools = tl.getInput('packageAliasTools', false);
+    if (packageAliasTools) {
+        packageAliasCommand = utils.cliJoin(packageAliasCommand, '--packages=' + utils.quote(packageAliasTools));
+    }
+    utils.executeCliCommand(packageAliasCommand, requiredWorkDir);
+
+    tl.prependPath(path.join(utils.getJfrogFolderPath(), 'package-alias', 'bin'));
+    process.env.JFROG_CLI_GHOST_FROG = 'true';
+    tl.setVariable('JFROG_CLI_GHOST_FROG', 'true');
 }
