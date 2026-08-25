@@ -46,8 +46,19 @@ async function RunTaskCbk(cliPath) {
     process.env.JFROG_CLI_BUILD_NAME = tl.getVariable('Build.DefinitionName');
     process.env.JFROG_CLI_BUILD_NUMBER = tl.getVariable('Build.BuildNumber');
 
-    serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
-    await utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
+    let configurationName = tl.getInput('configurationName', false);
+    if (configurationName) {
+        // Reuse an existing JFrog CLI configuration instead of creating a new one.
+        serverId = configurationName;
+    } else {
+        if (!tl.getInput('jfrogPlatformConnection', false)) {
+            tl.setResult(tl.TaskResult.Failed, "Either 'JFrog Platform service connection' or 'Configuration Name' must be provided.");
+            return;
+        }
+        serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
+        await utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
+    }
+    tl.setVariable('JFROG_CLI_CONFIG_NAME', serverId, false, true);
 
     let cliCommandsList = tl.getInput('command', true).split('\n');
     try {
@@ -58,7 +69,9 @@ async function RunTaskCbk(cliPath) {
                     tl.TaskResult.Failed,
                     "Unexpected JFrog CLI command prefix. Expecting the command to start with 'jf '. The command received is: " + cliCommand,
                 );
-                utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
+                if (!tl.getBoolInput('keepConfig')) {
+                    utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
+                }
                 return;
             }
             // Remove 'jf' and space from the beginning of the command string, so we can use the CLI's path
@@ -77,7 +90,9 @@ async function RunTaskCbk(cliPath) {
     } catch (executionException) {
         tl.setResult(tl.TaskResult.Failed, executionException);
     } finally {
-        utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
+        if (!tl.getBoolInput('keepConfig')) {
+            utils.taskDefaultCleanup(cliPath, requiredWorkDir, [serverId]);
+        }
     }
     tl.setResult(tl.TaskResult.Succeeded, 'Command Succeeded.', cliPath);
 }
