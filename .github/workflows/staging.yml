@@ -25,4 +25,4 @@ jobs:
         env:
           ADO_ARTIFACTORY_DEVELOPER: ecosystem-staging
           ADO_ARTIFACTORY_API_KEY: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-        run: npm run publish-private
+        run: .github/scripts/staging.sh
