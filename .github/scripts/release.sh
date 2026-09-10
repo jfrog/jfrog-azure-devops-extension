@@ -30,7 +30,7 @@ git remote set-url origin https://${IL_AUTOMATION_TOKEN}@github.com/jfrog/jfrog-
 git fetch origin dev
 
 jf c rm --quiet
-jf c add internal --url=${ARTIFACTORY_URL} --user=${ARTIFACTORY_USER} --password=${ARTIFACTORY_APIKEY}
+jf c add internal --url=${ARTIFACTORY_URL} --access-token=${ARTIFACTORY_APIKEY}
 
 git merge origin/dev
 
