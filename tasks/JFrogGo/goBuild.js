@@ -36,6 +36,12 @@ async function RunTaskCbk(cliPath) {
         }
         case 'custom': {
             let customCommand = tl.getInput('customCommand', true);
+            // Reject shell metacharacters to prevent command injection, since customCommand
+            // is executed via a shell (execSync) in utils.executeCliCommand.
+            if (/[;&|`$(){}<>\n]/.test(customCommand)) {
+                tl.setResult(tl.TaskResult.Failed, "Input 'customCommand' contains illegal characters.");
+                return;
+            }
             await performGoCommand(customCommand, cliPath, requiredWorkDir);
             break;
         }
