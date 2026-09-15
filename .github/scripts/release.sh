@@ -49,7 +49,14 @@ jf rt u "JFrog.jfrog-azure-devops-extension-${NEXT_VERSION}.vsix" ecosys-jfrog-a
 jf rt bag && jf rt bce
 jf rt bp
 
-npx tfx extension publish -t ${AZURE_DEVOPS_TOKEN}
+# --no-wait-validation: without this, tfx blocks on the Marketplace's own
+# validation queue and can time out client-side even after the publish has
+# genuinely succeeded server-side (observed directly: a run that failed here
+# still resulted in a validated, public release a few minutes later). Since
+# the script continues on to tag/push the release afterward, treating a slow
+# validation queue as fatal risks the extension actually publishing while the
+# repo never records the release happened.
+npx tfx extension publish -t ${AZURE_DEVOPS_TOKEN} --no-wait-validation
 
 git push origin v2
 git push origin --tags
