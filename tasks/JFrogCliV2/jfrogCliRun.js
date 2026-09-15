@@ -50,12 +50,12 @@ async function RunTaskCbk(cliPath) {
     serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
     await utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
 
-    if (tl.getBoolInput('enablePackageAlias')) {
-        setUpPackageAlias(cliPath, requiredWorkDir);
-    }
-
     let cliCommandsList = tl.getInput('command', true).split('\n');
     try {
+        if (tl.getBoolInput('enablePackageAlias')) {
+            setUpPackageAlias(cliPath, requiredWorkDir);
+        }
+
         for (let cliCommand of cliCommandsList) {
             cliCommand = cliCommand.trim();
             if (!cliCommand.startsWith(utils.jfrogCliToolName + ' ')) {

@@ -1,6 +1,6 @@
 const testUtils = require('../../testUtils');
 
-// Forces a CLI version older than the Package Alias minimum (2.93.0) - the task must
+// Forces a CLI version older than the Package Alias minimum (2.100.0) - the task must
 // still succeed, only skipping Package Alias setup with a warning.
 let inputs = {
     jfrogPlatformConnection: 'mock-service',

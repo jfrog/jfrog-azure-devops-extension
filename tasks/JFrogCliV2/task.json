@@ -70,7 +70,7 @@
             "label": "Enable Package Alias (Ghost Frog)",
             "defaultValue": "false",
             "required": false,
-            "helpMarkDown": "Install JFrog CLI's package-alias shims (requires JFrog CLI 2.93.0 or later), which transparently route native build tool commands (npm, mvn, gradle, dotnet, nuget, pip, go, docker, etc.) through 'jf' for the rest of the pipeline job."
+            "helpMarkDown": "Install JFrog CLI's package-alias shims (requires JFrog CLI 2.100.0 or later), which transparently route native build tool commands (npm, mvn, gradle, dotnet, nuget, pip, go, docker, etc.) through 'jf' for the rest of the pipeline job."
         },
         {
             "name": "packageAliasTools",
