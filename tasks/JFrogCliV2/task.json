@@ -24,8 +24,8 @@
             "type": "connectedService:jfrogPlatformService",
             "label": "JFrog Platform service connection",
             "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "JFrog Platform service connection to use in the command."
+            "required": false,
+            "helpMarkDown": "JFrog Platform service connection to use in the command. Required unless 'Configuration Name' is provided to reuse an existing JFrog CLI configuration."
         },
         {
             "name": "useCustomVersion",
@@ -63,6 +63,22 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
+        },
+        {
+            "name": "configurationName",
+            "type": "string",
+            "label": "Configuration Name",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Reuse an existing JFrog CLI configuration by name instead of creating a new one from 'JFrog Platform service connection'. The named configuration must already exist in the JFrog CLI's config store (for example, created by a previous run of this task with 'Keep Configuration' enabled)."
+        },
+        {
+            "name": "keepConfig",
+            "type": "boolean",
+            "label": "Keep Configuration",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Skip removing the JFrog CLI configuration when this task completes, so it can be reused by later steps via 'Configuration Name'. Use the 'JFROG_CLI_CONFIG_NAME' variable set by this task to reference it, and run a teardown task with 'Configuration Name' set and 'Keep Configuration' disabled to remove it at the end of the pipeline."
         }
     ],
     "execution": {

@@ -589,6 +589,46 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
+    describe('JFrog CLI V2 Persist Config Tests', (): void => {
+        const testDir: string = 'jfrogCliV2PersistConfig';
+
+        runSyncTest(
+            'Fails clearly when neither JFrog Platform connection nor Configuration Name is provided',
+            async (): Promise<void> => {
+                await mockTask(testDir, 'missingConnectionAndConfigName', true);
+            },
+            TestUtils.isSkipTest('generic'),
+        );
+
+        runSyncTest(
+            'Keeps and reuses the JFrog CLI configuration across two task invocations',
+            async (): Promise<void> => {
+                // Run the setup task directly (instead of via mockTask) so its stdout can be inspected
+                // for the JFROG_CLI_CONFIG_NAME value emitted via "##vso[task.setvariable ...]".
+                const taskJsonDummy: string = join(__dirname, 'resources', 'task.json');
+                const setupPath: string = join(__dirname, 'resources', testDir, 'keepConfigSetup.js');
+                const setupRunner: adoMockTest.MockTestRunner = new adoMockTest.MockTestRunner(setupPath, taskJsonDummy);
+                await setupRunner.runAsync();
+                tasksOutput += setupRunner.stderr + '\n' + setupRunner.stdout;
+                assert.ok(setupRunner.succeeded, '\nFailure in: ' + setupPath + '.\n' + tasksOutput);
+
+                const configNameMatch: RegExpMatchArray | null = setupRunner.stdout.match(
+                    /##vso\[task\.setvariable variable=JFROG_CLI_CONFIG_NAME;[^\]]*\](\S+)/,
+                );
+                assert.ok(configNameMatch, 'Expected JFROG_CLI_CONFIG_NAME to be set in task output.\n' + setupRunner.stdout);
+                process.env.ADO_TEST_PERSISTED_CONFIG_NAME = (configNameMatch as RegExpMatchArray)[1];
+                try {
+                    // Second invocation reuses the configuration by name, without a service connection,
+                    // and tears it down (keepConfig defaults to false).
+                    await mockTask(testDir, 'reuseConfigurationName');
+                } finally {
+                    delete process.env.ADO_TEST_PERSISTED_CONFIG_NAME;
+                }
+            },
+            TestUtils.isSkipTest('generic'),
+        );
+    });
+
     describe('Tools Installer Tests', (): void => {
         runSyncTest(
             'Download CLI',
