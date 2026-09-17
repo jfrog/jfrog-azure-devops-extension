@@ -589,6 +589,20 @@ describe('JFrog Artifactory Extension Tests', (): void => {
         );
     });
 
+    describe('JFrog CLI V2 Tests', (): void => {
+        runSyncTest(
+            'Adds the JFrog CLI directory to PATH when registerInPath is enabled',
+            async (): Promise<void> => {
+                const runner: adoMockTest.MockTestRunner = await mockTaskCapture('jfrogCliV2RegisterInPath', 'registerInPath');
+                assert.ok(
+                    /##vso\[task\.prependpath\].+/.test(runner.stdout),
+                    'Expected a "prependpath" logging command in task output.\n' + runner.stdout,
+                );
+            },
+            TestUtils.isSkipTest('generic'),
+        );
+    });
+
     describe('Tools Installer Tests', (): void => {
         runSyncTest(
             'Download CLI',
@@ -1420,6 +1434,18 @@ function runAsyncTest(description: string, testFunc: (done: mocha.Done) => void,
  * @param shouldFail (Boolean, Optional) - True if the task supposed to fail
  */
 async function mockTask(testDir: string, taskName: string, shouldFail?: boolean): Promise<void> {
+    await mockTaskCapture(testDir, taskName, shouldFail);
+}
+
+/**
+ * Mock a task from resources directory, returning the runner so its stdout/stderr can be inspected
+ * (e.g. to assert on a "##vso[...]" logging command, or to pull a value out of the task's output).
+ *
+ * @param testDir (String) - The test directory in resources
+ * @param taskName (String) - The '.js' file
+ * @param shouldFail (Boolean, Optional) - True if the task supposed to fail
+ */
+async function mockTaskCapture(testDir: string, taskName: string, shouldFail?: boolean): Promise<adoMockTest.MockTestRunner> {
     const taskPath: string = join(__dirname, 'resources', testDir, taskName + '.js');
     // task.json dummy passed to the mock runner to avoid the 'Unable to find task.json, ...' warnings.
     const taskJsonDummy: string = join(__dirname, 'resources', 'task.json');
@@ -1427,6 +1453,7 @@ async function mockTask(testDir: string, taskName: string, shouldFail?: boolean)
     await mockRunner.runAsync();
     tasksOutput += mockRunner.stderr + '\n' + mockRunner.stdout;
     assert.ok(shouldFail ? mockRunner.failed : mockRunner.succeeded, '\nFailure in: ' + taskPath + '.\n' + tasksOutput); // Check the test results
+    return mockRunner;
 }
 
 /**
