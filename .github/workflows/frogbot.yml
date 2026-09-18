@@ -33,7 +33,7 @@ jobs:
   
         # Install dependencies (required for npm scanning)
       - name: Install npm dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
       # Run JFrog CLI audit on PR changes
       - name: Setup JFrog CLI
@@ -78,7 +78,7 @@ jobs:
   
         # Install dependencies (required for npm scanning)
       - name: Install npm dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
       - uses: jfrog/frogbot@v2
         env:
