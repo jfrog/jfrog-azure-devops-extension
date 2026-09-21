@@ -167,6 +167,17 @@
                                     "isRequired": true,
                                     "dataType": "string"
                                 }
+                            },
+                            {
+                                "id": "jfrogPlatformUrl",
+                                "name": "Platform URL",
+                                "description": "The access token will be obtained from this URL. For example, https://my.jfrog.io/",
+                                "inputMode": "textbox",
+                                "isConfidential": false,
+                                "validation": {
+                                    "isRequired": true,
+                                    "dataType": "string"
+                                }
                             }
                         ]
                     }
