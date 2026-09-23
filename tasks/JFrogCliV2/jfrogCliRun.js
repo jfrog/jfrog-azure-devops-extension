@@ -1,6 +1,7 @@
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 const fs = require('fs');
+const path = require('path');
 
 let serverId;
 RunJfrogCliCommand(RunTaskCbk);
@@ -48,6 +49,10 @@ async function RunTaskCbk(cliPath) {
 
     serverId = utils.assembleUniqueServerId('jfrog_cli_cmd');
     await utils.configureDefaultJfrogServer(serverId, cliPath, requiredWorkDir);
+
+    if (tl.getBoolInput('registerInPath')) {
+        tl.prependPath(path.dirname(cliPath));
+    }
 
     let cliCommandsList = tl.getInput('command', true).split('\n');
     try {
