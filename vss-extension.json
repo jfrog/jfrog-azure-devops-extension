@@ -86,8 +86,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/artifactory/api/ping",
-                        "resultSelector": "jsonpath:$.values[*]"
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/system/ping"
                     },
                     {
                         "name": "BuildNames",
@@ -191,8 +190,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/ping",
-                        "resultSelector": "jsonpath:$.values[*]"
+                        "endpointUrl": "{{endpoint.url}}/api/system/ping"
                     },
                     {
                         "name": "BuildNames",
