@@ -86,7 +86,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/artifactory/api/plugins",
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/ping",
                         "resultSelector": "jsonpath:$.values[*]"
                     },
                     {
@@ -191,7 +191,7 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/plugins",
+                        "endpointUrl": "{{endpoint.url}}/api/ping",
                         "resultSelector": "jsonpath:$.values[*]"
                     },
                     {
