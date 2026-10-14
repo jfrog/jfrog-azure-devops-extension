@@ -46,9 +46,11 @@
 #   ADO_E2E_PAT              PAT with scopes:
 #                              • Build: Read + Execute
 #                              • Project and Team: Read
-#                              • Service Connections: Read
-#                                (needed by verify-connection-tests to look
-#                                 up and test jfrog-sanity-connection)
+#                              • Service Connections: Read, query, & manage
+#                                (verify-connection-tests looks up and tests
+#                                 jfrog-sanity-connection, and also creates +
+#                                 deletes a throwaway bad-credentials endpoint
+#                                 to prove the failure path still works)
 #                            (Marketplace scopes no longer needed in CI —
 #                             you publish via the UI.)
 #   ADO_SANITY_PROJECT       ADO project containing the sanity pipeline
@@ -588,7 +590,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.sha || github.sha }}
 
-      - name: Verify connection against jfrog-sanity-connection
+      - name: Verify connection (success + deliberate-failure cases)
         env:
           ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
           ADO_PROJECT: ${{ secrets.ADO_SANITY_PROJECT }}
