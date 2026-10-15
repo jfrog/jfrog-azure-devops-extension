@@ -1,0 +1,371 @@
+{
+    "id": "174fd5de-e8d2-48ac-8c4a-d6cd2ab803e6",
+    "name": "JFrogEvidence",
+    "friendlyName": "JFrog Evidence",
+    "description": "Evidence for an artifact or Release Bundle",
+    "author": "JFrog",
+    "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#Evidence-projects-dependencies-for-Security-Vulnerabilities)",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "version": {
+        "Major": "1",
+        "Minor": "14",
+        "Patch": "3"
+    },
+    "demands": [],
+    "minimumAgentVersion": "1.89.0",
+    "instanceNameFormat": "JFrog Evidence",
+    "groups": [
+        {
+            "name": "predicate",
+            "displayName": "Predicate",
+            "isExpanded": true
+        },
+        {
+            "name": "signing",
+            "displayName": "Signing",
+            "isExpanded": false
+        },
+        {
+            "name": "subject",
+            "displayName": "Subject",
+            "isExpanded": true
+        },
+        {
+            "name": "attachments",
+            "displayName": "Attachments",
+            "isExpanded": false
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "artifactoryConnection",
+            "type": "connectedService:jfrogArtifactoryService",
+            "label": "Artifactory service connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Select the Artifactory service connection to use for this task."
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
+        },
+        {
+            "name": "predicateFilePath",
+            "type": "filePath",
+            "label": "Predicate file path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "sigstoreBundle = \"\"",
+            "groupName": "predicate",
+            "helpMarkDown": "Path to the Predicate, arbitrary JSON. Mandatory unless 'Sigstore bundle' is used."
+        },
+        {
+            "name": "predicateType",
+            "type": "string",
+            "label": "Predicate type",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "sigstoreBundle = \"\"",
+            "groupName": "predicate",
+            "helpMarkDown": "Type of the Predicate. Mandatory unless 'Sigstore bundle' is used."
+        },
+        {
+            "name": "markdownFilePath",
+            "type": "filePath",
+            "label": "Markdown file path",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "predicate",
+            "helpMarkDown": "Markdown of the Predicate."
+        },
+        {
+            "name": "integration",
+            "type": "pickList",
+            "label": "Integration",
+            "defaultValue": "none",
+            "helpMarkDown": "Specify an integration to automatically generate the Predicate. Supported: 'sonar'. When using 'sonar', the 'SONAR_TOKEN' or 'SONARQUBE_TOKEN' environment variable must be set",
+            "required": false,
+            "groupName": "predicate",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "none": "none",
+                "sonar": "sonar"
+            }
+        },
+        {
+            "name": "sigstoreBundle",
+            "type": "filePath",
+            "label": "Sigstore bundle file path",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "signing",
+            "helpMarkDown": "Path to a Sigstore bundle file with a pre-signed DSSE envelope. Incompatible with 'Key', 'Key alias', 'Predicate', 'Predicate type' and 'Subject SHA256'."
+        },
+        {
+            "name": "keyFilePath",
+            "type": "filePath",
+            "label": "Key file path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "sigstoreBundle = \"\"",
+            "groupName": "signing",
+            "helpMarkDown": "Path to a private key that will sign the DSSE. Supported keys: 'ecdsa', 'rsa' and 'ed25519'."
+        },
+        {
+            "name": "keyAlias",
+            "type": "string",
+            "label": "Key alias",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "sigstoreBundle = \"\"",
+            "groupName": "signing",
+            "helpMarkDown": "Key alias."
+        },
+        {
+            "name": "subjectType",
+            "type": "pickList",
+            "label": "Subject type",
+            "defaultValue": "none",
+            "required": false,
+            "groupName": "subject",
+            "helpMarkDown": "The subject the evidence is attached to.",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "none": "None",
+                "build": "Build",
+                "releaseBundle": "Release Bundle",
+                "package": "Package",
+                "application": "Application",
+                "path": "Repository path"
+            }
+        },
+        {
+            "name": "buildName",
+            "type": "string",
+            "label": "Build name",
+            "defaultValue": "$(Build.DefinitionName)",
+            "required": false,
+            "visibleRule": "subjectType=build",
+            "groupName": "subject",
+            "helpMarkDown": "Build name.\nTo use the default build name of the pipeline, set the field to '$(Build.DefinitionName)'.\nThe build should already be published to Artifactory."
+        },
+        {
+            "name": "buildNumber",
+            "type": "string",
+            "label": "Build number",
+            "defaultValue": "$(Build.BuildNumber)",
+            "required": false,
+            "visibleRule": "subjectType=build",
+            "groupName": "subject",
+            "helpMarkDown": "Build number.\nTo use the default build number of the pipeline, set the field to '$(Build.BuildNumber)'.\nThe build should already be published to Artifactory."
+        },
+        {
+            "name": "releaseBundleName",
+            "type": "string",
+            "label": "Release Bundle name",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=releaseBundle",
+            "groupName": "subject",
+            "helpMarkDown": "Release Bundle name."
+        },
+        {
+            "name": "releaseBundleVersion",
+            "type": "string",
+            "label": "Release Bundle version",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=releaseBundle",
+            "groupName": "subject",
+            "helpMarkDown": "Release Bundle version."
+        },
+        {
+            "name": "packageName",
+            "type": "string",
+            "label": "Package name",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=package",
+            "groupName": "subject",
+            "helpMarkDown": "Package name."
+        },
+        {
+            "name": "packageRepoName",
+            "type": "string",
+            "label": "Package repository name",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=package",
+            "groupName": "subject",
+            "helpMarkDown": "Package repository name."
+        },
+        {
+            "name": "packageVersion",
+            "type": "string",
+            "label": "Package version",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=package",
+            "groupName": "subject",
+            "helpMarkDown": "Package version."
+        },
+        {
+            "name": "applicationKey",
+            "type": "string",
+            "label": "Application key",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=application",
+            "groupName": "subject",
+            "helpMarkDown": "Application key."
+        },
+        {
+            "name": "applicationVersion",
+            "type": "string",
+            "label": "Application version",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=application",
+            "groupName": "subject",
+            "helpMarkDown": "Application version."
+        },
+        {
+            "name": "subjectRepoPath",
+            "type": "string",
+            "label": "Subject repository path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=path",
+            "groupName": "subject",
+            "helpMarkDown": "Full path to some subject location, in the format <repo/path>."
+        },
+        {
+            "name": "subjectSha256",
+            "type": "string",
+            "label": "Subject SHA256",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "subjectType=path && sigstoreBundle = \"\"",
+            "groupName": "subject",
+            "helpMarkDown": "Subject checksum sha256."
+        },
+        {
+            "name": "attachmentSource",
+            "type": "pickList",
+            "label": "Attachment source",
+            "defaultValue": "none",
+            "required": false,
+            "groupName": "attachments",
+            "helpMarkDown": "The source of a file to attach to the created evidence.",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "none": "None",
+                "local": "Local file",
+                "artifactory": "Existing Artifactory file"
+            }
+        },
+        {
+            "name": "attachLocalFilePath",
+            "type": "filePath",
+            "label": "Local file path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "attachmentSource=local",
+            "groupName": "attachments",
+            "helpMarkDown": "Path to a local file to attach to the created evidence."
+        },
+        {
+            "name": "attachArtifactoryTempPath",
+            "type": "string",
+            "label": "Artifactory temp upload path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "attachmentSource=local",
+            "groupName": "attachments",
+            "helpMarkDown": "Temporary Artifactory upload path for the local file, in the format <repo/path[/name]>. Use trailing slash for directory targets."
+        },
+        {
+            "name": "attachArtifactoryPath",
+            "type": "string",
+            "label": "Artifactory file path",
+            "defaultValue": "",
+            "required": false,
+            "visibleRule": "attachmentSource=artifactory",
+            "groupName": "attachments",
+            "helpMarkDown": "Existing Artifactory file path to attach, in the format <repo/path>."
+        },
+        {
+            "name": "providerId",
+            "type": "string",
+            "label": "Provider ID",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "Provider ID for the evidence."
+        },
+        {
+            "name": "evidenceType",
+            "type": "string",
+            "label": "Type",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "Type can contain 'gh-commiter' value."
+        },
+        {
+            "name": "format",
+            "type": "pickList",
+            "label": "Output format",
+            "defaultValue": "none",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "Defines the output format of the command.",
+            "properties": {
+                "EditableOptions": "False"
+            },
+            "options": {
+                "none": "Default",
+                "json": "json",
+                "table": "table"
+            }
+        },
+        {
+            "name": "projectKey",
+            "type": "string",
+            "label": "Project key",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "advanced",
+            "helpMarkDown": "The JFrog Project key associated with the created evidence."
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "evidence.js",
+            "workingDirectory": "$(currentDirectory)"
+        },
+        "Node20_1": {
+            "target": "evidence.js",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }
+}
