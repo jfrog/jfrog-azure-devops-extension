@@ -63,6 +63,14 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "The working directory where the command will run. When empty, the value of '$(System.DefaultWorkingDirectory)' is used."
+        },
+        {
+            "name": "registerInPath",
+            "type": "boolean",
+            "label": "Add JFrog CLI to PATH",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Add the JFrog CLI executable's directory to the agent's PATH, so subsequent steps in the pipeline job can call 'jf' directly."
         }
     ],
     "execution": {

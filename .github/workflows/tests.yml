@@ -48,6 +48,15 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
+      # Pinned instead of relying on the OS image's bundled Maven: ubuntu-latest's
+      # image was bumped to Maven 3.10.0, whose maven-resolver/aether jars dropped
+      # DefaultArtifactResolver's no-arg constructor, breaking the Artifactory
+      # build-info-extractor Maven plugin (NoSuchMethodError) on ubuntu only.
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: '3.9.9'
+
       - name: Install Mono
         run: |
           sudo apt update
