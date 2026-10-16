@@ -86,8 +86,14 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/artifactory/api/plugins",
-                        "resultSelector": "jsonpath:$.values[*]"
+                        "endpointUrl": "{{endpoint.url}}/artifactory/api/system/ping",
+                        "resultSelector": "none",
+                        "headers": [
+                            {
+                                "name": "Accept",
+                                "value": "*/*"
+                            }
+                        ]
                     },
                     {
                         "name": "BuildNames",
@@ -191,8 +197,14 @@
                 "dataSources": [
                     {
                         "name": "TestConnection",
-                        "endpointUrl": "{{endpoint.url}}/api/plugins",
-                        "resultSelector": "jsonpath:$.values[*]"
+                        "endpointUrl": "{{endpoint.url}}/api/system/ping",
+                        "resultSelector": "none",
+                        "headers": [
+                            {
+                                "name": "Accept",
+                                "value": "*/*"
+                            }
+                        ]
                     },
                     {
                         "name": "BuildNames",
