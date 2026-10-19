@@ -59,6 +59,12 @@ async function performGoCommand(goCommand, cliPath, requiredWorkDir) {
     let cliCommand = utils.cliJoin(cliPath, cliGoCommand, goCommand);
     let goArguments = tl.getInput('goArguments', false);
     if (goArguments) {
+        // Block the '-exec' flag, which allows running an arbitrary program instead of the compiled binary,
+        // enabling arbitrary command execution during 'go build'/'go test'/'go run'.
+        if (/(^|\s)-{1,2}exec(=|\s|$)/i.test(goArguments)) {
+            tl.setResult(tl.TaskResult.Failed, "The 'goArguments' input must not contain the '-exec' flag.");
+            return;
+        }
         cliCommand = utils.cliJoin(cliCommand, goArguments);
     }
     executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
