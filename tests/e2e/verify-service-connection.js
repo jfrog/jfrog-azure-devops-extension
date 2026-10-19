@@ -85,6 +85,7 @@ class CheckFailed extends Error {}
 async function adoRequest(method, path, body) {
     let status = 0;
     let text = '';
+    let headers = '';
     try {
         const response = await fetch(`${API_BASE}${path}`, {
             method,
@@ -97,6 +98,7 @@ async function adoRequest(method, path, body) {
             signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
         });
         status = response.status;
+        headers = describeHeaders(response.headers);
         text = await response.text();
     } catch (err) {
         text = String(err && err.message ? err.message : err);
@@ -107,7 +109,17 @@ async function adoRequest(method, path, body) {
     } catch {
         // Not JSON; callers fall back to the raw text.
     }
-    return { status, text, json };
+    return { status, text, json, headers };
+}
+
+// The few response headers that help diagnose an auth/scope failure when ADO
+// returns an empty body (e.g. a bare 401). Never includes Set-Cookie.
+const DIAGNOSTIC_HEADERS = ['www-authenticate', 'x-vss-e2eid', 'x-tfs-processid', 'location', 'content-type'];
+
+function describeHeaders(headers) {
+    return DIAGNOSTIC_HEADERS.filter((name) => headers.has(name))
+        .map((name) => `${name}: ${headers.get(name)}`)
+        .join('; ');
 }
 
 function preview(text) {
@@ -159,7 +171,7 @@ function lookupFailureHint(status) {
         case 0:
             return `  Hint: network/DNS failure — ADO_ORG '${ADO_ORG}' may be wrong (used in URL host).`;
         case 401:
-            return '  Hint: PAT is invalid, expired, or for a different organization. Regenerate ADO_E2E_PAT.';
+            return '  Hint: PAT is invalid, expired, for a different organization, or missing the Service Connections (Read, query, & manage) scope. Regenerate ADO_E2E_PAT.';
         case 403:
             return '  Hint: PAT lacks scopes. Required: Service Connections (Read, query, & manage).';
         case 404:
@@ -185,6 +197,7 @@ async function positiveCheck() {
         console.error(`  HTTP status : ${lookup.status}`);
         console.error('  Response    :');
         console.error(preview(lookup.text));
+        console.error(`  Headers     : ${lookup.headers || '(none)'}`);
         console.error('');
         console.error(lookupFailureHint(lookup.status));
         throw new CheckFailed('lookup failed');
