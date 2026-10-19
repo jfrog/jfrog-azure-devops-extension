@@ -23,6 +23,12 @@
 #   4. oidc-tests             : Trigger the OIDC test pipeline.
 #                               Covers all task types with OIDC + non-OIDC.
 #
+#   5. verify-connection-tests: Call the same REST API the "Verify connection"
+#                               button uses, directly against the existing
+#                               jfrog-sanity-connection service endpoint.
+#                               This is the only job that exercises
+#                               TestConnection — no pipeline task does.
+#
 # WHY THE HYBRID?
 # ---------------
 # Publishing the .vsix to the Marketplace + installing it into the dev org
@@ -40,6 +46,11 @@
 #   ADO_E2E_PAT              PAT with scopes:
 #                              • Build: Read + Execute
 #                              • Project and Team: Read
+#                              • Service Connections: Read, query, & manage
+#                                (verify-connection-tests looks up and tests
+#                                 jfrog-sanity-connection, and also creates +
+#                                 deletes a throwaway bad-credentials endpoint
+#                                 to prove the failure path still works)
 #                            (Marketplace scopes no longer needed in CI —
 #                             you publish via the UI.)
 #   ADO_SANITY_PROJECT       ADO project containing the sanity pipeline
@@ -515,3 +526,73 @@ jobs:
           GH_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           TIMEOUT_MINUTES: ${{ github.event.inputs.timeout_minutes || '60' }}
         run: bash buildScripts/trigger-ado-pipeline.sh
+
+  # ======================================================================
+  # JOB 4 — Verify connection test.
+  # "Verify connection" is never invoked by a pipeline task — it's a
+  # UI-only action backed by a direct REST call. This job makes that same
+  # call against the existing jfrog-sanity-connection service endpoint so
+  # regressions in the TestConnection dataSource (wrong endpoint, wrong
+  # Accept header, wrong resultSelector, etc.) are caught in CI instead of
+  # only being found by a human clicking the button.
+  # Runs in parallel with Jobs 2/3 after Job 1 completes.
+  # ======================================================================
+  verify-connection-tests:
+    name: '4. Verify Connection Test'
+    needs: build
+    if: ${{ github.event.inputs.skip_pipelines != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Wait for Marketplace extension to propagate
+        run: |
+          echo "Waiting 420s (7 min) for Marketplace to verify and ADO to auto-update the extension..."
+          sleep 420
+          echo "Done — proceeding to version check."
+
+      - name: Verify extension version on Marketplace
+        env:
+          MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
+          PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
+          EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
+          EXPECTED_VERSION: ${{ needs.build.outputs.vsix_version }}
+        run: |
+          if [ -z "${MARKETPLACE_PAT:-}" ]; then
+            echo "ADO_E2E_MARKETPLACE_PAT not set — cannot query Marketplace."
+            echo "Expected version (built this run): $EXPECTED_VERSION"
+            exit 0
+          fi
+          TFX_OUT=$(npx --yes tfx-cli extension show \
+            --publisher "$PUBLISHER" \
+            --extension-id "$EXTENSION_ID" \
+            --token "$MARKETPLACE_PAT" 2>&1 || true)
+          echo "tfx output:"
+          echo "$TFX_OUT"
+          INSTALLED=$(echo "$TFX_OUT" | python3 -c "import sys,json; raw=sys.stdin.read(); s=raw.find('{'); d=json.loads(raw[s:]) if s>=0 else {}; v=d.get('versions',[]); print(v[0]['version'] if v else 'not-found')" 2>/dev/null || echo 'not-found')
+          [ -z "$INSTALLED" ] && INSTALLED='not-found'
+          echo "============================================================"
+          echo "  Expected version (built this run) : $EXPECTED_VERSION"
+          echo "  Published version on Marketplace  : $INSTALLED"
+          if [ "$INSTALLED" = "$EXPECTED_VERSION" ]; then
+            echo "  MATCH — tests will run against the current PR build."
+          else
+            echo "  MISMATCH — Marketplace has $INSTALLED but expected $EXPECTED_VERSION."
+            echo "  The publish step may have been skipped, or propagation took longer than 7 minutes."
+            echo "  Stopping to avoid running tests against a stale build."
+            echo "============================================================"
+            exit 1
+          fi
+          echo "============================================================"
+
+      - name: Checkout (for verify-connection script)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+
+      - name: Verify connection (success + deliberate-failure cases)
+        env:
+          ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
+          ADO_PROJECT: ${{ secrets.ADO_SANITY_PROJECT }}
+          ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
+        run: bash buildScripts/verify-service-connection.sh
