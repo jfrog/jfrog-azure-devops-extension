@@ -1,0 +1,56 @@
+# Place in: jfrog/jfrog-azure-devops-extension  ->  .github/workflows/bump-cli-version.yml
+name: Bump default JFrog CLI version
+on:
+  repository_dispatch:
+    types: [cli-released] # sent by jfrog/jfrog-cli after a release is published
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "JFrog CLI version to set as default (X.Y.Z)"
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: dev
+
+      - name: Bump defaultJfrogCliVersion and pluginVersion
+        id: bump
+        env:
+          NEW: ${{ github.event.client_payload.version || inputs.version }}
+          FILE: jfrog-tasks-utils/utils.js
+        run: |
+          [[ "$NEW" =~ ^2\.[0-9]+\.[0-9]+$ ]] || { echo "::error::bad version '$NEW'"; exit 1; }
+          CUR=$(grep -m1 -oE "let defaultJfrogCliVersion = '2\.[0-9]+\.[0-9]+'" "$FILE" | grep -oE '2\.[0-9]+\.[0-9]+')
+          [ -n "$CUR" ] || { echo "::error::defaultJfrogCliVersion not found in $FILE"; exit 1; }
+          if [ "$(printf '%s\n%s\n' "$CUR" "$NEW" | sort -V | tail -1)" != "$NEW" ] || [ "$CUR" = "$NEW" ]; then
+            echo "Current $CUR >= $NEW, nothing to do."; echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          sed -i -E "s/(let defaultJfrogCliVersion = ')$CUR(')/\1$NEW\2/" "$FILE"
+          # pluginVersion follows the extension version: next minor (e.g. 2.16.0 -> 2.17.0)
+          PCUR=$(grep -m1 -oE "const pluginVersion = '[0-9]+\.[0-9]+\.[0-9]+'" "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          [ -n "$PCUR" ] || { echo "::error::pluginVersion not found in $FILE"; exit 1; }
+          PNEW="$(echo "$PCUR" | cut -d. -f1).$(( $(echo "$PCUR" | cut -d. -f2) + 1 )).0"
+          sed -i -E "s/(const pluginVersion = ')$PCUR(')/\1$PNEW\2/" "$FILE"
+          echo "plugin=$PNEW" >> "$GITHUB_OUTPUT"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "new=$NEW" >> "$GITHUB_OUTPUT"
+
+      - name: Open PR
+        if: steps.bump.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: infra/RTECO-0000-bump-cli-version-${{ steps.bump.outputs.new }}
+          base: dev
+          commit-message: "RTECO-00000 - Bump default JFrog CLI version to ${{ steps.bump.outputs.new }} and plugin version to ${{ steps.bump.outputs.plugin }}"
+          title: "RTECO-00000 - Bump default JFrog CLI version to ${{ steps.bump.outputs.new }} and plugin version to ${{ steps.bump.outputs.plugin }}"
+          body: "Automated bump after the JFrog CLI ${{ steps.bump.outputs.new }} release: updates `defaultJfrogCliVersion` and `pluginVersion` in `jfrog-tasks-utils/utils.js`."
+          labels: safe to test
+          delete-branch: true
