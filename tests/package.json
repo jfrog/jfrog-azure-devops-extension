@@ -26,6 +26,6 @@
         "typescript": "^5.2.2"
     },
     "scripts": {
-        "test": "npm i && mocha -r ts-node/register tests.ts -t 1000000"
+        "test": "npm i && mocha -r ts-node/register tests.ts buildScanReportTests.js -t 1000000"
     }
 }
