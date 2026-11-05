@@ -1,3 +1,5 @@
+/* eslint-env browser, amd */
+/* global VSS, $ */
 'use strict';
 define(['TFS/DistributedTask/TaskRestClient'], (taskRestClient) => {
     let sharedConfig = VSS.getConfiguration();
@@ -27,9 +29,12 @@ define(['TFS/DistributedTask/TaskRestClient'], (taskRestClient) => {
                                 'buildDetails',
                             )
                             .then((attachmentContent) => {
-                                let buildDetails = JSON.parse(bufferToString(attachmentContent));
-                                let buildInfoDiv = createBuildInfoDiv(buildDetails);
-                                buildInfoParentDiv.append(buildInfoDiv);
+                                try {
+                                    let buildDetails = JSON.parse(bufferToString(attachmentContent));
+                                    buildInfoParentDiv.append(createBuildInfoDiv(buildDetails));
+                                } catch {
+                                    buildInfoParentDiv.append(createNoBuildInfoDiv());
+                                }
                             });
                     } else {
                         let noBuildInfoDiv = createNoBuildInfoDiv();
@@ -51,23 +56,43 @@ define(['TFS/DistributedTask/TaskRestClient'], (taskRestClient) => {
      * @param buildDetails - Contains 'artifactoryUrl', 'buildName' and 'buildNumber'
      */
     function createBuildInfoDiv(buildDetails) {
+        let destination;
+        try {
+            const platform = new URL(buildDetails.artifactoryUrl);
+            destination = new URL(
+                buildDetails.buildInfoUiUrl ||
+                    stripTrailingSlash(buildDetails.artifactoryUrl) +
+                        '/webapp/builds/' +
+                        encodeURIComponent(buildDetails.buildName) +
+                        '/' +
+                        encodeURIComponent(buildDetails.buildNumber),
+            );
+            // Preserve HTTP for existing on-prem installations, but never accept
+            // executable schemes, embedded credentials or a different origin.
+            if (
+                !['https:', 'http:'].includes(destination.protocol) ||
+                destination.username ||
+                destination.password ||
+                platform.username ||
+                platform.password ||
+                destination.origin !== platform.origin
+            ) {
+                return createNoBuildInfoDiv();
+            }
+        } catch {
+            return createNoBuildInfoDiv();
+        }
         let buildInfoDiv = document.createElement('div');
         let buildInfoIcon = document.createElement('img');
         let buildInfoUrlDiv = document.createElement('a');
 
         buildInfoIcon.src = 'images/artifactory-build-info.png';
         buildInfoUrlDiv.classList.add('build-info-url');
-        // Supported since JFrog CLI version 2.17.0.
-        if (buildDetails.buildInfoUiUrl) {
-            buildInfoUrlDiv.href = buildDetails.buildInfoUiUrl;
-        } else {
-            // Backward compatibility - if a lower JFrog CLI version is used,
-            // or for tasks that completed before the above functionality was introduced.
-            buildInfoUrlDiv.href =
-                stripTrailingSlash(buildDetails.artifactoryUrl) + '/webapp/builds/' + buildDetails.buildName + '/' + buildDetails.buildNumber;
-        }
-        buildInfoUrlDiv.text = 'Artifactory Build Info';
+        buildInfoUrlDiv.href = destination.href;
+        // Attachments are build-produced data, not an authenticated URL source.
+        buildInfoUrlDiv.text = 'Artifactory Build Info (' + destination.host + ')';
         buildInfoUrlDiv.target = '_blank';
+        buildInfoUrlDiv.rel = 'noopener noreferrer';
         buildInfoDiv.append(buildInfoIcon);
         buildInfoDiv.append(buildInfoUrlDiv);
         return buildInfoDiv;

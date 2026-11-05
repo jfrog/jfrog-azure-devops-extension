@@ -429,11 +429,12 @@ function executeCliCommand(cliCommand, runningDir, options = {}) {
  * @returns {string}
  */
 function maskSecrets(str) {
-    return str
-        .replace(/--password=".*?"/g, '--password=***')
-        .replace(/--access-token=".*?"/g, '--access-token=***')
-        .replace(/--password='.*?'/g, '--password=***')
-        .replace(/--access-token='.*?'/g, '--access-token=***');
+    return (
+        str
+            .replace(/(--(?:password|access-token|passphrase)(?:=|\s+))(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s]+)/g, '$1***')
+            // The agent scans anywhere in stdout for logging-command markers.
+            .replace(/##/g, '#\\u0023')
+    );
 }
 
 /**
@@ -567,7 +568,11 @@ function forwardProxyToEnv() {
                 const converted = [];
                 for (const h of hosts) {
                     if (/[*+?[\]()^${}|\\][^.]/.test(h) || h.includes('*')) {
-                        tl.warning('Skipping Agent.ProxyBypassList entry "' + h + '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.');
+                        tl.warning(
+                            'Skipping Agent.ProxyBypassList entry "' +
+                                h +
+                                '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.',
+                        );
                         continue;
                     }
                     converted.push(h.replace(/\\\./g, '.'));
@@ -931,7 +936,7 @@ function writeSpecContentToSpecPath(specSource, specPath) {
     let fileSpec;
     if (specSource === 'file') {
         let specInputPath = tl.getPathInput('file', true, true);
-        console.log('Using file spec located at ' + specInputPath);
+        console.log('Reading the configured file spec.');
         fileSpec = fs.readFileSync(specInputPath, 'utf8');
     } else if (specSource === 'taskConfiguration') {
         fileSpec = tl.getInput('fileSpec', true);
@@ -939,8 +944,7 @@ function writeSpecContentToSpecPath(specSource, specPath) {
         throw 'Failed creating File-Spec, since the provided File-Spec source value is invalid.';
     }
     fileSpec = fixWindowsPaths(fileSpec);
-    console.log('Using file spec:');
-    console.log(fileSpec);
+    console.log('Using file spec (' + Buffer.byteLength(fileSpec, 'utf8') + ' bytes).');
     // Write provided fileSpec to file
     tl.writeFile(specPath, fileSpec);
 }
@@ -960,6 +964,9 @@ function singleQuote(str) {
 function addStringParam(cliCommand, inputParam, cliParam, require) {
     let val = tl.getInput(inputParam, require);
     if (val) {
+        if (cliParam === 'passphrase') {
+            tl.setSecret(val);
+        }
         cliCommand = cliJoin(cliCommand, '--' + cliParam + '=' + quote(val));
     }
     return cliCommand;
