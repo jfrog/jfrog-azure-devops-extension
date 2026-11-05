@@ -1,95 +1,37 @@
-name: "Frogbot Security Scan"
+name: Frogbot Security Scan
 on:
-  # Trigger on pull requests for scanning
-  pull_request_target:
-    types: [ opened, synchronize ]
-  # Trigger on schedule for scanning and fixing
   schedule:
-    # The repository will be scanned once a day at 00:00 GMT.
-    - cron: "0 0 * * *"
-
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 permissions:
-  contents: write
-  pull-requests: write
-  security-events: write
-
+  contents: read
 jobs:
-  # Job for scanning pull requests
-  scan-pull-request:
-    if: github.event_name == 'pull_request_target'
-    runs-on: ubuntu-latest
-    # A pull request needs to be approved, before Frogbot scans it. Any GitHub user who is associated with the
-    # "frogbot" GitHub environment can approve the pull request to be scanned.
-    environment: frogbot
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-  
-        # Install dependencies (required for npm scanning)
-      - name: Install npm dependencies
-        run: npm install --no-audit --no-fund
-
-      # Run JFrog CLI audit on PR changes
-      - name: Setup JFrog CLI
-        uses: jfrog/setup-jfrog-cli@v4
-        env:
-          JF_URL: ${{ secrets.FROGBOT_URL }}
-          JF_ACCESS_TOKEN: ${{ secrets.FROGBOT_ACCESS_TOKEN }}
-
-      - uses: jfrog/frogbot@v2
-        env:
-          JFROG_CLI_HOME_DIR: /home/runner/work
-
-          # [Mandatory]
-          # JFrog platform URL (This functionality requires version 3.29.0 or above of Xray)
-          JF_URL: ${{ secrets.FROGBOT_URL }}
-
-          # [Mandatory if JF_USER and JF_PASSWORD are not provided]
-          # JFrog access token with 'read' permissions on Xray service
-          JF_ACCESS_TOKEN: ${{ secrets.FROGBOT_ACCESS_TOKEN }}
-
-          # [Mandatory]
-          # The GitHub token automatically generated for the job
-          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Job for scheduled scanning and creating fix pull requests
   scan-and-fix:
-    if: github.event_name == 'schedule'
+    # This privileged job only installs reviewed integration branch code.
+    # PR compilation runs separately in Static Analysis without secrets.
+    if: github.repository == 'jfrog/jfrog-azure-devops-extension' && contains(fromJSON('["refs/heads/dev", "refs/heads/v2"]'), github.ref)
     runs-on: ubuntu-latest
+    environment: frogbot
+    permissions:
+      contents: write
+      pull-requests: write
+      security-events: write
     strategy:
       matrix:
-        # The repository scanning will be triggered periodically on the following branches.
-        branch: [ "main" ]
+        branch: [dev, v2]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ matrix.branch }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "18"
-  
-        # Install dependencies (required for npm scanning)
-      - name: Install npm dependencies
+          node-version: '24'
+      - name: Install dependencies
         run: npm install --no-audit --no-fund
-
-      - uses: jfrog/frogbot@v2
+      - uses: jfrog/frogbot@a22483eb236de56eaf17174b50f7a5cc16d85e33 # v2
         env:
-          # [Mandatory]
-          # JFrog platform URL
           JF_URL: ${{ secrets.FROGBOT_URL }}
-
-          # [Mandatory if JF_USER and JF_PASSWORD are not provided]
-          # JFrog access token with 'read' permissions on Xray service
           JF_ACCESS_TOKEN: ${{ secrets.FROGBOT_ACCESS_TOKEN }}
-
-          # [Mandatory]
-          # The GitHub token automatically generated for the job
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_BASE_BRANCH: ${{ matrix.branch }}

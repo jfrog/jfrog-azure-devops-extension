@@ -6,18 +6,28 @@ on:
     tags-ignore:
       - '**'
   pull_request:
+permissions:
+  contents: read
 jobs:
   Lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
 
       - name: Install
         run: npm install --no-fund
+
+      - name: Check workflow trust boundaries
+        run: node .github/scripts/check-workflow-trust.js
 
       # Assert the extension is created successfully
       - name: Create vsix file
