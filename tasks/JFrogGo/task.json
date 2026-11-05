@@ -6,10 +6,7 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#JFrog-go-Task)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "17",
@@ -174,7 +171,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "goBuild.js"
         },
         "Node20_1": {

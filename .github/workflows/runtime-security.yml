@@ -1,0 +1,23 @@
+name: Runtime security and utility tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ['20', '24']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci --ignore-scripts --prefix jfrog-tasks-utils
+      - run: npm audit --omit=dev --audit-level=high --prefix jfrog-tasks-utils
+      - run: node --test tests/security/dependencies.test.js
+      - run: npm install --no-fund
+      - run: npm run test:utils --prefix tests

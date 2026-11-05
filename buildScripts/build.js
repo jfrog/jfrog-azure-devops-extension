@@ -1,7 +1,9 @@
+/* eslint-env node */
 const exec = require('child_process').execSync;
 const sync = require('rimraf').sync;
 const fs = require('fs-extra');
 const join = require('path').join;
+const resolve = require('path').resolve;
 const TASKS_UTILS_DIR = 'jfrog-tasks-utils';
 const TASKS_DIR = 'tasks';
 const TESTS_DIR = 'tests';
@@ -16,8 +18,12 @@ installTests();
  */
 function installJfrogTaskUtils() {
     clean(TASKS_UTILS_DIR, true);
-    execNpm('i', TASKS_UTILS_DIR);
-    exec('npx clean-modules -y "!**/shelljs/src/test.js" --directory ' + join(TASKS_UTILS_DIR, 'node_modules'), { stdio: [0, 1, 2] });
+    execNpm('ci', TASKS_UTILS_DIR);
+    // Resolve the declared build tool locally; never let npx fetch an executable.
+    exec('npx --no-install clean-modules -y "!**/shelljs/src/test.js" --directory "' + resolve(TASKS_UTILS_DIR, 'node_modules') + '"', {
+        cwd: __dirname,
+        stdio: [0, 1, 2],
+    });
     execNpm('pack', TASKS_UTILS_DIR);
 }
 
@@ -79,7 +85,10 @@ function copyTaskUtilsModules(dest) {
  */
 function clean(cwd, cleanPackage) {
     sync(join(cwd, 'node_modules'));
-    sync(join(cwd, 'package-lock.json'));
+    // Preserve committed dependency resolutions for the shared runtime.
+    if (cwd !== TASKS_UTILS_DIR) {
+        sync(join(cwd, 'package-lock.json'));
+    }
     if (cleanPackage) {
         // rimraf v6 doesn't support wildcards directly on Windows, so find files first
         try {

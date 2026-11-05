@@ -6,10 +6,7 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#Audit-projects-dependencies-for-Security-Vulnerabilities)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "17",
@@ -99,7 +96,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "audit.js",
             "workingDirectory": "$(currentDirectory)"
         },

@@ -567,7 +567,11 @@ function forwardProxyToEnv() {
                 const converted = [];
                 for (const h of hosts) {
                     if (/[*+?[\]()^${}|\\][^.]/.test(h) || h.includes('*')) {
-                        tl.warning('Skipping Agent.ProxyBypassList entry "' + h + '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.');
+                        tl.warning(
+                            'Skipping Agent.ProxyBypassList entry "' +
+                                h +
+                                '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.',
+                        );
                         continue;
                     }
                     converted.push(h.replace(/\\\./g, '.'));
@@ -1332,14 +1336,8 @@ function stripTrailingSlash(str) {
  * @returns The platform URL with the service suffix removed
  */
 function parsePlatformUrlFromServiceUrl(serviceUrl) {
-    const suffixes = ['/xray', '/artifactory', '/distribution'];
     const url = new URL(serviceUrl);
-    for (const suffix of suffixes) {
-        if (url.pathname.endsWith(suffix)) {
-            url.pathname = url.pathname.replace(suffix, '');
-            break;
-        }
-    }
+    url.pathname = url.pathname.replace(/\/(?:xray|artifactory|distribution)\/?$/i, '');
     // Remove trailing slash
     return url.toString().replace(/\/$/, '');
 }

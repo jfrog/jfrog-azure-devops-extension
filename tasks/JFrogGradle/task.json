@@ -6,10 +6,7 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#JFrog-gradle-Task)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "17",
@@ -202,9 +199,7 @@
         },
         {
             "name": "javaHomeSelection",
-            "aliases": [
-                "javaHomeOption"
-            ],
+            "aliases": ["javaHomeOption"],
             "type": "radio",
             "label": "Set JAVA_HOME by",
             "required": true,
@@ -218,9 +213,7 @@
         },
         {
             "name": "jdkVersion",
-            "aliases": [
-                "jdkVersionOption"
-            ],
+            "aliases": ["jdkVersionOption"],
             "type": "pickList",
             "label": "JDK version",
             "required": false,
@@ -241,9 +234,7 @@
         },
         {
             "name": "jdkUserInputPath",
-            "aliases": [
-                "jdkDirectory"
-            ],
+            "aliases": ["jdkDirectory"],
             "type": "string",
             "label": "JDK path",
             "required": true,
@@ -254,9 +245,7 @@
         },
         {
             "name": "jdkArchitecture",
-            "aliases": [
-                "jdkArchitectureOption"
-            ],
+            "aliases": ["jdkArchitectureOption"],
             "type": "pickList",
             "label": "JDK architecture",
             "defaultValue": "x64",
@@ -287,7 +276,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "gradleBuild.js",
             "workingDirectory": "$(currentDirectory)"
         },

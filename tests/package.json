@@ -8,7 +8,7 @@
     "main": "testUtils.ts",
     "dependencies": {
         "@jfrog/tasks-utils": "file:../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz",
-        "azure-pipelines-task-lib": "5.2.1",
+        "azure-pipelines-task-lib": "5.282.0",
         "fs-extra": "11.2.0",
         "js-yaml": "^4.1.1",
         "path": "^0.12.7"
@@ -26,6 +26,7 @@
         "typescript": "^5.2.2"
     },
     "scripts": {
-        "test": "npm i && mocha -r ts-node/register tests.ts -t 1000000"
+        "test": "npm run test:utils && mocha -r ts-node/register tests.ts -t 1000000",
+        "test:utils": "mocha -r ts-node/register utilsTests.ts -t 30000 && node proxyConfigTest.js"
     }
 }
