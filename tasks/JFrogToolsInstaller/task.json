@@ -6,10 +6,7 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#custom-tools-installation)",
     "category": "Tool",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "17",
@@ -58,10 +55,7 @@
         },
         {
             "name": "installExtractors",
-            "aliases": [
-                "installExtractors",
-                "installMavenExtractor"
-            ],
+            "aliases": ["installExtractors", "installMavenExtractor"],
             "type": "boolean",
             "label": "Install Maven and Gradle Extractors",
             "defaultValue": "false",
@@ -70,10 +64,7 @@
         },
         {
             "name": "extractorsInstallationRepo",
-            "aliases": [
-                "extractorsInstallationRepo",
-                "mavenInstallationRepo"
-            ],
+            "aliases": ["extractorsInstallationRepo", "mavenInstallationRepo"],
             "type": "pickList",
             "label": "From:",
             "defaultValue": "",
@@ -102,7 +93,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "toolsInstaller.js",
             "workingDirectory": "$(currentDirectory)"
         },

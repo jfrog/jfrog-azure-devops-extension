@@ -6,18 +6,13 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#JFrog-maven-Task)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "17",
         "Patch": "0"
     },
-    "demands": [
-        "maven"
-    ],
+    "demands": ["maven"],
     "minimumAgentVersion": "1.89.0",
     "instanceNameFormat": "JFrog Maven",
     "groups": [
@@ -40,9 +35,7 @@
     "inputs": [
         {
             "name": "mavenPOMFile",
-            "aliases": [
-                "mavenPomFile"
-            ],
+            "aliases": ["mavenPomFile"],
             "type": "filePath",
             "label": "Maven POM file",
             "defaultValue": "pom.xml",
@@ -208,9 +201,7 @@
         },
         {
             "name": "javaHomeSelection",
-            "aliases": [
-                "javaHomeOption"
-            ],
+            "aliases": ["javaHomeOption"],
             "type": "radio",
             "label": "Set JAVA_HOME by",
             "required": true,
@@ -224,9 +215,7 @@
         },
         {
             "name": "jdkVersion",
-            "aliases": [
-                "jdkVersionOption"
-            ],
+            "aliases": ["jdkVersionOption"],
             "type": "pickList",
             "label": "JDK version",
             "required": false,
@@ -247,9 +236,7 @@
         },
         {
             "name": "jdkUserInputPath",
-            "aliases": [
-                "jdkDirectory"
-            ],
+            "aliases": ["jdkDirectory"],
             "type": "string",
             "label": "JDK path",
             "required": true,
@@ -260,9 +247,7 @@
         },
         {
             "name": "jdkArchitecture",
-            "aliases": [
-                "jdkArchitectureOption"
-            ],
+            "aliases": ["jdkArchitectureOption"],
             "type": "pickList",
             "label": "JDK architecture",
             "defaultValue": "x64",
@@ -307,7 +292,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "mavenBuild.js",
             "workingDirectory": "$(currentDirectory)"
         },

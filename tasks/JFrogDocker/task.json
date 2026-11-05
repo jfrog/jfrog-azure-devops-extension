@@ -6,10 +6,7 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#Pushing-and-Pulling-Docker-Images-to-and-from-Artifactory)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "17",
@@ -233,7 +230,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "docker.js",
             "workingDirectory": "$(currentDirectory)"
         },

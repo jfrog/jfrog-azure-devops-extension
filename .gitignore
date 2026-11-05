@@ -7,6 +7,7 @@ pack_publish_extension.sh
 vss-extension-private.json
 jfrog-tasks-utils-*.tgz
 *package-lock.json
+!jfrog-tasks-utils/package-lock.json
 .DS_Store
 *testData
 .taskkey

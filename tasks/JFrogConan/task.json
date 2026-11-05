@@ -6,10 +6,7 @@
     "author": "JFrog",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#JFrog-conan-Task)",
     "category": "Utility",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "demands": [],
     "version": {
         "Major": "1",
@@ -221,7 +218,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "conanBuild.js"
         },
         "Node20_1": {

@@ -7,6 +7,9 @@ import * as semver from 'semver';
 // Use require to get the actual module with latest exports
 import * as jfrogUtils from '@jfrog/tasks-utils';
 
+// Public HTTP endpoints are opt-in integration checks, not unit-test prerequisites.
+const networkDescribe: Mocha.SuiteFunction | Mocha.PendingSuiteFunction = process.env.JFROG_UTILS_NETWORK_TESTS === 'true' ? describe : describe.skip;
+
 // Type declarations for exports not yet in the installed package's utils.d.ts
 declare module '@jfrog/tasks-utils' {
     export function syncRequestWithRetry(
@@ -154,7 +157,7 @@ describe('Utils Unit Tests', (): void => {
         });
     });
 
-    describe('syncRequestWithRetry', (): void => {
+    networkDescribe('syncRequestWithRetry', (): void => {
         it('should return response on successful request (2xx)', (): void => {
             const response: { statusCode: number } = jfrogUtils.syncRequestWithRetry('GET', 'https://httpstat.us/200', { timeout: 5000 });
             assert.strictEqual(response.statusCode, 200);
@@ -178,7 +181,7 @@ describe('Utils Unit Tests', (): void => {
         });
     });
 
-    describe('isCliBinaryAvailable', (): void => {
+    networkDescribe('isCliBinaryAvailable', (): void => {
         it('should return true for a known valid CLI version', (): void => {
             // Use a known stable version that should always be available
             const result: boolean = jfrogUtils.isCliBinaryAvailable('2.50.0');
@@ -196,7 +199,7 @@ describe('Utils Unit Tests', (): void => {
         });
     });
 
-    describe('fetchLatestCliVersion', (): void => {
+    networkDescribe('fetchLatestCliVersion', (): void => {
         it('should return a valid semver version string', (): void => {
             const version: string = jfrogUtils.fetchLatestCliVersion();
             // Version should match semver pattern (e.g., "2.89.0")
@@ -219,11 +222,9 @@ describe('Utils Unit Tests', (): void => {
             assert.match(jfrogUtils.defaultJfrogCliVersion, /^\d+\.\d+\.\d+$/);
         });
 
-        it('should match the result of fetchLatestCliVersion', (): void => {
-            // Since defaultJfrogCliVersion is set at module load, it should match fetchLatestCliVersion
-            // unless there was a failure (in which case both would use fallback)
-            const fetchedVersion: string = jfrogUtils.fetchLatestCliVersion();
-            assert.strictEqual(jfrogUtils.defaultJfrogCliVersion, fetchedVersion);
+        it('should not be older than the fallback', (): void => {
+            // The default is deliberately pinned, not fetched at module load.
+            assert.ok(semver.gte(jfrogUtils.defaultJfrogCliVersion, jfrogUtils.fallbackCliVersion));
         });
     });
 
@@ -233,10 +234,12 @@ describe('Utils Unit Tests', (): void => {
             assert.match(jfrogUtils.fallbackCliVersion, /^\d+\.\d+\.\d+$/);
         });
 
-        it('should have an available binary on releases.jfrog.io', (): void => {
-            // The fallback version should always have its binary available
-            const result: boolean = jfrogUtils.isCliBinaryAvailable(jfrogUtils.fallbackCliVersion);
-            assert.strictEqual(result, true, `Fallback version ${jfrogUtils.fallbackCliVersion} should have available binary`);
+        networkDescribe('fallback binary availability', (): void => {
+            it('should have an available binary on releases.jfrog.io', (): void => {
+                // The fallback version should always have its binary available
+                const result: boolean = jfrogUtils.isCliBinaryAvailable(jfrogUtils.fallbackCliVersion);
+                assert.strictEqual(result, true, `Fallback version ${jfrogUtils.fallbackCliVersion} should have available binary`);
+            });
         });
     });
 
@@ -344,11 +347,7 @@ describe('Utils Unit Tests', (): void => {
                 const re: RegExp = new RegExp(`function\\s+${name}\\s*\\([^)]*\\)\\s*\\{([\\s\\S]*?)\\n\\}`, 'm');
                 const match: RegExpMatchArray | null = src.match(re);
                 assert.ok(match, `${name} not found in utils.js`);
-                assert.match(
-                    match![1],
-                    /fetchOidcTokenIfConfigured\s*\(/,
-                    `${name} must call fetchOidcTokenIfConfigured — regression of issue #608`,
-                );
+                assert.match(match![1], /fetchOidcTokenIfConfigured\s*\(/, `${name} must call fetchOidcTokenIfConfigured — regression of issue #608`);
             }
         });
     });

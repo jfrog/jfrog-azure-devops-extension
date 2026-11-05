@@ -6,10 +6,7 @@
     "author": "JFrog",
     "category": "Tool",
     "helpMarkDown": "[More Information](https://github.com/jfrog/jfrog-azure-devops-extension#Executing-JFrog-CLI-Commands)",
-    "visibility": [
-        "Build",
-        "Release"
-    ],
+    "visibility": ["Build", "Release"],
     "version": {
         "Major": "1",
         "Minor": "17",
@@ -74,7 +71,7 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node24": {
             "target": "jfrogCliRun.js",
             "workingDirectory": "$(currentDirectory)"
         },

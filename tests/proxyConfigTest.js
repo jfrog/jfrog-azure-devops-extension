@@ -197,7 +197,8 @@ runTest('forwardProxyToEnv does not override existing lowercase http_proxy', () 
     tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
     jfrogUtils.forwardProxyToEnv();
     assert.strictEqual(process.env.http_proxy, 'http://existing:9090');
-    assert.strictEqual(process.env.HTTP_PROXY, undefined);
+    // Windows environment-variable names are case-insensitive.
+    assert.strictEqual(process.env.HTTP_PROXY, process.platform === 'win32' ? 'http://existing:9090' : undefined);
     assert.strictEqual(process.env.HTTPS_PROXY, 'http://myproxy:8080');
     clearProxyVars();
 });
@@ -208,7 +209,7 @@ runTest('forwardProxyToEnv does not override existing lowercase https_proxy', ()
     tl.setVariable('Agent.ProxyUrl', 'http://myproxy:8080');
     jfrogUtils.forwardProxyToEnv();
     assert.strictEqual(process.env.https_proxy, 'http://existing:9090');
-    assert.strictEqual(process.env.HTTPS_PROXY, undefined);
+    assert.strictEqual(process.env.HTTPS_PROXY, process.platform === 'win32' ? 'http://existing:9090' : undefined);
     assert.strictEqual(process.env.HTTP_PROXY, 'http://myproxy:8080');
     clearProxyVars();
 });
@@ -248,7 +249,6 @@ runTest('forwardProxyToEnv converts ECMAScript escaped dots to plain hostnames f
     clearProxyVars();
 });
 
-
 runTest('forwardProxyToEnv skips wildcard entries and warns — simple entries still converted', () => {
     clearProxyVars();
     // .*\.corp\.com is a valid ECMAScript regex but cannot be converted to NO_PROXY
@@ -287,7 +287,7 @@ runTest('forwardProxyToEnv does not override existing lowercase no_proxy', () =>
     tl.setVariable('Agent.ProxyBypassList', '["localhost"]');
     jfrogUtils.forwardProxyToEnv();
     assert.strictEqual(process.env.no_proxy, 'existing.host');
-    assert.strictEqual(process.env.NO_PROXY, undefined);
+    assert.strictEqual(process.env.NO_PROXY, process.platform === 'win32' ? 'existing.host' : undefined);
     clearProxyVars();
 });
 
@@ -321,7 +321,6 @@ runTest('forwardProxyToEnv does not set NO_PROXY when user already has HTTP_PROX
     assert.strictEqual(process.env.HTTPS_PROXY, 'http://user-proxy:9090');
     clearProxyVars();
 });
-
 
 console.log(`\nResults: ${passed} passed, ${failed} failed\n`);
 process.exit(failed > 0 ? 1 : 0);
