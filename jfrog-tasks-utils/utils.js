@@ -567,7 +567,11 @@ function forwardProxyToEnv() {
                 const converted = [];
                 for (const h of hosts) {
                     if (/[*+?[\]()^${}|\\][^.]/.test(h) || h.includes('*')) {
-                        tl.warning('Skipping Agent.ProxyBypassList entry "' + h + '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.');
+                        tl.warning(
+                            'Skipping Agent.ProxyBypassList entry "' +
+                                h +
+                                '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.',
+                        );
                         continue;
                     }
                     converted.push(h.replace(/\\\./g, '.'));
@@ -663,22 +667,22 @@ async function fetchAzureOidcToken(serviceConnectionID) {
     const responseBody = await response.readBody();
 
     if (statusCode !== 200) {
-        throw new Error(`OIDC token request failed: HTTP ${statusCode}\nBody: ${responseBody}`);
+        throw new Error(`OIDC token request failed: HTTP ${statusCode}`);
     }
     /** @type {{ oidcToken?: string }} */
-    const body = JSON.parse(responseBody);
+    const body = parseOidcResponse(responseBody);
     if (!body.oidcToken) {
         throw new Error('OIDC token not found in response body.');
     }
+    tl.setSecret(body.oidcToken);
     debugLogIDToken(body.oidcToken);
     return body.oidcToken;
 }
 
 /**
- * Performs an OIDC token exchange WITHOUT the JFrog CLI, via a direct REST call to
- * JFrog Access. Required by the JFrog Tools Installer, which must authenticate the
- * CLI *download* itself — at that point the CLI does not yet exist, so the
- * CLI-based exchange cannot be used. The request mirrors what `jf eot` sends for an
+ * Performs an OIDC token exchange via a direct REST call to JFrog Access, keeping
+ * the Azure ID token out of command lines and task logs. Used by both the Tools
+ * Installer and the normal task authentication flow. The request mirrors what `jf eot` sends for an
  * Azure provider (grant_type / subject_token_type / subject_token / provider_name /
  * provider_type / audience). The Azure DevOps identity mapping is matched on the ID
  * token's subject claim, which is carried in subject_token.
@@ -689,6 +693,10 @@ async function fetchAzureOidcToken(serviceConnectionID) {
  * @returns {Promise<string>} The exchanged JFrog access token.
  */
 async function exchangeOidcTokenViaRest(service, platformUrl, oidcProviderName) {
+    const endpoint = new URL(platformUrl);
+    if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password) {
+        throw new Error('OIDC token exchange requires an HTTPS platform URL without embedded credentials.');
+    }
     const oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
     const idToken = await fetchAzureOidcToken(service);
 
@@ -700,9 +708,11 @@ async function exchangeOidcTokenViaRest(service, platformUrl, oidcProviderName) 
         provider_name: oidcProviderName,
         provider_type: 'Azure',
         audience: oidcAudience,
+        repo: tl.getVariable('Build.Repository.Name'),
     };
 
-    const requestOptions = { ...getProxyConfiguration(), socketTimeout: 30000 };
+    // Do not forward the token body to a redirect destination, including HTTP.
+    const requestOptions = { ...getProxyConfiguration(), socketTimeout: 30000, allowRedirects: false };
     const httpClient = new httpm.HttpClient(buildAgent, [], requestOptions);
     tl.debug('Exchanging OIDC token via REST at: ' + exchangeUrl);
     const response = await httpClient.post(exchangeUrl, JSON.stringify(requestBody), {
@@ -712,93 +722,39 @@ async function exchangeOidcTokenViaRest(service, platformUrl, oidcProviderName) 
     const statusCode = response.message.statusCode;
     const responseBody = await response.readBody();
     if (statusCode !== 200) {
-        throw new Error(`OIDC token exchange failed: HTTP ${statusCode}\nBody: ${responseBody}`);
+        throw new Error(`OIDC token exchange failed: HTTP ${statusCode}`);
     }
     /** @type {{ access_token?: string, username?: string }} */
-    const body = JSON.parse(responseBody);
+    const body = parseOidcResponse(responseBody);
     if (!body.access_token) {
         throw new Error('OIDC token exchange response did not contain an access token.');
     }
 
-    // Publish outputs for parity with the CLI-based OIDC flow (downstream consumption / debug).
+    // Register before exposing the token to any downstream consumer.
+    tl.setSecret(body.access_token);
     tl.setVariable(oidcUserOutputName, body.username || '', true);
     tl.setVariable(oidcTokenOutputName, body.access_token, true);
     return body.access_token;
 }
 
-async function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath, buildDir) {
-    // First validate supported CLI version
-    let cliVersion = getCliVersion(cliPath);
+async function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcProviderName, cliPath) {
+    // Keep the existing task compatibility contract and stdin-secret support.
+    const cliVersion = getCliVersion(cliPath);
     if (semver.lt(cliVersion, minSupportedOidcCliVersion)) {
         throw new Error(
             `The CLI version ${cliVersion} is not supported for OIDC token exchange. Minimum required version is ${minSupportedOidcCliVersion}.`,
         );
     }
-    let oidcAudience = tl.getEndpointAuthorizationParameter(service, 'oidcAudience', true) || 'api://AzureADTokenExchange';
-    const repoName = tl.getVariable('Build.Repository.Name');
-    const idToken = await fetchAzureOidcToken(service);
-
-    // Build the CLI command
-    let cliCommand = cliJoin(
-        cliPath,
-        `eot ${quote(oidcProviderName)} ${quote(idToken)} --url=${quote(serviceUrl)} --oidc-provider-type=Azure --oidc-audience=${quote(oidcAudience)} --repository=${quote(repoName)}`,
-    );
-
-    // Execute the CLI command and capture the output
-    let exeRes = executeCliCommand(cliCommand, buildDir, { withOutput: true }).toString();
-
-    // Extract AccessToken
-    const { username, accessToken } = extractAccessTokenAndUsername(exeRes);
-
-    // Set output variables
-    tl.setVariable(oidcUserOutputName, username, true);
-    tl.setVariable(oidcTokenOutputName, accessToken, true);
-
-    return accessToken;
+    return exchangeOidcTokenViaRest(service, serviceUrl, oidcProviderName);
 }
 
-/**
- * Extracts AccessToken and Username from the CLI output.
- * Supports both JSON and non-JSON (regex) outputs.
- * Currently, the output is a non-valid JSON, which should be changed in the future.
- * @param {string} output - The CLI output.
- * @returns {{ accessToken: string, username: string }} - Extracted values.
- * @throws {Error} - If neither JSON nor regex extraction succeeds.
- */
-function extractAccessTokenAndUsername(output) {
-    // Attempt to parse as JSON
+function parseOidcResponse(responseBody) {
     try {
-        /**
-         * @typedef {Object} ParsedOutput
-         * @property {string} AccessToken
-         * @property {string} Username
-         */
-
-        /** @type {ParsedOutput} */
-        const parsedOutput = JSON.parse(output);
-        if (parsedOutput.AccessToken && parsedOutput.Username) {
-            return {
-                accessToken: parsedOutput.AccessToken,
-                username: parsedOutput.Username,
-            };
-        }
-    } catch (e) {
-        console.debug('Failed to parse output as JSON, trying with regex..');
+        return JSON.parse(responseBody);
+    } catch {
+        // JSON.parse errors may include a fragment of the credential response.
+        throw new Error('OIDC endpoint returned invalid JSON.');
     }
-
-    // Fallback to regex extraction
-    const accessTokenMatch = output.match(/AccessToken:\s*(\S+)/);
-    const usernameMatch = output.match(/Username:\s*(\S+)/);
-
-    if (accessTokenMatch && usernameMatch) {
-        return {
-            accessToken: accessTokenMatch[1],
-            username: usernameMatch[1],
-        };
-    }
-
-    // If both methods fail, throw an error
-    throw new Error('Failed to extract AccessToken or Username from the output.');
 }
 
 function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDir, oidcAccessToken) {
