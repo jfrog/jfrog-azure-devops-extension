@@ -9,6 +9,8 @@ on:
 
 jobs:
   release:
+    if: github.repository == 'jfrog/jfrog-azure-devops-extension' && github.ref == 'refs/heads/v2'
+    environment: release
     runs-on: ubuntu-latest
     env:
       NEXT_VERSION: ${{ github.event.inputs.next_version }}
@@ -17,18 +19,18 @@ jobs:
       JFROG_CLI_BUILD_PROJECT: ecosys
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: v2
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "16"
+          node-version: "24"
 
       - name: Setup JFrog CLI
-        uses: jfrog/setup-jfrog-cli@v4
+        uses: jfrog/setup-jfrog-cli@5a4fbe1e30dbb570cc62d2513421c4b9bc3c9959 # v4
 
       - name: Run release script
         env:

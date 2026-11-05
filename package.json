@@ -5,6 +5,7 @@
     "private": true,
     "license": "Apache-2.0",
     "devDependencies": {
+        "js-yaml": "^4.1.1",
         "@types/node": "^20.7.0",
         "@types/q": "^1.5.6",
         "@typescript-eslint/eslint-plugin": "^8.11.0",

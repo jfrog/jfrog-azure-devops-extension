@@ -70,9 +70,6 @@
 name: E2E Plugin Tests
 
 on:
-  # Run automatically when a PR receives the "safe to test" label.
-  pull_request_target:
-    types: [labeled]
   # Run automatically when code lands on v2 — i.e. a PR is merged into v2 or
   # something is pushed to it directly — so the release branch is validated
   # post-merge (build + publish + sanity + OIDC against the merged code).
@@ -97,8 +94,11 @@ on:
 # One E2E run at a time per PR. A new label-trigger on the same PR cancels
 # the previous queued/in-progress run so the latest commit is always tested.
 # Across different PRs, runs are independent and execute in parallel.
+permissions:
+  contents: read
+
 concurrency:
-  group: e2e-plugin-tests-${{ github.event.pull_request.number || github.run_id }}
+  group: e2e-plugin-tests-${{ github.run_id }}
   cancel-in-progress: true
 
 # ======================================================================
@@ -108,10 +108,7 @@ concurrency:
 jobs:
   build:
     name: '1. Build .vsix'
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'safe to test') ||
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push'
+    if: github.repository == 'jfrog/jfrog-azure-devops-extension' && contains(fromJSON('["refs/heads/dev", "refs/heads/v2"]'), github.ref)
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -120,13 +117,11 @@ jobs:
       vsix_name: ${{ steps.build_vsix.outputs.vsix_name }}
 
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
+      - name: Checkout reviewed integration commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          # Safe here: this job only runs after a maintainer applies the 'safe to test'
-          # label (see the 'if' above), which is the trust decision this flag requires.
-          allow-unsafe-pr-checkout: true
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
       - name: Install dependencies and compile
         # build.js installs all task node_modules and compiles TypeScript.
@@ -194,7 +189,7 @@ jobs:
           MARKETPLACE_PAT: ${{ secrets.ADO_E2E_MARKETPLACE_PAT }}
           PUBLISHER: "${{ secrets.ADO_E2E_PUBLISHER_ORG || secrets.ADO_E2E_ORG }}-private"
           EXTENSION_ID: "${{ secrets.ADO_E2E_EXTENSION_ID || 'jfrog-azure-devops-extension-e2etest' }}"
-          PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
+          PR_NUMBER: 0
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
@@ -273,7 +268,7 @@ jobs:
           echo "Built: $vsix_path ($(du -m "$vsix_path" | cut -f1)MB) — publisher=$PUBLISHER id=$EXTENSION_ID"
 
       - name: Upload .vsix as workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: jfrog-ext-vsix-${{ github.run_number }}
           path: '*.vsix'
@@ -436,9 +431,9 @@ jobs:
           echo "============================================================"
 
       - name: Checkout (for trigger script)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Trigger ADO sanity pipeline and wait for result
         # The sanity pipeline (.pipelines/ado-sanity-pipeline.yml) tests:
@@ -449,8 +444,8 @@ jobs:
           ADO_PROJECT: ${{ secrets.ADO_SANITY_PROJECT }}
           ADO_PIPELINE_ID: ${{ secrets.ADO_SANITY_PIPELINE_ID }}
           ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
-          GH_PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
-          GH_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          GH_PR_NUMBER: 0
+          GH_COMMIT_SHA: ${{ github.sha }}
           TIMEOUT_MINUTES: ${{ github.event.inputs.timeout_minutes || '60' }}
         run: bash buildScripts/trigger-ado-pipeline.sh
 
@@ -508,9 +503,9 @@ jobs:
           echo "============================================================"
 
       - name: Checkout (for trigger script)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Trigger ADO OIDC test pipeline and wait for result
         # The OIDC pipeline covers:
@@ -522,8 +517,8 @@ jobs:
           ADO_PROJECT: ${{ secrets.ADO_OIDC_PROJECT }}
           ADO_PIPELINE_ID: ${{ secrets.ADO_OIDC_PIPELINE_ID }}
           ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
-          GH_PR_NUMBER: ${{ github.event.pull_request.number || 0 }}
-          GH_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          GH_PR_NUMBER: 0
+          GH_COMMIT_SHA: ${{ github.sha }}
           TIMEOUT_MINUTES: ${{ github.event.inputs.timeout_minutes || '60' }}
         run: bash buildScripts/trigger-ado-pipeline.sh
 
@@ -586,9 +581,9 @@ jobs:
           echo "============================================================"
 
       - name: Checkout (for verify-connection script)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Verify connection (success + deliberate-failure cases)
         env:

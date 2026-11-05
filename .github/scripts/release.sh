@@ -20,8 +20,10 @@ set -euo pipefail
 # Always clean up the JFrog CLI config, even if an earlier command fails
 # (mirrors the "Cleanup JFrog CLI config" step's `if: always()` behavior).
 cleanup() {
+  git remote set-url origin "$original_origin"
   jf c rm --quiet
 }
+original_origin=$(git remote get-url origin)
 trap cleanup EXIT
 
 git config user.name "jfrog-ecosystem-integration"
@@ -40,7 +42,7 @@ git commit -am "[jfrog-release] Release version ${NEXT_VERSION}"
 git tag "${NEXT_VERSION}"
 
 npm i --unsafe-perm
-jf audit --fail=false
+jf audit --fail=true
 npm run create
 
 find . -iname "JFrog.jfrog-azure-devops-extension-${NEXT_VERSION}.vsix" -size +15M | grep .

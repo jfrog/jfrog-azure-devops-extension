@@ -3,31 +3,30 @@ name: Cloud Instance Tests
 on:
   push:
     branches:
-      - '**'
+      - dev
+      - v2
     tags-ignore:
       - '**'
-  # Triggers the workflow on labeled PRs only.
-  pull_request_target:
-    types: [ labeled ]
+  workflow_dispatch:
+permissions:
+  contents: read
 # Ensures that only the latest commit is running for each PR at a time.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   Cloud-Tests:
-    if: contains(github.event.pull_request.labels.*.name, 'safe to test') || github.event_name == 'push'
+    if: github.repository == 'jfrog/jfrog-azure-devops-extension' && contains(fromJSON('["refs/heads/dev", "refs/heads/v2"]'), github.ref)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          # Safe here: this job only runs after a maintainer applies the 'safe to test'
-          # label (see the 'if' above), which is the trust decision this flag requires.
-          allow-unsafe-pr-checkout: true
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '20'
 
@@ -38,6 +37,7 @@ jobs:
         run: npm t
         env:
           ADO_JFROG_PLATFORM_URL: ${{ secrets.PLATFORM_URL }}
-          ADO_JFROG_PLATFORM_ACCESS_TOKEN: ${{ secrets.PLATFORM_ADMIN_TOKEN }}
+          # Dedicated test identity, limited to the test repositories and operations.
+          ADO_JFROG_PLATFORM_ACCESS_TOKEN: ${{ secrets.PLATFORM_TEST_TOKEN }}
           ADO_JFROG_PLATFORM_DOCKER_DOMAIN: ${{ secrets.CONTAINER_REGISTRY }}
           ADO_SKIP_TESTS: unit,proxy,generic,installer,npm,maven,gradle,conan,nuget,dotnet,go,pip
