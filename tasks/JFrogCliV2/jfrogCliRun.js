@@ -68,7 +68,7 @@ async function RunTaskCbk(cliPath) {
             }
             // Remove 'jf' and space from the beginning of the command string, so we can use the CLI's path
             cliCommand = cliCommand.slice(utils.jfrogCliToolName.length + 1);
-            cliCommand = utils.cliJoin(cliPath, cliCommand);
+            cliCommand = utils.cliJoin(utils.quote(cliPath), cliCommand);
             if (utils.isServerIdEnvSupported()) {
                 // Provide Server ID to JFrog CLI via environment variable
                 process.env.JFROG_CLI_SERVER_ID = serverId;

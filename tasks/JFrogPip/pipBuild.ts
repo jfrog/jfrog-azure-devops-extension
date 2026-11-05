@@ -19,19 +19,16 @@ async function performPipInstall(cliPath: string): Promise<void> {
     const defaultWorkDir: string = tl.getVariable('System.DefaultWorkingDirectory') || process.cwd();
     const sourcePath: string = utils.determineCliWorkDir(defaultWorkDir, inputWorkingDirectory);
     const pipArguments: string = buildPipCliArgs();
-    let pipCommand: string = utils.cliJoin(cliPath, cliPipInstallCommand, pipArguments);
+    const pipCommand: string = utils.cliJoin(utils.quote(cliPath), cliPipInstallCommand, pipArguments);
     const virtualEnvActivation: string | undefined = tl.getInput('virtualEnvActivation', false);
-    if (virtualEnvActivation) {
-        pipCommand = utils.cliJoin(virtualEnvActivation, '&&', pipCommand);
-    }
-    await executeCliCommand(pipCommand, sourcePath, cliPath);
+    await executeCliCommand(pipCommand, sourcePath, cliPath, virtualEnvActivation);
 }
 
-async function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string): Promise<void> {
+async function executeCliCommand(cliCmd: string, buildDir: string, cliPath: string, activationCommand?: string): Promise<void> {
     const configuredServerIds: string[] = await performPipConfig(cliPath, buildDir);
     cliCmd = utils.appendBuildFlagsToCliCommand(cliCmd);
     try {
-        utils.executeCliCommand(cliCmd, buildDir);
+        utils.executeCliCommand(cliCmd, buildDir, { activationCommand });
         tl.setResult(tl.TaskResult.Succeeded, 'Build Succeeded.');
     } catch (ex) {
         tl.setResult(tl.TaskResult.Failed, ex as string);

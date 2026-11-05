@@ -53,7 +53,7 @@ async function RunTaskCbk(cliPath) {
 
 function performNpmCommand(cliNpmCommand, addThreads, cliPath, requiredWorkDir) {
     // Build the cli command.
-    let cliCommand = utils.cliJoin(cliPath, cliNpmCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliNpmCommand);
 
     // Add npm args
     let npmParam = tl.getInput('arguments', false);

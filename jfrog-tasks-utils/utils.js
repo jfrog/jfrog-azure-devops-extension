@@ -1,7 +1,8 @@
 const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task');
 const { join, sep, isAbsolute } = require('path');
-const execSync = require('child_process').execSync;
+const { execFileSync } = require('child_process');
+const { parseCommandLine, quoteArgument } = require('./commandLine');
 const toolLib = require('azure-pipelines-tool-lib/tool');
 const credentialsHandler = require('typed-rest-client/Handlers');
 const httpm = require('typed-rest-client/HttpClient');
@@ -136,7 +137,7 @@ function getJfrogFolderPath() {
     }
 
     const rawPath = join(toolsDir, '_jf');
-    return encodePath(rawPath);
+    return rawPath;
 }
 
 let jfrogFolderPath = getJfrogFolderPath();
@@ -151,14 +152,14 @@ const buildAgent = 'jfrog-azure-devops-extension';
  * Get the custom folder path, dynamically calculated based on current jfrogFolderPath
  */
 function getCustomFolderPath() {
-    return encodePath(join(jfrogFolderPath, 'current'));
+    return join(jfrogFolderPath, 'current');
 }
 
 /**
  * Get the custom CLI path, dynamically calculated based on current paths
  */
 function getCustomCliPath() {
-    return encodePath(join(getCustomFolderPath(), fileName));
+    return join(getCustomFolderPath(), fileName);
 }
 const jfrogCliReleasesUrl = 'https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf';
 const oidcUserOutputName = 'oidc_user';
@@ -397,7 +398,7 @@ function generateDownloadCliErrorMessage(downloadUrl, cliVersion) {
  *   stdinSecret?: string;
  *   withOutput?: boolean
  *   }} [options]
- * @returns {Buffer|string} - execSync output.
+ * @returns {Buffer|string} - CLI output.
  * @throws In CLI execution failure.
  */
 function executeCliCommand(cliCommand, runningDir, options = {}) {
@@ -412,7 +413,20 @@ function executeCliCommand(cliCommand, runningDir, options = {}) {
         const stdout = options.withOutput ? 'pipe' : 1;
         const stderr = 2;
         console.log('Executing JFrog CLI Command:\n' + maskSecrets(cliCommand));
-        return execSync(cliCommand, { cwd: runningDir, stdio: [stdin, stdout, stderr], input: options.stdinSecret });
+        const [executable, ...args] = parseCommandLine(cliCommand);
+        if (!executable) {
+            throw new Error('Cannot execute an empty CLI command.');
+        }
+        // Only the explicitly documented Python activation input is shell code.
+        // CLI arguments never enter that shell, including after activation.
+        const activated = options.activationCommand ? captureActivatedEnvironment(options.activationCommand, runningDir) : {};
+        return execFileSync(executable, args, {
+            cwd: activated.cwd || runningDir,
+            env: activated.env || process.env,
+            shell: false,
+            stdio: [stdin, stdout, stderr],
+            input: options.stdinSecret,
+        });
     } catch (ex) {
         // Error occurred - mask secrets in message.
         if (ex.message) {
@@ -567,7 +581,11 @@ function forwardProxyToEnv() {
                 const converted = [];
                 for (const h of hosts) {
                     if (/[*+?[\]()^${}|\\][^.]/.test(h) || h.includes('*')) {
-                        tl.warning('Skipping Agent.ProxyBypassList entry "' + h + '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.');
+                        tl.warning(
+                            'Skipping Agent.ProxyBypassList entry "' +
+                                h +
+                                '": regex patterns with wildcards or special characters are not supported for NO_PROXY conversion. Use a plain hostname in your .proxybypass file instead.',
+                        );
                         continue;
                     }
                     converted.push(h.replace(/\\\./g, '.'));
@@ -740,7 +758,7 @@ async function exchangeOidcTokenAndSetStepVariables(service, serviceUrl, oidcPro
 
     // Build the CLI command
     let cliCommand = cliJoin(
-        cliPath,
+        quote(cliPath),
         `eot ${quote(oidcProviderName)} ${quote(idToken)} --url=${quote(serviceUrl)} --oidc-provider-type=Azure --oidc-audience=${quote(oidcAudience)} --repository=${quote(repoName)}`,
     );
 
@@ -806,7 +824,7 @@ function configureSpecificCliServer(service, urlFlag, serverId, cliPath, buildDi
     let serviceUser = tl.getEndpointAuthorizationParameter(service, 'username', true);
     let servicePassword = tl.getEndpointAuthorizationParameter(service, 'password', true);
     let serviceAccessToken = oidcAccessToken || tl.getEndpointAuthorizationParameter(service, 'apitoken', true);
-    let cliCommand = cliJoin(cliPath, jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
+    let cliCommand = cliJoin(quote(cliPath), jfrogCliConfigAddCommand, quote(serverId), urlFlag + '=' + quote(serviceUrl), '--interactive=false');
     let stdinSecret;
     let secretInStdinSupported = isStdinSecretSupported();
 
@@ -892,7 +910,7 @@ async function configureDefaultXrayServer(usageType, cliPath, workDir) {
  * @throws In CLI execution failure.
  */
 function useCliServer(serverId, cliPath, buildDir) {
-    const cliCommand = cliJoin(cliPath, jfrogCliConfigUseCommand, quote(serverId));
+    const cliCommand = cliJoin(quote(cliPath), jfrogCliConfigUseCommand, quote(serverId));
     return executeCliCommand(cliCommand, buildDir);
 }
 
@@ -909,7 +927,7 @@ function deleteCliServers(cliPath, buildDir, serverIdArray) {
     for (let i = 0, len = serverIdArray.length; i < len; i++) {
         try {
             if (serverIdArray[i]) {
-                const deleteServerIDCommand = cliJoin(cliPath, jfrogCliConfigRmCommand, quote(serverIdArray[i]), '--quiet');
+                const deleteServerIDCommand = cliJoin(quote(cliPath), jfrogCliConfigRmCommand, quote(serverIdArray[i]), '--quiet');
                 // This operation throws an exception in case of failure.
                 executeCliCommand(deleteServerIDCommand, buildDir);
             }
@@ -950,11 +968,46 @@ function cliJoin(...args) {
 }
 
 function quote(str) {
-    return str ? '"' + str + '"' : '';
+    return str ? quoteArgument(str) : '';
 }
 
 function singleQuote(str) {
-    return str ? "'" + str + "'" : '';
+    return quote(str);
+}
+
+function captureActivatedEnvironment(command, cwd) {
+    const helper = join(__dirname, 'captureEnvironment.js');
+    const shellQuote = (value) => {
+        if (isWindows()) {
+            if (/["%!\r\n]/.test(value)) {
+                throw new Error('Unsupported character in the activation helper path.');
+            }
+            return '"' + value + '"';
+        }
+        return "'" + value.replace(/'/g, "'\\''") + "'";
+    };
+    const script = command + ' && ' + shellQuote(process.execPath) + ' ' + shellQuote(helper);
+    const shell = isWindows() ? process.env.ComSpec || 'cmd.exe' : '/bin/sh';
+    const args = isWindows() ? ['/d', '/s', '/c', '"' + script + '"'] : ['-c', script];
+    let output;
+    try {
+        output = execFileSync(shell, args, {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe'],
+            maxBuffer: 4 * 1024 * 1024,
+            windowsVerbatimArguments: isWindows(),
+        });
+    } catch {
+        // Activation stdout/stderr can contain the entire environment.
+        throw new Error('Python virtual environment activation failed.');
+    }
+    const marker = '\nJFROG_ACTIVATED_ENV=';
+    const start = output.lastIndexOf(marker);
+    if (start < 0) {
+        throw new Error('Python activation did not return an environment.');
+    }
+    return JSON.parse(output.slice(start + marker.length));
 }
 
 function addStringParam(cliCommand, inputParam, cliParam, require) {
@@ -1031,8 +1084,7 @@ function logCliVersionAndSetSelected(cliPath) {
 }
 
 function getCliVersion(cliPath) {
-    let cliCommand = cliJoin(cliPath, '--version');
-    let res = execSync(cliCommand);
+    let res = execFileSync(cliPath, ['--version'], { shell: false });
     return String.fromCharCode.apply(null, res).split(' ')[2].trim();
 }
 
@@ -1307,7 +1359,7 @@ function collectEnvVars(cliPath) {
     let buildName = tl.getInput('buildName', true);
     let buildNumber = tl.getInput('buildNumber', true);
     let workDir = tl.getVariable('System.DefaultWorkingDirectory');
-    let cliEnvVarsCommand = cliJoin(cliPath, 'rt bce', quote(buildName), quote(buildNumber));
+    let cliEnvVarsCommand = cliJoin(quote(cliPath), 'rt bce', quote(buildName), quote(buildNumber));
     cliEnvVarsCommand = addProjectOption(cliEnvVarsCommand);
     executeCliCommand(cliEnvVarsCommand, workDir);
 }
@@ -1378,7 +1430,7 @@ function assembleUniqueServerId(usageType) {
  * @returns {string[]}
  */
 async function createBuildToolConfigFile(cliPath, cmd, requiredWorkDir, configCommand, repoResolver, repoDeploy) {
-    let cliCommand = cliJoin(cliPath, configCommand);
+    let cliCommand = cliJoin(quote(cliPath), configCommand);
     let serverIdResolve;
     let serverIdDeploy;
     if (repoResolver) {

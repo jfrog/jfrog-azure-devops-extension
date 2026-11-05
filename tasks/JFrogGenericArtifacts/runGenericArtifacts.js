@@ -69,7 +69,7 @@ async function RunTaskCbk(cliPath) {
 }
 
 function handleGenericUpload(cliPath, workDir) {
-    let cliCommand = utils.cliJoin(cliPath, cliUploadCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliUploadCommand);
     cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
 
@@ -84,7 +84,7 @@ function handleGenericUpload(cliPath, workDir) {
 }
 
 function handleGenericDownload(cliPath, workDir) {
-    let cliCommand = utils.cliJoin(cliPath, cliDownloadCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliDownloadCommand);
     cliCommand = utils.appendBuildFlagsToCliCommand(cliCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
 
@@ -102,30 +102,30 @@ function handleGenericDownload(cliPath, workDir) {
 
 function handleGenericSetProperties(cliPath, workDir) {
     let props = tl.getInput('setProps', false);
-    let cliCommand = utils.cliJoin(cliPath, cliSetPropertiesCommand, utils.quote(props));
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliSetPropertiesCommand, utils.quote(props));
     performGenericTask(cliCommand, cliPath, workDir);
 }
 
 function handleGenericDeleteProperties(cliPath, workDir) {
     let props = tl.getInput('deleteProps', false);
-    let cliCommand = utils.cliJoin(cliPath, cliDeletePropertiesCommand, utils.quote(props));
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliDeletePropertiesCommand, utils.quote(props));
     performGenericTask(cliCommand, cliPath, workDir);
 }
 
 function handleGenericMove(cliPath, workDir) {
-    let cliCommand = utils.cliJoin(cliPath, cliMoveCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliMoveCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
     performGenericTask(cliCommand, cliPath, workDir);
 }
 
 function handleGenericCopy(cliPath, workDir) {
-    let cliCommand = utils.cliJoin(cliPath, cliCopyCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliCopyCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
     performGenericTask(cliCommand, cliPath, workDir);
 }
 
 function handleGenericDeleteArtifacts(cliPath, workDir) {
-    let cliCommand = utils.cliJoin(cliPath, cliDeleteArtifactsCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliDeleteArtifactsCommand);
     cliCommand = utils.addBoolParam(cliCommand, 'dryRun', 'dry-run');
     performGenericTask(cliCommand, cliPath, workDir);
 }
@@ -178,7 +178,7 @@ function performArtifactSourceDownload(cliPath, workDir) {
     downloadPath = utils.fixWindowsPaths(downloadPath);
 
     let cliCommand = utils.cliJoin(
-        cliPath,
+        utils.quote(cliPath),
         cliDownloadCommand,
         utils.quote('*'),
         utils.quote(downloadPath),
