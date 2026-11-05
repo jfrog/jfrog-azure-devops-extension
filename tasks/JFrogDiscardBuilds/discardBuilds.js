@@ -14,7 +14,7 @@ async function RunTaskCbk(cliPath) {
 
     let buildName = tl.getInput('buildName', true);
 
-    let cliCommand = utils.cliJoin(cliPath, cliDiscardCommand, utils.quote(buildName));
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliDiscardCommand, utils.quote(buildName));
     cliCommand = utils.addStringParam(cliCommand, 'maxDays', 'max-days', false);
     cliCommand = utils.addStringParam(cliCommand, 'maxBuilds', 'max-builds', false);
     cliCommand = utils.addStringParam(cliCommand, 'excludeBuilds', 'exclude-builds', false);

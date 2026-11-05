@@ -73,7 +73,7 @@ async function exec(cliPath, nugetCommand) {
                 solutionPath = solutionFile;
             }
             let nugetArguments = addNugetArgsToCommands();
-            nugetCommandCli = utils.cliJoin(cliPath, cliNuGetCommand, nugetCommand, nugetArguments);
+            nugetCommandCli = utils.cliJoin(utils.quote(cliPath), cliNuGetCommand, nugetCommand, nugetArguments);
             let resolverServerId = await performNugetConfig(cliPath, solutionPath, 'targetResolveRepo');
             runNuGet(nugetCommandCli, solutionPath, cliPath, [resolverServerId]);
         }
@@ -85,7 +85,7 @@ async function exec(cliPath, nugetCommand) {
             targetPath = utils.addTrailingSlashIfNeeded(targetPath) + utils.addTrailingSlashIfNeeded(relativeTargetPath);
         }
         let pathToNupkg = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
-        nugetCommandCli = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(pathToNupkg), utils.quote(targetPath));
+        nugetCommandCli = utils.cliJoin(utils.quote(cliPath), cliUploadCommand, utils.quote(pathToNupkg), utils.quote(targetPath));
         const deployerServerId = await utils.configureDefaultArtifactoryServer('nuget_deployer', cliPath, buildDir);
         nugetCommandCli = utils.addServerIdOption(nugetCommandCli, deployerServerId);
         nugetCommandCli = utils.cliJoin(nugetCommandCli, '--flat=' + utils.quote('true'));
@@ -107,7 +107,7 @@ function runNuGet(nugetCommandCli, buildDir, cliPath, configuredServerIdsArray) 
 
 // Create nuget config
 async function performNugetConfig(cliPath, requiredWorkDir, repoResolve) {
-    let cliCommand = utils.cliJoin(cliPath, nugetConfigCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), nugetConfigCommand);
 
     // Create serverId
     const resolverServerId = await utils.configureDefaultArtifactoryServer('nuget_resolver', cliPath, requiredWorkDir);

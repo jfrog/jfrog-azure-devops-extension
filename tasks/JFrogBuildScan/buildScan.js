@@ -16,7 +16,7 @@ async function RunTaskCbk(cliPath) {
 
     serverId = await utils.configureDefaultXrayServer('xray_build_scan', cliPath, workDir);
 
-    let cliCommand = utils.cliJoin(cliPath, cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber));
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliXrayBuildScanCommand, utils.quote(buildName), utils.quote(buildNumber));
     cliCommand = utils.addBoolParam(cliCommand, 'vuln', 'vuln');
     cliCommand = utils.addBoolParam(cliCommand, 'allowFailBuild', 'fail');
     cliCommand = utils.addServerIdOption(cliCommand, serverId);

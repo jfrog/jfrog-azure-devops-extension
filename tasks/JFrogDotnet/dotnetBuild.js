@@ -40,7 +40,7 @@ async function performDotnetCommand(cliPath, commandName) {
         }
         let resolverServerId = await performDotnetConfig(cliPath, sourcePath, 'targetResolveRepo');
         let dotnetArguments = buildDotnetCliArgs();
-        let dotnetCommand = utils.cliJoin(cliPath, commandName, dotnetArguments);
+        let dotnetCommand = utils.cliJoin(utils.quote(cliPath), commandName, dotnetArguments);
         executeCliCommand(dotnetCommand, sourcePath, cliPath, [resolverServerId]);
     }
 }
@@ -59,7 +59,7 @@ async function performDotnetNugetPush(cliPath) {
     }
 
     let nupkgPath = utils.fixWindowsPaths(tl.getPathInput('pathToNupkg', true, false));
-    let uploadCommand = utils.cliJoin(cliPath, cliUploadCommand, utils.quote(nupkgPath), utils.quote(targetPath));
+    let uploadCommand = utils.cliJoin(utils.quote(cliPath), cliUploadCommand, utils.quote(nupkgPath), utils.quote(targetPath));
     let serverId = await utils.configureDefaultArtifactoryServer('dotnet_nuget_push', cliPath, buildDir);
     uploadCommand = utils.addServerIdOption(uploadCommand, serverId);
     uploadCommand = utils.cliJoin(uploadCommand, '--flat=' + utils.quote('true'));
@@ -80,7 +80,7 @@ function executeCliCommand(cliCmd, buildDir, cliPath, configuredServerIdsArray) 
 
 // Create dotnet config
 async function performDotnetConfig(cliPath, requiredWorkDir, repoResolve) {
-    let cliCommand = utils.cliJoin(cliPath, dotnetConfigCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), dotnetConfigCommand);
 
     // Create serverId
     const resolverServerId = await utils.configureDefaultArtifactoryServer('dotnet_resolver', cliPath, requiredWorkDir);

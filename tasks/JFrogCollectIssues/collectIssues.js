@@ -38,7 +38,7 @@ async function RunTaskCbk(cliPath) {
     serverId = await utils.configureDefaultArtifactoryServer('collect_issues', cliPath, requiredWorkDir);
 
     let cliCommand = utils.cliJoin(
-        cliPath,
+        utils.quote(cliPath),
         cliCollectIssuesCommand,
         utils.quote(buildName),
         utils.quote(buildNumber),

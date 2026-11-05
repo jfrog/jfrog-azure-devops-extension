@@ -18,7 +18,7 @@ async function RunTaskCbk(cliPath: string): Promise<void> {
     }
     const imageName: string = tl.getInput('imageName', true) ?? '';
     const command: string = tl.getInput('command', true) ?? '';
-    let cliCommand: string = utils.cliJoin(cliPath, cliDockerCommand, command.toLowerCase(), utils.quote(imageName));
+    let cliCommand: string = utils.cliJoin(utils.quote(cliPath), cliDockerCommand, command.toLowerCase(), utils.quote(imageName));
     switch (command) {
         case 'Push':
         case 'Pull': {

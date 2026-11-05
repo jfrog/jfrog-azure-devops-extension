@@ -160,7 +160,7 @@ function getWorkDir(): string {
 async function getCliCmdBase(cliPath: string, cliCommandName: string, workDir: string): Promise<string> {
     const rbName: string = tl.getInput('rbName', true) ?? '';
     const rbVersion: string = tl.getInput('rbVersion', true) ?? '';
-    const cliCommand: string = utils.cliJoin(cliPath, cliCommandName, rbName, rbVersion);
+    const cliCommand: string = utils.cliJoin(utils.quote(cliPath), cliCommandName, utils.quote(rbName), utils.quote(rbVersion));
     serverId = await utils.configureDefaultDistributionServer('distribution_' + cliCommandName.replace(' ', '_'), cliPath, workDir);
     return utils.addServerIdOption(cliCommand, serverId);
 }
