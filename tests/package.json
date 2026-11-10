@@ -29,6 +29,6 @@
         "test": "npm i && mocha -r ts-node/register tests.ts -t 1000000"
     },
     "overrides": {
-        "adm-zip": "0.6.1"
+        "adm-zip": "^0.6.1"
     }
 }

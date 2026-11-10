@@ -14,6 +14,6 @@
         "@jfrog/tasks-utils": "file:../../jfrog-tasks-utils/jfrog-tasks-utils-1.0.0.tgz"
     },
     "overrides": {
-        "adm-zip": "0.6.1"
+        "adm-zip": "^0.6.1"
     }
 }
