@@ -25,7 +25,9 @@ jobs:
         include:
           - os: windows
             extraSkipTests: ",conan"
-    runs-on: ${{ matrix.os }}-latest
+    # ubuntu is pinned: ubuntu-latest moved to 26.04 (GCC 15), which Conan 1.x ("conan<2")
+    # cannot auto-detect ("Invalid setting '15' is not a valid 'settings.compiler.version'").
+    runs-on: ${{ matrix.os == 'ubuntu' && 'ubuntu-24.04' || 'windows-latest' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
