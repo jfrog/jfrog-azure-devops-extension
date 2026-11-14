@@ -20,12 +20,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu, windows ]
+        # ubuntu is pinned: ubuntu-latest moved to 26.04 (GCC 15), which Conan 1.x ("conan<2")
+        # cannot auto-detect ("Invalid setting '15' is not a valid 'settings.compiler.version'").
+        os: [ ubuntu-24.04, windows-latest ]
         node-version: [ '16', '20', '22', '24' ]
         include:
-          - os: windows
+          - os: windows-latest
             extraSkipTests: ",conan"
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,7 +64,7 @@ jobs:
           sudo apt update
           sudo apt install mono-complete
           mono --version
-        if: ${{ matrix.os == 'ubuntu' }}
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
 
       - name: Install JFrog CLI
         run: curl -fL https://install-cli.jfrog.io | sh

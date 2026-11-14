@@ -1,11 +1,11 @@
 const tl = require('azure-pipelines-task-lib/task');
-const { v4: uuid } = require('uuid');
 const os = require('os');
 const tmpdir = os.tmpdir;
 const EOL = os.EOL;
 const fs = require('fs-extra');
 const join = require('path').join;
 const createHash = require('crypto').createHash;
+const randomBytes = require('crypto').randomBytes;
 
 // Helper Constants
 const CONAN_ARTIFACTS_PROPERTIES_BUILD_NAME = 'artifact_property_build.name';
@@ -114,7 +114,12 @@ function executeConanTask(commandArgs) {
  * Generate a unique ID to be used by this Conan task
  */
 function generateConanTaskUUId() {
-    return uuid();
+    // RFC 4122 version 4 UUID, generated with Node's built-in crypto (no external dependency).
+    const bytes = randomBytes(16);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 10xx
+    const hex = bytes.toString('hex');
+    return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join('-');
 }
 
 /**
