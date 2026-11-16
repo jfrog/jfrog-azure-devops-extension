@@ -595,4 +595,4 @@ jobs:
           ADO_ORG: ${{ secrets.ADO_E2E_ORG }}
           ADO_PROJECT: ${{ secrets.ADO_SANITY_PROJECT }}
           ADO_PAT: ${{ secrets.ADO_E2E_PAT }}
-        run: bash buildScripts/verify-service-connection.sh
+        run: node tests/e2e/verify-service-connection.js
