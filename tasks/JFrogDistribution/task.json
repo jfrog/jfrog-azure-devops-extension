@@ -16,7 +16,7 @@
         "Patch": "0"
     },
     "demands": [],
-    "minimumAgentVersion": "3.232.0",
+    "minimumAgentVersion": "4.265.1",
     "instanceNameFormat": "JFrog Distribution $(command)",
     "groups": [
         {
@@ -276,10 +276,6 @@
         }
     ],
     "execution": {
-        "Node20_1": {
-            "target": "distribution.js",
-            "workingDirectory": "$(currentDirectory)"
-        },
         "Node24": {
             "target": "distribution.js",
             "workingDirectory": "$(currentDirectory)"

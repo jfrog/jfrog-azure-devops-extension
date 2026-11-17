@@ -16,7 +16,7 @@
         "Minor": "20",
         "Patch": "0"
     },
-    "minimumAgentVersion": "3.232.0",
+    "minimumAgentVersion": "4.265.1",
     "instanceNameFormat": "JFrog Generic Artifacts $(command)",
     "groups": [
         {
@@ -393,9 +393,6 @@
         }
     ],
     "execution": {
-        "Node20_1": {
-            "target": "runGenericArtifacts.js"
-        },
         "Node24": {
             "target": "runGenericArtifacts.js"
         }

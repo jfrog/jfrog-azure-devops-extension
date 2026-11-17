@@ -210,18 +210,17 @@ For the build agent to be able to run conan builds, do the following:
 
 ##### Using TFS 2015
 
-The tasks require build agent version 3.232.0 or above. Older agents, such as the agents that came with TFS 2015,
+The tasks require build agent version 4.265.1 or above. Older agents, such as the agents that came with TFS 2015,
 are not supported.
 
 </details>
 
 ### Node.js runtime for the tasks
 
-The JFrog tasks declare the `Node24` execution handler. They also declare `Node20_1` as a fallback for agents that do not
-yet ship Node 24.
+The JFrog tasks declare only the `Node24` execution handler.
 
-* The tasks require build agent version **3.232.0** or above.
-* End-of-life handlers (`Node10` and older) are no longer declared.
+* The tasks require build agent version **4.265.1** or above, the first agent version that includes the Node 24 handler.
+* End-of-life handlers (`Node10` and older) and `Node20_1` are no longer declared.
 
 ## Configuring the Service Connections
 
