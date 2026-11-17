@@ -176,6 +176,9 @@
     "execution": {
         "Node24": {
             "target": "goBuild.js"
+        },
+        "Node26": {
+            "target": "goBuild.js"
         }
     }
 }

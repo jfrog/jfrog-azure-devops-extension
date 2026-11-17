@@ -310,6 +310,10 @@
         "Node24": {
             "target": "mavenBuild.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "mavenBuild.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

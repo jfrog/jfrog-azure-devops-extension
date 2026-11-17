@@ -72,6 +72,10 @@
         "Node24": {
             "target": "buildScan.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "buildScan.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

@@ -231,6 +231,10 @@
         "Node24": {
             "target": "dotnetBuild.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "dotnetBuild.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

@@ -64,6 +64,10 @@
         "Node24": {
             "target": "publishBuildInfo.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "publishBuildInfo.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

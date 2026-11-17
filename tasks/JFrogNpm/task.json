@@ -181,6 +181,9 @@
     "execution": {
         "Node24": {
             "target": "npmBuild.js"
+        },
+        "Node26": {
+            "target": "npmBuild.js"
         }
     }
 }

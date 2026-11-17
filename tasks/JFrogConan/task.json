@@ -223,6 +223,9 @@
     "execution": {
         "Node24": {
             "target": "conanBuild.js"
+        },
+        "Node26": {
+            "target": "conanBuild.js"
         }
     }
 }

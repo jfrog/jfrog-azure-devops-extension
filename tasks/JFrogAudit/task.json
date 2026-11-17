@@ -102,6 +102,10 @@
         "Node24": {
             "target": "audit.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "audit.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

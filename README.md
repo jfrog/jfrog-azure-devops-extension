@@ -217,7 +217,7 @@ are not supported.
 
 ### Node.js runtime for the tasks
 
-The JFrog tasks declare only the `Node24` execution handler.
+The JFrog tasks declare the `Node24` and `Node26` execution handlers.
 
 * The tasks require build agent version **4.265.1** or above, the first agent version that includes the Node 24 handler.
 * End-of-life handlers (`Node10` and older) and `Node20_1` are no longer declared.

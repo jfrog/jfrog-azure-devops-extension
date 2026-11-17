@@ -105,6 +105,10 @@
         "Node24": {
             "target": "toolsInstaller.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "toolsInstaller.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }
