@@ -35,6 +35,7 @@ The *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog
     - [Download and Installation](#Download-and-Installation)
         - [Installing the Extension](#Installing-the-Extension)
         - [Installing the Build Agent](#Installing-the-Build-Agent)
+        - [Node.js runtime for the tasks](#Nodejs-runtime-for-the-tasks)
         - [Configuring the Service Connections](#Configuring-the-Service-Connections)
         - [Using OpenID Connect (OIDC) Authentication](#using-openid-connect-oidc-authentication)
     - [Executing JFrog CLI Commands](#Executing-JFrog-CLI-Commands)
@@ -209,20 +210,18 @@ For the build agent to be able to run conan builds, do the following:
 
 ##### Using TFS 2015
 
-Node.JS version 8 and above.
-
-The build agent requires using Node.JS version 8 and above. To check which version of Node.JS is running on the build
-agent:
-
-1. Navigate to the `Worker\Handlers\Node` folder located under the Agent home.
-2. From the terminal, run *node -v*
-
-To upgrade Node.JS on the build agent:
-
-* Replace the existing node.exe file on the agent with the node.exe file with the required version located in
-  the `Worker\Handlers\Node` folder under the agent home.
+The tasks require build agent version 3.232.0 or above. Older agents, such as the agents that came with TFS 2015,
+are not supported.
 
 </details>
+
+### Node.js runtime for the tasks
+
+The JFrog tasks declare the `Node24` execution handler. They also declare `Node20_1` as a fallback for agents that do not
+yet ship Node 24.
+
+* The tasks require build agent version **3.232.0** or above.
+* End-of-life handlers (`Node10` and older) are no longer declared.
 
 ## Configuring the Service Connections
 
