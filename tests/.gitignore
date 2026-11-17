@@ -10,3 +10,7 @@ testUtils.js
 utilsTests.js.map
 utilsTests.d.ts
 utilsTests.js
+
+taskManifestTests.js.map
+taskManifestTests.d.ts
+taskManifestTests.js

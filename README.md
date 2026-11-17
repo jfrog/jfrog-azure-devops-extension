@@ -35,6 +35,7 @@ The *[JFrog Extension](https://marketplace.visualstudio.com/items?itemName=JFrog
     - [Download and Installation](#Download-and-Installation)
         - [Installing the Extension](#Installing-the-Extension)
         - [Installing the Build Agent](#Installing-the-Build-Agent)
+        - [Node.js runtime for the tasks](#Nodejs-runtime-for-the-tasks)
         - [Configuring the Service Connections](#Configuring-the-Service-Connections)
         - [Using OpenID Connect (OIDC) Authentication](#using-openid-connect-oidc-authentication)
     - [Executing JFrog CLI Commands](#Executing-JFrog-CLI-Commands)
@@ -223,6 +224,16 @@ To upgrade Node.JS on the build agent:
   the `Worker\Handlers\Node` folder under the agent home.
 
 </details>
+
+### Node.js runtime for the tasks
+
+The JFrog tasks declare the `Node24` execution handler, with `Node20_1` as a fallback for agents that do not yet ship
+Node 24. Azure Pipelines runs each task with the highest handler available on the agent, so no pipeline changes are needed.
+
+* The tasks require build agent version **4.248.0** or above (agents below this version are upgraded automatically).
+* End-of-life handlers (`Node10` and older) are no longer declared.
+* To run the tasks with Node 24 on an agent that also has Node 20, set the pipeline or agent variable `AGENT_USE_NODE24`
+  to `true`.
 
 ## Configuring the Service Connections
 

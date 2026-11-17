@@ -15,3 +15,4 @@ tests.js
 testUtils.js
 docker.js
 utilsTests.js
+taskManifestTests.js
