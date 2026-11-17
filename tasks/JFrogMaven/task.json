@@ -18,7 +18,7 @@
     "demands": [
         "maven"
     ],
-    "minimumAgentVersion": "4.248.0",
+    "minimumAgentVersion": "3.232.0",
     "instanceNameFormat": "JFrog Maven",
     "groups": [
         {

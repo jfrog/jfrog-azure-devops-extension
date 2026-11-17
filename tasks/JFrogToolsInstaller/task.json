@@ -16,7 +16,7 @@
         "Patch": "0"
     },
     "demands": [],
-    "minimumAgentVersion": "4.248.0",
+    "minimumAgentVersion": "3.232.0",
     "instanceNameFormat": "JFrog Tools Installer",
     "inputs": [
         {

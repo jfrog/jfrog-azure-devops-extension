@@ -27,8 +27,9 @@ if (!TASKS_DIR) {
 const PREFERRED_HANDLER: string = 'Node24';
 const FALLBACK_HANDLER: string = 'Node20_1';
 const DEPRECATED_HANDLERS: string[] = ['Node', 'Node6', 'Node10', 'Node16'];
-// First Azure Pipelines agent version that ships the Node20_1 handler.
-const MIN_AGENT_VERSION: string = '4.248.0';
+// Node20_1 is the fallback handler. Agent v3.224.1 added the Node 20 handler.
+// Agent v3.230.x and v3.232.0 fixed the Node 20 runner choice on older operating systems.
+const MIN_AGENT_VERSION: string = '3.232.0';
 
 interface TaskManifest {
     name: string;

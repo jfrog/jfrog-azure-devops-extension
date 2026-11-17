@@ -16,7 +16,7 @@
         "Minor": "20",
         "Patch": "0"
     },
-    "minimumAgentVersion": "4.248.0",
+    "minimumAgentVersion": "3.232.0",
     "instanceNameFormat": "JFrog Build Scan",
     "inputs": [
         {

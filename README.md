@@ -210,30 +210,18 @@ For the build agent to be able to run conan builds, do the following:
 
 ##### Using TFS 2015
 
-Node.JS version 8 and above.
-
-The build agent requires using Node.JS version 8 and above. To check which version of Node.JS is running on the build
-agent:
-
-1. Navigate to the `Worker\Handlers\Node` folder located under the Agent home.
-2. From the terminal, run *node -v*
-
-To upgrade Node.JS on the build agent:
-
-* Replace the existing node.exe file on the agent with the node.exe file with the required version located in
-  the `Worker\Handlers\Node` folder under the agent home.
+The tasks require build agent version 3.232.0 or above. Older agents, such as the agents that came with TFS 2015,
+are not supported.
 
 </details>
 
 ### Node.js runtime for the tasks
 
-The JFrog tasks declare the `Node24` execution handler, with `Node20_1` as a fallback for agents that do not yet ship
-Node 24. Azure Pipelines runs each task with the highest handler available on the agent, so no pipeline changes are needed.
+The JFrog tasks declare the `Node24` execution handler. They also declare `Node20_1` as a fallback for agents that do not
+yet ship Node 24.
 
-* The tasks require build agent version **4.248.0** or above (agents below this version are upgraded automatically).
+* The tasks require build agent version **3.232.0** or above.
 * End-of-life handlers (`Node10` and older) are no longer declared.
-* To run the tasks with Node 24 on an agent that also has Node 20, set the pipeline or agent variable `AGENT_USE_NODE24`
-  to `true`.
 
 ## Configuring the Service Connections
 
