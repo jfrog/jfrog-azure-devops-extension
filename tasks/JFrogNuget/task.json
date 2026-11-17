@@ -218,6 +218,10 @@
         "Node24": {
             "target": "nugetBuild.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "nugetBuild.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

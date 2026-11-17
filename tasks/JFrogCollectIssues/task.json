@@ -96,6 +96,10 @@
         "Node24": {
             "target": "collectIssues.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "collectIssues.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

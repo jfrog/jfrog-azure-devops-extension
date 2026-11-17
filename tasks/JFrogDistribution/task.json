@@ -279,6 +279,10 @@
         "Node24": {
             "target": "distribution.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "distribution.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

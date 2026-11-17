@@ -88,6 +88,10 @@
         "Node24": {
             "target": "discardBuilds.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "discardBuilds.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

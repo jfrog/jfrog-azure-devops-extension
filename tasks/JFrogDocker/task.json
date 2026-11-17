@@ -236,6 +236,10 @@
         "Node24": {
             "target": "docker.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "docker.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

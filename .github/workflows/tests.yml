@@ -23,7 +23,7 @@ jobs:
         # ubuntu is pinned: ubuntu-latest moved to 26.04 (GCC 15), which Conan 1.x ("conan<2")
         # cannot auto-detect ("Invalid setting '15' is not a valid 'settings.compiler.version'").
         os: [ ubuntu-24.04, windows-latest ]
-        node-version: [ '16', '20', '22', '24' ]
+        node-version: [ '16', '20', '22', '24', '26' ]
         include:
           - os: windows-latest
             extraSkipTests: ",conan"

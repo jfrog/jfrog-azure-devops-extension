@@ -155,6 +155,10 @@
         "Node24": {
             "target": "pipBuild.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "pipBuild.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

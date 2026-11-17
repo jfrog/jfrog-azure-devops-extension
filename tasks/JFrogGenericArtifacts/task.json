@@ -395,6 +395,9 @@
     "execution": {
         "Node24": {
             "target": "runGenericArtifacts.js"
+        },
+        "Node26": {
+            "target": "runGenericArtifacts.js"
         }
     }
 }

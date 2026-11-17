@@ -77,6 +77,10 @@
         "Node24": {
             "target": "jfrogCliRun.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "jfrogCliRun.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

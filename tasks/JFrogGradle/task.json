@@ -290,6 +290,10 @@
         "Node24": {
             "target": "gradleBuild.js",
             "workingDirectory": "$(currentDirectory)"
+        },
+        "Node26": {
+            "target": "gradleBuild.js",
+            "workingDirectory": "$(currentDirectory)"
         }
     }
 }

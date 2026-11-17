@@ -8,7 +8,8 @@ import { join } from 'path';
  *
  * These tests do not require Artifactory or an Azure DevOps agent, so they run anywhere `npm t` runs.
  * Azure Pipelines selects the highest handler that exists on the agent, so the contract we enforce is:
- *  - Node24 is the only declared handler.
+ *  - Node24 is declared (preferred handler).
+ *  - Node26 is declared with the same configuration as Node24.
  *  - End-of-life handlers (Node, Node6, Node10, Node16, Node20_1) are not declared.
  *  - minimumAgentVersion guarantees the agent has at least the Node24 handler.
  */
@@ -24,6 +25,7 @@ if (!TASKS_DIR) {
     );
 }
 const PREFERRED_HANDLER: string = 'Node24';
+const NODE26_HANDLER: string = 'Node26';
 const DEPRECATED_HANDLERS: string[] = ['Node', 'Node6', 'Node10', 'Node16', 'Node20_1'];
 // First Azure Pipelines agent version that ships the Node24 handler (release notes of v4.265.1: "Added Node24 in Agent").
 const MIN_AGENT_VERSION: string = '4.265.1';
@@ -76,6 +78,11 @@ describe('Task manifest (task.json) Node handlers', (): void => {
         describe(dir, (): void => {
             it('declares the ' + PREFERRED_HANDLER + ' handler', (): void => {
                 assert.ok(manifest.execution[PREFERRED_HANDLER], dir + '/task.json is missing the ' + PREFERRED_HANDLER + ' handler');
+            });
+
+            it('declares the ' + NODE26_HANDLER + ' handler with the same configuration as ' + PREFERRED_HANDLER, (): void => {
+                assert.ok(manifest.execution[NODE26_HANDLER], dir + '/task.json is missing the ' + NODE26_HANDLER + ' handler');
+                assert.deepStrictEqual(manifest.execution[NODE26_HANDLER], manifest.execution[PREFERRED_HANDLER]);
             });
 
             it('does not declare end-of-life handlers', (): void => {
