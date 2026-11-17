@@ -16,7 +16,7 @@
         "Minor": "20",
         "Patch": "0"
     },
-    "minimumAgentVersion": "3.232.0",
+    "minimumAgentVersion": "4.265.1",
     "instanceNameFormat": "JFrog Build Promotion",
     "inputs": [
         {
@@ -131,11 +131,6 @@
         }
     ],
     "execution": {
-        "Node20_1": {
-            "target": "buildPromotion.js",
-            "argumentFormat": "",
-            "workingDirectory": "$(currentDirectory)"
-        },
         "Node24": {
             "target": "buildPromotion.js",
             "argumentFormat": "",

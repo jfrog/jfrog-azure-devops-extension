@@ -16,7 +16,7 @@
         "Patch": "0"
     },
     "demands": [],
-    "minimumAgentVersion": "3.232.0",
+    "minimumAgentVersion": "4.265.1",
     "instanceNameFormat": "JFrog Docker $(command)",
     "groups": [
         {
@@ -233,10 +233,6 @@
         }
     ],
     "execution": {
-        "Node20_1": {
-            "target": "docker.js",
-            "workingDirectory": "$(currentDirectory)"
-        },
         "Node24": {
             "target": "docker.js",
             "workingDirectory": "$(currentDirectory)"

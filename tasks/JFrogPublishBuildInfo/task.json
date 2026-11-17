@@ -16,7 +16,7 @@
         "Minor": "20",
         "Patch": "0"
     },
-    "minimumAgentVersion": "3.232.0",
+    "minimumAgentVersion": "4.265.1",
     "instanceNameFormat": "JFrog Publish Build Info",
     "inputs": [
         {
@@ -61,10 +61,6 @@
         }
     ],
     "execution": {
-        "Node20_1": {
-            "target": "publishBuildInfo.js",
-            "workingDirectory": "$(currentDirectory)"
-        },
         "Node24": {
             "target": "publishBuildInfo.js",
             "workingDirectory": "$(currentDirectory)"

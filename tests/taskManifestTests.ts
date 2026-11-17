@@ -8,10 +8,9 @@ import { join } from 'path';
  *
  * These tests do not require Artifactory or an Azure DevOps agent, so they run anywhere `npm t` runs.
  * Azure Pipelines selects the highest handler that exists on the agent, so the contract we enforce is:
- *  - Node24 is declared (preferred handler).
- *  - Node20_1 is declared as a temporary fallback for agents that do not ship Node24 yet.
- *  - End-of-life handlers (Node, Node6, Node10, Node16) are not declared.
- *  - minimumAgentVersion guarantees the agent has at least the Node20_1 handler.
+ *  - Node24 is the only declared handler.
+ *  - End-of-life handlers (Node, Node6, Node10, Node16, Node20_1) are not declared.
+ *  - minimumAgentVersion guarantees the agent has at least the Node24 handler.
  */
 
 // __dirname is not available when Node loads this file as an ES module (Node 22+), so resolve relative to the working directory:
@@ -25,11 +24,9 @@ if (!TASKS_DIR) {
     );
 }
 const PREFERRED_HANDLER: string = 'Node24';
-const FALLBACK_HANDLER: string = 'Node20_1';
-const DEPRECATED_HANDLERS: string[] = ['Node', 'Node6', 'Node10', 'Node16'];
-// Node20_1 is the fallback handler. Agent v3.224.1 added the Node 20 handler.
-// Agent v3.230.x and v3.232.0 fixed the Node 20 runner choice on older operating systems.
-const MIN_AGENT_VERSION: string = '3.232.0';
+const DEPRECATED_HANDLERS: string[] = ['Node', 'Node6', 'Node10', 'Node16', 'Node20_1'];
+// First Azure Pipelines agent version that ships the Node24 handler (release notes of v4.265.1: "Added Node24 in Agent").
+const MIN_AGENT_VERSION: string = '4.265.1';
 
 interface TaskManifest {
     name: string;
@@ -81,18 +78,10 @@ describe('Task manifest (task.json) Node handlers', (): void => {
                 assert.ok(manifest.execution[PREFERRED_HANDLER], dir + '/task.json is missing the ' + PREFERRED_HANDLER + ' handler');
             });
 
-            it('keeps the ' + FALLBACK_HANDLER + ' handler as a fallback for older agents', (): void => {
-                assert.ok(manifest.execution[FALLBACK_HANDLER], dir + '/task.json is missing the ' + FALLBACK_HANDLER + ' handler');
-            });
-
             it('does not declare end-of-life handlers', (): void => {
                 const declared: string[] = Object.keys(manifest.execution);
                 const found: string[] = declared.filter((handler: string): boolean => DEPRECATED_HANDLERS.indexOf(handler) !== -1);
                 assert.deepStrictEqual(found, [], dir + '/task.json declares end-of-life handlers: ' + found.join(', '));
-            });
-
-            it('uses the same configuration for ' + PREFERRED_HANDLER + ' and ' + FALLBACK_HANDLER, (): void => {
-                assert.deepStrictEqual(manifest.execution[PREFERRED_HANDLER], manifest.execution[FALLBACK_HANDLER]);
             });
 
             it('points to an entry point that exists (.js, or the .ts it is compiled from)', (): void => {
@@ -105,7 +94,7 @@ describe('Task manifest (task.json) Node handlers', (): void => {
                 });
             });
 
-            it('requires an agent version that ships the ' + FALLBACK_HANDLER + ' handler (>= ' + MIN_AGENT_VERSION + ')', (): void => {
+            it('requires an agent version that ships the ' + PREFERRED_HANDLER + ' handler (>= ' + MIN_AGENT_VERSION + ')', (): void => {
                 assert.ok(
                     compareVersions(manifest.minimumAgentVersion, MIN_AGENT_VERSION) >= 0,
                     dir + '/task.json minimumAgentVersion is ' + manifest.minimumAgentVersion + ', expected >= ' + MIN_AGENT_VERSION,
