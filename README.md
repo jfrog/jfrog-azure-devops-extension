@@ -266,6 +266,16 @@ To enable TLS 1.2 on TFS:
 
 </details>
 
+## Using Project-Scoped Access Tokens
+
+Service Connections can authenticate with a [project-scoped access token](https://jfrog.com/help/r/jfrog-platform-administration-documentation/access-tokens),
+for example a token issued for a JFrog Project admin. A platform admin token is not required, including when you click
+**Verify** while creating the Service Connection.
+
+> [!NOTE]
+> A project-scoped token only grants access to resources within its project. Set the `projectKey` input on the tasks
+> that support it (for example, Build Scan and Publish Build Info) to the key of the project the token belongs to.
+
 ## Using OpenID Connect (OIDC) Authentication
 
 Using OpenID Connect (OIDC) to authenticate your pipelines eliminates the need for long lived static credentials providing a whole range of [security and practical benefits](https://jfrog.com/help/r/jfrog-platform-administration-documentation/openid-connect-integration-benefits).   
