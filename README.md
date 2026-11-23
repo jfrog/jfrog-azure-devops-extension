@@ -413,7 +413,7 @@ Now this Service Connection can be used for any of JFrog tasks as normal, authen
    inputs:
      targetType: 'inline'
      script: |
-            echo "OIDC Username (from output): $(oidc_user)"
+            echo "OIDC Usernames (from output): $(oidc_user)"
             echo "OIDC Token (from output): $(oidc_token)"
    displayName: 'Use OIDC Output Variables'
 ```
