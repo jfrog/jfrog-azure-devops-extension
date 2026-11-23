@@ -69,15 +69,14 @@ function writeConfigFile(configSourceInput, configPath) {
     let configContent;
     if (configSourceInput === 'file') {
         let configInputPath = tl.getPathInput('file', true, true);
-        console.log('Using config file located at ' + configInputPath);
+        console.log('Reading the configured issues file.');
         configContent = fs.readFileSync(configInputPath, 'utf8');
     } else if (configSourceInput === 'taskConfiguration') {
         configContent = tl.getInput('taskConfig', true);
     } else {
         throw 'Failed creating config file, since the provided Config source value is invalid.';
     }
-    console.log('Using config:');
-    console.log(configContent);
+    console.log('Using issues configuration (' + Buffer.byteLength(configContent, 'utf8') + ' bytes).');
     // Write provided config to file.
     tl.writeFile(configPath, configContent, 'utf8');
 }
