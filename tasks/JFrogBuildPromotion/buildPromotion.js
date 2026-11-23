@@ -17,7 +17,13 @@ async function RunTaskCbk(cliPath) {
     let buildNumber = tl.getInput('buildNumber', true);
     let targetRepo = tl.getInput('targetRepo', true);
 
-    let cliCommand = utils.cliJoin(cliPath, cliPromoteCommand, utils.quote(buildName), utils.quote(buildNumber), utils.quote(targetRepo));
+    let cliCommand = utils.cliJoin(
+        utils.quote(cliPath),
+        cliPromoteCommand,
+        utils.quote(buildName),
+        utils.quote(buildNumber),
+        utils.quote(targetRepo),
+    );
 
     cliCommand = utils.addStringParam(cliCommand, 'status', 'status', false);
     cliCommand = utils.addStringParam(cliCommand, 'comment', 'comment', false);

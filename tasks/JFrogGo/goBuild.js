@@ -56,7 +56,7 @@ async function performGoCommand(goCommand, cliPath, requiredWorkDir) {
     }
 
     // Build go command with arguments and execute.
-    let cliCommand = utils.cliJoin(cliPath, cliGoCommand, goCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliGoCommand, goCommand);
     let goArguments = tl.getInput('goArguments', false);
     if (goArguments) {
         cliCommand = utils.cliJoin(cliCommand, goArguments);
@@ -86,7 +86,7 @@ async function performGoPublishCommand(cliPath, requiredWorkDir) {
     }
 
     // Build go publish command and execute
-    let cliCommand = utils.cliJoin(cliPath, cliGoPublishCommand, version);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), cliGoPublishCommand, utils.quote(version));
     executeGoCliCommand(cliCommand, cliPath, requiredWorkDir);
 }
 

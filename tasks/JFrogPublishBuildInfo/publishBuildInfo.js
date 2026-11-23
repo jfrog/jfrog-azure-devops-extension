@@ -19,7 +19,7 @@ async function RunTaskCbk(cliPath) {
     let excludeEnvVars = tl.getInput('excludeEnvVars', false);
 
     let cliCommand = utils.cliJoin(
-        cliPath,
+        utils.quote(cliPath),
         cliBuildPublishCommand,
         utils.quote(buildName),
         utils.quote(buildNumber),

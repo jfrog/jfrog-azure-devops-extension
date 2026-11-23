@@ -34,7 +34,7 @@ async function RunTaskCbk(cliPath: string): Promise<void> {
     if (options) {
         goalsAndOptions = utils.cliJoin(goalsAndOptions, options);
     }
-    let mavenCommand: string = utils.cliJoin(cliPath, cliMavenCommand, goalsAndOptions);
+    let mavenCommand: string = utils.cliJoin(utils.quote(cliPath), cliMavenCommand, goalsAndOptions);
     mavenCommand = utils.appendBuildFlagsToCliCommand(mavenCommand);
     try {
         utils.executeCliCommand(mavenCommand, workDir);
@@ -71,7 +71,7 @@ function checkAndSetMavenHome(): void {
 }
 
 async function createMavenConfigFile(cliPath: string, buildDir: string) {
-    let cliCommand: string = utils.cliJoin(cliPath, mavenConfigCommand);
+    let cliCommand: string = utils.cliJoin(utils.quote(cliPath), mavenConfigCommand);
 
     // Configure resolver server, throws on failure.
     const artifactoryResolver: string | undefined = tl.getInput('artifactoryResolverService');

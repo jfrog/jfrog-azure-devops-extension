@@ -442,6 +442,12 @@ The command will use the connection details provided by the selected *JFrog Plat
 Azure DevOps,
 so there's no need to provide the connection details as command options.
 
+Commands are executed directly as CLI arguments. Quoted arguments are supported,
+but shell expansion, pipes, redirection and command chaining are not evaluated.
+Put each `jf` command on its own line, and use a separate script task for shell
+operations. The Python task's explicit virtual-environment setup command still
+runs in a shell; its resulting environment is passed to the CLI separately.
+
 ![cli-v2-task.png](images/cli-v2-task.png)
 
 Single command example:

@@ -11,7 +11,7 @@ async function RunTaskCbk(cliPath: string): Promise<void> {
 
     serverId = await utils.configureDefaultXrayServer('xray_audit', cliPath, sourcePath);
 
-    let auditCommand: string = utils.cliJoin(cliPath, cliAuditCommand);
+    let auditCommand: string = utils.cliJoin(utils.quote(cliPath), cliAuditCommand);
     auditCommand = utils.addServerIdOption(auditCommand, serverId);
     auditCommand = utils.addBoolParam(auditCommand, 'allowFailBuild', 'fail');
 

@@ -67,7 +67,7 @@ function getWorkDir() {
  */
 async function executeGradleConfig(cliPath, workDir) {
     // Build the cli config command.
-    let cliCommand = utils.cliJoin(cliPath, gradleConfigCommand);
+    let cliCommand = utils.cliJoin(utils.quote(cliPath), gradleConfigCommand);
 
     // Configure resolver server, throws on failure.
     let artifactoryResolver = tl.getInput('artifactoryResolverService');
@@ -111,7 +111,7 @@ function getGradleVersion(cliPath, workDir) {
     try {
         // Use JFrog CLI to get gradle version, which will handle wrapper logic internally
         // based on the gradle configuration
-        const gradleCommand = utils.cliJoin(cliPath, cliGradleCommand, '--version');
+        const gradleCommand = utils.cliJoin(utils.quote(cliPath), cliGradleCommand, '--version');
 
         // Execute gradle --version through JFrog CLI and capture output
         const gradleVersionOutput = utils.executeCliCommand(gradleCommand, workDir, { withOutput: true }).toString();
@@ -150,9 +150,9 @@ function executeGradle(cliPath, workDir, isGradle9) {
     // Gradle 9+ changed how build files are specified, so we don't use the -b flag
     // for version 9 and above to avoid compatibility issues
     if (!isGradle9) {
-        tasksAndOptions = utils.cliJoin(tasksAndOptions, '-b', tl.getInput('gradleBuildFile'));
+        tasksAndOptions = utils.cliJoin(tasksAndOptions, '-b', utils.quote(tl.getInput('gradleBuildFile')));
     }
-    let gradleCommand = utils.cliJoin(cliPath, cliGradleCommand, tasksAndOptions);
+    let gradleCommand = utils.cliJoin(utils.quote(cliPath), cliGradleCommand, tasksAndOptions);
     gradleCommand = utils.appendBuildFlagsToCliCommand(gradleCommand);
 
     // Execute cli.
