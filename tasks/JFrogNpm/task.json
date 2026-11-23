@@ -18,7 +18,7 @@
     "demands": [
         "npm"
     ],
-    "minimumAgentVersion": "1.91.0",
+    "minimumAgentVersion": "4.248.0",
     "instanceNameFormat": "JFrog npm $(command)",
     "inputs": [
         {
@@ -179,10 +179,10 @@
         }
     ],
     "execution": {
-        "Node10": {
+        "Node20_1": {
             "target": "npmBuild.js"
         },
-        "Node20_1": {
+        "Node24": {
             "target": "npmBuild.js"
         }
     }
