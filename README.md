@@ -1506,6 +1506,7 @@ export ADO_SKIP_TESTS=nuget,dotnet
 * Please make sure the code is covered by tests.
 * Please run `npm run format` for formatting the code before submitting the pull request.
 * Please run `npm run lint` and make sure no new tslint warnings were introduced.
+* Please add `safe to test` label to run end-to-end tests
 
 </details>
 
