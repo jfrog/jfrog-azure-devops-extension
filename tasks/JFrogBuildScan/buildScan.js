@@ -34,12 +34,7 @@ async function RunTaskCbk(cliPath) {
             scanOutput = ex.capturedOutput;
             scanError = ex;
         }
-        try {
-            scanReport.recordScanReport(scanOutput, tl.getVariable('Agent.TempDirectory') || workDir);
-        } catch (ex) {
-            // A report link that cannot be saved must not change the scan result.
-            tl.warning('Could not save the Xray scan report link: ' + ex);
-        }
+        scanReport.recordScanReport(scanOutput, workDir);
         if (scanError) {
             tl.setResult(tl.TaskResult.Failed, scanError);
         }

@@ -7,49 +7,65 @@ define(['TFS/DistributedTask/TaskRestClient'], (taskRestClient) => {
         sharedConfig.onBuildChanged((build) => {
             let taskClient = taskRestClient.getClient();
 
-            let planId = build.orchestrationPlan.planId;
-
-            // Get the content of the first attachment of the given type, or null when there is none.
-            let fetchAttachment = (type, name) =>
-                taskClient.getPlanAttachments(vsoContext.project.id, 'build', planId, type).then((taskAttachments) => {
-                    if (taskAttachments.length === 0) {
-                        return null;
+            // Create build-info div.
+            // Get 'artifactoryType' attachments from build agent.
+            taskClient
+                .getPlanAttachments(vsoContext.project.id, 'build', build.orchestrationPlan.planId, 'artifactoryType')
+                .then((taskAttachments) => {
+                    let buildInfoParentDiv = $('#artifactory-build-info-parent');
+                    if (taskAttachments.length > 0) {
+                        let recId = taskAttachments[0].recordId;
+                        let timelineId = taskAttachments[0].timelineId;
+                        taskClient
+                            .getAttachmentContent(
+                                vsoContext.project.id,
+                                'build',
+                                build.orchestrationPlan.planId,
+                                timelineId,
+                                recId,
+                                'artifactoryType',
+                                'buildDetails',
+                            )
+                            .then((attachmentContent) => {
+                                let buildDetails = JSON.parse(bufferToString(attachmentContent));
+                                let buildInfoDiv = createBuildInfoDiv(buildDetails);
+                                buildInfoParentDiv.append(buildInfoDiv);
+                            });
+                    } else {
+                        let noBuildInfoDiv = createNoBuildInfoDiv();
+                        buildInfoParentDiv.append(noBuildInfoDiv);
                     }
-                    let recId = taskAttachments[0].recordId;
-                    let timelineId = taskAttachments[0].timelineId;
-                    return taskClient
-                        .getAttachmentContent(vsoContext.project.id, 'build', planId, timelineId, recId, type, name)
-                        .then((attachmentContent) => JSON.parse(bufferToString(attachmentContent)));
                 });
 
-            // Show the build-info link from the 'artifactoryType' attachment published by the build agent,
-            // then the Xray report when Build Scan published one. Stay quiet about Xray when it did not:
+            // Show the Xray report when Build Scan published one. Stay quiet when it did not:
             // a missing attachment means this run did not scan, not that a scan was skipped.
-            Promise.all([
-                fetchAttachment('artifactoryType', 'buildDetails'),
-                fetchAttachment('xrayType', 'scanDetails').catch((error) => {
-                    console.error('Could not read the Xray scan report link: ' + error);
-                    return null;
-                }),
-            ]).then(([buildDetails, scanUrl]) => {
-                let parentDiv = $('#artifactory-build-info-parent');
-                parentDiv.append(buildDetails ? createBuildInfoDiv(buildDetails) : createNoBuildInfoDiv());
-                if (isWebUrl(scanUrl)) {
-                    parentDiv.append(createXrayScanDiv(scanUrl));
+            taskClient.getPlanAttachments(vsoContext.project.id, 'build', build.orchestrationPlan.planId, 'xrayType').then((taskAttachments) => {
+                if (taskAttachments.length === 0) {
+                    return;
                 }
+                let recId = taskAttachments[0].recordId;
+                let timelineId = taskAttachments[0].timelineId;
+                taskClient
+                    .getAttachmentContent(
+                        vsoContext.project.id,
+                        'build',
+                        build.orchestrationPlan.planId,
+                        timelineId,
+                        recId,
+                        'xrayType',
+                        'scanDetails',
+                    )
+                    .then((attachmentContent) => {
+                        let scanUrl = JSON.parse(bufferToString(attachmentContent));
+                        if (!scanUrl) {
+                            return;
+                        }
+                        $('#artifactory-build-info-parent').append(createXrayScanDiv(scanUrl));
+                    });
             });
 
             VSS.notifyLoadSucceeded();
         });
-    }
-
-    // Only http and https links are shown, whatever the attachment holds.
-    function isWebUrl(value) {
-        try {
-            return ['http:', 'https:'].includes(new URL(value).protocol);
-        } catch (error) {
-            return false;
-        }
     }
 
     function bufferToString(buffer) {

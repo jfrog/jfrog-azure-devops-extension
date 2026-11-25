@@ -30,6 +30,11 @@ describe('Build scan report link', function () {
             assert.strictEqual(scanReport.extractScanReportUrl('The scan data is available at: https://example.test/old\n' + reportLine), reportUrl);
         });
 
+        it('ignores colour codes around the report URL', function () {
+            assert.strictEqual(scanReport.extractScanReportUrl('The scan data is available at: \u001b[36m' + reportUrl + '\u001b[0m\n'), reportUrl);
+            assert.strictEqual(scanReport.extractScanReportUrl('The scan data is available at: \u001b[0m\n'), '');
+        });
+
         it('returns no URL when the scan output has none', function () {
             assert.strictEqual(scanReport.extractScanReportUrl('High | CVE-2024-0001 | pkg\n'), '');
             assert.strictEqual(scanReport.extractScanReportUrl('The scan data is available at: \n'), '');
@@ -114,6 +119,21 @@ describe('Build scan report link', function () {
             });
         });
 
+        it('keeps a character that is split across two chunks', async function () {
+            const echoed = captureStream(process.stdout);
+            let output;
+            try {
+                output = await scanReport.captureCliCommand(
+                    "node -e \"const b=Buffer.from('\\u2500'); process.stdout.write(b.subarray(0,1)); setTimeout(()=>process.stdout.write(b.subarray(1)),100)\"",
+                    process.cwd(),
+                );
+            } finally {
+                echoed.restore();
+            }
+            assert.strictEqual(output, '\u2500');
+            assert.ok(echoed.text().endsWith('\n\u2500'));
+        });
+
         it('rejects a missing folder and an empty command', function () {
             assert.throws(() => scanReport.captureCliCommand('node -v', path.join(workDir, 'missing')), /doesn't exist/);
             assert.throws(() => scanReport.captureCliCommand('', workDir), /empty Cli command/);
@@ -148,7 +168,7 @@ describe('Build scan report link', function () {
             const toolsDir = path.join(workDir, 'tools');
             const cliDir = path.join(toolsDir, '_jf', 'current');
             fs.mkdirSync(cliDir, { recursive: true });
-            fs.writeFileSync(path.join(cliDir, 'jf'), '#!/bin/sh\nif [ "$1" = "--version" ]; then echo "jf version 2.133.0"; exit 0; fi\nif [ "$1" = "bs" ]; then\n' + bsScript + '\nfi\nexit 0\n', { mode: 0o755 });
+            fs.writeFileSync(path.join(cliDir, 'jf'), '#!/bin/sh\nif [ "$1" = "--version" ]; then echo "jf version 2.133.0"; exit 0; fi\nif [ "$1" = "c" ]; then cat > /dev/null; exit 0; fi\nif [ "$1" = "bs" ]; then\n' + bsScript + '\nfi\nexit 0\n', { mode: 0o755 });
             const agentDir = path.join(workDir, 'agent');
             fs.mkdirSync(agentDir);
             return spawnSync(process.execPath, [taskFile], {

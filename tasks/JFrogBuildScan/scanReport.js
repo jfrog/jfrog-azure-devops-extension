@@ -1,9 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const { StringDecoder } = require('string_decoder');
 const tl = require('azure-pipelines-task-lib/task');
 const utils = require('@jfrog/tasks-utils/utils.js');
 
+// Matches ANSI colour and cursor codes. The pattern needs the escape character.
+// eslint-disable-next-line no-control-regex
+const ansiPattern = /\u001b\[[0-?]*[ -/]*[@-~]/g;
 const scanReportPattern = /The scan data is available at:[ \t]*(\S+)/g;
 
 /**
@@ -12,7 +16,7 @@ const scanReportPattern = /The scan data is available at:[ \t]*(\S+)/g;
  * @returns {string}
  */
 function extractScanReportUrl(output) {
-    const matches = [...String(output || '').matchAll(scanReportPattern)];
+    const matches = [...String(output || '').replace(ansiPattern, '').matchAll(scanReportPattern)];
     return matches.length ? matches[matches.length - 1][1] : '';
 }
 
@@ -49,12 +53,16 @@ function captureCliCommand(cliCommand, runningDir) {
     }
     console.log('Executing JFrog CLI Command:\n' + utils.maskSecrets(cliCommand));
     return new Promise((resolve, reject) => {
-        const child = spawn(cliCommand, { shell: true, cwd: runningDir });
+        const child = spawn(cliCommand, { shell: true, cwd: runningDir, stdio: ['inherit', 'pipe', 'pipe'] });
         let output = '';
-        const tee = (stream) => (chunk) => {
-            const text = chunk.toString();
-            stream.write(text);
-            output += text;
+        // One decoder per stream keeps a character that is split across two chunks whole.
+        const tee = (stream) => {
+            const decoder = new StringDecoder('utf8');
+            return (chunk) => {
+                const text = decoder.write(chunk);
+                stream.write(text);
+                output += text;
+            };
         };
         const fail = (error) => {
             error.message = utils.maskSecrets(error.message);
