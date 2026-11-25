@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const tl = require('azure-pipelines-task-lib/task');
+const utils = require('@jfrog/tasks-utils/utils.js');
 
 const scanReportPattern = /The scan data is available at:[ \t]*(\S+)/g;
 
@@ -10,40 +12,30 @@ const scanReportPattern = /The scan data is available at:[ \t]*(\S+)/g;
  * @returns {string}
  */
 function extractScanReportUrl(output) {
-    if (!output) {
-        return '';
-    }
-    let url = '';
-    const pattern = new RegExp(scanReportPattern.source, 'g');
-    let match = pattern.exec(String(output));
-    while (match) {
-        url = match[1];
-        match = pattern.exec(String(output));
-    }
-    return url;
+    const matches = [...String(output || '').matchAll(scanReportPattern)];
+    return matches.length ? matches[matches.length - 1][1] : '';
 }
 
 /**
  * Write the scan URL the way the legacy Artifactory tab reads it.
- * The file body is a JSON string, and the logging command publishes xrayType/scanDetails.
+ * The file body is a JSON string, and the attachment is xrayType/scanDetails.
+ * Does nothing when the output has no report URL.
  * @param {string} output
- * @param {string} workDir
- * @returns {string} The saved URL, or an empty string when output has none.
+ * @param {string} dir - Folder for the attachment file.
  */
-function recordScanReport(output, workDir) {
+function recordScanReport(output, dir) {
     const url = extractScanReportUrl(output);
     if (!url) {
-        return '';
+        return;
     }
-    const filePath = path.join(workDir, 'scanUrlFile');
+    const filePath = path.join(dir, 'scanUrlFile');
     fs.writeFileSync(filePath, JSON.stringify(url));
-    console.log('##vso[task.addattachment type=xrayType;name=scanDetails;]' + filePath);
-    return url;
+    tl.addAttachment('xrayType', 'scanDetails', filePath);
 }
 
 /**
  * Run a CLI command, echo both streams as they arrive so a long table is not cut off, and return them together.
- * A non-zero exit or a signal throws an error whose capturedOutput still holds both streams.
+ * A non-zero exit or a signal rejects with a short error. Its capturedOutput still holds both streams.
  * @param {string} cliCommand
  * @param {string} runningDir
  * @returns {Promise<string>}
@@ -55,46 +47,32 @@ function captureCliCommand(cliCommand, runningDir) {
     if (!cliCommand) {
         throw 'Cannot execute empty Cli command.';
     }
+    console.log('Executing JFrog CLI Command:\n' + utils.maskSecrets(cliCommand));
     return new Promise((resolve, reject) => {
         const child = spawn(cliCommand, { shell: true, cwd: runningDir });
         let output = '';
-        let settled = false;
-
-        function append(chunk, stream) {
+        const tee = (stream) => (chunk) => {
             const text = chunk.toString();
             stream.write(text);
             output += text;
-        }
+        };
+        const fail = (error) => {
+            error.message = utils.maskSecrets(error.message);
+            error.capturedOutput = output;
+            reject(error);
+        };
 
-        function finish(error) {
-            if (settled) {
-                return;
-            }
-            settled = true;
-            if (error) {
-                error.capturedOutput = output;
-                reject(error);
-                return;
-            }
-            resolve(output);
-        }
-
-        child.stdout.on('data', (chunk) => {
-            append(chunk, process.stdout);
-        });
-        child.stderr.on('data', (chunk) => {
-            append(chunk, process.stderr);
-        });
-        child.on('error', (error) => {
-            finish(error);
-        });
+        child.stdout.on('data', tee(process.stdout));
+        child.stderr.on('data', tee(process.stderr));
+        child.on('error', fail);
         child.on('close', (status, signal) => {
-            if (signal || status) {
-                const error = new Error(signal ? 'Command ended by signal ' + signal : output || 'Command failed');
-                finish(error);
-                return;
+            if (signal) {
+                fail(new Error('Command ended by signal ' + signal));
+            } else if (status) {
+                fail(new Error('Command failed with exit code ' + status));
+            } else {
+                resolve(output);
             }
-            finish();
         });
     });
 }

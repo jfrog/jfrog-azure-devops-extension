@@ -23,15 +23,26 @@ async function RunTaskCbk(cliPath) {
     cliCommand = utils.addServerIdOption(cliCommand, serverId);
     cliCommand = utils.addProjectOption(cliCommand);
 
+    // Echo both streams so the vulnerability table stays in the task log, and keep the text
+    // so a printed report URL can be saved even when the CLI exits non-zero.
     try {
-        // Echo both streams so the vulnerability table stays in the task log, and keep the text
-        // so a printed report URL can be saved even when the CLI exits non-zero.
-        console.log('Executing JFrog CLI Command:\n' + cliCommand);
-        let scanOutput = await scanReport.captureCliCommand(cliCommand, process.cwd());
-        scanReport.recordScanReport(scanOutput, workDir);
-    } catch (ex) {
-        scanReport.recordScanReport(ex && ex.capturedOutput ? ex.capturedOutput : '', workDir);
-        tl.setResult(tl.TaskResult.Failed, ex);
+        let scanOutput = '';
+        let scanError;
+        try {
+            scanOutput = await scanReport.captureCliCommand(cliCommand, process.cwd());
+        } catch (ex) {
+            scanOutput = ex.capturedOutput;
+            scanError = ex;
+        }
+        try {
+            scanReport.recordScanReport(scanOutput, tl.getVariable('Agent.TempDirectory') || workDir);
+        } catch (ex) {
+            // A report link that cannot be saved must not change the scan result.
+            tl.warning('Could not save the Xray scan report link: ' + ex);
+        }
+        if (scanError) {
+            tl.setResult(tl.TaskResult.Failed, scanError);
+        }
     } finally {
         utils.taskDefaultCleanup(cliPath, workDir, [serverId]);
     }

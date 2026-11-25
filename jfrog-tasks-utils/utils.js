@@ -186,6 +186,7 @@ module.exports = {
     fetchLatestCliVersion: fetchLatestCliVersion,
     executeCliTask: executeCliTask,
     executeCliCommand: executeCliCommand,
+    maskSecrets: maskSecrets,
     downloadCli: downloadCli,
     cliJoin: cliJoin,
     quote: quote,
